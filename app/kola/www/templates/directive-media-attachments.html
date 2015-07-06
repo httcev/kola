@@ -1,0 +1,13 @@
+<div ng-if="ngModel._attachments">
+	<h1 ng-if="hideHeader != 'true'" class="task-section-header">Anhänge:</h1>
+	<a class="item item-list-detail">
+	    <div ng-if="!attachmentUrls" class="center-horizontal">
+			<ion-spinner></ion-spinner>
+	    </div>
+	    <div ng-if="attachmentUrls">
+			  <ion-scroll direction="x">
+			    <img ng-repeat="(key, value) in attachmentUrls" ng-src="{{value}}" class="image-list-thumb" ng-click="showImage($index, attachmentUrls)"/>
+			  </ion-scroll>
+		</div>
+	</a>
+</div>

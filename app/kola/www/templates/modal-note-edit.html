@@ -1,0 +1,12 @@
+<ion-modal-view>
+	<ion-header-bar class="bar-dark">
+		<h1 class="title"><i class="icon ion-compose"></i> Neue Notiz</h1>
+	</ion-header-bar>
+	<ion-content class="padding">
+		<textarea ng-model="newNote.text" placeholder="Geben Sie hier ihre Notiz ein..." class="fullwidth" rows="8"></textarea>
+		<div class="bar bar-footer">
+			<button class="button button-clear" ng-click="closeModal()">Abbrechen</button>
+			<button class="button button-positive">Speichern</button>
+		</div>
+	</ion-content>
+</ion-modal-view>

@@ -1,0 +1,17 @@
+<ion-view view-title="Einstellungen">
+  <ion-content>
+  	<div class="list">
+	  <label class="item item-input item-stacked-label">
+	    <span class="input-label">Benutzer</span>
+	    <input type="text" ng-model="profile.name" autocapitalize="off">
+	  </label>
+	  <label class="item item-input item-stacked-label">
+	    <span class="input-label">Passwort</span>
+	    <input type="password" ng-model="profile.password">
+	  </label>
+	</div>
+	<div class="center-horizontal">
+		<button class="button button-balanced icon-left ion-checkmark-round" ng-click="updateProfile()">Speichern</button>
+	</div>
+  </ion-content>
+</ion-view>

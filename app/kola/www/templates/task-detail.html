@@ -1,0 +1,38 @@
+<ion-view ng-show="task">
+  <ion-nav-title>Aufgabe: {{task.title}}</ion-nav-title>
+  <ion-content class="padding">
+    <h3>{{task.title}}</h3>
+    <p ng-if="task.due"><b>Wann:</b> {{task.due | date:'fullDate'}}</p>
+    <p>
+      {{task.description}}
+    </p>
+    <ion-list ng-if="task.steps">
+      <h1 class="task-section-header">Teilschritte:</h1>
+      <ion-item ng-repeat="step in task.steps" class="item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task._id}}/step/{{$index}}">
+        {{$index+1}}. {{step.title}}
+        <i class="icon ion-chevron-right icon-accessory"></i>
+      </ion-item>
+    </ion-list>
+
+    <media-attachments ng-model="task"></media-attachments>
+    <learning-resources ng-model="task.resources"></learning-resources>
+
+    <h1 class="task-section-header">Notizen und Fragen:</h1>
+    <ion-list>
+      <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task._id}}/notes">
+        <i class="icon ion-compose"></i>
+        Meine Notizen zur Aufgabe
+        <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 0}}</span>
+        <i class="icon ion-chevron-right icon-accessory"></i>
+        <ion-option-button class="button-positive" ng-click="addNote(task)"><i class="icon ion-plus-round"></i></ion-option-button>
+      </ion-item>
+      <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task._id}}/chats">
+        <i class="icon ion-help"></i>
+        Meine Fragen zur Aufgabe
+        <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 0}}</span>
+        <i class="icon ion-chevron-right icon-accessory"></i>
+        <ion-option-button class="button-positive" ng-click="addQuestion(task)"><i class="icon ion-plus-round"></i></ion-option-button>
+      </ion-item>
+    </ion-list>
+  </ion-content>
+</ion-view>

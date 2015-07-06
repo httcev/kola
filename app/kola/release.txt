@@ -1,0 +1,1 @@
+cordova build --release androidjarsigner -verbose -sigalg SHA1withRSA -digestalg SHA1 -keystore ~/work/httc/httc-keystore/httc.keystore /home/tittel/projects/kola/app/kola/platforms/android/build/outputs/apk/android-release-unsigned.apk httc~/bin/android-sdk-linux/build-tools/22.0.1/zipalign -v 4 platforms/android/build/outputs/apk/android-release-unsigned.apk kola.apk

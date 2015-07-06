@@ -1,0 +1,39 @@
+<ion-view>
+  <ion-nav-title>Teilschritt: {{step.title}}</ion-nav-title>
+  <ion-content class="padding">
+    <h3>{{step.title}}</h3>
+    <p>
+      {{step.description}}
+    </p>
+    <div ng-if="step._attachments">
+      <h1 class="task-section-header">Anhänge:</h1>
+      <a class="item item-list-detail">
+        <ion-scroll direction="x">
+          <img ng-repeat="image in step._attachments" ng-src="{{'data:'+image.content_type+';base64,'+image.data}}" ng-click="showImage($index, step._attachments)" class="image-list-thumb"/>
+        </ion-scroll>
+      </a>
+    </div>
+
+    <media-attachments ng-model="step._attachments"></media-attachments>
+    <learning-resources ng-model="step.resources"></learning-resources>
+
+    <h1 class="task-section-header">Notizen und Fragen:</h1>
+    <ion-list>
+      <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task._id}}/notes">
+        <i class="icon ion-compose"></i>
+        Meine Notizen zum Teilschritt
+        <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 0}}</span>
+        <i class="icon ion-chevron-right icon-accessory"></i>
+        <ion-option-button class="button-positive" ng-click="addNote(task)"><i class="icon ion-plus-round"></i></ion-option-button>
+      </ion-item>
+      <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task._id}}/chats">
+        <i class="icon ion-help"></i>
+        Meine Fragen zum Teilschritt
+        <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 0}}</span>
+        <i class="icon ion-chevron-right icon-accessory"></i>
+        <ion-option-button class="button-positive" ng-click="addQuestion(task)"><i class="icon ion-plus-round"></i></ion-option-button>
+      </ion-item>
+    </ion-list>
+
+  </ion-content>
+</ion-view>
