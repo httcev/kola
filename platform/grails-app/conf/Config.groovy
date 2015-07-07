@@ -88,9 +88,12 @@ grails.hibernate.osiv.readonly = false
 environments {
     development {
         grails.logging.jul.usebridge = true
+
+        repository.directory = new java.io.File("./repository")
     }
     production {
         grails.logging.jul.usebridge = false
+        repository.directory = new java.io.File("./repository")
         // TODO: grails.serverURL = "http://www.changeme.com"
     }
 }
