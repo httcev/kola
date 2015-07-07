@@ -7,6 +7,7 @@ import grails.transaction.Transactional
 
 @Transactional(readOnly = true)
 class AssetController {
+    def hashIds
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 

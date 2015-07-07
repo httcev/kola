@@ -84,6 +84,15 @@
 				</li>
 				</g:if>
 			
+				<li class="fieldcontain">
+					<span id="url-label" class="property-label"><g:message code="asset.url.label" default="URL" /></span>
+					
+						<span class="property-value" aria-labelledby="url-label">
+						<g:set var="url" value="${createLink(controller:'repository', id:assetInstance.encodeId(), absolute:'true')}" />
+						<a href="${url}">${url}</a>
+						</span>
+					
+				</li>
 			</ol>
 			<g:form url="[resource:assetInstance, action:'delete']" method="DELETE">
 				<fieldset class="buttons">

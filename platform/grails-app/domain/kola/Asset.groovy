@@ -1,6 +1,7 @@
 package kola
 
 class Asset {
+	def hashIds
 
     static constraints = {
     	// Limit upload file size to 100MB
@@ -11,6 +12,7 @@ class Asset {
     static mapping = {
 		content lazy: true
     }
+    static transients = ['encodeId']
 
     String name
     String description
@@ -24,4 +26,8 @@ class Asset {
     byte[] content
     // only for local zip files
     String anchor
+
+    String encodeId() {
+    	hashIds.encode(id)
+    }
 }
