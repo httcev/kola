@@ -1,10 +1,10 @@
 .classpath
 .project
 .settings
-target
-target-eclipse
-plugins
-logs
+/target
+/target-eclipse
+/plugins
+/logs
 /target/
-repository
-data
+/repository
+/data
