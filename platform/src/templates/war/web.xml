@@ -36,7 +36,7 @@
     </filter>
     <filter-mapping>
        <filter-name>etagFilter</filter-name>
-       <url-pattern>/repository/*</url-pattern>
+       <url-pattern>/repository/view/*</url-pattern>
     </filter-mapping>
 
     <filter-mapping>

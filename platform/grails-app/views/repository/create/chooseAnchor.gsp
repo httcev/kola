@@ -15,8 +15,8 @@
 		</div>
 		<div id="create-asset" class="content scaffold-create" role="main">
 			<h1><g:message code="default.create.label" args="[entityName]" /></h1>
-			<g:if test="${request.message}">
-			<div class="message" role="status">${request.message}</div>
+			<g:if test="${flash.message}">
+			<div class="message" role="status">${flash.message}</div>
 			</g:if>
 			<g:hasErrors bean="${assetInstance}">
 			<ul class="errors" role="alert">
@@ -25,21 +25,12 @@
 				</g:eachError>
 			</ul>
 			</g:hasErrors>
-			<g:form action="create" enctype="multipart/form-data">
+			<g:form action="create">
 				<fieldset class="form">
-					<div class="fieldcontain ${hasErrors(bean: assetInstance, field: 'content', 'error')} required">
-						<label for="content">
-							<g:message code="asset.content.label" default="Content" />
-						</label>
-						<input type="file" id="content" name="content" />
-					</div>
-					<div class="fieldcontain ${hasErrors(bean: assetInstance, field: 'externalUrl', 'error')} ">
-						<label for="externalUrl">
-							<g:message code="asset.externalUrl.label" default="External URL" />
-							
-						</label>
-						<g:textField name="externalUrl" value="${assetInstance?.externalUrl}"/>
-					</div>
+					<g:radioGroup name="anchor" values="${possibleAnchors}" labels="${possibleAnchors}" value="${assetInstance?.anchor}" >
+					<p><label>${it.radio} ${it.label}</label></p>
+					</g:radioGroup>
+					
 				</fieldset>
 				<fieldset class="buttons">
 					<g:submitButton name="submit" class="save" value="${message(code: 'default.button.next.label', default: 'Next')}" />

@@ -79,10 +79,9 @@
 					<span id="url-label" class="property-label"><g:message code="asset.url.label" default="URL" /></span>
 					
 						<span class="property-value" aria-labelledby="url-label">
-						<g:set var="url" value="${createLink(action:'download', id:assetInstance.encodeId(), absolute:'true')}" />
+						<g:set var="url" value="${createLink(action:'view', id:encodedId, absolute:'true')}" />
 						<a href="${url}">${url}</a>
 						</span>
-					
 				</li>
 			</ol>
 			<g:form url="[controller:"repository", id:assetInstance.id, action:'delete']" method="DELETE">

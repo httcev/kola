@@ -1,10 +1,13 @@
 package kola
 
-class Asset {
-	def hashIds
+class Asset implements Serializable {
+	private static final long serialVersionUID = 42L;
 
 	static searchable = {
+		all = [analyzer: 'german']
         only = ['name', 'description', 'mimeType', 'externalUrl', 'filename', 'anchor', 'indexText']
+        name boost:3.0
+        description boost:2.0
     }
     static constraints = {
     	// Limit upload file size to 100MB
@@ -17,7 +20,7 @@ class Asset {
     static mapping = {
 		content lazy: true
     }
-    static transients = ['encodeId', 'hashIds', 'indexText']
+    static transients = ['indexText']
 
     String name
     String description
@@ -34,8 +37,4 @@ class Asset {
     String anchor
 
     String indexText
-
-    String encodeId() {
-    	hashIds.encode(id)
-    }
 }

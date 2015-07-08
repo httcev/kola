@@ -1,6 +1,7 @@
 package kola
 
 import org.apache.commons.io.IOUtils
+import org.apache.commons.io.FileUtils
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 import org.apache.tika.mime.MediaType
@@ -12,13 +13,19 @@ import org.apache.tika.parser.html.BoilerpipeContentHandler;
 import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tika.sax.WriteOutContentHandler;
 import org.xml.sax.ContentHandler;
+import java.io.FileOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.nio.file.Files;
+
+import kola.ZipUtil
 
 @Transactional(readOnly = true)
 class RepositoryController {
     def hashIds
 	def repoDir
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [save: "POST", update: ["PUT", "POST"], delete: "DELETE"]
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -26,31 +33,83 @@ class RepositoryController {
     }
 
     def show(Asset assetInstance) {
-    	println  Asset.search("described").searchResults
-        respond assetInstance
-    }
-
-    def create() {
-        println "--- CREATE"
-        respond new Asset(params)
+    	println  Asset.search("klick").searchResults
+        [assetInstance:assetInstance, encodedId:encodeId(assetInstance.id)]
     }
 /*
-    def createFlow = {
-        init {
-           action {
-              [assetInstance: new Asset()]
-           }
-           on("success").to "uploadOrLink"
-           on(Exception).to "handleError"
-        }
-        uploadOrLink {
-
-        }
-        metadata ()
-        //respond new Asset(params)
-
+    def create() {
+        respond new Asset(params)
     }
-*/
+    */
+
+    def createFlow = {
+    	
+        initiliaze {
+			action {
+				flow.assetInstance = new Asset(params)
+           	}
+           	on("success").to "uploadOrLink"
+           	on(Exception).to "error"
+        }
+        
+        uploadOrLink {
+        	on("submit") {
+        		bindData(flow.assetInstance, params)
+        		if (!flow.assetInstance.content && !flow.assetInstance.externalUrl) {
+	        		flow.assetInstance.errors.rejectValue('content', 'nullable')
+	        		flow.assetInstance.errors.rejectValue('externalUrl', 'nullable')
+        			error()
+        		}
+    		}.to "checkUploadOrLink"
+        }
+        checkUploadOrLink {
+        	action {
+        		try {
+		        	enrichAsset(flow.assetInstance)
+		        	if (flow.assetInstance.content && "application/zip".equals(flow.assetInstance.mimeType)) {
+		        		println "--- LOCAL ZIP"
+						ZipInputStream zin = new ZipInputStream(new BufferedInputStream(new ByteArrayInputStream(flow.assetInstance.content)))
+						def possibleAnchors = ZipUtil.getFilenames(zin, false)
+						if (possibleAnchors.length > 0) {
+							flow.possibleAnchors = possibleAnchors
+							return chooseAnchor()
+						}
+
+		        	}
+			        return metadata()
+		        }
+		        catch(e) {
+		        	if (flow.assetInstance.externalUrl) {
+		        		flow.assetInstance.errors.rejectValue('externalUrl', 'urlNotValid')
+		        		println "----------------------------"
+		        		        flow.assetInstance.errors.allErrors.each { println it }
+
+		        	}
+		        	return error()
+		        }
+        	}
+        	on("chooseAnchor").to "chooseAnchor"
+        	on("metadata").to "metadata"
+        	on("error").to "uploadOrLink"
+        }
+        chooseAnchor {
+        	on("submit") {
+        		printl "--- INCOMING ANCHOR IS " +params.anchor
+        		bindData(flow.assetInstance, params)
+        		println "--- NEW ANCHOR IS " + flow.assetInstance.anchor 
+    		}.to "metadata" 
+        }
+        metadata {
+        	on("submit") {
+        		bindData(flow.assetInstance, params)
+        		flow.assetInstance.save() ? success() : error()
+    		}.to "finish"
+        }
+        finish {
+        	redirect(action: "index")
+        }
+    }
+
     @Transactional
     def save(Asset assetInstance) {
         if (assetInstance == null) {
@@ -99,7 +158,7 @@ class RepositoryController {
         request.withFormat {
             form multipartForm {
                 flash.message = message(code: 'default.updated.message', args: [message(code: 'Asset.label', default: 'Asset'), assetInstance.id])
-                redirect assetInstance
+                redirect action:"show", id:assetInstance.id
             }
             '*'{ respond assetInstance, [status: OK] }
         }
@@ -124,17 +183,14 @@ class RepositoryController {
         }
     }
 
-    def download(String id) {
-    	println "encode=" + hashIds.encode(2)
-    	println "--- input=$id"
+    def view(String id, String file) {
     	def hashId = hashIds.decode(id)
     	if (!hashId) {
 			response.sendError(404)
 			return
     	}
     	def decodedId = hashId[0]
-    	println "--- decoded=$decodedId"
-
+    	log.info "viewing asset $decodedId"
     	def asset = Asset.read(decodedId)
     	if (!asset) {
 			response.sendError(404)
@@ -150,7 +206,17 @@ class RepositoryController {
 		// local asset
 		def contentType = asset.mimeType
     	def repoFile = new File(repoDir, decodedId as String)
+		if ("application/zip" == contentType && asset.anchor) {
+			// handle special case: zip files
+			viewZipFile(asset, file, repoFile)
+			return
+		}
+		if (repoFile.exists() && repoFile.isDirectory()) {
+			log.info "deleting repo dir " + repoDir.getName()
+			FileUtils.deleteDirectory(repoFile)
+		}
     	if (!repoFile.exists()) {
+    		// non-zip files
     		def input = new ByteArrayInputStream(asset.content)
     		def output = new FileOutputStream(repoFile)
     		try {
@@ -162,8 +228,33 @@ class RepositoryController {
     		}
     	}
     	render(file:repoFile, contentType:contentType, fileName:asset.filename)
+    }
 
-    	println "show $decodedId"
+    def encodeId(long id) {
+    	return hashIds.encode(id)
+    }
+
+    protected void viewZipFile(Asset asset, String file, File repoFile) {
+    	// check if zip has been extracted
+    	if (repoFile.exists() && !repoFile.isDirectory()) {
+    		repoFile.delete()
+    	}
+    	if (!repoFile.exists()) {
+			ZipInputStream zin = new ZipInputStream(new BufferedInputStream(new ByteArrayInputStream(asset.content)))
+			ZipUtil.unzip(zin, repoFile)
+    	}
+    	if (!file) {
+    		log.debug "redirecting to anchor " + asset.anchor
+    		redirect(uri: "/repository/view/" + encodeId(asset.id) + "/" + asset.anchor)
+    		return
+    	}
+    	File zipEntry = new File(repoFile, file)
+    	if (!zipEntry.exists()) {
+    		render status: NOT_FOUND
+    		return
+    	}
+    	def contentType = Files.probeContentType(zipEntry.toPath())
+    	render(file:zipEntry, contentType:contentType)
     }
 
     protected void notFound() {
@@ -189,30 +280,22 @@ class RepositoryController {
 
 	            inputStream = new ByteArrayInputStream(assetInstance.content)
 	            metadata.add(Metadata.RESOURCE_NAME_KEY, assetInstance.filename)
-
-	            //println assetInstance.properties
 	        }
 	        else {
 	            inputStream = new BufferedInputStream(new URL(assetInstance.externalUrl).openStream())
-	            println "opened " + assetInstance.externalUrl
 	        }
 
             MediaType mediaType = detector.detect(inputStream, metadata)
             assetInstance.mimeType = mediaType.toString()
-            println "--- SET MIME TO " + assetInstance.mimeType
-
+/*
             def titleAndText = extractText(inputStream, assetInstance.mimeType)
             if (titleAndText.title && !assetInstance.name) {
-            	println "--- SETTING TITLE TO " + titleAndText.title
             	assetInstance.name = titleAndText.title
             }
             if (titleAndText.text) {
-            	println "--- SETTING TEXT TO " + titleAndText.text
             	assetInstance.indexText = titleAndText.text
             }
-        }
-        catch(e) {
-            println e
+*/            
         }
         finally {
             if (inputStream) {
@@ -223,9 +306,11 @@ class RepositoryController {
         if (!assetInstance.mimeType) {
             assetInstance.mimeType = "application/octet-stream"
         }
+        /*
         assetInstance.validate()
         println "--- MIME IS " + assetInstance.mimeType
         assetInstance.errors.allErrors.each { println it }
+        */
     }
 
     protected Object extractText(InputStream inputStream, String mimeType) {

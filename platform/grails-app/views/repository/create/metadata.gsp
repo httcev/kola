@@ -25,12 +25,40 @@
 				</g:eachError>
 			</ul>
 			</g:hasErrors>
-			<g:form url="[resource:assetInstance, action:'save']"  enctype="multipart/form-data">
+			<g:form action="create">
 				<fieldset class="form">
-					<g:render template="form"/>
+					<div class="fieldcontain ${hasErrors(bean: assetInstance, field: 'name', 'error')} required">
+						<label for="name">
+							<g:message code="asset.name.label" default="Name" />
+							<span class="required-indicator">*</span>
+						</label>
+						<g:textField name="name" required="" value="${assetInstance?.name}"/>
+
+					</div>
+					<div class="fieldcontain ${hasErrors(bean: assetInstance, field: 'description', 'error')} required">
+						<label for="description">
+							<g:message code="asset.description.label" default="Description" />
+							<span class="required-indicator">*</span>
+						</label>
+						<g:textArea name="description" required="" value="${assetInstance?.description}"/>
+					</div>
+					<div class="fieldcontain ${hasErrors(bean: assetInstance, field: 'mimeType', 'error')}">
+						<label>
+							<g:message code="asset.mimeType.label" default="Mime Type" />
+						</label>
+						${assetInstance?.mimeType}
+					</div>
+					<g:if test="${assetInstance?.anchor}">
+						<div class="fieldcontain ${hasErrors(bean: assetInstance, field: 'anchor', 'error')}">
+							<label>
+								<g:message code="asset.anchor.label" default="Anchor" />
+							</label>
+							${assetInstance?.anchor}
+						</div>
+					</g:if>
 				</fieldset>
 				<fieldset class="buttons">
-					<g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
+					<g:submitButton name="submit" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
 				</fieldset>
 			</g:form>
 		</div>

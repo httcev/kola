@@ -27,7 +27,7 @@
 				</g:eachError>
 			</ul>
 			</g:hasErrors>
-			<g:form url="[controller:'repository', id:assetInstance.id, action:'update']" method="PUT"  enctype="multipart/form-data">
+			<g:form lala="lulul" url="[controller:'repository', id:assetInstance.id, action:'update']" method="put"  enctype="multipart/form-data">
 				<g:hiddenField name="version" value="${assetInstance?.version}" />
 				<fieldset class="form">
 					<g:render template="form"/>
