@@ -14,6 +14,7 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tika.sax.WriteOutContentHandler;
 import org.xml.sax.ContentHandler;
 import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.nio.file.Files;
@@ -24,6 +25,7 @@ import kola.ZipUtil
 class RepositoryController {
     def hashIds
 	def repoDir
+	def elasticSearchService
 
     static allowedMethods = [save: "POST", update: ["PUT", "POST"], delete: "DELETE"]
 
@@ -33,8 +35,21 @@ class RepositoryController {
     }
 
     def show(Asset assetInstance) {
-    	println  Asset.search("klick").searchResults
-        [assetInstance:assetInstance, encodedId:encodeId(assetInstance.id)]
+        respond assetInstance
+    }
+
+    def search() {
+		def highlighter = {
+			field 'name'
+			field 'description'
+			field 'indexText'
+			preTags '<strong>'
+  			postTags '</strong>'
+		}
+		def results = elasticSearchService.search("${params.query}", [highlight: highlighter])    	
+		println results
+		
+		[results:results]
     }
 /*
     def create() {
@@ -67,7 +82,6 @@ class RepositoryController {
         		try {
 		        	enrichAsset(flow.assetInstance)
 		        	if (flow.assetInstance.content && "application/zip".equals(flow.assetInstance.mimeType)) {
-		        		println "--- LOCAL ZIP"
 						ZipInputStream zin = new ZipInputStream(new BufferedInputStream(new ByteArrayInputStream(flow.assetInstance.content)))
 						def possibleAnchors = ZipUtil.getFilenames(zin, false)
 						if (possibleAnchors.length > 0) {
@@ -81,9 +95,6 @@ class RepositoryController {
 		        catch(e) {
 		        	if (flow.assetInstance.externalUrl) {
 		        		flow.assetInstance.errors.rejectValue('externalUrl', 'urlNotValid')
-		        		println "----------------------------"
-		        		        flow.assetInstance.errors.allErrors.each { println it }
-
 		        	}
 		        	return error()
 		        }
@@ -94,9 +105,7 @@ class RepositoryController {
         }
         chooseAnchor {
         	on("submit") {
-        		printl "--- INCOMING ANCHOR IS " +params.anchor
         		bindData(flow.assetInstance, params)
-        		println "--- NEW ANCHOR IS " + flow.assetInstance.anchor 
     		}.to "metadata" 
         }
         metadata {
@@ -227,11 +236,7 @@ class RepositoryController {
     			output.close()
     		}
     	}
-    	render(file:repoFile, contentType:contentType, fileName:asset.filename)
-    }
-
-    def encodeId(long id) {
-    	return hashIds.encode(id)
+    	renderFile(repoFile, contentType)
     }
 
     protected void viewZipFile(Asset asset, String file, File repoFile) {
@@ -245,7 +250,7 @@ class RepositoryController {
     	}
     	if (!file) {
     		log.debug "redirecting to anchor " + asset.anchor
-    		redirect(uri: "/repository/view/" + encodeId(asset.id) + "/" + asset.anchor)
+    		redirect(uri: "/v/" + hashIds.encode(asset.id) + "/" + asset.anchor)
     		return
     	}
     	File zipEntry = new File(repoFile, file)
@@ -254,7 +259,44 @@ class RepositoryController {
     		return
     	}
     	def contentType = Files.probeContentType(zipEntry.toPath())
-    	render(file:zipEntry, contentType:contentType)
+    	renderFile(zipEntry, contentType)
+    }
+
+    protected void renderFile(File file, String contentType) {
+		response.setHeader("Accept-Ranges", "bytes")
+		String range = request.getHeader("range")
+		if (range != null && range.length() > 0) {
+			def matcher = range =~ /bytes=(\d+)-(\d*)/
+			def start = matcher[0][1].toInteger()
+			def end = matcher[0][2]
+			def fileLength = file.length()
+			if (!end) {
+				end = fileLength - 1
+			}
+			else {
+				end = end.toInteger()
+			}
+			// check bounds and conditionally return status 416 ("Requested Range not satisfiable")
+			if (end < start || start < 0 || end < 0 || end >= fileLength) {
+				response.status = 416
+				return
+			}
+			def length = end - start + 1
+			response.status = 206
+			response.contentLength = length
+			response.setHeader("Content-Range", "bytes " + start + "-" + end + "/" + fileLength)
+			// TODO: try to not allocate array in memory
+			RandomAccessFile raf = new RandomAccessFile(file, "r")
+			raf.seek(start)
+			byte[] buf = new byte[length]
+			raf.readFully(buf)
+
+			//response.outputStream << buf
+    		render(file:buf, contentType:contentType)
+		}
+		else {
+    		render(file:file, contentType:contentType)
+	    }
     }
 
     protected void notFound() {
@@ -287,7 +329,7 @@ class RepositoryController {
 
             MediaType mediaType = detector.detect(inputStream, metadata)
             assetInstance.mimeType = mediaType.toString()
-/*
+
             def titleAndText = extractText(inputStream, assetInstance.mimeType)
             if (titleAndText.title && !assetInstance.name) {
             	assetInstance.name = titleAndText.title
@@ -295,7 +337,6 @@ class RepositoryController {
             if (titleAndText.text) {
             	assetInstance.indexText = titleAndText.text
             }
-*/            
         }
         finally {
             if (inputStream) {
@@ -306,11 +347,6 @@ class RepositoryController {
         if (!assetInstance.mimeType) {
             assetInstance.mimeType = "application/octet-stream"
         }
-        /*
-        assetInstance.validate()
-        println "--- MIME IS " + assetInstance.mimeType
-        assetInstance.errors.allErrors.each { println it }
-        */
     }
 
     protected Object extractText(InputStream inputStream, String mimeType) {

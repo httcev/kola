@@ -1,9 +1,16 @@
 class UrlMappings {
 
 	static mappings = {
-        "/repository/view/$id/$file**?(.$format)?"{
-        	controller = "repository"
-        	action = "view"
+        name viewAsset: "/v/$id"{
+            controller = "repository"
+            action = "view"
+            constraints {
+                // apply constraints here
+            }
+        }
+        "/v/$id/$file**?(.$format)?"{
+            controller = "repository"
+            action = "view"
             constraints {
                 // apply constraints here
             }
