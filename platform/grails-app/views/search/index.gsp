@@ -1,4 +1,4 @@
-<g:set var="hashIds" bean="hashIds"/>
+<g:set var="assetService" bean="assetService"/>
 
 <html>
 	<head>
@@ -7,8 +7,8 @@
 	</head>
 	<body>
 		<div id="show-search" class="content scaffold-search" role="main">
-			<g:form action="search" method="GET">
-				<input type="search" name="query" value="${params.query}">
+			<g:form action="." method="GET">
+				<input type="search" name="query" value="${params.query}" autofocus>
 				<button type="submit" class="search">${message(code: 'default.button.search.label', default: 'Search')}</button>
 			</g:form>
 			<g:if test="${params.query}">
@@ -19,7 +19,7 @@
 					<ul>
 					<g:each var="hit" in="${searchResults}" status="i">
 						<li>
-							<div><a href="${createLink(mapping:'viewAsset', id:hashIds.encode(hit.id))}">${hit.name}</a></div>
+							<div><a href="${assetService.createEncodedLink(hit)}">${hit.name}</a></div>
 							<g:each var="field" in="['description', 'indexText']">
 								<g:each var="fragment" in="${highlights[i][field]?.fragments}">
 									<div>${field}: ${raw(fragment.toString())}</div>
@@ -30,7 +30,7 @@
 					</ul>
 				</g:if>
 				<g:else>
-					Die Suche nach '${params.query}' ergab keine Treffer.
+					Die Suche nach '${params.query}' ergab keinen Treffer.
 				</g:else>
 			</g:if>
 		</div>

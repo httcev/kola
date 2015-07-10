@@ -1,7 +1,5 @@
 package kola
 
-import org.apache.commons.io.IOUtils
-import org.apache.commons.io.FileUtils
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 import org.apache.tika.mime.MediaType
@@ -13,7 +11,6 @@ import org.apache.tika.parser.html.BoilerpipeContentHandler;
 import org.apache.tika.sax.BodyContentHandler;
 import org.apache.tika.sax.WriteOutContentHandler;
 import org.xml.sax.ContentHandler;
-import java.io.FileOutputStream;
 import java.io.RandomAccessFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -23,9 +20,7 @@ import kola.ZipUtil
 
 @Transactional(readOnly = true)
 class RepositoryController {
-    def hashIds
-	def repoDir
-	def elasticSearchService
+	def assetService
 
     static allowedMethods = [save: "POST", update: ["PUT", "POST"], delete: "DELETE"]
 
@@ -38,19 +33,6 @@ class RepositoryController {
         respond assetInstance
     }
 
-    def search() {
-		def highlighter = {
-			field 'name'
-			field 'description'
-			field 'indexText'
-			preTags '<strong>'
-  			postTags '</strong>'
-		}
-		def results = elasticSearchService.search("${params.query}", [highlight: highlighter])    	
-		println results
-		
-		[results:results]
-    }
 /*
     def create() {
         respond new Asset(params)
@@ -111,14 +93,20 @@ class RepositoryController {
         metadata {
         	on("submit") {
         		bindData(flow.assetInstance, params)
-        		flow.assetInstance.save() ? success() : error()
+        		if (flow.assetInstance.save()) {
+        			assetService.deleteRepositoryFile(flow.assetInstance)
+    				return success()	
+    			}
+    			else {
+    				return error()	
+				}
     		}.to "finish"
         }
         finish {
         	redirect(action: "index")
         }
     }
-
+/*
     @Transactional
     def save(Asset assetInstance) {
         if (assetInstance == null) {
@@ -143,7 +131,7 @@ class RepositoryController {
             '*' { respond assetInstance, [status: CREATED] }
         }
     }
-
+*/
     def edit(Asset assetInstance) {
         respond assetInstance
     }
@@ -163,6 +151,7 @@ class RepositoryController {
         }
 
         assetInstance.save flush:true
+        assetService.deleteRepositoryFile(assetInstance)
 
         request.withFormat {
             form multipartForm {
@@ -192,15 +181,8 @@ class RepositoryController {
         }
     }
 
-    def view(String id, String file) {
-    	def hashId = hashIds.decode(id)
-    	if (!hashId) {
-			response.sendError(404)
-			return
-    	}
-    	def decodedId = hashId[0]
-    	log.info "viewing asset $decodedId"
-    	def asset = Asset.read(decodedId)
+    def viewAsset(String id, String file) {
+    	def asset = assetService.readAsset(id)
     	if (!asset) {
 			response.sendError(404)
 			return
@@ -213,44 +195,19 @@ class RepositoryController {
     	}
 
 		// local asset
-		def contentType = asset.mimeType
-    	def repoFile = new File(repoDir, decodedId as String)
-		if ("application/zip" == contentType && asset.anchor) {
+    	def repoFile = assetService.getOrCreateRepositoryFile(asset)
+		if (repoFile.isDirectory()) {
 			// handle special case: zip files
 			viewZipFile(asset, file, repoFile)
 			return
 		}
-		if (repoFile.exists() && repoFile.isDirectory()) {
-			log.info "deleting repo dir " + repoDir.getName()
-			FileUtils.deleteDirectory(repoFile)
-		}
-    	if (!repoFile.exists()) {
-    		// non-zip files
-    		def input = new ByteArrayInputStream(asset.content)
-    		def output = new FileOutputStream(repoFile)
-    		try {
-    			IOUtils.copy(input, output)
-    		}
-    		finally {
-    			input.close()
-    			output.close()
-    		}
-    	}
-    	renderFile(repoFile, contentType)
+    	renderFile(repoFile, asset.mimeType)
     }
 
     protected void viewZipFile(Asset asset, String file, File repoFile) {
-    	// check if zip has been extracted
-    	if (repoFile.exists() && !repoFile.isDirectory()) {
-    		repoFile.delete()
-    	}
-    	if (!repoFile.exists()) {
-			ZipInputStream zin = new ZipInputStream(new BufferedInputStream(new ByteArrayInputStream(asset.content)))
-			ZipUtil.unzip(zin, repoFile)
-    	}
     	if (!file) {
     		log.debug "redirecting to anchor " + asset.anchor
-    		redirect(uri: "/v/" + hashIds.encode(asset.id) + "/" + asset.anchor)
+    		redirect(url: assetService.createEncodedLink(asset, asset.anchor))
     		return
     	}
     	File zipEntry = new File(repoFile, file)
@@ -258,8 +215,7 @@ class RepositoryController {
     		render status: NOT_FOUND
     		return
     	}
-    	def contentType = Files.probeContentType(zipEntry.toPath())
-    	renderFile(zipEntry, contentType)
+    	renderFile(zipEntry, Files.probeContentType(zipEntry.toPath()))
     }
 
     protected void renderFile(File file, String contentType) {
@@ -313,40 +269,41 @@ class RepositoryController {
         def detector = TikaConfig.getDefaultConfig().getDetector();
         Metadata metadata = new Metadata()
         def inputStream
+        if (assetInstance.content || assetInstance.externalUrl) {
+	        try {
+		        if (assetInstance.content) {
+		            // remove externalUrl since we're now expecting a local asset
+		            assetInstance.externalUrl = null
+		            assetInstance.filename = request.getFile("content").getOriginalFilename()
 
-        try {
-	        if (assetInstance.content) {
-	            // remove externalUrl since we're now expecting a local asset
-	            assetInstance.externalUrl = null
-	            assetInstance.filename = request.getFile("content").getOriginalFilename()
+		            inputStream = new ByteArrayInputStream(assetInstance.content)
+		            metadata.add(Metadata.RESOURCE_NAME_KEY, assetInstance.filename)
+		        }
+		        else {
+		            inputStream = new BufferedInputStream(new URL(assetInstance.externalUrl).openStream())
+		        }
 
-	            inputStream = new ByteArrayInputStream(assetInstance.content)
-	            metadata.add(Metadata.RESOURCE_NAME_KEY, assetInstance.filename)
+	            MediaType mediaType = detector.detect(inputStream, metadata)
+	            assetInstance.mimeType = mediaType.toString()
+
+	            def titleAndText = extractText(inputStream, assetInstance.mimeType)
+	            if (titleAndText.title && !assetInstance.name) {
+	            	assetInstance.name = titleAndText.title
+	            }
+	            if (titleAndText.text) {
+	            	assetInstance.indexText = titleAndText.text
+	            }
 	        }
-	        else {
-	            inputStream = new BufferedInputStream(new URL(assetInstance.externalUrl).openStream())
+	        finally {
+	            if (inputStream) {
+	                inputStream.close()
+	            }
 	        }
 
-            MediaType mediaType = detector.detect(inputStream, metadata)
-            assetInstance.mimeType = mediaType.toString()
-
-            def titleAndText = extractText(inputStream, assetInstance.mimeType)
-            if (titleAndText.title && !assetInstance.name) {
-            	assetInstance.name = titleAndText.title
-            }
-            if (titleAndText.text) {
-            	assetInstance.indexText = titleAndText.text
-            }
-        }
-        finally {
-            if (inputStream) {
-                inputStream.close()
-            }
-        }
-
-        if (!assetInstance.mimeType) {
-            assetInstance.mimeType = "application/octet-stream"
-        }
+	        if (!assetInstance.mimeType) {
+	            assetInstance.mimeType = "application/octet-stream"
+	        }
+	    }
     }
 
     protected Object extractText(InputStream inputStream, String mimeType) {

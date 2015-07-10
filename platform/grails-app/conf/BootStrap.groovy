@@ -8,7 +8,7 @@ class BootStrap {
     		repoDir.mkdirs()
     	}
 
-    	def asset = new Asset(name:"Asset 1", description:"Huhu sfsdf", mimeType:"application/pdf", content:[1,2,3] as byte[])
+    	def asset = new Asset(name:"Asset 1", description:"Huhu sfsdf", mimeType:"text/plain", content:"Das ist ein Text!" as byte[])
     	if (!asset.save(true)) {
 			asset.errors.allErrors.each { println it }
     	}

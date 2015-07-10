@@ -1,6 +1,6 @@
 
 <%@ page import="kola.Asset" %>
-<g:set var="hashIds" bean="hashIds"/>
+<g:set var="assetService" bean="assetService"/>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -80,7 +80,7 @@
 					<span id="url-label" class="property-label"><g:message code="asset.url.label" default="URL" /></span>
 					
 						<span class="property-value" aria-labelledby="url-label">
-						<g:set var="url" value="${createLink(mapping:'viewAsset', id:hashIds.encode(assetInstance?.id),absolute:'true')}" />
+						<g:set var="url" value="${assetService.createEncodedLink(assetInstance)}" />
 						<a href="${url}">${url}</a>
 						</span>
 				</li>

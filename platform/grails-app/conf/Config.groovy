@@ -89,11 +89,25 @@ environments {
     development {
         grails.logging.jul.usebridge = true
 
-        repository.directory = new java.io.File("./repository")
+        kola {
+            repository.directory = "./repository"
+            couchdb {
+                url = "http://koladb.httc.de"
+                admin.user = "admin"
+                admin.pass = "admin"
+            }
+        }
     }
     production {
         grails.logging.jul.usebridge = false
-        repository.directory = new java.io.File("./repository")
+        kola {
+            repository.directory = "./repository"
+            couchdb {
+                url = "http://koladb.httc.de"
+                admin.user = "admin"
+                admin.pass = "admin"
+            }
+        }
         // TODO: grails.serverURL = "http://www.changeme.com"
     }
 }
@@ -123,3 +137,19 @@ elasticSearch {
     datastoreImpl = "hibernateDatastore"
     includeTransients = false
 }
+
+// Added by the Spring Security Core plugin:
+grails.plugin.springsecurity.userLookup.userDomainClassName = 'kola.User'
+grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'kola.UserRole'
+grails.plugin.springsecurity.authority.className = 'kola.Role'
+grails.plugin.springsecurity.controllerAnnotations.staticRules = [
+	'/':                ['permitAll'],
+	'/index':           ['permitAll'],
+	'/index.gsp':       ['permitAll'],
+	'/assets/**':       ['permitAll'],
+	'/**/js/**':        ['permitAll'],
+	'/**/css/**':       ['permitAll'],
+	'/**/images/**':    ['permitAll'],
+	'/**/favicon.ico':  ['permitAll']
+]
+

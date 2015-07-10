@@ -37,4 +37,6 @@ class Asset implements Serializable {
     String anchor
 
     String indexText
+
+    Date lastUpdated
 }
