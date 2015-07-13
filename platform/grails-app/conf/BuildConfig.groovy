@@ -54,8 +54,10 @@ grails.project.dependency.resolution = {
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
 
         compile('org.apache.tika:tika-core:1.9')
-        compile('org.apache.tika:tika-parsers:1.9') { excludes "xercesImpl", "xmlParserAPIs", "xml-apis", "log4j" }
+        compile('org.apache.tika:tika-parsers:1.9') { excludes "xercesImpl", "xmlParserAPIs", "xml-apis", "log4j", "httpcore" }
         compile('org.hashids:hashids:1.0.1')
+        compile('org.lightcouch:lightcouch:0.1.8')
+        compile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1')
     }
 
     plugins {

@@ -15,10 +15,12 @@ import java.io.RandomAccessFile;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.nio.file.Files;
+import org.springframework.security.access.annotation.Secured
 
 import kola.ZipUtil
 
 @Transactional(readOnly = true)
+@Secured(['ROLE_USER'])
 class RepositoryController {
 	def assetService
 
@@ -181,6 +183,7 @@ class RepositoryController {
         }
     }
 
+    @Secured(['permitAll'])
     def viewAsset(String id, String file) {
     	def asset = assetService.readAsset(id)
     	if (!asset) {

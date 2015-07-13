@@ -4,25 +4,26 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import groovy.json.JsonSlurper
+import org.lightcouch.CouchDbClient
 
 
 class CouchSynchronizerJob {
     static triggers = {
-		simple name: 'mySimpleTrigger', startDelay: 1, repeatInterval: 10000
+		//simple name: 'mySimpleTrigger', startDelay: 1, repeatInterval: 10000
 		//cron name: 'myTrigger', cronExpression: "0 45 10 1/1 * ? *"
     }
     def group = "CronJobs"
     def description = "Synchronize local db with couch db"
     def concurrent = false
 
-    def grailsApplication
-    def sessionFactory
     def couchdbUrl
     def couchdbAdminUser
     def couchdbAdminPass
+    def couchSynchronizerService
 
     def execute() {
 		try {
+			println hashCode()
 			def settings = CouchSynchronizerSettings.findOrSaveById(1)
 			println "RUN -> lastSync=$settings.lastSync, url=$couchdbUrl, admin=$couchdbAdminUser"
 			def now = new Date()
@@ -30,6 +31,7 @@ class CouchSynchronizerJob {
 			if (!since) {
 				since = new Date(0)
 			}
+			checkUsers(since, now)
 			def changedAssets = Asset.findAllByLastUpdatedBetween(since, now)
 			if (changedAssets) {
 				changedAssets.each {
@@ -45,6 +47,13 @@ class CouchSynchronizerJob {
 		}
 		catch(Exception e) {
 		    e.printStackTrace()
+		}
+    }
+
+    def checkUsers(since, now) {
+		def changedUsers = User.findAllByLastUpdatedBetween(since, now)
+		changedUsers?.each {
+			couchSynchronizerService.updateUsers(it)
 		}
     }
 /*

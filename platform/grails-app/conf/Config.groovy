@@ -92,9 +92,11 @@ environments {
         kola {
             repository.directory = "./repository"
             couchdb {
-                url = "http://koladb.httc.de"
-                admin.user = "admin"
-                admin.pass = "admin"
+                protocol = "http"
+                host = "koladb.httc.de"
+                port = "80"
+                admin.user = "syncservice"
+                admin.pass = "pw4syncservice"
             }
         }
     }
@@ -103,9 +105,11 @@ environments {
         kola {
             repository.directory = "./repository"
             couchdb {
-                url = "http://koladb.httc.de"
-                admin.user = "admin"
-                admin.pass = "admin"
+                protocol = "http"
+                host = "koladb.httc.de"
+                port = "80"
+                admin.user = "syncservice"
+                admin.pass = "pw4syncservice"
             }
         }
         // TODO: grails.serverURL = "http://www.changeme.com"
@@ -153,3 +157,11 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/**/favicon.ico':  ['permitAll']
 ]
 
+// enable basic authentication for couchdb proxy
+grails.plugin.springsecurity.useBasicAuth = true
+grails.plugin.springsecurity.basic.realmName = "kola db (proxy)"
+grails.plugin.springsecurity.filterChain.chainMap = [
+        '/db': 'JOINED_FILTERS,-exceptionTranslationFilter',
+        '/db/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
+        '/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
+]

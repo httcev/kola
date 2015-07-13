@@ -8,8 +8,14 @@ beans = {
         bean.constructorArgs = [ application.config.kola.repository.directory ]
     }
 
-	couchdbUrl(java.lang.String) { bean ->
-        bean.constructorArgs = [ application.config.kola.couchdb.url ]
+    couchdbProtocol(java.lang.String) { bean ->
+        bean.constructorArgs = [ application.config.kola.couchdb.protocol ]
+    }
+    couchdbHost(java.lang.String) { bean ->
+        bean.constructorArgs = [ application.config.kola.couchdb.host ]
+    }
+    couchdbPort(java.lang.String) { bean ->
+        bean.constructorArgs = [ application.config.kola.couchdb.port ]
     }
 	couchdbAdminUser(java.lang.String) { bean ->
         bean.constructorArgs = [ application.config.kola.couchdb.admin.user ]
