@@ -20,7 +20,10 @@ beans = {
 	couchdbAdminUser(java.lang.String) { bean ->
         bean.constructorArgs = [ application.config.kola.couchdb.admin.user ]
     }
-	couchdbAdminPass(java.lang.String) { bean ->
+    couchdbAdminPass(java.lang.String) { bean ->
         bean.constructorArgs = [ application.config.kola.couchdb.admin.pass ]
+    }
+    couchdbSecret(java.lang.String) { bean ->
+        bean.constructorArgs = [ application.config.kola.couchdb.secret ]
     }
 }

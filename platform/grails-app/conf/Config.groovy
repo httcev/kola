@@ -97,6 +97,7 @@ environments {
                 port = "5984"
                 admin.user = "syncservice"
                 admin.pass = "pw4syncservice"
+                secret = "92de07df7e7a3fe14808cef90a7cc0d91"
             }
         }
     }
@@ -110,6 +111,7 @@ environments {
                 port = "5984"
                 admin.user = "syncservice"
                 admin.pass = "pw4syncservice"
+                secret = "92de07df7e7a3fe14808cef90a7cc0d91"
             }
         }
         // TODO: grails.serverURL = "http://www.changeme.com"

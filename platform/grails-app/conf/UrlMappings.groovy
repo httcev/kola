@@ -3,7 +3,7 @@ class UrlMappings {
 	static mappings = {
         "/db/**?"{
             controller = "couchProxy"
-            action = [OPTIONS:"optionsRequest", GET:"proxy", POST:"proxy", PUT:"proxy", DELETE:"proxy", PATCH:"proxy", TRACE:"proxy", HEAD:"proxy"]
+            action = [OPTIONS:"proxyOptionsRequest", GET:"proxy", POST:"proxy", PUT:"proxy", DELETE:"proxy", PATCH:"proxy", TRACE:"proxy", HEAD:"proxy"]
         }
 
         name viewAsset: "/v/$id"{
