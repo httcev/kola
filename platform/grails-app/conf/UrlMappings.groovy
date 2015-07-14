@@ -1,13 +1,9 @@
 class UrlMappings {
 
 	static mappings = {
-        "/db/**"{
+        "/db/**?"{
             controller = "couchProxy"
-            action = [GET:"index", OPTIONS:"optionsRequest", POST:"index", HEAD:"index", PUT:"index", DELETE:"index"]
-        }
-        "/db"{
-            controller = "couchProxy"
-            action = [GET:"index", OPTIONS:"optionsRequest", POST:"index", HEAD:"index", PUT:"index", DELETE:"index"]
+            action = [OPTIONS:"optionsRequest", GET:"proxy", POST:"proxy", PUT:"proxy", DELETE:"proxy", PATCH:"proxy", TRACE:"proxy", HEAD:"proxy"]
         }
 
         name viewAsset: "/v/$id"{

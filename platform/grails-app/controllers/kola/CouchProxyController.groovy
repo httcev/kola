@@ -1,71 +1,60 @@
 package kola
 
-import groovyx.net.http.*
+import org.apache.http.*
+import org.apache.http.client.*
+import org.apache.http.entity.*
+import org.apache.http.impl.client.*
+import org.apache.http.message.*
 import org.springframework.security.access.annotation.Secured
 
 class CouchProxyController {
+    def static FILTERED_REQUEST_HEADERS = ["authorization", "cookie", "content-length"]
 	def springSecurityService
+    def couchdbProtocol
+    def couchdbHost
+    def couchdbPort
 
+    // TODO: 301 from couch does not work (example: GET /_utils)
 	@Secured(['ROLE_USER'])
-    def synchronized index() {
-    	def outerResponse = response
-    	def outerRequest = request
-//    	def http = new HTTPBuilder("http://koladb.httc.de")
-    	def http = new HTTPBuilder("http://10.0.17.7:5984")
-    	def origin = request.getHeader("origin")
-
-println "----------------------------------------"
-println "METHOD=" + request.method
-	    http.request(request.method as Method) {
-	        uri.path = outerRequest.forwardURI.replace(outerRequest.contextPath + "/db", "")
-	       // uri.query = outerRequest.queryString
-	        println "PATH=" + uri.path
-	        uri.rawQuery = outerRequest.queryString
-
-	    	outerRequest.headerNames.each {
-	    		if (!it?.equalsIgnoreCase("authorization")) {
-		    		println "--- setting request header '$it' to " + outerRequest.getHeader(it)
-	    			headers[it] = outerRequest.getHeader(it)
-	    		}
-	    	}
-	        headers.'X-Auth-CouchDB-UserName' = springSecurityService.principal.username
-	        headers.'X-Auth-CouchDB-Roles' = springSecurityService.principal.authorities?.join(",")
-/*
-	        // add possible headers
-	        requestHeaders.each { key, value ->
-	            headers."${key}" = "${value}"
-	        }
-*/
-	        // response handler for success and failure
-	        def responseHandler = { resp, reader ->
-	        	// copy response status
-				outerResponse.status = resp.status
-	        	// copy response headers
-		    	resp.allHeaders?.each {
-		    		println "--- setting response header '$it.name' to " + it.value
-		    		outerResponse.setHeader(it.name, it.value)
-		    	}
-		    	resp.entity.properties.each {
-		    		println it
-		    	}
-				outerResponse.outputStream << resp.entity.content
-	        }
-	        response.success = responseHandler
-	        response.failure = responseHandler
+    def proxy() {
+    	def path = request.forwardURI.replace(request.contextPath + "/db", "")
+    	def query = request.queryString ? "?" + request.queryString : ""
+    	def hcRequest = new BasicHttpEntityEnclosingRequest(request.method, path + query)
+    	request.headerNames.each {
+    		if (!FILTERED_REQUEST_HEADERS.contains(it.toLowerCase())) {
+//	    		println "--- setting request header '$it' to " + request.getHeader(it)
+    			hcRequest.setHeader(it, request.getHeader(it))
+    		}
+    	}
+        hcRequest.setHeader("X-Auth-CouchDB-UserName", springSecurityService.principal.username)
+        hcRequest.setHeader("X-Auth-CouchDB-Roles", springSecurityService.principal.authorities?.join(","))
+        if (request.JSON) {
+	        hcRequest.setEntity(new StringEntity(request.JSON.toString()))
 	    }
+//        println hcRequest
+
+    	def host = new HttpHost(couchdbHost, couchdbPort as int, couchdbProtocol)
+    	def client = new HttpClientBuilder().create().build()
+    	client.execute(host, hcRequest, new ResponseHandler() {
+    		def handleResponse(HttpResponse hcResponse) {
+    			println hcResponse
+    			response.status = hcResponse.statusLine.statusCode
+//    			println "status=" + response.status
+    			hcResponse.allHeaders.each {
+//	    		println "--- setting response header '$it.name' to '$it.value'"
+    				response.setHeader(it.name, it.value)
+    			}
+    			response.outputStream << hcResponse.entity?.content
+    			response.outputStream.flush()
+    		}
+    	})
     }
 
-    @Secured(['permitAll'])
+    /*
+		Let OPTIONS requests path through unauthenticated
+    */
+	@Secured(['permitAll'])
     def optionsRequest() {
-    	println "--- OPTIONS!!!"
-    	//index()
-    	def origin = request.getHeader("origin")
-    	println "origin=" + origin
-    	response.status = 200
-    	response.setHeader("Access-Control-Allow-Origin", origin == null ? "*" : origin)
-		response.setHeader("Access-Control-Allow-Methods", "PUT, POST, GET, HEAD, OPTIONS, DELETE, PATCH")
-		response.setHeader("Access-Control-Allow-Headers", "accept, authorization, content-type, origin, referer, x-csrf-token, x-requested-with")
-		response.setHeader("Access-Control-Allow-Credentials", "true")
-		response.outputStream.flush()
+    	proxy()
     }
 }

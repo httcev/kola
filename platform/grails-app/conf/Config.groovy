@@ -93,8 +93,8 @@ environments {
             repository.directory = "./repository"
             couchdb {
                 protocol = "http"
-                host = "koladb.httc.de"
-                port = "80"
+                host = "10.0.17.7"
+                port = "5984"
                 admin.user = "syncservice"
                 admin.pass = "pw4syncservice"
             }
@@ -106,8 +106,8 @@ environments {
             repository.directory = "./repository"
             couchdb {
                 protocol = "http"
-                host = "koladb.httc.de"
-                port = "80"
+                host = "10.0.17.7"
+                port = "5984"
                 admin.user = "syncservice"
                 admin.pass = "pw4syncservice"
             }

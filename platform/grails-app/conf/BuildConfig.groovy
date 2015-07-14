@@ -57,7 +57,6 @@ grails.project.dependency.resolution = {
         compile('org.apache.tika:tika-parsers:1.9') { excludes "xercesImpl", "xmlParserAPIs", "xml-apis", "log4j", "httpcore" }
         compile('org.hashids:hashids:1.0.1')
         compile('org.lightcouch:lightcouch:0.1.8')
-        compile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1')
     }
 
     plugins {
@@ -84,7 +83,5 @@ grails.project.dependency.resolution = {
         //compile ":less-asset-pipeline:1.10.0"
         //compile ":coffee-asset-pipeline:1.8.0"
         //compile ":handlebars-asset-pipeline:1.3.0.3"
-
-        //compile ":searchable:0.6.9"
     }
 }
