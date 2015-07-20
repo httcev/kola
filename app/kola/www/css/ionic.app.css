@@ -7729,3 +7729,7 @@ media-attachments .center-horizontal {
 
 .created-date {
   font-size: 60%; }
+
+.task-description ul {
+  margin-left: 20px;
+  list-style: disc; }
