@@ -5,6 +5,7 @@ class User implements Serializable {
 	private static final long serialVersionUID = 1
 
 	transient springSecurityService
+	static hasOne = [profile:Profile]
 
 	String username
 	String password
@@ -12,13 +13,6 @@ class User implements Serializable {
 	boolean accountExpired
 	boolean accountLocked
 	boolean passwordExpired
-
-	String displayName
-    String company
-    String department
-    String phone
-    String mobile
-    String email
     Date lastUpdated
 
 	User(String username, String password) {
@@ -43,7 +37,13 @@ class User implements Serializable {
 	}
 
 	Set<Role> getAuthorities() {
-		UserRole.findAllByUser(this)*.role
+		try {
+			return UserRole.findAllByUser(this)*.role
+		}
+		catch(Exception e) {
+			log.warn e
+			return null
+		}
 	}
 
 	def beforeInsert() {
@@ -65,12 +65,6 @@ class User implements Serializable {
 	static constraints = {
 		username blank: false, unique: true
 		password blank: false
-		displayName blank: false
-		company nullable: true
-		department nullable: true
-		phone nullable: true
-		mobile nullable: true
-		email nullable: true
 	}
 
 	static mapping = {

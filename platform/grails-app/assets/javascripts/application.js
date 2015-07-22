@@ -6,15 +6,18 @@
 // to create separate JavaScript files as needed.
 //
 //= require jquery
+//= require bootstrap
 //= require_tree .
 //= require_self
 
 if (typeof jQuery !== 'undefined') {
 	(function($) {
-		$('#spinner').ajaxStart(function() {
-			$(this).fadeIn();
-		}).ajaxStop(function() {
-			$(this).fadeOut();
+		$(document).ready(function() {
+			$('#spinner').ajaxStart(function() {
+				$(this).fadeIn();
+			}).ajaxStop(function() {
+				$(this).fadeOut();
+			});
 		});
 	})(jQuery);
 }

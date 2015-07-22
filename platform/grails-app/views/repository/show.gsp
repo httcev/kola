@@ -81,7 +81,7 @@
 					
 						<span class="property-value" aria-labelledby="url-label">
 						<g:set var="url" value="${assetService.createEncodedLink(assetInstance)}" />
-						<a href="${url}">${url}</a>
+						<a href="${url}" target="_blank">${url}</a>
 						</span>
 				</li>
 			</ol>

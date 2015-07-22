@@ -7,7 +7,15 @@
 * You're free to add application-wide styles to this file and they'll appear at the top of the
 * compiled file, but it's generally better to create a new file per style scope.
 *
-*= require main
-*= require mobile
+*= require bootstrap
+*= require font-awesome
 *= require_self
 */
+
+#loginWrapper { max-width:350px; margin:50px auto }
+.error input { border-color:red; }
+header h1, .navbar-default .navbar-brand { color:#a11d21 }
+header #logo, .navbar-header #logo { width:20px; }
+/*.avatar { width:36px; height:36px; }*/
+.avatar-container { position:relative; overflow:hidden; padding-bottom:100%; }
+.avatar-container img { position:absolute; }

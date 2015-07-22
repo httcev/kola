@@ -5,6 +5,7 @@ import org.apache.http.client.*
 import org.apache.http.entity.*
 import org.apache.http.impl.client.*
 import org.apache.http.message.*
+import org.apache.http.params.*
 import org.springframework.security.access.annotation.Secured
 import org.apache.commons.codec.binary.Hex
 import javax.crypto.spec.SecretKeySpec
@@ -39,6 +40,10 @@ class CouchProxyController {
         if (request.JSON) {
 	        hcRequest.setEntity(new StringEntity(request.JSON.toString()))
 	    }
+        // prevent any redirect handling by apache http client
+        HttpParams params = new BasicHttpParams()
+        params.setParameter("http.protocol.handle-redirects", false)
+        hcRequest.setParams(params)
 
     	def host = new HttpHost(couchdbHost, couchdbPort as int, couchdbProtocol)
     	def client = new HttpClientBuilder().create().build()
@@ -48,7 +53,18 @@ class CouchProxyController {
 //    			println "status=" + response.status
     			hcResponse.allHeaders.each {
 //	    		println "--- setting response header '$it.name' to '$it.value'"
-    				response.setHeader(it.name, it.value)
+                    def value = it.value
+                    if ("location".equalsIgnoreCase(it.name)) {
+                        println "___ LOC INPUT=" + value
+                        // rewrite "location" header to point to this controller
+                        def uri = new URI(value)
+                        value = uri.scheme + "://" + uri.host + ":" + uri.port + request.contextPath + "/db" + uri.path
+                        if (uri.query) {
+                            value += "?" + uri.query
+                        }
+                        println "___ LOC OUTPUT=" + value
+                    }
+    				response.setHeader(it.name, value)
     			}
     			response.outputStream << hcResponse.entity?.content
     			response.outputStream.flush()

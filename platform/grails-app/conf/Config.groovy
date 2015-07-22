@@ -88,6 +88,7 @@ grails.hibernate.osiv.readonly = false
 environments {
     development {
         grails.logging.jul.usebridge = true
+        grails.serverURL = "http://localhost:8080/platform"
 
         kola {
             repository.directory = "./repository"
@@ -97,12 +98,13 @@ environments {
                 port = "5984"
                 admin.user = "syncservice"
                 admin.pass = "pw4syncservice"
-                secret = "92de07df7e7a3fe14808cef90a7cc0d91"
+                secret = "mySuperSecretSecret!;"
             }
         }
     }
     production {
         grails.logging.jul.usebridge = false
+        grails.serverURL = "http://platform.kola-project.de"
         kola {
             repository.directory = "./repository"
             couchdb {
@@ -111,7 +113,7 @@ environments {
                 port = "5984"
                 admin.user = "syncservice"
                 admin.pass = "pw4syncservice"
-                secret = "92de07df7e7a3fe14808cef90a7cc0d91"
+                secret = "mySuperSecretSecret!;"
             }
         }
         // TODO: grails.serverURL = "http://www.changeme.com"
@@ -145,6 +147,7 @@ elasticSearch {
 }
 
 // Added by the Spring Security Core plugin:
+grails.plugin.springsecurity.logout.postOnly = false
 grails.plugin.springsecurity.userLookup.userDomainClassName = 'kola.User'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'kola.UserRole'
 grails.plugin.springsecurity.authority.className = 'kola.Role'
@@ -155,7 +158,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/assets/**':       ['permitAll'],
 	'/**/js/**':        ['permitAll'],
 	'/**/css/**':       ['permitAll'],
-	'/**/images/**':    ['permitAll'],
+    '/**/images/**':    ['permitAll'],
 	'/**/favicon.ico':  ['permitAll']
 ]
 

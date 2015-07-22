@@ -57,6 +57,8 @@ grails.project.dependency.resolution = {
         compile('org.apache.tika:tika-parsers:1.9') { excludes "xercesImpl", "xmlParserAPIs", "xml-apis", "log4j", "httpcore" }
         compile('org.hashids:hashids:1.0.1')
         compile('org.lightcouch:lightcouch:0.1.8')
+        // needed for rendering-plugin to work (PDF generation)
+        runtime ('org.springframework:spring-test:4.1.5.RELEASE')
     }
 
     plugins {
@@ -73,10 +75,13 @@ grails.project.dependency.resolution = {
         runtime ":hibernate4:4.3.8.1" // or ":hibernate:3.6.10.18"
         runtime ":database-migration:1.4.0"
         runtime ":jquery:1.11.1"
+        runtime ":twitter-bootstrap:3.3.4"
+        runtime ":font-awesome-resources:4.3.0.1"
 
         runtime ":elasticsearch:0.0.4.6"
         runtime ":quartz:1.0.2"
-        compile(":webflow:2.1.0")
+        compile ":webflow:2.1.0"
+        compile ":rendering:1.0.0"
 
         // Uncomment these to enable additional asset-pipeline capabilities
         //compile ":sass-asset-pipeline:1.9.0"

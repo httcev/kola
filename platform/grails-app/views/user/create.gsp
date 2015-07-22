@@ -6,33 +6,33 @@
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
 	</head>
 	<body>
-		<a href="#create-user" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
-		<div class="nav" role="navigation">
-			<ul>
-				<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-				<li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
-			</ul>
-		</div>
-		<div id="create-user" class="content scaffold-create" role="main">
-			<h1><g:message code="default.create.label" args="[entityName]" /></h1>
-			<g:if test="${flash.message}">
-			<div class="message" role="status">${flash.message}</div>
-			</g:if>
-			<g:hasErrors bean="${userInstance}">
-			<ul class="errors" role="alert">
+		<ol class="breadcrumb">
+			<li><g:link uri="/admin"><g:message code="default.admin.label" default="Administration" /></g:link></li>
+			<li><g:link action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
+			<li class="active"><g:message code="default.create.label" args="[entityName]" /></li>
+		</ol>
+		<h1 class="page-header"><g:message code="default.create.label" args="[entityName]" /></h1>
+		<g:hasErrors bean="${userInstance}">
+			<ul class="errors alert alert-danger" role="alert">
 				<g:eachError bean="${userInstance}" var="error">
 				<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
 				</g:eachError>
 			</ul>
-			</g:hasErrors>
-			<g:form url="[resource:userInstance, action:'save']" >
-				<fieldset class="form">
-					<g:render template="form"/>
-				</fieldset>
-				<fieldset class="buttons">
-					<g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-				</fieldset>
-			</g:form>
-		</div>
+		</g:hasErrors>
+		<g:hasErrors bean="${userInstance.profile}">
+			<ul class="errors alert alert-danger" role="alert">
+				<g:eachError bean="${userInstance.profile}" var="error">
+				<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
+				</g:eachError>
+			</ul>
+		</g:hasErrors>
+		<g:form url="[resource:userInstance, action:'save']" class="form-horizontal" autocomplete="off" enctype="multipart/form-data">
+			<g:render template="form"/>
+			<g:render template="account"/>
+			<g:render template="profile"/>
+			<div class="buttons pull-right">
+				<button class="save btn btn-success"><i class="fa fa-cloud-upload"></i> <g:message code="default.button.create.label" default="Create" /></button>
+			</div>
+		</g:form>
 	</body>
 </html>
