@@ -14,11 +14,8 @@
 		</ol>
 		<h1 class="page-header">
 			<g:message code="default.list.label" args="[entityName]" />
-			<g:link class="create btn btn-default btn-sm pull-right" action="create" title="${message(code: 'default.new.label', args:[entityName])}">
-				<span class="fa-stack">
-				  <i class="fa fa-user fa-stack-2x"></i>
-				  <i class="fa fa-plus fa-stack-1x text-primary"></i>
-				</span>
+			<g:link class="create btn btn-primary pull-right" action="create" title="${message(code: 'default.new.label', args:[entityName])}">
+				<i class="fa fa-user-plus"></i>
 			</g:link>
 		</h1>
 		<g:if test="${flash.message}">

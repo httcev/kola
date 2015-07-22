@@ -25,7 +25,7 @@
 <div class="form-group ${hasErrors(bean: userInstance.profile, field: 'photo', 'error')} ">
 	<label for="photo" class="col-sm-2 control-label"><g:message code="user.photo.label" default="Photo" /></label>
 	<div class="col-sm-10">
-		<g:if test="${userInstance.profile.photo?.length > 0}">
+		<g:if test="${userInstance.profile?.photo?.length > 0}">
 			<div class="row">
 			  <div class="col-xs-3 col-md-2">
 			  	<div class="thumbnail">

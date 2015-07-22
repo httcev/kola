@@ -7,11 +7,13 @@
 	</head>
 	<body>
 		<div id="show-search" class="content scaffold-search" role="main">
-			<g:form action="." method="GET">
-				<input type="search" name="query" value="${params.query}" autofocus>
-				<button type="submit" class="search">${message(code: 'default.button.search.label', default: 'Search')}</button>
+			<g:form action="." method="GET" class="form-inline">
+				<div class="form-group">
+					<input type="search" name="q" class="form-control" value="${params.q}" placeholder="Search" autofocus>
+					<button type="submit" class="search btn btn-default">${message(code: 'default.button.search.label', default: 'Search')}</button>
+				</div>
 			</g:form>
-			<g:if test="${params.query}">
+			<g:if test="${params.q}">
 				<g:if test="${results?.total > 0}">
 					<p>Anzahl Treffer: ${results?.total}</p>
 					<g:set var="searchResults" value="${results?.searchResults}"/>
@@ -30,7 +32,7 @@
 					</ul>
 				</g:if>
 				<g:else>
-					Die Suche nach '${params.query}' ergab keinen Treffer.
+					Die Suche nach '${params.q}' ergab keinen Treffer.
 				</g:else>
 			</g:if>
 		</div>

@@ -13,7 +13,7 @@ class SearchController {
 			preTags '<strong>'
   			postTags '</strong>'
 		}
-		def results = elasticSearchService.search("${params.query}", [highlight: highlighter])    	
+		def results = elasticSearchService.search("${params.q}", [highlight: highlighter])    	
 		println results
 		
 		[results:results]
