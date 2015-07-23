@@ -25,17 +25,17 @@
 <div class="form-group ${hasErrors(bean: userInstance.profile, field: 'photo', 'error')} ">
 	<label for="photo" class="col-sm-2 control-label"><g:message code="user.photo.label" default="Photo" /></label>
 	<div class="col-sm-10">
+		<input type="hidden" name="_deletePhoto" id="deletePhoto" value="false">
 		<g:if test="${userInstance.profile?.photo?.length > 0}">
-			<div class="row">
-			  <div class="col-xs-3 col-md-2">
-			  	<div class="thumbnail">
-			  	<div class="avatar-container">
+			<div id="avatar-container">
+			  	<div class="thumbnail pull-left">
 					<img class="avatar" src="data:image/png;base64,${userInstance.profile.photo.encodeBase64().toString()}">
-					</div>
-					</div>
-			  </div>
+				</div>
+				
+				<button type="button" class="delete btn btn-danger" title="Bild löschen" onclick="$('#avatar-container').remove(); $('#deletePhoto').val('true');" style="margin-left:10px"><i class="fa fa-times"></i></button>
+				
 			</div>
 		</g:if>
-		<input type="file" name="profile.photo" class="form-control" id="photo">
+		<input type="file" name="_photo" class="form-control" id="photo">
 	</div>
 </div>

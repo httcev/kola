@@ -7,6 +7,7 @@ import org.springframework.security.access.annotation.Secured
 @Transactional(readOnly = true)
 @Secured(['ROLE_ADMIN'])
 class UserController {
+    def thumbnailService
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -22,6 +23,13 @@ class UserController {
         if (userInstance == null) {
             notFound()
             return
+        }
+
+        if (params['_photo']?.bytes?.length > 0) {
+            userInstance.profile.photo = thumbnailService.createThumbnailBytes(params['_photo'].bytes)
+        }
+        else if (params['_deletePhoto'] == 'true') {
+            userInstance.profile.photo = null
         }
 
         userInstance.save flush:true
@@ -47,6 +55,13 @@ class UserController {
         if (userInstance == null) {
             notFound()
             return
+        }
+
+        if (params['_photo']?.bytes?.length > 0) {
+            userInstance.profile.photo = thumbnailService.createThumbnailBytes(params['_photo'].bytes)
+        }
+        else if (params['_deletePhoto'] == 'true') {
+            userInstance.profile.photo = null
         }
 
         userInstance.save flush:true

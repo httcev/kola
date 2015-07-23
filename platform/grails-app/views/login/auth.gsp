@@ -17,7 +17,7 @@
 					</g:if>
 					<div class="form-group">
 						<label for="username" class="control-label"><g:message code="springSecurity.login.username.label" /></label>
-						<input type="text" name="j_username" class="form-control" id="username" placeholder="<g:message code="springSecurity.login.username.label"/>" autofocus>
+						<input type="text" name="j_username" class="form-control" id="username" placeholder="<g:message code="springSecurity.login.username.label"/>" autocapitalize="off" autofocus>
 					</div>
 					<div class="form-group">
 						<label for="password" class="control-label"><g:message code="springSecurity.login.password.label" /></label>

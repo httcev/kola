@@ -53,10 +53,14 @@ grails.project.dependency.resolution = {
         // runtime 'org.postgresql:postgresql:9.3-1101-jdbc41'
         test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
 
+        // fixes a bug in grails
+        compile('com.google.guava:guava:18.0')
+
         compile('org.apache.tika:tika-core:1.9')
         compile('org.apache.tika:tika-parsers:1.9') { excludes "xercesImpl", "xmlParserAPIs", "xml-apis", "log4j", "httpcore" }
         compile('org.hashids:hashids:1.0.1')
         compile('org.lightcouch:lightcouch:0.1.8')
+        compile('net.coobird:thumbnailator:0.4.8')
         // needed for rendering-plugin to work (PDF generation)
         runtime ('org.springframework:spring-test:4.1.5.RELEASE')
     }

@@ -28,6 +28,8 @@ class RepositoryController {
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
+        params.sort = params.sort ?: "lastUpdated"
+        params.order = params.order ?: "desc"
         respond Asset.list(params), model:[assetInstanceCount: Asset.count()]
     }
 

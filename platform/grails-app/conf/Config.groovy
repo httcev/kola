@@ -104,12 +104,12 @@ environments {
     }
     production {
         grails.logging.jul.usebridge = false
-        grails.serverURL = "http://platform.kola-project.de"
+        grails.serverURL = "http://platform.kola-projekt.de"
         kola {
-            repository.directory = "./repository"
+            repository.directory = "/srv/kola/repository"
             couchdb {
                 protocol = "http"
-                host = "10.0.17.7"
+                host = "localhost"
                 port = "5984"
                 admin.user = "syncservice"
                 admin.pass = "pw4syncservice"
@@ -118,6 +118,10 @@ environments {
         }
         // TODO: grails.serverURL = "http://www.changeme.com"
     }
+}
+
+kola {
+    thumbnailSize = 80
 }
 
 // log4j configuration
@@ -144,6 +148,7 @@ log4j.main = {
 elasticSearch {
     datastoreImpl = "hibernateDatastore"
     includeTransients = false
+    client.mode = 'local'
 }
 
 // Added by the Spring Security Core plugin:
@@ -170,3 +175,5 @@ grails.plugin.springsecurity.filterChain.chainMap = [
         '/db/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
         '/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
 ]
+
+grails.plugins.twitterbootstrap.fixtaglib = true
