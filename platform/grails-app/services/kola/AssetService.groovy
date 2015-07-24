@@ -7,7 +7,7 @@ import java.util.zip.ZipInputStream
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
 
-@Transactional
+@Transactional(readOnly = true)
 class AssetService {
 	def grailsLinkGenerator
     def hashIds
@@ -62,13 +62,15 @@ class AssetService {
     		throw new IOException("asset is not local")
     	}
     	*/
-    	return new File(repoDir, asset.id as String)
+        if (asset?.id) {
+        	return new File(repoDir, asset.id as String)
+        }
     }
 
     def deleteRepositoryFile(asset) {
     	def file = getRepositoryFile(asset)
-    	if (file.exists()) {
-    		println "--- DELETING REPO FILE " + file.getName()
+    	if (file?.exists()) {
+    		log.debug "deleting repository file " + file.getName()
     		if (file.isDirectory()) {
     			FileUtils.deleteDirectory(file)
     		}

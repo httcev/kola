@@ -16,10 +16,14 @@ class BootStrap {
         if (Role.count() == 0) {
             def adminRole = new Role(authority: 'ROLE_ADMIN').save(flush: true)
             def userRole = new Role(authority: 'ROLE_USER').save(flush: true)
+            assert Role.count() == 2
 
             def adminUser = new User(username:"admin", password:"admin", profile:[displayName:"Admin User"]).save(flush: true)
+            assert User.count() == 1
+
             UserRole.create(adminUser, userRole, true)
             UserRole.create(adminUser, adminRole, true)
+            assert UserRole.count() == 2
         }
 
         environments {

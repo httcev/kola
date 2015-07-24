@@ -1,10 +1,19 @@
+<%@ page import="kola.Profile" %>
+
 <div class="form-group ${hasErrors(bean: userInstance.profile, field: 'displayName', 'error')} required">
 	<label for="displayName" class="col-sm-2 control-label"><g:message code="user.displayName.label" default="Display name" /><span class="required-indicator">*</span></label>
 	<div class="col-sm-10"><g:textField name="profile.displayName" required="" value="${userInstance?.profile?.displayName}" class="form-control"/></div>
 </div>
-<div class="form-group ${hasErrors(bean: userInstance.profile, field: 'company', 'error')} ">
-	<label for="company" class="col-sm-2 control-label"><g:message code="user.company.label" default="Company" /></label>
-	<div class="col-sm-10"><g:textField name="profile.company" value="${userInstance?.profile?.company}" class="form-control"/></div>
+<div class="form-group ${hasErrors(bean: userInstance.profile, field: 'company', 'error')} required">
+	<label for="company" class="col-sm-2 control-label"><g:message code="user.company.label" default="Company" /><span class="required-indicator">*</span></label>
+	<div class="col-sm-10">
+		<input type="text" list="companies" name="profile.company" value="${userInstance?.profile?.company}" class="form-control" required="">
+		<datalist id="companies">
+			<g:each in="${Profile.executeQuery("select distinct p.company from Profile p")}">
+				<option value="${it}">
+			</g:each>
+		</datalist>
+	</div>
 </div>
 <div class="form-group ${hasErrors(bean: userInstance.profile, field: 'department', 'error')} ">
 	<label for="department" class="col-sm-2 control-label"><g:message code="user.department.label" default="Department" /></label>

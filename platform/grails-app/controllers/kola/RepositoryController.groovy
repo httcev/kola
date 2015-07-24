@@ -19,7 +19,8 @@ import org.springframework.security.access.annotation.Secured
 
 import kola.ZipUtil
 
-@Transactional(readOnly = true)
+// Non "readOnly" Transactional is needed for the "create" Webflow to work
+@Transactional
 @Secured(['ROLE_USER'])
 class RepositoryController {
 	def assetService
@@ -27,6 +28,7 @@ class RepositoryController {
     static allowedMethods = [save: "POST", update: ["PUT", "POST"], delete: "DELETE"]
 
     def index(Integer max) {
+            log.warn "-------------------------------------------------- MESSAGE2"
         params.max = Math.min(max ?: 10, 100)
         params.sort = params.sort ?: "lastUpdated"
         params.order = params.order ?: "desc"
@@ -44,10 +46,9 @@ class RepositoryController {
     */
 
     def createFlow = {
-    	
         initiliaze {
 			action {
-				flow.assetInstance = new Asset(params)
+				flow.assetInstance = new Asset()
            	}
            	on("success").to "uploadOrLink"
            	on(Exception).to "error"
@@ -67,7 +68,7 @@ class RepositoryController {
         	action {
         		try {
 		        	enrichAsset(flow.assetInstance)
-		        	if (flow.assetInstance.content && "application/zip".equals(flow.assetInstance.mimeType)) {
+		        	if (flow.assetInstance.content && "application/zip".equals(flow.assetInstance.mimeType?.toLowerCase())) {
 						ZipInputStream zin = new ZipInputStream(new BufferedInputStream(new ByteArrayInputStream(flow.assetInstance.content)))
 						def possibleAnchors = ZipUtil.getFilenames(zin, false)
 						if (possibleAnchors.length > 0) {
@@ -79,6 +80,7 @@ class RepositoryController {
 			        return metadata()
 		        }
 		        catch(e) {
+                    log.error e
 		        	if (flow.assetInstance.externalUrl) {
 		        		flow.assetInstance.errors.rejectValue('externalUrl', 'urlNotValid')
 		        	}
@@ -97,17 +99,19 @@ class RepositoryController {
         metadata {
         	on("submit") {
         		bindData(flow.assetInstance, params)
-        		if (flow.assetInstance.save()) {
-        			assetService.deleteRepositoryFile(flow.assetInstance)
-    				return success()	
-    			}
-    			else {
-    				return error()	
-				}
+                if (flow.assetInstance.save(true)) {
+                    println "--- assetService 2=" + assetService
+                    assetService.deleteRepositoryFile(flow.assetInstance)
+                    println "- FINISH DELETE"
+                    return success()
+                }
+                else {
+                    return error()  
+                }
     		}.to "finish"
         }
         finish {
-        	redirect(action: "index")
+            redirect(controller:"repository", action:"index")
         }
     }
 /*
@@ -137,6 +141,11 @@ class RepositoryController {
     }
 */
     def edit(Asset assetInstance) {
+        println "-- HERE"
+        if (assetInstance == null) {
+            notFound()
+            return
+        }
         respond assetInstance
     }
 
@@ -261,13 +270,8 @@ class RepositoryController {
     }
 
     protected void notFound() {
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.not.found.message', args: [message(code: 'asset.label', default: 'Asset'), params.id])
-                redirect action: "index", method: "GET"
-            }
-            '*'{ render status: NOT_FOUND }
-        }
+        flash.message = message(code: 'default.not.found.message', args: [message(code: 'asset.label', default: 'Asset'), params.id])
+        redirect action: "index", method: "GET"
     }
 
     protected void enrichAsset(Asset assetInstance) {

@@ -2,7 +2,8 @@
 <%@ page import="kola.Role" %>
 
 <div class="form-group ${hasErrors(bean: userInstance, field: 'enabled', 'error')}">
-	<div class="col-sm-offset-2 col-sm-10">
+	<label class="col-sm-2 control-label"><g:message code="user.account.label" default="Account" /></label>
+	<div class="col-sm-10">
 		<div class="checkbox">
 			<label><g:checkBox name="enabled" value="${userInstance?.enabled}"/> <g:message code="user.enabled.label" default="Enabled" /></label>
 		</div>

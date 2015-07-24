@@ -21,7 +21,7 @@ class ThumbnailService {
 	        }
 	        BufferedImage resized = new BufferedImage(thumbnailSize, thumbnailSize, image.getType());
 	        Graphics2D g = resized.createGraphics();
-	        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+	        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 	        g.drawImage(image, 0, 0, thumbnailSize, thumbnailSize, 0, 0, image.getWidth(), image.getHeight(), null);
 	        g.dispose();
 

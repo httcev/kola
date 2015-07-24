@@ -39,11 +39,6 @@
 						<li class="${controllerName == 'task' ? 'active' : ''}"><g:link controller="task" action="index">Aufgaben</g:link></li>
 						<li class="${controllerName == 'repository' ? 'active' : ''}"><g:link controller="repository" action="index">Lernressourcen</g:link></li>
 					</ul>
-					<g:form controller="search" class="navbar-form navbar-left" role="search" method="get">
-						<div class="form-group">
-							<input name="q" type="search" class="form-control" placeholder="Search">
-						</div>
-					</g:form>
 					</sec:ifLoggedIn>
 					<ul class="nav navbar-nav navbar-right">
 					<sec:ifAllGranted roles="ROLE_ADMIN">
@@ -62,8 +57,6 @@
 						<li class="dropdown">
 							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user"></i> <kola:displayName /> <span class="caret"></span></a>
 							<ul class="dropdown-menu">
-								<li><a href="#">Action</a></li>
-								<li><a href="#">Another action</a></li>
 								<li>
 									<g:link controller="profile">
 										<i class="fa fa-user"></i> Profil
