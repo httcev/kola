@@ -20,7 +20,7 @@ class CouchProxyController {
     def couchdbSecret
 
     // TODO: 301 from couch does not work (example: GET /_utils)
-	@Secured(['ROLE_USER'])
+	@Secured(['IS_AUTHENTICATED_FULLY'])
     def proxy() {
     	def path = request.forwardURI.replace(request.contextPath + "/db", "")
     	def query = request.queryString ? "?" + request.queryString : ""

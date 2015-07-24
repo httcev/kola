@@ -1,7 +1,7 @@
 package kola
 import org.springframework.security.access.annotation.Secured
 
-@Secured(['ROLE_USER'])
+@Secured(['IS_AUTHENTICATED_FULLY'])
 class SearchController {
 	def elasticSearchService
 

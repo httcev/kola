@@ -19,22 +19,22 @@ import org.springframework.security.access.annotation.Secured
 import org.springframework.web.context.request.RequestContextHolder
 import kola.ZipUtil
 
-// Non "readOnly" Transactional is needed for the "create" Webflow to work
 @Transactional
-@Secured(['ROLE_USER'])
+@Secured(['ROLE_ADMIN', 'ROLE_REPOSITORY_ADMIN'])
 class RepositoryController {
 	def assetService
 
     static allowedMethods = [save: "POST", update: ["PUT", "POST"], delete: "DELETE"]
 
+    @Secured(['IS_AUTHENTICATED_FULLY'])
     def index(Integer max) {
-            log.warn "-------------------------------------------------- MESSAGE2"
         params.max = Math.min(max ?: 10, 100)
         params.sort = params.sort ?: "lastUpdated"
         params.order = params.order ?: "desc"
         respond Asset.list(params), model:[assetInstanceCount: Asset.count()]
     }
 
+    @Secured(['IS_AUTHENTICATED_FULLY'])
     def show(Asset assetInstance) {
         respond assetInstance
     }

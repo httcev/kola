@@ -15,21 +15,19 @@ class BootStrap {
 
         if (Role.count() == 0) {
             def adminRole = new Role(authority: 'ROLE_ADMIN').save(flush: true)
-            def userRole = new Role(authority: 'ROLE_USER').save(flush: true)
+            def repositoryAdminRole = new Role(authority: 'ROLE_REPOSITORY_ADMIN').save(flush: true)
             assert Role.count() == 2
 
             def adminUser = new User(username:"admin", password:"admin", profile:[displayName:"Admin User"]).save(flush: true)
             assert User.count() == 1
 
-            UserRole.create(adminUser, userRole, true)
             UserRole.create(adminUser, adminRole, true)
-            assert UserRole.count() == 2
+            assert UserRole.count() == 1
         }
 
         environments {
             development {
                 def testUser = new User(username:"tittel", password:"tittel", profile:[displayName:"Stephan Tittel", company:"httc e.V.", department:"Knowledge & Educational Technologies", phone:"+49615116882", mobile:"+4915114474556", email:"stephan.tittel@kom.tu-darmstadt.de"]).save(flush: true)
-                UserRole.create(testUser, Role.findByAuthority('ROLE_USER'), true)
 
                 def numAssets = 20
                 for (i in 1..numAssets) {

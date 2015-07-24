@@ -5,7 +5,7 @@ import org.springframework.security.access.annotation.Secured
 import static org.springframework.http.HttpStatus.*
 
 @Transactional(readOnly = true)
-@Secured(['ROLE_USER'])
+@Secured(['IS_AUTHENTICATED_FULLY'])
 class ProfileController {
 	def springSecurityService
     def thumbnailService

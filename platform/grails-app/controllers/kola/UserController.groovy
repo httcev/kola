@@ -37,6 +37,7 @@ class UserController {
             respond userInstance.errors, view:'create'
             return
         }
+        updateRoles(userInstance)
 
         flash.message = message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])
         redirect action:"index", method:"GET"
@@ -69,6 +70,7 @@ class UserController {
             respond userInstance.errors, view:'edit'
             return
         }
+        updateRoles(userInstance)
 
         flash.message = message(code: 'default.updated.message', args: [message(code: 'User.label', default: 'User'), userInstance.id])
         redirect action:"index", method:"GET"
@@ -76,7 +78,6 @@ class UserController {
 
     @Transactional
     def delete(User userInstance) {
-
         if (userInstance == null) {
             notFound()
             return
@@ -91,5 +92,12 @@ class UserController {
     protected void notFound() {
         flash.message = message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])
         redirect action: "index", method: "GET"
+    }
+
+    protected void updateRoles(User userInstance) {
+        UserRole.findAllByUser(userInstance)*.delete()
+        params?.role?.each {
+            UserRole.create(userInstance, Role.get(it), true)
+        }
     }
 }

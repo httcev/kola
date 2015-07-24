@@ -7,7 +7,7 @@ import grails.transaction.Transactional
 import org.springframework.security.access.annotation.Secured
 
 @Transactional(readOnly = true)
-@Secured(['ROLE_USER'])
+@Secured(['IS_AUTHENTICATED_FULLY'])
 class TaskTemplateController {
 
     static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]

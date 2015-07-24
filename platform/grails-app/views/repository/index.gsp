@@ -10,7 +10,9 @@
 	<body>
 		<h1 class="page-header">
 			<g:message code="default.list.label" args="[entityName]" />
-			<g:link class="create btn btn-primary pull-right" action="create" title="${message(code: 'default.new.label', args:[entityName])}"><i class="fa fa-plus"></i></g:link>
+			<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REPOSITORY_ADMIN">
+				<g:link class="create btn btn-primary pull-right" action="create" title="${message(code: 'default.new.label', args:[entityName])}"><i class="fa fa-plus"></i></g:link>
+			</sec:ifAnyGranted>
 		</h1>
 		<g:if test="${flash.message}">
 			<div class="message alert alert-success" role="status">${flash.message}</div>
