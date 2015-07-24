@@ -16,7 +16,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.nio.file.Files;
 import org.springframework.security.access.annotation.Secured
-
+import org.springframework.web.context.request.RequestContextHolder
 import kola.ZipUtil
 
 // Non "readOnly" Transactional is needed for the "create" Webflow to work
@@ -100,9 +100,8 @@ class RepositoryController {
         	on("submit") {
         		bindData(flow.assetInstance, params)
                 if (flow.assetInstance.save(true)) {
-                    println "--- assetService 2=" + assetService
                     assetService.deleteRepositoryFile(flow.assetInstance)
-                    println "- FINISH DELETE"
+                    RequestContextHolder.currentRequestAttributes().flashScope.message = message(code: 'default.created.message', args: [message(code: 'asset.label', default: 'Asset'), flow.assetInstance.id])
                     return success()
                 }
                 else {
@@ -111,7 +110,7 @@ class RepositoryController {
     		}.to "finish"
         }
         finish {
-            redirect(controller:"repository", action:"index")
+            redirect(action:"index")
         }
     }
 /*
@@ -141,7 +140,6 @@ class RepositoryController {
     }
 */
     def edit(Asset assetInstance) {
-        println "-- HERE"
         if (assetInstance == null) {
             notFound()
             return
