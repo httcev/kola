@@ -20,8 +20,9 @@ html, body { height:100% }
 #loginWrapper { max-width:350px; margin:50px auto }
 .error input { border-color:red; }
 header h1, .navbar-default .navbar-brand { color:#a11d21 }
-header #logo, .navbar-header #logo { width:20px; }
+header #logo, .navbar-header #logo { width:32px; margin-top:-6px;}
 .dropdown-menu > li > a { padding-top:9px; padding-bottom:9px }
+.page-header { margin-top:0; }
 /*.avatar { width:36px; height:36px; }*/
 .avatar-container { position:relative; overflow:hidden; padding-bottom:100%; }
 .avatar-container img { position:absolute; }

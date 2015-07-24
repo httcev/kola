@@ -26,15 +26,7 @@
 		
 	</label>
 	<g:datePicker name="due" precision="day"  value="${taskInstance?.due}" default="none" noSelection="['': '']" />
-
-</div>
-
-<div class="fieldcontain ${hasErrors(bean: taskInstance, field: 'template', 'error')} ">
-	<label for="template">
-		<g:message code="task.template.label" default="Template" />
-		
-	</label>
-	<g:select id="template" name="template.id" from="${kola.TaskTemplate.list()}" optionKey="id" value="${taskInstance?.template?.id}" class="many-to-one" noSelection="['null': '']"/>
+	<input name="due" type="date" value="${taskInstance?.due}">
 
 </div>
 
@@ -53,15 +45,6 @@
 		
 	</label>
 	<g:select name="attachments" from="${kola.Attachment.list()}" multiple="multiple" optionKey="id" size="5" value="${taskInstance?.attachments*.id}" class="many-to-many"/>
-
-</div>
-
-<div class="fieldcontain ${hasErrors(bean: taskInstance, field: 'creator', 'error')} required">
-	<label for="creator">
-		<g:message code="task.creator.label" default="Creator" />
-		<span class="required-indicator">*</span>
-	</label>
-	<g:select id="creator" name="creator.id" from="${kola.User.list()}" optionKey="id" required="" value="${taskInstance?.creator?.id}" class="many-to-one"/>
 
 </div>
 

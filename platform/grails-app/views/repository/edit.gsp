@@ -7,35 +7,33 @@
 		<title><g:message code="default.edit.label" args="[entityName]" /></title>
 	</head>
 	<body>
-		<a href="#edit-asset" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
-		<div class="nav" role="navigation">
-			<ul>
-				<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-				<li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
-				<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
-			</ul>
-		</div>
-		<div id="edit-asset" class="content scaffold-edit" role="main">
-			<h1><g:message code="default.edit.label" args="[entityName]" /></h1>
+		<ol class="breadcrumb">
+			<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
+			<li><g:link class="index" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
+			<li class="active"><g:message code="default.edit.label" args="[entityName]" /></li>
+		</ol>
+		<g:form class="form-horizontal" url="[controller:'repository', id:assetInstance.id, action:'update']" method="put"  enctype="multipart/form-data">
+			<h1 class="page-header">
+				<g:message code="default.edit.label" args="[entityName]" />
+				<div class="buttons pull-right">
+					<button class="save btn btn-success"><i class="fa fa-save"></i> <g:message code="default.button.update.label" default="Update" /></button>
+				</div>
+			</h1>
 			<g:if test="${flash.message}">
-			<div class="message" role="status">${flash.message}</div>
+				<div class="message" role="status">${flash.message}</div>
 			</g:if>
 			<g:hasErrors bean="${assetInstance}">
-			<ul class="errors" role="alert">
-				<g:eachError bean="${assetInstance}" var="error">
-				<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
-				</g:eachError>
-			</ul>
+				<ul class="errors alert alert-danger" role="alert">
+					<g:eachError bean="${assetInstance}" var="error">
+					<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
+					</g:eachError>
+				</ul>
 			</g:hasErrors>
-			<g:form lala="lulul" url="[controller:'repository', id:assetInstance.id, action:'update']" method="put"  enctype="multipart/form-data">
-				<g:hiddenField name="version" value="${assetInstance?.version}" />
-				<fieldset class="form">
-					<g:render template="form"/>
-				</fieldset>
-				<fieldset class="buttons">
-					<g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-				</fieldset>
-			</g:form>
-		</div>
+			<g:hiddenField name="version" value="${assetInstance?.version}" />
+			<g:render template="form"/>
+			<div class="buttons pull-right">
+				<button class="save btn btn-success"><i class="fa fa-save"></i> <g:message code="default.button.update.label" default="Update" /></button>
+			</div>
+		</g:form>
 	</body>
 </html>

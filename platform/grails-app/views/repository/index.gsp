@@ -27,10 +27,10 @@
 				</tr>
 			</thead>
 			<tbody>
-			<g:each in="${assetInstanceList}" status="i" var="assetInstance">
-				<tr class="${(i % 2) == 0 ? 'even' : 'odd'}">
+			<g:each in="${assetInstanceList}" var="assetInstance">
+				<tr>
 					<td><g:link action="show" id="${assetInstance.id}">${fieldValue(bean: assetInstance, field: "name")}</g:link></td>
-					<td>${fieldValue(bean: assetInstance, field: "description").take(100)}</td>
+					<td>${fieldValue(bean: assetInstance, field: "description")?.take(100)}</td>
 					<td>${fieldValue(bean: assetInstance, field: "lastUpdated")}</td>
 					<td>${fieldValue(bean: assetInstance, field: "mimeType")}</td>
 				</tr>

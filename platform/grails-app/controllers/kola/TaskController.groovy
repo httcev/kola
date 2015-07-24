@@ -11,7 +11,7 @@ import org.springframework.security.access.annotation.Secured
 @Secured(['IS_AUTHENTICATED_FULLY'])
 class TaskController {
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [save: "POST", update: ["PUT", "POST"], delete: "DELETE"]
     def pdfRenderingService
 
     def index(Integer max) {

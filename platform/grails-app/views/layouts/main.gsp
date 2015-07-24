@@ -43,7 +43,7 @@
 					<ul class="nav navbar-nav navbar-right">
 					<sec:ifAllGranted roles="ROLE_ADMIN">
 						<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-wrench"></i> Administration <span class="caret"></span></a>
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-wrench fa-lg"></i> Administration <span class="caret"></span></a>
 							<ul class="dropdown-menu">
 								<li><g:link controller="user"><i class="fa fa-users"></i> Benutzerverwaltung</g:link></li>
 								<li><g:link controller="platformInfo"><i class="fa fa-cubes"></i> Systeminformationen</g:link></li>
@@ -51,11 +51,11 @@
 						</li>
 					</sec:ifAllGranted>
 					<sec:ifNotLoggedIn>
-						<li><g:link controller="login"><i class="fa fa-sign-in"></i> Anmelden</g:link></li>
+						<li><g:link controller="login"><i class="fa fa-sign-in fa-lg"></i> Anmelden</g:link></li>
 					</sec:ifNotLoggedIn>
 					<sec:ifLoggedIn>
 						<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user"></i> <kola:displayName /> <span class="caret"></span></a>
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user fa-lg"></i> <kola:displayName /> <span class="caret"></span></a>
 							<ul class="dropdown-menu">
 								<li>
 									<g:link controller="profile">

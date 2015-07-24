@@ -16,7 +16,8 @@ class BootStrap {
         if (Role.count() == 0) {
             def adminRole = new Role(authority: 'ROLE_ADMIN').save(flush: true)
             def repositoryAdminRole = new Role(authority: 'ROLE_REPOSITORY_ADMIN').save(flush: true)
-            assert Role.count() == 2
+            def taskTemplateCreatorRole = new Role(authority: 'ROLE_TASK_TEMPLATE_CREATOR').save(flush: true)
+            assert Role.count() == 3
 
             def adminUser = new User(username:"admin", password:"admin", profile:[displayName:"Admin User"]).save(flush: true)
             assert User.count() == 1

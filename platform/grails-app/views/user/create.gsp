@@ -7,7 +7,7 @@
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><g:link uri="/admin"><g:message code="default.admin.label" default="Administration" /></g:link></li>
+			<li><g:link uri="/"><g:message code="default.home.label" default="Home" /></g:link></li>
 			<li><g:link action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
 			<li class="active"><g:message code="default.create.label" args="[entityName]" /></li>
 		</ol>

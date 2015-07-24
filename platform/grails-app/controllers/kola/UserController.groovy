@@ -8,6 +8,7 @@ import org.springframework.security.access.annotation.Secured
 @Secured(['ROLE_ADMIN'])
 class UserController {
     def thumbnailService
+    def springSecurityService
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -87,6 +88,57 @@ class UserController {
 
         flash.message = message(code: 'default.deleted.message', args: [message(code: 'User.label', default: 'User'), userInstance.id])
         redirect action:"index", method:"GET"
+    }
+
+    /*
+    * copied from https://grails-plugins.github.io/grails-spring-security-core/guide/passwords.html
+    */
+    @Secured('permitAll')
+    def passwordExpired() {
+        println "--- " + session['SPRING_SECURITY_LAST_EXCEPTION']
+        println "--- SESSION USER="+session['SPRING_SECURITY_LAST_EXCEPTION']?.authentication?.principal
+        [username: session['SPRING_SECURITY_LAST_USERNAME']]
+    }
+
+    /*
+    * copied from https://grails-plugins.github.io/grails-spring-security-core/guide/passwords.html
+    */
+    @Transactional
+    @Secured('permitAll')
+    def updatePassword() {
+        String username = session['SPRING_SECURITY_LAST_USERNAME']
+        if (!username) {
+          flash.message = 'Sorry, an error has occurred'
+          redirect controller: 'login', action: 'auth'
+          return
+        }
+        String password = params.password
+        String newPassword = params.password_new
+        String newPassword2 = params.password_new_2
+        if (!password || !newPassword || !newPassword2 || newPassword != newPassword2) {
+          flash.message = 'Please enter your current password and a valid new password'
+          render view: 'passwordExpired', model: [username: session['SPRING_SECURITY_LAST_USERNAME']]
+          return
+        }
+
+        User user = User.findByUsername(username)
+        if (!springSecurityService.passwordEncoder?.isPasswordValid(user.password, password, null /*salt*/)) {
+          flash.message = 'Current password is incorrect'
+          render view: 'passwordExpired', model: [username: session['SPRING_SECURITY_LAST_USERNAME']]
+          return
+        }
+
+        if (springSecurityService.passwordEncoder?.isPasswordValid(user.password, newPassword, null /*salt*/)) {
+          flash.message = 'Please choose a different password from your current one'
+          render view: 'passwordExpired', model: [username: session['SPRING_SECURITY_LAST_USERNAME']]
+          return
+        }
+
+        user.password = newPassword
+        user.passwordExpired = false
+        user.save()
+
+        redirect controller: 'login', action: 'auth'
     }
 
     protected void notFound() {

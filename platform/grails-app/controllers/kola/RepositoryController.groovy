@@ -24,7 +24,7 @@ import kola.ZipUtil
 class RepositoryController {
 	def assetService
 
-    static allowedMethods = [save: "POST", update: ["PUT", "POST"], delete: "DELETE"]
+    //static allowedMethods = [save: "POST", update: ["PUT", "POST"], delete: "DELETE"]
 
     @Secured(['IS_AUTHENTICATED_FULLY'])
     def index(Integer max) {
@@ -182,14 +182,8 @@ class RepositoryController {
         }
 
         assetInstance.delete flush:true
-
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'Asset.label', default: 'Asset'), assetInstance.id])
-                redirect action:"index", method:"GET"
-            }
-            '*'{ render status: NO_CONTENT }
-        }
+        flash.message = message(code: 'default.deleted.message', args: [message(code: 'Asset.label', default: 'Asset'), assetInstance.id])
+        redirect action:"index", method:"GET"
     }
 
     @Secured(['permitAll'])
@@ -281,7 +275,10 @@ class RepositoryController {
 		        if (assetInstance.content) {
 		            // remove externalUrl since we're now expecting a local asset
 		            assetInstance.externalUrl = null
-		            assetInstance.filename = request.getFile("content").getOriginalFilename()
+                    def uploadFile = request.getFile("content")
+                    if (uploadFile) {
+    		            assetInstance.filename = uploadFile.getOriginalFilename()
+                    }
 
 		            inputStream = new ByteArrayInputStream(assetInstance.content)
 		            metadata.add(Metadata.RESOURCE_NAME_KEY, assetInstance.filename)

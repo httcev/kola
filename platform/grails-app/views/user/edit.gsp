@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><g:link uri="/admin"><g:message code="default.admin.label" default="Administration" /></g:link></li>
+			<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
 			<li><g:link class="index" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
 			<li class="active"><g:message code="default.edit.label" args="[entityName]" /></li>
 		</ol>
