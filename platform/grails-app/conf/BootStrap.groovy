@@ -19,7 +19,7 @@ class BootStrap {
             def taskTemplateCreatorRole = new Role(authority: 'ROLE_TASK_TEMPLATE_CREATOR').save(flush: true)
             assert Role.count() == 3
 
-            def adminUser = new User(username:"admin", password:"admin", profile:[displayName:"Admin User"]).save(flush: true)
+            def adminUser = new User(username:"admin", password:"admin", email:"stephan.tittel@httc.de", profile:[displayName:"Admin User", company:"KOLA"]).save(flush: true)
             assert User.count() == 1
 
             UserRole.create(adminUser, adminRole, true)
@@ -28,7 +28,7 @@ class BootStrap {
 
         environments {
             development {
-                def testUser = new User(username:"tittel", password:"tittel", profile:[displayName:"Stephan Tittel", company:"httc e.V.", department:"Knowledge & Educational Technologies", phone:"+49615116882", mobile:"+4915114474556", email:"stephan.tittel@kom.tu-darmstadt.de"]).save(flush: true)
+                def testUser = new User(username:"tittel", password:"tittel", email:"stephan.tittel@kom.tu-darmstadt.de", profile:[displayName:"Stephan Tittel", company:"httc e.V.", phone:"+49615116882", mobile:"+4915114474556"]).save(flush: true)
 
                 def numAssets = 20
                 for (i in 1..numAssets) {

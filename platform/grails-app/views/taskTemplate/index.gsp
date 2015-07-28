@@ -1,10 +1,8 @@
 
-<%@ page import="kola.TaskTemplate" %>
-<!DOCTYPE html>
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'taskTemplate.label', default: 'TaskTemplate')}" />
+		<g:set var="entityName" value="${message(code: 'taskTemplate.label', default: 'Arbeitsprozessbeschreibung')}" />
 		<title><g:message code="default.list.label" args="[entityName]" /></title>
 	</head>
 	<body>

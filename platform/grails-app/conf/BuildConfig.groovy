@@ -86,6 +86,8 @@ grails.project.dependency.resolution = {
         runtime ":quartz:1.0.2"
         compile ":webflow:2.1.0"
         compile ":rendering:1.0.0"
+        compile (":spring-security-ui:1.0-RC2" ) { excludes "jquery-ui", "famfamfam" }
+        compile ":mail:1.0.7"
 
         // Uncomment these to enable additional asset-pipeline capabilities
         //compile ":sass-asset-pipeline:1.9.0"

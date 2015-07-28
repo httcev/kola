@@ -16,6 +16,7 @@ class UserController {
     }
 
     def create() {
+        params.passwordExpired = true
         respond new User(params)
     }
 
@@ -95,8 +96,6 @@ class UserController {
     */
     @Secured('permitAll')
     def passwordExpired() {
-        println "--- " + session['SPRING_SECURITY_LAST_EXCEPTION']
-        println "--- SESSION USER="+session['SPRING_SECURITY_LAST_EXCEPTION']?.authentication?.principal
         [username: session['SPRING_SECURITY_LAST_USERNAME']]
     }
 
@@ -138,7 +137,9 @@ class UserController {
         user.passwordExpired = false
         user.save()
 
-        redirect controller: 'login', action: 'auth'
+        springSecurityService.reauthenticate user.username
+
+        redirect uri:"/"
     }
 
     protected void notFound() {

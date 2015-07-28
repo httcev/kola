@@ -36,7 +36,7 @@
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<sec:ifLoggedIn>
 					<ul class="nav navbar-nav">
-						<li class="${controllerName == 'task' ? 'active' : ''}"><g:link controller="task" action="index">Aufgaben</g:link></li>
+						<li class="${controllerName == 'task' ? 'active' : ''}"><g:link controller="task" action="index">Aufträge</g:link></li>
 						<li class="${controllerName == 'repository' ? 'active' : ''}"><g:link controller="repository" action="index">Lernressourcen</g:link></li>
 					</ul>
 					</sec:ifLoggedIn>

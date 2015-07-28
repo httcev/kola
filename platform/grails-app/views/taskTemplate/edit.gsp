@@ -1,41 +1,36 @@
-<%@ page import="kola.TaskTemplate" %>
-<!DOCTYPE html>
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'taskTemplate.label', default: 'TaskTemplate')}" />
+		<g:set var="entityName" value="${message(code: 'taskTemplate.label', default: 'Arbeitsprozessbeschreibung')}" />
 		<title><g:message code="default.edit.label" args="[entityName]" /></title>
 	</head>
 	<body>
-		<a href="#edit-taskTemplate" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
-		<div class="nav" role="navigation">
-			<ul>
-				<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-				<li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
-				<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
-			</ul>
-		</div>
-		<div id="edit-taskTemplate" class="content scaffold-edit" role="main">
-			<h1><g:message code="default.edit.label" args="[entityName]" /></h1>
-			<g:if test="${flash.message}">
-			<div class="message" role="status">${flash.message}</div>
-			</g:if>
+		<ol class="breadcrumb">
+			<li><g:link uri="/"><g:message code="default.home.label" default="Home" /></g:link></li>
+			<li><g:link action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
+			<li class="active"><g:message code="default.edit.label" args="[entityName]" /></li>
+		</ol>
+		<g:form url="[resource:taskTemplateInstance, action:'update']" method="PUT" class="form-horizontal" enctype="multipart/form-data" autocomplete="off">
+			<h1 class="page-header">
+				<g:message code="default.edit.label" args="[entityName]" />
+				<div class="buttons pull-right">
+					<g:link class="delete btn btn-danger" action="delete" id="${taskTemplateInstance.id}" title="${message(code: 'default.button.delete.label', args:[entityName])}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+						<i class="fa fa-times"></i>
+					</g:link>
+					<button class="save btn btn-success"><i class="fa fa-save"></i> <g:message code="default.button.update.label" default="Update" /></button>
+				</div>
+			</h1>
 			<g:hasErrors bean="${taskTemplateInstance}">
-			<ul class="errors" role="alert">
-				<g:eachError bean="${taskTemplateInstance}" var="error">
-				<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
-				</g:eachError>
-			</ul>
+				<ul class="errors alert alert-danger" role="alert">
+					<g:eachError bean="${taskTemplateInstance}" var="error">
+					<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
+					</g:eachError>
+				</ul>
 			</g:hasErrors>
-			<g:form url="[resource:taskTemplateInstance, action:'update']" method="PUT" >
-				<g:hiddenField name="version" value="${taskTemplateInstance?.version}" />
-				<fieldset class="form">
-					<g:render template="form"/>
-				</fieldset>
-				<fieldset class="buttons">
-					<g:actionSubmit class="save" action="update" value="${message(code: 'default.button.update.label', default: 'Update')}" />
-				</fieldset>
-			</g:form>
-		</div>
+			<g:render template="form"/>
+			<div class="buttons pull-right">
+				<button class="save btn btn-success"><i class="fa fa-save"></i> <g:message code="default.button.update.label" default="Update" /></button>
+			</div>
+		</g:form>
 	</body>
 </html>

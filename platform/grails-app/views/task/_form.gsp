@@ -26,7 +26,6 @@
 		
 	</label>
 	<g:datePicker name="due" precision="day"  value="${taskInstance?.due}" default="none" noSelection="['': '']" />
-	<input name="due" type="date" value="${taskInstance?.due}">
 
 </div>
 

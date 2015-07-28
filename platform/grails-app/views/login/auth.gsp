@@ -28,6 +28,7 @@
 							<label><input type="checkbox" name="${rememberMeParameter}" <g:if test='${hasCookie}'>checked='checked'</g:if>> <g:message code="springSecurity.login.remember.me.label" /></label>
 						</div>
 					</div>
+					<g:link class="pull-right" controller="register" action="forgotPassword"><g:message code="spring.security.ui.login.forgotPassword"/></g:link>
 				</div>
 				<div class="panel-footer text-center">
 					<button type="submit" class="btn btn-default"><g:message code="springSecurity.login.button" /></button>

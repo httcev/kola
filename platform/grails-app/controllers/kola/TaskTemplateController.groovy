@@ -10,7 +10,7 @@ import org.springframework.security.access.annotation.Secured
 @Secured(['IS_AUTHENTICATED_FULLY'])
 class TaskTemplateController {
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    def springSecurityService
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -31,6 +31,8 @@ class TaskTemplateController {
             notFound()
             return
         }
+        taskTemplateInstance.creator = springSecurityService.currentUser
+        taskTemplateInstance.validate()
 
         if (taskTemplateInstance.hasErrors()) {
             respond taskTemplateInstance.errors, view:'create'
@@ -39,13 +41,8 @@ class TaskTemplateController {
 
         taskTemplateInstance.save flush:true
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.created.message', args: [message(code: 'taskTemplate.label', default: 'TaskTemplate'), taskTemplateInstance.id])
-                redirect taskTemplateInstance
-            }
-            '*' { respond taskTemplateInstance, [status: CREATED] }
-        }
+        flash.message = message(code: 'default.created.message', args: [message(code: 'taskTemplate.label', default: 'TaskTemplate'), taskTemplateInstance.id])
+        redirect taskTemplateInstance
     }
 
     def edit(TaskTemplate taskTemplateInstance) {
@@ -66,13 +63,8 @@ class TaskTemplateController {
 
         taskTemplateInstance.save flush:true
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'TaskTemplate.label', default: 'TaskTemplate'), taskTemplateInstance.id])
-                redirect taskTemplateInstance
-            }
-            '*'{ respond taskTemplateInstance, [status: OK] }
-        }
+        flash.message = message(code: 'default.updated.message', args: [message(code: 'TaskTemplate.label', default: 'TaskTemplate'), taskTemplateInstance.id])
+        redirect taskTemplateInstance
     }
 
     @Transactional
@@ -85,13 +77,8 @@ class TaskTemplateController {
 
         taskTemplateInstance.delete flush:true
 
-        request.withFormat {
-            form multipartForm {
-                flash.message = message(code: 'default.deleted.message', args: [message(code: 'TaskTemplate.label', default: 'TaskTemplate'), taskTemplateInstance.id])
-                redirect action:"index", method:"GET"
-            }
-            '*'{ render status: NO_CONTENT }
-        }
+        flash.message = message(code: 'default.deleted.message', args: [message(code: 'TaskTemplate.label', default: 'TaskTemplate'), taskTemplateInstance.id])
+        redirect action:"index", method:"GET"
     }
 
     protected void notFound() {

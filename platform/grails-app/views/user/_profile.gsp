@@ -15,10 +15,6 @@
 		</datalist>
 	</div>
 </div>
-<div class="form-group ${hasErrors(bean: userInstance.profile, field: 'department', 'error')} ">
-	<label for="department" class="col-sm-2 control-label"><g:message code="user.department.label" default="Department" /></label>
-	<div class="col-sm-10"><g:textField name="profile.department" value="${userInstance?.profile?.department}" class="form-control"/></div>
-</div>
 <div class="form-group ${hasErrors(bean: userInstance.profile, field: 'phone', 'error')} ">
 	<label for="phone" class="col-sm-2 control-label"><g:message code="user.phone.label" default="Phone" /></label>
 	<div class="col-sm-10"><input type="tel" name="profile.phone" value="${userInstance?.profile?.phone}" class="form-control" id="phone"></div>
@@ -26,10 +22,6 @@
 <div class="form-group ${hasErrors(bean: userInstance.profile, field: 'mobile', 'error')} ">
 	<label for="mobile" class="col-sm-2 control-label"><g:message code="user.mobile.label" default="Mobile" /></label>
 	<div class="col-sm-10"><input type="tel" name="profile.mobile" value="${userInstance?.profile?.mobile}" class="form-control" id="mobile"></div>
-</div>
-<div class="form-group ${hasErrors(bean: userInstance.profile, field: 'email', 'error')} ">
-	<label for="email" class="col-sm-2 control-label"><g:message code="user.email.label" default="Email" /></label>
-	<div class="col-sm-10"><input type="email" name="profile.email" value="${userInstance?.profile?.email}" class="form-control" id="email"></div>
 </div>
 <div class="form-group ${hasErrors(bean: userInstance.profile, field: 'photo', 'error')} ">
 	<label for="photo" class="col-sm-2 control-label"><g:message code="user.photo.label" default="Photo" /></label>

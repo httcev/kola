@@ -166,7 +166,8 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/**/js/**':        ['permitAll'],
 	'/**/css/**':       ['permitAll'],
     '/**/images/**':    ['permitAll'],
-	'/**/favicon.ico':  ['permitAll']
+	'/**/favicon.ico':  ['permitAll'],
+    '/register/**':  ['permitAll']
 ]
 
 // enable basic authentication for couchdb proxy
@@ -182,3 +183,17 @@ grails.plugin.springsecurity.failureHandler.exceptionMappings = [
    'org.springframework.security.authentication.CredentialsExpiredException': '/user/passwordExpired'
 ]
 grails.plugins.twitterbootstrap.fixtaglib = true
+
+grails {
+   mail {
+        host = "mailserver.kom.e-technik.tu-darmstadt.de"
+        port = 465
+        username = "tittel@kom.tu-darmstadt.de"
+        password = "sys64738"
+        props = ["mail.smtp.auth":"true",                     
+            "mail.smtp.socketFactory.port":"465",
+            "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+            "mail.smtp.socketFactory.fallback":"false"]
+   }
+}
+grails.plugin.springsecurity.ui.forgotPassword.emailFrom = "info@kola-projekt.de"
