@@ -14,6 +14,9 @@ class ThumbnailService {
     	try {
 			def thumbnailSize = grailsApplication.config.kola.thumbnailSize
 	        def image = ImageIO.read(bis)
+	        if (!image) {
+	        	return null
+	        }
 	        if (image.width != image.height) {
 	        	def minDimension = Math.min(image.width, image.height)
 	            //println "--- min dim=$minDimension -> [" + ((int)((image.width - minDimension) / 2)) + ", " + ((int)((image.height - minDimension) / 2)) + ", $minDimension, $minDimension]"

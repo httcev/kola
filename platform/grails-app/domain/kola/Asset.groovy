@@ -1,7 +1,7 @@
 package kola
 
-class Asset implements Serializable {
-	private static final long serialVersionUID = 42L;
+class Asset {
+    def assetService
 
 	static searchable = {
 		all = [analyzer: 'german']
@@ -14,6 +14,7 @@ class Asset implements Serializable {
         content maxSize: 1024 * 1024 * 100, nullable:true
         externalUrl nullable: true
         anchor nullable: true
+        description nullable: true
         filename nullable: true
         indexText nullable: true
     }
@@ -39,4 +40,16 @@ class Asset implements Serializable {
     String indexText
 
     Date lastUpdated
+
+    def afterInsert() {
+        assetService.deleteRepositoryFile(this)
+    }
+
+    def afterUpdate() {
+        assetService.deleteRepositoryFile(this)
+    }
+
+    def afterDelete() {
+        assetService.deleteRepositoryFile(this)
+    }
 }

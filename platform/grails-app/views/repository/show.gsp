@@ -1,7 +1,5 @@
 
-<%@ page import="kola.Asset" %>
 <g:set var="assetService" bean="assetService"/>
-<!DOCTYPE html>
 <html>
 	<head>
 		<meta name="layout" content="main">
@@ -11,7 +9,7 @@
 	<body>
 		<ol class="breadcrumb">
 			<li><g:link uri="/"><g:message code="default.home.label" default="Home" /></g:link></li>
-			<li><g:link controller="repository" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
+			<li><g:link action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
 			<li class="active"><g:message code="default.show.label" args="[entityName]" /></li>
 		</ol>
 		<g:if test="${flash.message}">

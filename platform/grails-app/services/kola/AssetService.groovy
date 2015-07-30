@@ -71,6 +71,7 @@ class AssetService {
     	def file = getRepositoryFile(asset)
     	if (file?.exists()) {
     		log.debug "deleting repository file " + file.getName()
+            println "deleting repository file " + file.getName()
     		if (file.isDirectory()) {
     			FileUtils.deleteDirectory(file)
     		}

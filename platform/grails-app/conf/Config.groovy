@@ -166,8 +166,9 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/**/js/**':        ['permitAll'],
 	'/**/css/**':       ['permitAll'],
     '/**/images/**':    ['permitAll'],
+    '/**/img/**':       ['permitAll'],
 	'/**/favicon.ico':  ['permitAll'],
-    '/register/**':  ['permitAll']
+    '/register/**':     ['permitAll']
 ]
 
 // enable basic authentication for couchdb proxy

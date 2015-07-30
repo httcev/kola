@@ -31,7 +31,8 @@ class RepositoryController {
         params.max = Math.min(max ?: 10, 100)
         params.sort = params.sort ?: "lastUpdated"
         params.order = params.order ?: "desc"
-        respond Asset.list(params), model:[assetInstanceCount: Asset.count()]
+        def query = Asset.where { type == "learning-resource" }
+        respond query.list(params), model:[assetInstanceCount: query.count()]
     }
 
     @Secured(['IS_AUTHENTICATED_FULLY'])
@@ -48,7 +49,7 @@ class RepositoryController {
     def createFlow = {
         initiliaze {
 			action {
-				flow.assetInstance = new Asset()
+				flow.cmd = new CreateAssetCommand()
            	}
            	on("success").to "uploadOrLink"
            	on(Exception).to "error"
@@ -56,10 +57,10 @@ class RepositoryController {
         
         uploadOrLink {
         	on("submit") {
-        		bindData(flow.assetInstance, params)
-        		if (!flow.assetInstance.content && !flow.assetInstance.externalUrl) {
-	        		flow.assetInstance.errors.rejectValue('content', 'nullable')
-	        		flow.assetInstance.errors.rejectValue('externalUrl', 'nullable')
+        		bindData(flow.cmd, params)
+        		if (!flow.cmd.content && !flow.cmd.externalUrl) {
+	        		flow.cmd.errors.rejectValue('content', 'nullable')
+	        		flow.cmd.errors.rejectValue('externalUrl', 'nullable')
         			error()
         		}
     		}.to "checkUploadOrLink"
@@ -67,9 +68,9 @@ class RepositoryController {
         checkUploadOrLink {
         	action {
         		try {
-		        	enrichAsset(flow.assetInstance)
-		        	if (flow.assetInstance.content && "application/zip".equals(flow.assetInstance.mimeType?.toLowerCase())) {
-						ZipInputStream zin = new ZipInputStream(new BufferedInputStream(new ByteArrayInputStream(flow.assetInstance.content)))
+		        	enrichAsset(flow.cmd)
+		        	if (flow.cmd.content && "application/zip".equals(flow.cmd.mimeType?.toLowerCase())) {
+						ZipInputStream zin = new ZipInputStream(new BufferedInputStream(new ByteArrayInputStream(flow.cmd.content)))
 						def possibleAnchors = ZipUtil.getFilenames(zin, false)
 						if (possibleAnchors.length > 0) {
 							flow.possibleAnchors = possibleAnchors
@@ -81,8 +82,8 @@ class RepositoryController {
 		        }
 		        catch(e) {
                     log.error e
-		        	if (flow.assetInstance.externalUrl) {
-		        		flow.assetInstance.errors.rejectValue('externalUrl', 'urlNotValid')
+		        	if (flow.cmd.externalUrl) {
+		        		flow.cmd.errors.rejectValue('externalUrl', 'urlNotValid')
 		        	}
 		        	return error()
 		        }
@@ -93,15 +94,19 @@ class RepositoryController {
         }
         chooseAnchor {
         	on("submit") {
-        		bindData(flow.assetInstance, params)
+        		bindData(flow.cmd, params)
     		}.to "metadata" 
         }
         metadata {
         	on("submit") {
-        		bindData(flow.assetInstance, params)
-                if (flow.assetInstance.save(true)) {
-                    assetService.deleteRepositoryFile(flow.assetInstance)
-                    RequestContextHolder.currentRequestAttributes().flashScope.message = message(code: 'default.created.message', args: [message(code: 'asset.label', default: 'Asset'), flow.assetInstance.id])
+        		bindData(flow.cmd, params)
+                if (!flow.cmd.validate()) {
+                    return error()
+                }
+                def assetInstance = new Asset()
+                assetInstance.properties = flow.cmd
+                if (assetInstance.save(true)) {
+                    RequestContextHolder.currentRequestAttributes().flashScope.message = message(code: 'default.created.message', args: [message(code: 'asset.label', default: 'Asset'), assetInstance.id])
                     return success()
                 }
                 else {
@@ -162,7 +167,6 @@ class RepositoryController {
         }
 
         assetInstance.save flush:true
-        assetService.deleteRepositoryFile(assetInstance)
 
         request.withFormat {
             form multipartForm {
@@ -199,7 +203,6 @@ class RepositoryController {
     		response.sendRedirect(asset.externalUrl)
     		return
     	}
-
 		// local asset
     	def repoFile = assetService.getOrCreateRepositoryFile(asset)
 		if (repoFile.isDirectory()) {
@@ -266,36 +269,36 @@ class RepositoryController {
         redirect action: "index", method: "GET"
     }
 
-    protected void enrichAsset(Asset assetInstance) {
+    protected void enrichAsset(assetOrCommand) {
         def detector = TikaConfig.getDefaultConfig().getDetector();
         Metadata metadata = new Metadata()
         def inputStream
-        if (assetInstance.content || assetInstance.externalUrl) {
+        if (assetOrCommand.content || assetOrCommand.externalUrl) {
 	        try {
-		        if (assetInstance.content) {
+		        if (assetOrCommand.content) {
 		            // remove externalUrl since we're now expecting a local asset
-		            assetInstance.externalUrl = null
+		            assetOrCommand.externalUrl = null
                     def uploadFile = request.getFile("content")
                     if (uploadFile) {
-    		            assetInstance.filename = uploadFile.getOriginalFilename()
+    		            assetOrCommand.filename = uploadFile.getOriginalFilename()
                     }
 
-		            inputStream = new ByteArrayInputStream(assetInstance.content)
-		            metadata.add(Metadata.RESOURCE_NAME_KEY, assetInstance.filename)
+		            inputStream = new ByteArrayInputStream(assetOrCommand.content)
+		            metadata.add(Metadata.RESOURCE_NAME_KEY, assetOrCommand.filename)
 		        }
 		        else {
-		            inputStream = new BufferedInputStream(new URL(assetInstance.externalUrl).openStream())
+		            inputStream = new BufferedInputStream(new URL(assetOrCommand.externalUrl).openStream())
 		        }
 
 	            MediaType mediaType = detector.detect(inputStream, metadata)
-	            assetInstance.mimeType = mediaType.toString()
+	            assetOrCommand.mimeType = mediaType.toString()
 
-	            def titleAndText = extractText(inputStream, assetInstance.mimeType)
-	            if (titleAndText.title && !assetInstance.name) {
-	            	assetInstance.name = titleAndText.title
+	            def titleAndText = extractText(inputStream, assetOrCommand.mimeType)
+	            if (titleAndText.title && !assetOrCommand.name) {
+	            	assetOrCommand.name = titleAndText.title
 	            }
 	            if (titleAndText.text) {
-	            	assetInstance.indexText = titleAndText.text
+	            	assetOrCommand.indexText = titleAndText.text
 	            }
 	        }
 	        finally {
@@ -304,8 +307,8 @@ class RepositoryController {
 	            }
 	        }
 
-	        if (!assetInstance.mimeType) {
-	            assetInstance.mimeType = "application/octet-stream"
+	        if (!assetOrCommand.mimeType) {
+	            assetOrCommand.mimeType = "application/octet-stream"
 	        }
 	    }
     }
@@ -328,4 +331,36 @@ class RepositoryController {
 		parser.parse(inputStream, handler, metadata);
     	[title:metadata.get(TikaCoreProperties.TITLE), text:writer.toString().trim()]
     }
+}
+
+@grails.validation.Validateable
+class CreateAssetCommand implements Serializable {
+    private static final long serialVersionUID = 42L;
+
+    static constraints = {
+        // Limit upload file size to 100MB
+        content maxSize: 1024 * 1024 * 100, nullable:true
+        externalUrl nullable: true
+        anchor nullable: true
+        name blank:false
+        description blank:false
+        filename nullable: true
+        indexText nullable: true
+    }
+
+    String name
+    String description
+    String mimeType
+    String type = "learning-resource"
+
+    // only external assets
+    String externalUrl
+
+    // only local assets
+    byte[] content
+    String filename
+    // only for local zip files
+    String anchor
+
+    String indexText
 }

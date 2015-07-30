@@ -60,7 +60,7 @@ grails.project.dependency.resolution = {
         compile('org.apache.tika:tika-parsers:1.9') { excludes "xercesImpl", "xmlParserAPIs", "xml-apis", "log4j", "httpcore" }
         compile('org.hashids:hashids:1.0.1')
         compile('org.lightcouch:lightcouch:0.1.8')
-        compile('net.coobird:thumbnailator:0.4.8')
+        compile('org.pegdown:pegdown:1.5.0')
         // needed for rendering-plugin to work (PDF generation)
         runtime ('org.springframework:spring-test:4.1.5.RELEASE')
     }
@@ -86,7 +86,7 @@ grails.project.dependency.resolution = {
         runtime ":quartz:1.0.2"
         compile ":webflow:2.1.0"
         compile ":rendering:1.0.0"
-        compile (":spring-security-ui:1.0-RC2" ) { excludes "jquery-ui", "famfamfam" }
+        compile (":spring-security-ui:1.0-RC2") { excludes "jquery-ui", "famfamfam" }
         compile ":mail:1.0.7"
 
         // Uncomment these to enable additional asset-pipeline capabilities

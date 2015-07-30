@@ -12,7 +12,7 @@
 	<link rel="shortcut icon" href="${assetPath(src: 'favicon.png')}" type="image/png">
 	<link rel="apple-touch-icon" href="${assetPath(src: 'apple-touch-icon.png')}">
 	<link rel="apple-touch-icon" sizes="114x114" href="${assetPath(src: 'apple-touch-icon-retina.png')}">
-		<asset:stylesheet src="application.css"/>
+	<asset:stylesheet src="application.css"/>
 	<asset:javascript src="application.js"/>
 	<g:layoutHead/>
 </head>
@@ -36,7 +36,7 @@
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<sec:ifLoggedIn>
 					<ul class="nav navbar-nav">
-						<li class="${controllerName == 'task' ? 'active' : ''}"><g:link controller="task" action="index">Aufträge</g:link></li>
+						<li class="${(controllerName == 'task' || controllerName == 'taskTemplate') ? 'active' : ''}"><g:link controller="task" action="index">Aufträge</g:link></li>
 						<li class="${controllerName == 'repository' ? 'active' : ''}"><g:link controller="repository" action="index">Lernressourcen</g:link></li>
 					</ul>
 					</sec:ifLoggedIn>
@@ -71,14 +71,14 @@
 				</div><!-- /.navbar-collapse -->
 			</div><!-- /.container-fluid -->
 		</nav>
-		<div class="container-fluid">
+		<div class="container-fluid" id="main-container">
 			<g:layoutBody/>
 		</div>
 		<div id="spinner" class="spinner" style="display:none;"><g:message code="spinner.alt" default="Loading&hellip;"/></div>
 		<div id="push"></div>
 	</div>
 	<div id="footer">
-		<div class="container">
+		<div class="container-fluid">
 			<p class="text-muted">
 				<a href="http://www.kola-projekt.de/ueber_das_projekt.html" target="_blank" class="pull-right">Über KOLA</a>
 			</p>

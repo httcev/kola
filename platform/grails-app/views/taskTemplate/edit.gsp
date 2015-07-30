@@ -3,6 +3,9 @@
 		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: 'taskTemplate.label', default: 'Arbeitsprozessbeschreibung')}" />
 		<title><g:message code="default.edit.label" args="[entityName]" /></title>
+		<asset:stylesheet src="bootstrap-markdown.min.css"/>
+		<asset:javascript src="bootstrap-markdown.js"/>
+		<asset:javascript src="Sortable.min.js"/>
 	</head>
 	<body>
 		<ol class="breadcrumb">
@@ -32,5 +35,6 @@
 				<button class="save btn btn-success"><i class="fa fa-save"></i> <g:message code="default.button.update.label" default="Update" /></button>
 			</div>
 		</g:form>
+		<g:render template="assetModal" />
 	</body>
 </html>

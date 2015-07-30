@@ -1,10 +1,10 @@
 package kola
 
-import grails.transaction.Transactional
+import org.pegdown.PegDownProcessor
 
 class KolaTagLib {
 	def springSecurityService
-    static defaultEncodeAs = [taglib:'html']
+    static defaultEncodeAs = [taglib:'none']
     static namespace = "kola"
     //static encodeAsForTags = [tagName: [taglib:'html'], otherTagName: [taglib:'none']]
 
@@ -19,5 +19,9 @@ class KolaTagLib {
         }catch(Throwable e) {
             log.error e
         }
+    }
+
+    def markdown = { attrs, body ->
+        out << new PegDownProcessor().markdownToHtml(body().toString())
     }
 }

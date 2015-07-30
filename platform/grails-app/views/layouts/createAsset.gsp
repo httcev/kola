@@ -14,11 +14,11 @@
 		<g:if test="${flash.message}">
 			<div class="message" role="status">${flash.message}</div>
 		</g:if>
-		<g:hasErrors bean="${assetInstance}">
+		<g:hasErrors bean="${cmd}">
 		<ul class="errors alert alert-danger" role="alert">
-			<g:eachError bean="${assetInstance}" var="error">
+		<g:eachError bean="${cmd}" var="error">
 			<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
-			</g:eachError>
+		</g:eachError>
 		</ul>
 		</g:hasErrors>
 		<g:form action="create" enctype="multipart/form-data" class="form-horizontal">

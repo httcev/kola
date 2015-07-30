@@ -29,12 +29,9 @@
 		<input type="hidden" name="_deletePhoto" id="deletePhoto" value="false">
 		<g:if test="${userInstance.profile?.photo?.length > 0}">
 			<div id="avatar-container">
-			  	<div class="thumbnail pull-left">
-					<img class="avatar" src="data:image/png;base64,${userInstance.profile.photo.encodeBase64().toString()}">
-				</div>
+				<img class="avatar pull-left" src="data:image/png;base64,${userInstance.profile.photo.encodeBase64().toString()}">
 				
 				<button type="button" class="delete btn btn-danger" title="Bild löschen" onclick="$('#avatar-container').remove(); $('#deletePhoto').val('true');" style="margin-left:10px"><i class="fa fa-times"></i></button>
-				
 			</div>
 		</g:if>
 		<input type="file" name="_photo" class="form-control" id="photo">

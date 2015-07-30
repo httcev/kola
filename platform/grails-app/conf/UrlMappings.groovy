@@ -20,7 +20,11 @@ class UrlMappings {
                 // apply constraints here
             }
         }
-
+/*
+        "/taskTemplates"(resources:'taskTemplate') {
+            "/steps"(resources:"taskBody")
+        }
+*/
         "/$controller/$action?/$id?(.$format)?"{
             constraints {
                 // apply constraints here

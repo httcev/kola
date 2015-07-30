@@ -20,8 +20,8 @@
 			<thead>
 				<tr>
 					<g:sortableColumn property="username" title="${message(code: 'user.username.label', default: 'Username')}" />
-					<g:sortableColumn property="profile.displayName" title="${message(code: 'user.displayName.label', default: 'Display Name')}" />
-					<g:sortableColumn property="profile.company" title="${message(code: 'user.company.label', default: 'Company')}" />
+					<g:sortableColumn property="profile?.displayName" title="${message(code: 'user.displayName.label', default: 'Display Name')}" />
+					<g:sortableColumn property="profile?.company" title="${message(code: 'user.company.label', default: 'Company')}" />
 				</tr>
 			</thead>
 			<tbody>
