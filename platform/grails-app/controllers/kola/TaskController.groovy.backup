@@ -4,11 +4,15 @@ package kola
 
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
+import org.springframework.security.access.annotation.Secured
+
 
 @Transactional(readOnly = true)
+@Secured(['IS_AUTHENTICATED_FULLY'])
 class TaskController {
 
-    static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
+    static allowedMethods = [save: "POST", update: ["PUT", "POST"], delete: "DELETE"]
+    def pdfRenderingService
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -90,6 +94,13 @@ class TaskController {
             }
             '*'{ render status: NO_CONTENT }
         }
+    }
+
+    def export(Task taskInstance) {
+        println "--- export"
+//        ByteArrayOutputStream bytes = pdfRenderingService.render(controller:"task", template: "export", model: [data: taskInstance])
+        renderPdf(template: "export", model:[taskInstance:taskInstance], filename: "${taskInstance.name}.pdf")
+//        render(template:"export", model:[taskInstance:taskInstance])
     }
 
     protected void notFound() {

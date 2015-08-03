@@ -88,6 +88,32 @@ class TaskTemplateController {
 
     @Transactional
     @Secured(['IS_AUTHENTICATED_FULLY'])
+    def updateRelations(TaskTemplate taskTemplateInstance) {
+        if (taskTemplateInstance == null) {
+            notFound()
+            return
+        }
+
+        if (!authService.canEdit(taskTemplateInstance)) {
+            forbidden()
+            return
+        }
+
+        updateFromParams(taskTemplateInstance)
+
+        if (taskTemplateInstance.hasErrors()) {
+            respond taskTemplateInstance.errors, view:'edit'
+            return
+        }
+
+        taskTemplateInstance.save flush:true
+  
+//        flash.message = message(code: 'default.updated.message', args: [message(code: 'TaskTemplate.label', default: 'TaskTemplate'), taskTemplateInstance.id])
+        redirect action:"edit", id:taskTemplateInstance.id
+    }
+
+    @Transactional
+    @Secured(['IS_AUTHENTICATED_FULLY'])
     def addStep(TaskTemplate taskTemplateInstance) {
         if (taskTemplateInstance == null) {
             notFound()
@@ -134,11 +160,11 @@ class TaskTemplateController {
 
     protected void updateFromParams(TaskTemplate taskTemplateInstance) {
         taskTemplateInstance.resources?.clear()
-        params.list("resources")?.each {
+        params.list("resources")?.unique(false).each {
             taskTemplateInstance.addToResources(Asset.get(it))
         }
         taskTemplateInstance.attachments?.clear()
-        params.list("attachments")?.each {
+        params.list("attachments")?.unique(false).each {
             taskTemplateInstance.addToAttachments(Asset.get(it))
         }
         def f = request.multiFileMap?.each { k,files ->

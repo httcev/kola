@@ -58,72 +58,19 @@
 				<ul class="list-group">
 					<g:each var="assetInstance" in="${taskTemplateInstance?.resources}">
 						<li class="list-group-item">
-							<h4 class="list-group-item-heading">
-								<a href="${assetService.createEncodedLink(assetInstance)}" target="_blank"><i class="fa fa-external-link"></i> ${assetInstance.name}</a>
-							</h4>
-							<p class="list-group-item-text">
-								${assetInstance.description?.take(100)}
-							</p>
+							<a href="${assetService.createEncodedLink(assetInstance)}" target="_blank">
+								<h4 class="list-group-item-heading">
+									<i class="fa fa-external-link"></i> ${assetInstance.name}
+								</h4>
+								<p class="list-group-item-text text-default">
+									${assetInstance.description?.take(100)}
+								</p>
+							</a>
 						</li>
 					</g:each>
 				</ul>
 			</div>
 		</div>
 		</g:if>
-<%--
-		<a href="#show-taskTemplate" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
-		<div class="nav" role="navigation">
-			<ul>
-				<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-				<li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
-				<li><g:link class="create" action="create"><g:message code="default.new.label" args="[entityName]" /></g:link></li>
-			</ul>
-		</div>
-		<div id="show-taskTemplate" class="content scaffold-show" role="main">
-			<h1><g:message code="default.show.label" args="[entityName]" /></h1>
-			<g:if test="${flash.message}">
-			<div class="message" role="status">${flash.message}</div>
-			</g:if>
-			<ol class="property-list taskTemplate">
-			
-
-				<g:if test="${taskTemplateInstance?.attachments}">
-				<li class="fieldcontain">
-					<span id="attachments-label" class="property-label"><g:message code="taskTemplate.attachments.label" default="Attachments" /></span>
-					
-						<g:each in="${taskTemplateInstance.attachments}" var="a">
-						<span class="property-value" aria-labelledby="attachments-label"><g:link controller="attachment" action="show" id="${a.id}">${a?.encodeAsHTML()}</g:link></span>
-						</g:each>
-					
-				</li>
-				</g:if>
-			
-
-				<g:if test="${taskTemplateInstance?.resources}">
-				<li class="fieldcontain">
-					<span id="resources-label" class="property-label"><g:message code="taskTemplate.resources.label" default="Resources" /></span>
-					
-						<g:each in="${taskTemplateInstance.resources}" var="r">
-						<span class="property-value" aria-labelledby="resources-label"><g:link controller="asset" action="show" id="${r.id}">${r?.encodeAsHTML()}</g:link></span>
-						</g:each>
-					
-				</li>
-				</g:if>
-			
-				<g:if test="${taskTemplateInstance?.steps}">
-				<li class="fieldcontain">
-					<span id="steps-label" class="property-label"><g:message code="taskTemplate.steps.label" default="Steps" /></span>
-					
-						<g:each in="${taskTemplateInstance.steps}" var="s">
-						<span class="property-value" aria-labelledby="steps-label"><g:link controller="taskStep" action="show" id="${s.id}">${s?.encodeAsHTML()}</g:link></span>
-						</g:each>
-					
-				</li>
-				</g:if>
-			
-			</ol>
-
-		</div>
---%>		
 	</body>
 </html>

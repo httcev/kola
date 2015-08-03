@@ -7,7 +7,7 @@
 * You're free to add application-wide styles to this file and they'll appear at the top of the
 * compiled file, but it's generally better to create a new file per style scope.
 *
-*= require bootstrap
+*= require custom-bootstrap
 *= require font-awesome
 *= require_self
 */
@@ -23,8 +23,13 @@ html, body { height:100% }
 .error input { border-color:red; }
 header h1, .navbar-default .navbar-brand { color:#a11d21 }
 header #logo, .navbar-header #logo { width:32px; margin-top:-6px;}
+th.sortable.sorted.asc a:after { font-family:"FontAwesome"; content:" \f0d8" }
+th.sortable.sorted.desc a:after { font-family:"FontAwesome"; content:" \f0d7" }
 .dropdown-menu > li > a { padding-top:9px; padding-bottom:9px }
-.page-header { margin-top:0; }
-.avatar { width:40px; height:40px; font-size:28px }
+.page-header { margin-top:0; word-break:break-all; }
+.text-default, .text-default:hover { color:initial }
+ avatar { width:40px; height:40px; font-size:28px }
 .form-padding { padding-top:6px }
-.attachments .thumbnail { width:80px; height:auto; min-height:70px; line-height:70px; margin-right:15px; vertical-align:middle}
+.margin { margin-top:10px; }
+.attachments .thumbnail { width:80px; height:auto; min-height:70px; line-height:70px; margin-right:15px; vertical-align:middle }
+.drag-handle { cursor:move; cursor:-webkit-grabbing }

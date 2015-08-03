@@ -6,7 +6,7 @@ class RegisterController extends grails.plugin.springsecurity.ui.RegisterControl
 	}
 
 	/**
-		Overridden because default behavior does not work in proxied production environment (links to private IP)
+	 * Overridden because default behavior does not work in proxied production environment (it links to private IP)
 	**/
 	protected String generateLink(String action, linkParams) {
 		createLink(controller:"register", action:action, params:linkParams, absolute:true)

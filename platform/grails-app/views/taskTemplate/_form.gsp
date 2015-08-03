@@ -4,21 +4,21 @@
 <div class="form-group ${hasErrors(bean: taskTemplateInstance, field: 'name', 'error')} required">
 	<label for="name" class="col-sm-2 control-label">
 		<g:message code="taskTemplate.name.label" default="Name" />
-		<span class="required-indicator">*</span>
+		<span class="required-indicator">*</span>:
 	</label>
 	<div class="col-sm-10"><g:textField name="name" class="form-control" required="" value="${taskTemplateInstance?.name}"/></div>
 </div>
 
 <div class="form-group ${hasErrors(bean: taskTemplateInstance, field: 'description', 'error')} ">
 	<label for="description" class="col-sm-2 control-label">
-		<g:message code="taskTemplate.description.label" default="Beschreibung" />
+		<g:message code="taskTemplate.description.label" default="Beschreibung" />:
 	</label>
 	<div class="col-sm-10"><g:textArea rows="8" name="description" class="form-control" data-provide="markdown" data-iconlibrary="fa" value="${taskTemplateInstance?.description}"/></div>
 </div>
 
 <div class="form-group ${hasErrors(bean: taskTemplateInstance, field: 'attachments', 'error')} ">
 	<label for="attachments" class="col-sm-2 control-label">
-		<g:message code="taskTemplate.attachments.label" default="Anhänge" />
+		<g:message code="taskTemplate.attachments.label" default="Anhänge" />:
 	</label>
 	<div class="col-sm-10" id="attachments-container">
 		<g:if test="${taskTemplateInstance?.attachments?.size() > 0}">
@@ -27,7 +27,10 @@
 					<li class="list-group-item clearfix">
 						<input type="hidden" name="attachments" value="${assetInstance.id}">
 						<h4 class="list-group-item-heading">
-							<a href="${assetService.createEncodedLink(assetInstance)}" target="_blank"><i class="fa fa-external-link"></i> ${assetInstance.name}</a>
+							<g:if test="${taskTemplateInstance?.attachments?.size() > 1}">
+								<div class="btn btn-default drag-handle" title="Verschieben mit Drag&amp;Drop"><i class="fa fa-arrows-v fa-lg"></i></div>
+							</g:if>
+							<a href="${assetService.createEncodedLink(assetInstance)}" target="_blank">${assetInstance.name}</a>
 							<button type="button" class="btn btn-danger pull-right" onclick="$(this).closest('li').remove()"><i class="fa fa-times"></i></button>
 						</h4>
 						<p class="list-group-item-text">
@@ -38,22 +41,25 @@
 				</g:each>
 			</ul>
 		</g:if>
-		<div class="form-padding"><g:message code="taskTemplate.addAttachment.label" default="Neuer Anhang" />:</div> <input type="file" name="_newAttachment" class="new-attachment form-padding">
+		<div class="form-padding"><label><g:message code="taskTemplate.addAttachment.label" default="Neuer Anhang" />:</label></div> <input type="file" name="_newAttachment" class="new-attachment form-padding">
 	</div>
 </div>
 
 <div class="form-group ${hasErrors(bean: taskTemplateInstance, field: 'resources', 'error')} ">
 	<label for="resources" class="col-sm-2 control-label">
-		<g:message code="taskTemplate.resources.label" default="Lernressourcen" />
+		<g:message code="taskTemplate.resources.label" default="Lernressourcen" />:
 	</label>
 	<div class="col-sm-10">
 		<g:if test="${taskTemplateInstance?.resources?.size() > 0}">
-			<ul class="list-group sortable">
+			<ul id="asset-list" class="list-group sortable">
 				<g:each var="assetInstance" in="${taskTemplateInstance?.resources}">
 					<li class="list-group-item clearfix">
 						<input type="hidden" name="resources" value="${assetInstance.id}">
 						<h4 class="list-group-item-heading">
-							<a href="${assetService.createEncodedLink(assetInstance)}" target="_blank"><i class="fa fa-external-link"></i> ${assetInstance.name}</a>
+							<g:if test="${taskTemplateInstance?.resources?.size() > 1}">
+								<div class="btn btn-default drag-handle" title="Verschieben mit Drag&amp;Drop"><i class="fa fa-arrows-v fa-lg"></i></div>
+							</g:if>
+							<a href="${assetService.createEncodedLink(assetInstance)}" target="_blank">${assetInstance.name}</a>
 							<button type="button" class="btn btn-danger pull-right" onclick="$(this).closest('li').remove()"><i class="fa fa-times"></i></button>
 						</h4>
 						<p class="list-group-item-text">
@@ -72,7 +78,7 @@
 
 <div class="form-group ${hasErrors(bean: taskTemplateInstance, field: 'steps', 'error')} ">
 	<label for="steps" class="col-sm-2 control-label">
-		<g:message code="taskTemplate.steps.label" default="Teilschritte" />
+		<g:message code="taskTemplate.steps.label" default="Teilschritte" />:
 	</label>
 	<div class="col-sm-10">
 		<g:if test="${taskTemplateInstance?.steps?.size() > 0}">
@@ -101,7 +107,7 @@
 <script>
 	$(document).ready(function() {
 		$(".sortable").each(function() {
-			Sortable.create(this);
+			Sortable.create(this, { handle:".drag-handle" });
 		})
 		$(document).on("change", ".new-attachment", function() {
 			var emptyFileChooserCount = $("#attachments-container input:file").filter(function() { return $(this).val() == ""; }).length;
