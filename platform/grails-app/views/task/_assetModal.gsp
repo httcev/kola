@@ -52,16 +52,22 @@
 		});
 		$("#assetResult :not(.pagination) a").attr("target", "_blank");
 
-		var $button = $("<button type='button' class='btn btn-primary' onclick='createAssetRelation($(this).parent().attr(\"id\"))'>Use</button>");
+		var $button = $("<button type='button' class='btn btn-primary' onclick='createAssetRelation($(this).parent())'>Use</button>");
 		$("#assetResult .search-result-hit").append($button);
 	}
 
-	function createAssetRelation(id) {
-		var $form = $("form").first();
-		$form.append($("<input type='hidden' name='resources' value='"+id+"'>"));
-		$form.attr("action", "${createLink(action:'updateRelations', id:params.id)}");
-		console.log($form.attr("action"));
-		$form.submit();
+	function createAssetRelation($searchResultNode) {
+		var id = $searchResultNode.attr("id");
+		var $link = $(".search-result-link", $searchResultNode).clone();
+		var $li = $("<li class='list-group-item clearfix'>");
+		$li.append($("<input type='hidden' name='resources' value='"+id+"'>"));
+		var $h4 = $("<h4 class='list-group-item-heading'>");
+		$li.append($h4);
+		$h4.append($("<div class='btn btn-default drag-handle' title='Verschieben mit Drag&amp;Drop'><i class='fa fa-arrows-v fa-lg'></i></div>"));
+		$h4.append("\n");
+		$h4.append($link);
+		$("#asset-list").append($li);
+		$("#assetModal").modal("hide");
 	}
 
 	$(document).ready(function() {

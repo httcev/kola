@@ -20,4 +20,20 @@ class AuthService {
     def canDelete(domain, user = springSecurityService.currentUser) {
         return canEdit(domain, user)
     }
+
+    def getAssignableUserProfiles() {
+        if (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')) {
+            return Profile.list(sort:"displayName")
+        }
+        else {
+            def currentCompany = springSecurityService.currentUser?.profile?.company
+            /*
+            def query = User.where { profile?.company == company }.order("profile?.displayName")
+            return query.list()
+            */
+            return Profile.findAll(sort:"displayName") {
+                company == currentCompany
+            }
+        }
+    }
 }

@@ -7,7 +7,7 @@
 	<ul class="search-result">
 	<g:each var="hit" in="${searchResults}" status="i">
 		<li class="search-result-hit" id="${hit.id}">
-			<div><a href="${assetService.createEncodedLink(hit)}">${hit.name}</a></div>
+			<div><a href="${assetService.createEncodedLink(hit)}" class="search-result-link">${hit.name}</a></div>
 			<g:each var="field" in="['description', 'indexText']">
 				<g:each var="fragment" in="${highlights[i][field]?.fragments}">
 					<div>${field}: ${raw(fragment.toString())}</div>

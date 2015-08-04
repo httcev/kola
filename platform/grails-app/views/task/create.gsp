@@ -1,38 +1,39 @@
-<!DOCTYPE html>
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'task.label', default: 'Task')}" />
+		<g:set var="entityName" value="${message(code: taskInstance.isTemplate ? 'taskTemplate.label' : 'task.label', default: taskInstance.isTemplate ? 'Arbeitsprozessbeschreibung' : 'Arbeitsauftrag')}" />
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
+		<asset:stylesheet src="bootstrap-markdown.min.css"/>
+		<asset:javascript src="bootstrap-markdown.js"/>
+		<asset:javascript src="Sortable.min.js"/>
 	</head>
 	<body>
-		<a href="#create-task" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
-		<div class="nav" role="navigation">
-			<ul>
-				<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-				<li><g:link class="list" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
-			</ul>
-		</div>
-		<div id="create-task" class="content scaffold-create" role="main">
-			<h1><g:message code="default.create.label" args="[entityName]" /></h1>
-			<g:if test="${flash.message}">
-			<div class="message" role="status">${flash.message}</div>
-			</g:if>
+		<ol class="breadcrumb">
+			<li><g:link uri="/"><g:message code="default.home.label" default="Home" /></g:link></li>
+			<li><g:link action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
+			<li class="active"><g:message code="default.create.label" args="[entityName]" /></li>
+		</ol>
+		<g:form url="[resource:taskInstance, action:'save']" class="form-horizontal" autocomplete="off" enctype="multipart/form-data">
+			<input type="hidden" name="isTemplate" value="${taskInstance?.isTemplate}">
+			<input type="hidden" name="template" value="${taskInstance?.template?.id}">
+			<h1 class="page-header">
+				<g:message code="default.create.label" args="[entityName]" />
+				<div class="buttons pull-right">
+					<button class="save btn btn-success"><i class="fa fa-save"></i> <g:message code="default.button.create.label" default="Create" /></button>
+				</div>
+			</h1>
 			<g:hasErrors bean="${taskInstance}">
-			<ul class="errors" role="alert">
-				<g:eachError bean="${taskInstance}" var="error">
-				<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
-				</g:eachError>
-			</ul>
+				<ul class="errors alert alert-danger" role="alert">
+					<g:eachError bean="${taskInstance}" var="error">
+					<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
+					</g:eachError>
+				</ul>
 			</g:hasErrors>
-			<g:form url="[resource:taskInstance, action:'save']" >
-				<fieldset class="form">
-					<g:render template="form"/>
-				</fieldset>
-				<fieldset class="buttons">
-					<g:submitButton name="create" class="save" value="${message(code: 'default.button.create.label', default: 'Create')}" />
-				</fieldset>
-			</g:form>
-		</div>
+			<g:render template="form"/>
+			<div class="buttons pull-right">
+				<button class="save btn btn-success"><i class="fa fa-save"></i> <g:message code="default.button.create.label" default="Create" /></button>
+			</div>
+		</g:form>
+		<g:render template="assetModal" />
 	</body>
 </html>

@@ -3,7 +3,6 @@ import kola.User
 import kola.Role
 import kola.UserRole
 import kola.Task
-import kola.TaskTemplate
 
 class BootStrap {
 	def repoDir
@@ -38,15 +37,15 @@ class BootStrap {
 
                 def numTaskTemplates = 15
                 for (i in 1..numTaskTemplates) {
-                    new TaskTemplate(name:"Example Task Template $i", creator:testUser).save(true)
+                    new Task(name:"Example Task Template $i", description:"Description for Example Task Template $i", creator:testUser, isTemplate:true).save(true)
                 }
-                assert TaskTemplate.count() == numTaskTemplates
+                assert Task.count() == numTaskTemplates
 
                 def numTasks = 15
                 for (i in 1..numTasks) {
-                    new Task(name:"Example Task $i", creator:testUser).save(true)
+                    new Task(name:"Example Task $i", description:"Description for Example Task $i", creator:testUser).save(true)
                 }
-                assert Task.count() == numTasks
+                assert Task.count() == numTaskTemplates + numTasks
             }
         }
     }
