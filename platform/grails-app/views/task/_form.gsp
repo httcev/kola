@@ -102,21 +102,32 @@
 		<ul id="step-list" class="list-group sortable">
 			<g:each var="step" in="${taskInstance?.steps}" status="i">
 				<li class="list-group-item clearfix">
-					ID=${step.id}
 					<g:if test="${step.id}"><input type="hidden" name="steps[${i}].id" value="${step.id}"></g:if>
 					<input type="hidden" name="steps[${i}].deleted" class="deleteFlag" value="false">
-					<h4 class="list-group-item-heading">
+					<h4 class="list-group-item-heading clearfix">
 						<div class="btn btn-default drag-handle" title="Verschieben mit Drag&amp;Drop"><i class="fa fa-arrows-v fa-lg"></i></div>
-						<input type="text" name="steps[${i}].name" value="${step.name}">
+						<span class="text-muted">Schritt <span class="step-index">${i+1}</span></span>
 						<button type="button" class="btn btn-danger pull-right" onclick="deleteStep($(this))"><i class="fa fa-times"></i></button>
 					</h4>
-					<p class="list-group-item-text">
-						<textarea name="steps[${i}].description">${step.description}</textarea>
-					</p>
+					<div class="list-group-item-text">
+						<div class="form-group">
+							<label for="name" class="col-sm-2 control-label">
+								<g:message code="task.name.label" default="Name" />
+								<span class="required-indicator">*</span>:
+							</label>
+							<div class="col-sm-10"><input type="text" name="steps[${i}].name" class="form-control" value="${step.name}" required></div>
+						</div>
+						<div class="form-group">
+							<label for="name" class="col-sm-2 control-label">
+								<g:message code="task.description.label" default="Beschreibung" />
+							</label>
+							<div class="col-sm-10"><textarea name="steps[${i}].description" class="form-control" rows="6" data-provide="markdown" data-iconlibrary="fa">${step.description}</textarea></div>
+						</div>
+					</div>
 				</li>
 			</g:each>
 		</ul>
-		<button type="button" class="btn btn-primary" onclick="addStep()"><i class="fa fa-plus"></i></button>
+		<button type="button" class="btn btn-primary" onclick="addStep()"><i class="fa fa-plus"></i> Teilschritt hinzufügen</button>
 <%--	
 		<g:link resource="task/step" action="create" taskId="${taskInstance.id}" class="btn btn-primary"><i class="fa fa-plus"></i></g:link>
 		<g:actionSubmit class="btn btn-primary" value="Teilschritt hinzufügen" action="addStep" />
@@ -165,23 +176,25 @@
 	$(document).ready(function() {
 		$(".sortable").each(function() {
 			var sortable = Sortable.create(this, { handle:".drag-handle" });
-			/*
+			
 			if ($(this).attr("id") == "step-list") {
 				sortable.option("onUpdate", function() {
 					// update all step indices according to new sort order
 					$("#step-list li").each(function(index) {
 						var prefix = "step[" + index + "]";
-						$("input", $(this)).each(function() {
+						$(":input", $(this)).each(function() {
 							var field = $(this);
-							var replaced = field.attr("name").replace(/steps\[.*?\]/, prefix);
-							field.attr("name", replaced);
-							console.log(field.attr("name") + "=" + field.val());
+							var name = field.attr("name");
+							if (name) {
+								var replaced = name.replace(/steps\[.*?\]/, prefix);
+								field.attr("name", replaced);
+								console.log(field.attr("name") + "=" + field.val());
+							}
 						})
 					});
 
 				});
 			}
-			*/
 		})
 		$(document).on("change", ".new-attachment", function() {
 			var emptyFileChooserCount = $("#attachments-container input:file").filter(function() { return $(this).val() == ""; }).length;

@@ -37,8 +37,7 @@
 			return false;
 		});
 		$("#reflectionQuestionResult :not(.pagination) a").attr("target", "_blank");
-
-		var $button = $("<button type='button' class='btn btn-primary' onclick='createReflectionQuestionRelation($(this).parent())'>Use</button>");
+		var $button = $("<button type='button' class='choose btn btn-primary pull-right' onclick='createReflectionQuestionRelation($(this).parent())'><i class='fa fa-check-square-o'></i> <g:message code='default.button.choose.label' default='Auswählen' /></button>");
 		$("#reflectionQuestionResult .search-result-hit").append($button);
 	}
 
@@ -57,7 +56,7 @@
 	}
 
 	$(document).ready(function() {
-		$.get("${createLink(controller:'search', action:'index', params:[type:'reflectionQuestion'])}", function(data) {
+		$.get("${raw(createLink(controller:'search', action:'index', params:[hideFilter:true, type:'reflectionQuestion']))}", function(data) {
 			updateReflectionQuestionModalContent(data);
 		});
 		$("#reflectionQuestionModal").on("shown.bs.modal", function () {

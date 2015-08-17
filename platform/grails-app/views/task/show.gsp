@@ -72,5 +72,40 @@
 			</div>
 		</div>
 		</g:if>
+		<g:if test="${taskInstance?.steps?.size() > 0}">
+		<div class="row">
+			<div class="col-sm-2"><label><g:message code="task.steps.label" default="Teilschritte" />:</label></div>
+			<div class="col-sm-10">
+				<ul class="list-group">
+					<g:each var="step" in="${taskInstance?.steps}">
+						<li class="list-group-item">
+							<h4 class="list-group-item-heading">
+								${step.name}
+							</h4>
+							<p class="list-group-item-text">
+								${step.description}
+							</p>
+						</li>
+					</g:each>
+				</ul>
+			</div>
+		</div>
+		</g:if>
+		<g:if test="${taskInstance?.reflectionQuestions?.size() > 0}">
+		<div class="row">
+			<div class="col-sm-2"><label><g:message code="taskInstance.reflectionQuestions.label" default="Reflexionsaufforderungen" />:</label></div>
+			<div class="col-sm-10">
+				<ul class="list-group">
+					<g:each var="reflectionQuestion" in="${taskInstance?.reflectionQuestions}">
+						<li class="list-group-item">
+							<p class="list-group-item-text text-default">
+								${reflectionQuestion.name}
+							</p>
+						</li>
+					</g:each>
+				</ul>
+			</div>
+		</div>
+		</g:if>
 	</body>
 </html>

@@ -11,6 +11,13 @@
 				<input type="search" name="q" class="form-control" value="${params.q}" placeholder="Search" autofocus>
 				<button type="submit" class="search btn btn-default">${message(code: 'default.button.search.label', default: 'Search')}</button>
 			</div>
+			<g:if test="${params.hideFilter}">
+				<input type="hidden" name="type" value="${params.type}">
+				<input type="hidden" name="hideFilter" value="true">
+			</g:if>
+			<g:else>
+				SEARCH FILTER
+			</g:else>
 		</g:form>
 		<g:if test="${params.q}">
 			<g:render template="searchResult" />

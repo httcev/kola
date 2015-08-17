@@ -38,7 +38,7 @@
 		});
 		$("#assetResult :not(.pagination) a").attr("target", "_blank");
 
-		var $button = $("<button type='button' class='btn btn-primary' onclick='createAssetRelation($(this).parent())'>Use</button>");
+		var $button = $("<button type='button' class='choose btn btn-primary pull-right' onclick='createAssetRelation($(this).parent())'><i class='fa fa-check-square-o'></i> <g:message code='default.button.choose.label' default='Auswählen' /></button>");		
 		$("#assetResult .search-result-hit").append($button);
 	}
 
@@ -57,7 +57,7 @@
 	}
 
 	$(document).ready(function() {
-		$.get("${createLink(controller:'search', action:'index')}", function(data) {
+		$.get("${raw(createLink(controller:'search', action:'index', params:[hideFilter:true, type:'asset']))}", function(data) {
 			updateAssetModalContent(data);
 		});
 		$("#assetModal").on("shown.bs.modal", function () {

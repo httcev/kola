@@ -4,6 +4,7 @@ import kola.Role
 import kola.UserRole
 import kola.Task
 import kola.TaskStep
+import kola.ReflectionQuestion
 
 class BootStrap {
 	def repoDir
@@ -25,6 +26,20 @@ class BootStrap {
 
             UserRole.create(adminUser, adminRole, true)
             assert UserRole.count() == 1
+        }
+        if (ReflectionQuestion.count() == 0) {
+            new ReflectionQuestion(name:"Kam es bei der Durchführung der Arbeitshandlung zu Schwierigkeiten (technisch/fachlich)?").save(true)
+            new ReflectionQuestion(name:"Wodurch kann die Funktionstüchtigkeit grundsätzlich beeinträchtigt werden?").save(true)
+            new ReflectionQuestion(name:"Was kann bei einer erneuten Durchführung der verschiedenen Arbeitsschritte besser/anders durchgeführt werden?").save(true)
+            new ReflectionQuestion(name:"Ist der Arbeitsschritt in der dafür vorgesehen Zeit durchgeführt worden?").save(true)
+            new ReflectionQuestion(name:"Welcher Arbeitsschritt war am zeitintensivsten? Begründen Sie ihre Aussage.").save(true)
+            new ReflectionQuestion(name:"Welches Funktionswissen/Vorwissen war für die Durchführung der Arbeiten notwendig?").save(true)
+            new ReflectionQuestion(name:"Ist die Planung und Durchführung der Arbeitshandlung selbstständig erfolgt oder gab es Hilfestellungen von Meistern bzw. Gesellen?").save(true)
+            new ReflectionQuestion(name:"Haben Sie die Arbeit alleine durchgeführt oder im Team?").save(true)
+            new ReflectionQuestion(name:"Welche Rückmeldungen haben Sie vom Team vor Ort erhalten?").save(true)
+            new ReflectionQuestion(name:"Welche Teilschritte des gesamten Kundenauftrags ging den durchgeführten Arbeiten voraus? Welche schließen sich an?").save(true)
+            new ReflectionQuestion(name:"War die durchgeführte Arbeit eher über- oder unterfordernd? Begründen Sie Ihre Meinung.").save(true)
+             assert ReflectionQuestion.count() == 11
         }
 
         environments {

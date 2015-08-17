@@ -1,5 +1,6 @@
 package kola
 import org.springframework.security.access.annotation.Secured
+import org.apache.lucene.queryparser.classic.QueryParser
 
 @Secured(['IS_AUTHENTICATED_FULLY'])
 class SearchController {
@@ -16,17 +17,32 @@ class SearchController {
 			preTags '<strong>'
   			postTags '</strong>'
 		}
-		def results = elasticSearchService.search("${params.q}", [highlight: highlighter, size:params.max, from:params.offset])    	
-		//println results
-		/*
-		if (request.xhr) {
-			render (template:"searchResult", model:[results:results])
+		def options = [highlight: highlighter, size:params.max, from:params.offset]
+		def types = params.list("type")?.unique(false).collect {
+			switch (it) {
+				case "asset":
+					return Asset.class
+				case "reflectionQuestion":
+					return ReflectionQuestion.class
+			}
+		}.findAll()
+		if (types) {
+
+			options.types = types
 		}
-		else {
-			[results:results]
-		}
-		*/
-		//respond results
+		println "--- options=" + options
+		def query = params.q ? QueryParser.escape(params.q) : null
+		println "q=" + query
+//		def results = elasticSearchService.search("${params.q}", [highlight: highlighter, size:params.max, from:params.offset])    	
+		def results = elasticSearchService.search(query, options)    	
 		[results:results]
     }
+
+    protected String escapeQuery(String query) {
+    	/*
+		def escapedCharacters = Regexp.escape('\\+-&|!(){}[]^~*?:')
+		return query?.gsub(/([#{escaped_characters}])/, '\\\\\1')
+		*/
+		return QueryParser.escape(query)
+	}
 }
