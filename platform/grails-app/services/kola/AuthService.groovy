@@ -9,7 +9,7 @@ class AuthService {
 
     def canEdit(domain, user = springSecurityService.currentUser) {
         if (user) {
-            if (domain?.creator && domain.creator == user) {
+            if (domain?.hasProperty("creator") && domain.creator == user) {
                 return true
             }
             return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')

@@ -36,5 +36,6 @@
 			</div>
 		</g:form>
 		<g:render template="assetModal" />
+		<g:render template="reflectionQuestionModal" />
 	</body>
 </html>

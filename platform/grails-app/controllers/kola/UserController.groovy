@@ -74,7 +74,7 @@ class UserController {
         }
         updateRoles(userInstance)
 
-        flash.message = message(code: 'default.updated.message', args: [message(code: 'User.label', default: 'User'), userInstance.id])
+        flash.message = message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])
         redirect action:"index", method:"GET"
     }
 
@@ -87,7 +87,7 @@ class UserController {
 
         userInstance.delete flush:true
 
-        flash.message = message(code: 'default.deleted.message', args: [message(code: 'User.label', default: 'User'), userInstance.id])
+        flash.message = message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])
         redirect action:"index", method:"GET"
     }
 

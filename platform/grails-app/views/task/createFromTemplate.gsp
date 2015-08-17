@@ -15,7 +15,7 @@
 			<h1 class="page-header">
 				<g:message code="default.create.label" args="[entityName]" />
 			</h1>
-			<p>Bitte wählen Sie eine Vorlage für den neuen Arbeitsauftrag aus:</p>
+			<p class="text-danger"><b>Bitte wählen Sie eine Vorlage für den neuen Arbeitsauftrag aus:</b></p>
 			<div class="well">
 				Keine Vorlage, Arbeitsauftrag komplett neu erstellen
 				<button class="choose btn btn-primary pull-right" name="template.id" value=""><i class="fa fa-check-square-o"></i> <g:message code="default.button.choose.label" default="Auswählen" /></button>

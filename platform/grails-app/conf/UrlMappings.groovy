@@ -7,14 +7,14 @@ class UrlMappings {
         }
 
         name viewAsset: "/v/$id"{
-            controller = "repository"
+            controller = "asset"
             action = "viewAsset"
             constraints {
                 // apply constraints here
             }
         }
         name viewAssetFile: "/v/$id/$file**"{
-            controller = "repository"
+            controller = "asset"
             action = "viewAsset"
             constraints {
                 // apply constraints here

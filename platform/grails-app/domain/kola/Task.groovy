@@ -14,6 +14,7 @@ class Task {
     }
     static mapping = {
         steps cascade:"all-delete-orphan"
+        description type:"text"
     }
  
     String name

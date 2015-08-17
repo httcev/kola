@@ -91,9 +91,6 @@
 			</g:each>
 		</ul>
 		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#assetModal"><i class="fa fa-plus"></i> Lernressource hinzufügen</button>
-		<%--
-		<g:select name="resources" from="${kola.Asset.list()}" multiple="multiple" optionKey="id" size="5" value="${taskInstance?.resources*.id}" class="form-control"/>
-		--%>
 	</div>
 </div>
 
@@ -128,6 +125,29 @@
 	</div>
 </div>
 
+<div class="form-group ${hasErrors(bean: taskInstance, field: 'reflectionQuestions', 'error')} ">
+	<label for="reflectionQuestions" class="col-sm-2 control-label">
+		<g:message code="task.reflectionQuestions.label" default="Reflexionsaufforderungen" />:
+	</label>
+	<div class="col-sm-10">
+		<ul id="reflectionQuestion-list" class="list-group sortable">
+			<g:each var="reflectionQuestionInstance" in="${taskInstance?.reflectionQuestions}">
+				<li class="list-group-item clearfix">
+					<input type="hidden" name="reflectionQuestions" value="${reflectionQuestionInstance.id}">
+					<h4 class="list-group-item-heading">
+						<g:if test="${taskInstance?.reflectionQuestions?.size() > 1}">
+							<div class="btn btn-default drag-handle" title="Verschieben mit Drag&amp;Drop"><i class="fa fa-arrows-v fa-lg"></i></div>
+						</g:if>
+						${reflectionQuestionInstance.name}
+						<button type="button" class="btn btn-danger pull-right" onclick="$(this).closest('li').remove()"><i class="fa fa-times"></i></button>
+					</h4>
+				</li>
+			</g:each>
+		</ul>
+		<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#reflectionQuestionModal"><i class="fa fa-plus"></i> Reflexionsaufforderung hinzufügen</button>
+	</div>
+</div>
+
 <script>
 	function deleteStep($button) {
 		var $li = $button.closest("li");
@@ -143,7 +163,6 @@
 	}
 
 	$(document).ready(function() {
-
 		$(".sortable").each(function() {
 			var sortable = Sortable.create(this, { handle:".drag-handle" });
 			/*

@@ -21,7 +21,10 @@
 							<g:link class="btn btn-default" style="margin-bottom:10px" controller="task" action="createTemplate"><i class="fa fa-plus"></i> Neue Arbeitsprozessbeschreibung</g:link><br>
 						</sec:ifAnyGranted>
 						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REPOSITORY_ADMIN">
-							<g:link class="btn btn-default" style="margin-bottom:10px" controller="repository" action="create"><i class="fa fa-plus"></i> Neue Lernressource</g:link><br>
+							<g:link class="btn btn-default" style="margin-bottom:10px" controller="asset" action="create"><i class="fa fa-plus"></i> Neue Lernressource</g:link><br>
+						</sec:ifAnyGranted>
+						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REFLECTION_QUESTION_CREATOR">
+							<g:link class="btn btn-default" style="margin-bottom:10px" controller="reflectionQuestion" action="create"><i class="fa fa-plus"></i> Neue Reflexionsaufforderung</g:link><br>
 						</sec:ifAnyGranted>
 						<sec:ifAnyGranted roles="ROLE_ADMIN">
 							<g:link class="btn btn-default" style="margin-bottom:10px" controller="user" action="create"><i class="fa fa-plus"></i> Neuer Benutzer</g:link>

@@ -3,8 +3,15 @@ package kola
 class ReflectionQuestion {
 
     static constraints = {
-    	question blank:false
+    	name blank:false
+    }
+    static mapping = {
+        name type:"text"
+    }
+	static searchable = {
+		all = [analyzer: 'german']
+        only = ['name']
     }
 
-    String question
+    String name
 }

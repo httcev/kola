@@ -9,6 +9,9 @@ class TaskStep {
         deleted bindable:true
     }
     static transients = ["deleted"]
+    static mapping = {
+        description type:"text"
+    }
 
     String name
     String description

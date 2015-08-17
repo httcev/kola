@@ -10,7 +10,6 @@ import org.springframework.security.access.prepost.PreAuthorize
 @Transactional(readOnly = true)
 @Secured(['IS_AUTHENTICATED_FULLY'])
 class TaskController {
-
     def springSecurityService
     def authService
 
@@ -20,6 +19,10 @@ class TaskController {
     }
 
     def show(Task taskInstance) {
+        if (taskInstance == null) {
+            notFound()
+            return
+        }
         respond taskInstance
     }
 
@@ -183,7 +186,18 @@ class TaskController {
             }
         }
         // update steps
-        taskInstance.steps.removeAll{ it == null || it.deleted }
+        taskInstance.steps?.removeAll{ it == null || it.deleted }
+        // update reflection questions
+        taskInstance.reflectionQuestions?.clear()
+        params.list("reflectionQuestions")?.unique(false).each {
+            def reflectionQuestion = ReflectionQuestion.get(it)
+            if (reflectionQuestion) {
+                taskInstance.addToReflectionQuestions(reflectionQuestion)
+            }
+            else {
+                log.error "Couldn't add reflection question: ReflectionQuestion not found: ${it}"
+            }
+        }
         // create new attachments
         def f = request.multiFileMap?.each { k,files ->
             println "--- upload file with key " + k

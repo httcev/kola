@@ -37,7 +37,7 @@
 					<sec:ifLoggedIn>
 					<ul class="nav navbar-nav">
 						<li class="${(controllerName == 'task' || controllerName == 'taskTemplate') ? 'active' : ''}"><g:link controller="task" action="index">Aufträge</g:link></li>
-						<li class="${controllerName == 'repository' ? 'active' : ''}"><g:link controller="repository" action="index">Lernressourcen</g:link></li>
+						<li class="${controllerName == 'asset' ? 'active' : ''}"><g:link controller="asset" action="index">Lernressourcen</g:link></li>
 					</ul>
 					</sec:ifLoggedIn>
 					<ul class="nav navbar-nav navbar-right">

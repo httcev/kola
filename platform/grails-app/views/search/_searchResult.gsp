@@ -7,10 +7,13 @@
 	<ul class="search-result">
 	<g:each var="hit" in="${searchResults}" status="i">
 		<li class="search-result-hit" id="${hit.id}">
-			<div><a href="${assetService.createEncodedLink(hit)}" class="search-result-link">${hit.name}</a></div>
+		<%--
+			<div><a href="${assetService.createEncodedLink(hit)}" class="search-result-link">${hit.name?.take(100)}</a></div>
+		--%>	
+			<div><a href="${createLink(resource:hit, action:'show')}" class="search-result-link">${hit.name?.take(100)}</a></div>
 			<g:each var="field" in="['description', 'indexText']">
 				<g:each var="fragment" in="${highlights[i][field]?.fragments}">
-					<div>${field}: ${raw(fragment.toString())}</div>
+					<div>${raw(fragment.toString())}</div>
 				</g:each>
 			</g:each>
 		</li>

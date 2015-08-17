@@ -21,7 +21,7 @@ import kola.ZipUtil
 
 @Transactional
 @Secured(['ROLE_ADMIN', 'ROLE_REPOSITORY_ADMIN'])
-class RepositoryController {
+class AssetController {
 	def assetService
 
     //static allowedMethods = [save: "POST", update: ["PUT", "POST"], delete: "DELETE"]
@@ -37,14 +37,12 @@ class RepositoryController {
 
     @Secured(['IS_AUTHENTICATED_FULLY'])
     def show(Asset assetInstance) {
+        if (assetInstance == null) {
+            notFound()
+            return
+        }
         respond assetInstance
     }
-
-/*
-    def create() {
-        respond new Asset(params)
-    }
-    */
 
     def createFlow = {
         initiliaze {
