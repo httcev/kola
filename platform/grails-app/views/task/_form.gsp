@@ -102,33 +102,67 @@
 		<g:message code="task.steps.label" default="Teilschritte" />:
 	</label>
 	<div class="col-sm-10">
-		<g:if test="${taskInstance?.steps?.size() > 0}">
-			<ul class="list-group sortable">
-				<g:each var="step" in="${taskInstance?.steps}">
-					<li class="list-group-item clearfix">
-						<input type="hidden" name="steps" value="${step.id}">
-						<h4 class="list-group-item-heading">
-							${step.name}
-							<button type="button" class="btn btn-danger pull-right" onclick="$(this).closest('li').remove()"><i class="fa fa-times"></i></button>
-						</h4>
-						<p class="list-group-item-text">
-							${step.description?.take(100)}
-						</p>
-					</li>
-				</g:each>
-			</ul>
-		</g:if>
-		<g:actionSubmit class="btn btn-primary" value="Teilschritt hinzufügen" action="addStep" />
+		<ul id="step-list" class="list-group sortable">
+			<g:each var="step" in="${taskInstance?.steps}" status="i">
+				<li class="list-group-item clearfix">
+					ID=${step.id}
+					<g:if test="${step.id}"><input type="hidden" name="steps[${i}].id" value="${step.id}"></g:if>
+					<input type="hidden" name="steps[${i}].deleted" class="deleteFlag" value="false">
+					<h4 class="list-group-item-heading">
+						<div class="btn btn-default drag-handle" title="Verschieben mit Drag&amp;Drop"><i class="fa fa-arrows-v fa-lg"></i></div>
+						<input type="text" name="steps[${i}].name" value="${step.name}">
+						<button type="button" class="btn btn-danger pull-right" onclick="deleteStep($(this))"><i class="fa fa-times"></i></button>
+					</h4>
+					<p class="list-group-item-text">
+						<textarea name="steps[${i}].description">${step.description}</textarea>
+					</p>
+				</li>
+			</g:each>
+		</ul>
+		<button type="button" class="btn btn-primary" onclick="addStep()"><i class="fa fa-plus"></i></button>
 <%--	
+		<g:link resource="task/step" action="create" taskId="${taskInstance.id}" class="btn btn-primary"><i class="fa fa-plus"></i></g:link>
+		<g:actionSubmit class="btn btn-primary" value="Teilschritt hinzufügen" action="addStep" />
 		<g:select name="steps" from="${kola.TaskStep.list()}" multiple="multiple" optionKey="id" size="5" value="${taskInstance?.steps*.id}" class="form-control"/>
 --%>		
 	</div>
 </div>
 
 <script>
+	function deleteStep($button) {
+		var $li = $button.closest("li");
+		$(".deleteFlag", $li).val("true");
+		$li.hide()
+	}
+
+	function addStep() {
+		var stepCount = $("#step-list li").size()
+		var $li = $("<li class='list-group-item clearfix'>");
+		$li.append($("<input type='text' name='steps["+stepCount+"].name'>"));
+		$("#step-list").append($li);
+	}
+
 	$(document).ready(function() {
+
 		$(".sortable").each(function() {
-			Sortable.create(this, { handle:".drag-handle" });
+			var sortable = Sortable.create(this, { handle:".drag-handle" });
+			/*
+			if ($(this).attr("id") == "step-list") {
+				sortable.option("onUpdate", function() {
+					// update all step indices according to new sort order
+					$("#step-list li").each(function(index) {
+						var prefix = "step[" + index + "]";
+						$("input", $(this)).each(function() {
+							var field = $(this);
+							var replaced = field.attr("name").replace(/steps\[.*?\]/, prefix);
+							field.attr("name", replaced);
+							console.log(field.attr("name") + "=" + field.val());
+						})
+					});
+
+				});
+			}
+			*/
 		})
 		$(document).on("change", ".new-attachment", function() {
 			var emptyFileChooserCount = $("#attachments-container input:file").filter(function() { return $(this).val() == ""; }).length;

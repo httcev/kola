@@ -13,7 +13,7 @@
 			<li><g:link action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
 			<li class="active"><g:message code="default.create.label" args="[entityName]" /></li>
 		</ol>
-		<g:form url="[resource:taskInstance, action:'save']" class="form-horizontal" autocomplete="off" enctype="multipart/form-data">
+		<g:form action="save" class="form-horizontal" autocomplete="off" enctype="multipart/form-data">
 			<input type="hidden" name="isTemplate" value="${taskInstance?.isTemplate}">
 			<input type="hidden" name="template" value="${taskInstance?.template?.id}">
 			<h1 class="page-header">

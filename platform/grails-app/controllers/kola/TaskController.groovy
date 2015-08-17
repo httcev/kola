@@ -31,7 +31,9 @@ class TaskController {
             task.name = task.template.name
             task.description = task.template.description
             task.template = task.template
-            task.steps = task.template.steps
+            task.template.steps?.each {
+                task.addToSteps(new TaskStep(name:it.name, description:it.description, attachments:it.attachments))
+            }
             task.attachments = task.template.attachments
             task.resources = task.template.resources
         }
@@ -54,6 +56,8 @@ class TaskController {
 
     @Transactional
     def save(Task taskInstance) {
+        println params
+        println taskInstance.name
         if (taskInstance == null) {
             notFound()
             return
@@ -61,6 +65,8 @@ class TaskController {
         taskInstance.creator = springSecurityService.currentUser
         updateFromParams(taskInstance)
         taskInstance.validate()
+
+        taskInstance.errors.allErrors.each { println it }
 
         if (taskInstance.hasErrors()) {
             respond taskInstance.errors, view:'create'
@@ -93,7 +99,9 @@ class TaskController {
             return
         }
 
+        println "--- steps before save -> " + taskInstance.steps*.name
         updateFromParams(taskInstance)
+        taskInstance.validate()
 
         if (taskInstance.hasErrors()) {
             respond taskInstance.errors, view:'edit'
@@ -101,7 +109,7 @@ class TaskController {
         }
 
         taskInstance.save flush:true
-        println "--- attachments after save -> " + taskInstance.attachments
+        println "--- steps after save -> " + taskInstance.steps*.name
 
         flash.message = message(code: 'default.updated.message', args: [message(code: 'Task.label', default: 'Task'), taskInstance.id])
         redirect taskInstance
@@ -152,15 +160,33 @@ class TaskController {
     }
 
     protected void updateFromParams(Task taskInstance) {
+        // update resources
         taskInstance.resources?.clear()
         params.list("resources")?.unique(false).each {
-            taskInstance.addToResources(Asset.get(it))
+            def asset = Asset.get(it)
+            if (asset) {
+                taskInstance.addToResources(asset)
+            }
+            else {
+                log.error "Couldn't add resource: Asset not found: ${it}"
+            }
         }
+        // update attachments
         taskInstance.attachments?.clear()
         params.list("attachments")?.unique(false).each {
-            taskInstance.addToAttachments(Asset.get(it))
+            def asset = Asset.get(it)
+            if (asset) {
+                taskInstance.addToAttachments(asset)
+            }
+            else {
+                log.error "Couldn't add attachment: Asset not found: ${it}"
+            }
         }
+        // update steps
+        taskInstance.steps.removeAll{ it == null || it.deleted }
+        // create new attachments
         def f = request.multiFileMap?.each { k,files ->
+            println "--- upload file with key " + k
             files?.each { f ->
                 if (!f.empty) {
                     def asset = new Asset(name:f.originalFilename, type:"attachment", mimeType:f.getContentType(), content:f.bytes)

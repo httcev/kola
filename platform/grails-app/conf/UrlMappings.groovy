@@ -21,8 +21,8 @@ class UrlMappings {
             }
         }
 /*
-        "/taskTemplates"(resources:'taskTemplate') {
-            "/steps"(resources:"taskBody")
+        "/tasks"(resources:"task") {
+            "/steps"(resources:"taskStep")
         }
 */
         "/$controller/$action?/$id?(.$format)?"{

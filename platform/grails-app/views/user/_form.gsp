@@ -12,6 +12,6 @@
 </div>
 <div class="form-group ${hasErrors(bean: userInstance, field: 'email', 'error')} required">
 	<label for="email" class="col-sm-2 control-label"><g:message code="user.email.label" default="Email" /><span class="required-indicator">*</span></label>
-	<div class="col-sm-10"><input type="email" name="email" value="${userInstance?.email}" class="form-control" id="email"></div>
+	<div class="col-sm-10"><input type="email" name="email" value="${userInstance?.email}" class="form-control" id="email" required></div>
 </div>
 
