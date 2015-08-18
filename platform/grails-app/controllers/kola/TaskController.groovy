@@ -15,7 +15,21 @@ class TaskController {
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        respond Task.list(params), model:[taskInstanceCount: Task.count()]
+        def filtered = params.own || params.assigned
+        def query = new grails.gorm.DetachedCriteria(Task).build {
+            if (filtered) {
+                or {
+                    if (params.own) {
+                        eq("creator", springSecurityService.currentUser)
+                    }
+                    if (params.assigned) {
+                        eq("assignee", springSecurityService.currentUser)
+                    }
+                }
+            }
+        }
+        def result = query.list(params)
+        respond result, model:[taskInstanceCount: result.totalCount]
     }
 
     def show(Task taskInstance) {
@@ -203,7 +217,7 @@ class TaskController {
             println "--- upload file with key " + k
             files?.each { f ->
                 if (!f.empty) {
-                    def asset = new Asset(name:f.originalFilename, type:"attachment", mimeType:f.getContentType(), content:f.bytes)
+                    def asset = new Asset(name:f.originalFilename, subType:"attachment", mimeType:f.getContentType(), content:f.bytes)
                     if (!asset.save(true)) {
                         asset.errors.allErrors.each { println it }
                     }

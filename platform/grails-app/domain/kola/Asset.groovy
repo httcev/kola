@@ -5,9 +5,10 @@ class Asset {
 
 	static searchable = {
 		all = [analyzer: 'german']
-        only = ['name', 'description', 'mimeType', 'externalUrl', 'filename', 'anchor', 'indexText']
+        only = ['name', 'description', 'mimeType', 'subType', 'externalUrl', 'filename', 'anchor', 'indexText']
         name boost:3.0
         description boost:2.0
+        subType index:"not_analyzed"
     }
     static constraints = {
     	// Limit upload file size to 100MB
@@ -20,13 +21,15 @@ class Asset {
     }
     static mapping = {
 		content lazy: true
+        indexText lazy: true, type:"text"
     }
-    static transients = ['indexText']
+
+    //static transients = ['indexText']
 
     String name
     String description
     String mimeType
-    String type = "learning-resource"
+    String subType = "learning-resource"
 
     // only external assets
     String externalUrl

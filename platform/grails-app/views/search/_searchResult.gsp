@@ -3,17 +3,25 @@
 	<g:set var="searchResults" value="${results?.searchResults}"/>
 	<g:set var="highlights" value="${results?.highlight}"/>
 	<ul class="search-result list-group">
-	<g:each var="hit" in="${searchResults}" status="i">
+	<g:each var="hit" in="${searchResults}" status="hitIndex">
 		<li class="search-result-hit list-group-item clearfix" id="${hit.id}">
 			<h4 class="list-group-item-heading">
 				<a href="${createLink(resource:hit, action:'show')}" class="search-result-link">${hit.name?.take(100)}</a>
 			</h4>
 			<p class="list-group-item-text">
-			<g:each var="field" in="['description', 'indexText']">
-				<g:each var="fragment" in="${highlights[i][field]?.fragments}">
+			<g:if test="${highlights[hitIndex]['indexText']?.fragments}">
+				<g:each var="fragment" in="${highlights[hitIndex]['indexText']?.fragments}">
 					<div>${raw(fragment.toString())}</div>
 				</g:each>
-			</g:each>
+			</g:if>
+			<g:elseif test="${highlights[hitIndex]['description']?.fragments}">
+				<g:each var="fragment" in="${highlights[hitIndex]['description']?.fragments}">
+					<div>${raw(fragment.toString())}</div>
+				</g:each>
+			</g:elseif>
+			<g:elseif test="${hit.description}">
+				<div>${hit.description?.take(150)}</div>
+			</g:elseif>
 			</p>
 		</li>
 	</g:each>

@@ -8,7 +8,10 @@ class IndexController {
 
     def index() {
     	if (springSecurityService.isLoggedIn()) {
-    		render(view:"dashboard")
+    		def assignedTasks = Task.where { assignee == springSecurityService.currentUser && done != true }.list()
+    		def latestAssets = Asset.where { subType == 'learning-resource' }.list(sort:"lastUpdated", order:"desc", max:4)
+
+    		render(view:"dashboard", model:[assignedTasks:assignedTasks, latestAssets:latestAssets])
     	}
     	else {
     		render(view:"index")

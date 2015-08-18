@@ -128,11 +128,6 @@
 			</g:each>
 		</ul>
 		<button type="button" class="btn btn-primary" onclick="addStep()"><i class="fa fa-plus"></i> Teilschritt hinzufügen</button>
-<%--	
-		<g:link resource="task/step" action="create" taskId="${taskInstance.id}" class="btn btn-primary"><i class="fa fa-plus"></i></g:link>
-		<g:actionSubmit class="btn btn-primary" value="Teilschritt hinzufügen" action="addStep" />
-		<g:select name="steps" from="${kola.TaskStep.list()}" multiple="multiple" optionKey="id" size="5" value="${taskInstance?.steps*.id}" class="form-control"/>
---%>		
 	</div>
 </div>
 

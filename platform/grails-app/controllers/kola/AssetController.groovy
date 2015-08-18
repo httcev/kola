@@ -31,7 +31,7 @@ class AssetController {
         params.max = Math.min(max ?: 10, 100)
         params.sort = params.sort ?: "lastUpdated"
         params.order = params.order ?: "desc"
-        def query = Asset.where { type == "learning-resource" }
+        def query = Asset.where { subType == "learning-resource" }
         respond query.list(params), model:[assetInstanceCount: query.count()]
     }
 
@@ -103,6 +103,12 @@ class AssetController {
                 }
                 def assetInstance = new Asset()
                 assetInstance.properties = flow.cmd
+                //println "---saved instance: " + assetInstance.indexText
+
+
+                assetInstance.validate()
+                assetInstance.errors.allErrors.each { println it }
+
                 if (assetInstance.save(true)) {
                     RequestContextHolder.currentRequestAttributes().flashScope.message = message(code: 'default.created.message', args: [message(code: 'asset.label', default: 'Asset'), assetInstance.id])
                     return success()
@@ -349,7 +355,7 @@ class CreateAssetCommand implements Serializable {
     String name
     String description
     String mimeType
-    String type = "learning-resource"
+    String subType = "learning-resource"
 
     // only external assets
     String externalUrl
