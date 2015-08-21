@@ -36,22 +36,22 @@
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<sec:ifLoggedIn>
 					<ul class="nav navbar-nav">
-						<li class="${(controllerName == 'task' || controllerName == 'taskTemplate') ? 'active' : ''}"><g:link controller="task" action="index">Aufträge</g:link></li>
-						<li class="${controllerName == 'asset' ? 'active' : ''}"><g:link controller="asset" action="index">Lernressourcen</g:link></li>
+						<li class="${(controllerName == 'task' || controllerName == 'taskTemplate') ? 'active' : ''}"><g:link controller="task" action="index"><g:message code="kola.tasks" /></g:link></li>
+						<li class="${controllerName == 'asset' ? 'active' : ''}"><g:link controller="asset" action="index"><g:message code="kola.assets" /></g:link></li>
 					</ul>
 					</sec:ifLoggedIn>
 					<ul class="nav navbar-nav navbar-right">
 					<sec:ifAllGranted roles="ROLE_ADMIN">
 						<li class="dropdown">
-							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-wrench fa-lg"></i> Administration <span class="caret"></span></a>
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-wrench fa-lg"></i> <g:message code="kola.admin" /> <span class="caret"></span></a>
 							<ul class="dropdown-menu">
-								<li><g:link controller="user"><i class="fa fa-users"></i> Benutzerverwaltung</g:link></li>
-								<li><g:link controller="platformInfo"><i class="fa fa-cubes"></i> Systeminformationen</g:link></li>
+								<li><g:link controller="user"><i class="fa fa-users fa-fw"></i> <g:message code="kola.admin.users" /></g:link></li>
+								<li><g:link controller="platformInfo"><i class="fa fa-cubes fa-fw"></i> <g:message code="kola.admin.system" /></g:link></li>
 							</ul>
 						</li>
 					</sec:ifAllGranted>
 					<sec:ifNotLoggedIn>
-						<li><g:link controller="login"><i class="fa fa-sign-in fa-lg"></i> Anmelden</g:link></li>
+						<li><g:link controller="login"><i class="fa fa-sign-in fa-lg"></i> <g:message code="kola.signin" /></g:link></li>
 					</sec:ifNotLoggedIn>
 					<sec:ifLoggedIn>
 						<li class="dropdown">
@@ -59,11 +59,11 @@
 							<ul class="dropdown-menu">
 								<li>
 									<g:link controller="profile">
-										<i class="fa fa-user"></i> Profil
+										<i class="fa fa-user fa-fw"></i> <g:message code="kola.profile" />
 									</g:link>
 								</li>
 								<li role="separator" class="divider"></li>
-								<li><g:link controller="logout"><i class="fa fa-sign-out"></i> Abmelden</g:link></li>
+								<li><g:link controller="logout"><i class="fa fa-sign-out fa-fw"></i> <g:message code="kola.signout" /></g:link></li>
 							</ul>
 						</li>
 					</sec:ifLoggedIn>
@@ -80,7 +80,7 @@
 	<div id="footer">
 		<div class="container-fluid">
 			<p class="text-muted">
-				<a href="http://www.kola-projekt.de/ueber_das_projekt.html" target="_blank" class="pull-right">Über KOLA</a>
+				<a href="http://www.kola-projekt.de/ueber_das_projekt.html" target="_blank" class="pull-right"><g:message code="kola.about" /></a>
 			</p>
 		</div>
 	</div>

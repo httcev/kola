@@ -9,6 +9,7 @@ import org.springframework.security.access.annotation.Secured
 class UserController {
     def thumbnailService
     def springSecurityService
+    def grailsApplication
 
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
@@ -28,7 +29,7 @@ class UserController {
         }
 
         if (params['_photo']?.bytes?.length > 0) {
-            userInstance.profile.photo = thumbnailService.createThumbnailBytes(params['_photo'].bytes)
+            userInstance.profile.photo = thumbnailService.createThumbnailBytes(params['_photo'].bytes, grailsApplication.config.kola.avatarSize)
         }
         else if (params['_deletePhoto'] == 'true') {
             userInstance.profile.photo = null
@@ -61,7 +62,7 @@ class UserController {
         }
 
         if (params['_photo']?.bytes?.length > 0) {
-            userInstance.profile.photo = thumbnailService.createThumbnailBytes(params['_photo'].bytes)
+            userInstance.profile.photo = thumbnailService.createThumbnailBytes(params['_photo'].bytes, grailsApplication.config.kola.avatarSize)
         }
         else if (params['_deletePhoto'] == 'true') {
             userInstance.profile.photo = null

@@ -1,7 +1,7 @@
 <html>
 	<head>
 		<meta name="layout" content="main"/>
-		<title>Willkommen bei KOLA</title>
+		<title><g:message code="kola.welcome.to" /></title>
 	</head>
 	<body>
 		<div class="row">
@@ -9,8 +9,8 @@
 				<div class="panel panel-success">
 					<div class="panel-heading">
 						<h3 class="panel-title">
-							Zu bearbeitende Aufträge:
-							<a href="${createLink(controller:'task', action:'index', params:[assigned:'on'])}" class="pull-right">alle &gt;</a>
+							<g:message code="kola.tasks.assigned" />:
+							<a href="${createLink(controller:'task', action:'index', params:[assigned:'on'])}" class="pull-right"><g:message code="kola.all" /> <i class="fa fa-chevron-right"></i></a>
 						</h3>
 					</div>
 					<g:if test="${assignedTasks?.size() > 0}">
@@ -21,7 +21,7 @@
 									<p class="list-group-item-text">
 										${task.description?.take(100)}<br>
 										<g:if test="${task.due}">
-											<span class="text-danger"><g:message code="task.due.label" default="Fällig" />: <g:formatDate date="${task.due}" type="date"/></span>
+											<span class="text-danger"><g:message code="kola.task.due" />: <g:formatDate date="${task.due}" type="date"/></span>
 										</g:if>
 									</p>
 								</a>
@@ -30,14 +30,17 @@
 					</g:if>
 					<g:else>
 						<div class="panel-body">
-							<p class="text-muted">Momentan stehen keine zu bearbeitende Aufträge an.</p>
+							<p class="text-muted"> <g:message code="kola.tasks.assigned.empty" /></p>
 						</div>
 					</g:else>
 				</div>				
 
 				<div class="panel panel-default">
 					<div class="panel-heading">
-						<h3 class="panel-title">Neueste Lernressourcen:</h3>
+						<h3 class="panel-title">
+							<g:message code="kola.asset.newest" />:
+							<a href="${createLink(controller:'asset', action:'index')}" class="pull-right"><g:message code="kola.all" /> <i class="fa fa-chevron-right"></i></a>
+						</h3>
 					</div>
 					<ul class="list-group">
 						<g:each var="asset" in="${latestAssets}">
@@ -55,21 +58,21 @@
 			<div class="col-sm-3">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
-						<h1 class="panel-title"><b>Anlegen:</b></h1>
+						<h1 class="panel-title"><b><g:message code="default.button.create.label" />:</b></h1>
 					</div>
 					<div class="panel-body">
-						<g:link class="btn btn-default" style="margin-bottom:10px" controller="task" action="createFromTemplate"><i class="fa fa-plus"></i> Arbeitsauftrag</g:link><br>
+						<g:link class="btn btn-default" style="margin-bottom:10px" controller="task" action="createFromTemplate"><i class="fa fa-plus"></i> <g:message code="kola.task" /></g:link><br>
 						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_TASK_TEMPLATE_CREATOR">
-							<g:link class="btn btn-default" style="margin-bottom:10px" controller="task" action="createTemplate"><i class="fa fa-plus"></i> Arbeitsprozessbeschreibung</g:link><br>
+							<g:link class="btn btn-default" style="margin-bottom:10px" controller="task" action="createTemplate"><i class="fa fa-plus"></i> <g:message code="kola.taskTemplate" /></g:link><br>
 						</sec:ifAnyGranted>
 						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REPOSITORY_ADMIN">
-							<g:link class="btn btn-default" style="margin-bottom:10px" controller="asset" action="create"><i class="fa fa-plus"></i> Lernressource</g:link><br>
+							<g:link class="btn btn-default" style="margin-bottom:10px" controller="asset" action="create"><i class="fa fa-plus"></i> <g:message code="kola.asset" /></g:link><br>
 						</sec:ifAnyGranted>
 						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REFLECTION_QUESTION_CREATOR">
-							<g:link class="btn btn-default" style="margin-bottom:10px" controller="reflectionQuestion" action="create"><i class="fa fa-plus"></i> Reflexionsaufforderung</g:link><br>
+							<g:link class="btn btn-default" style="margin-bottom:10px" controller="reflectionQuestion" action="create"><i class="fa fa-plus"></i> <g:message code="kola.reflectionQuestion" /></g:link><br>
 						</sec:ifAnyGranted>
 						<sec:ifAnyGranted roles="ROLE_ADMIN">
-							<g:link class="btn btn-default" style="margin-bottom:10px" controller="user" action="create"><i class="fa fa-plus"></i> Benutzer</g:link>
+							<g:link class="btn btn-default" style="margin-bottom:10px" controller="user" action="create"><i class="fa fa-plus"></i> <g:message code="kola.user" /></g:link>
 						</sec:ifAnyGranted>
 					</div>
 				</div>

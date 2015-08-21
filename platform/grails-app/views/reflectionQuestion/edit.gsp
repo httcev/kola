@@ -3,13 +3,14 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'reflectionQuestion.label', default: 'Reflexionsaufforderung')}" />
+		<g:set var="entityName" value="${message(code: 'kola.reflectionQuestion')}" />
+		<g:set var="entitiesName" value="${message(code: 'kola.reflectionQuestions')}" />
 		<title><g:message code="default.edit.label" args="[entityName]" /></title>
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-			<li><g:link class="index" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
+			<li><a class="home" href="${createLink(uri: '/')}"><g:message code="kola.home"/></a></li>
+			<li><g:link class="index" action="index">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.edit.label" args="[entityName]" /></li>
 		</ol>
 		<g:form url="[resource:reflectionQuestionInstance, action:'update']" method="PUT" class="form-horizontal" autocomplete="off">
@@ -19,9 +20,6 @@
 					<g:link class="delete btn btn-danger" action="delete" id="${reflectionQuestionInstance.id}" title="${message(code: 'default.button.delete.label', args:[entityName])}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
 						<i class="fa fa-times"></i>
 					</g:link>
-<%--				
-					<button class="save btn btn-success"><i class="fa fa-save"></i> <g:message code="default.button.update.label" default="Update" /></button>
---%>					
 				</div>
 			</h1>
 			<g:hasErrors bean="${reflectionQuestionInstance}">

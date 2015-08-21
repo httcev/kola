@@ -1,13 +1,14 @@
 <g:applyLayout name="main">
 <html>
 	<head>
-		<g:set var="entityName" value="${message(code: 'asset.label', default: 'Asset')}" />
+		<g:set var="entityName" value="${message(code: 'kola.asset')}" />
+		<g:set var="entitiesName" value="${message(code: 'kola.assets')}" />
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><g:link uri="/"><g:message code="default.home.label" default="Home" /></g:link></li>
-			<li><g:link controller="asset" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
+			<li><g:link uri="/"><g:message code="kola.home" /></g:link></li>
+			<li><g:link controller="asset" action="index">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.create.label" args="[entityName]" /></li>
 		</ol>
 		<h1 class="page-header"><g:message code="default.create.label" args="[entityName]" /></h1>

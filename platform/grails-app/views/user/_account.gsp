@@ -1,16 +1,15 @@
-<%@ page import="kola.User" %>
 <%@ page import="kola.Role" %>
 
 <div class="form-group">
-	<label class="col-sm-2 control-label"><g:message code="user.account.label" default="Account" /></label>
+	<label class="col-sm-2 control-label"><g:message code="kola.user.account" />:</label>
 	<div class="col-sm-10">
 		<div class="checkbox">
-			<label><g:checkBox name="enabled" value="${userInstance?.enabled}"/> <g:message code="user.enabled.label" default="Enabled" /></label>
+			<label><g:checkBox name="enabled" value="${userInstance?.enabled}"/> <g:message code="kola.user.enabled" /></label>
 		</div>
 	</div>
 	<div class="col-sm-offset-2 col-sm-10">
 		<div class="checkbox">
-			<label><g:checkBox name="passwordExpired" value="${userInstance?.passwordExpired}"/> <g:message code="user.passwordExpired.label" default="Password Expired" /></label>
+			<label><g:checkBox name="passwordExpired" value="${userInstance?.passwordExpired}"/> <g:message code="kola.user.passwordExpired" /></label>
 		</div>
 	</div>
 </div>
@@ -18,20 +17,20 @@
 <div class="form-group ${hasErrors(bean: userInstance, field: 'accountExpired', 'error')}">
 	<div class="col-sm-offset-2 col-sm-10">
 		<div class="checkbox">
-			<label><g:checkBox name="accountExpired" value="${userInstance?.accountExpired}"/> <g:message code="user.accountExpired.label" default="Account Expired" /></label>
+			<label><g:checkBox name="accountExpired" value="${userInstance?.accountExpired}"/> <g:message code="kola.user.accountExpired" /></label>
 		</div>
 	</div>
 </div>
 <div class="form-group ${hasErrors(bean: userInstance, field: 'accountLocked', 'error')}">
 	<div class="col-sm-offset-2 col-sm-10">
 		<div class="checkbox">
-			<label><g:checkBox name="accountLocked" value="${userInstance?.accountLocked}"/> <g:message code="user.accountLocked.label" default="Account Locked" /></label>
+			<label><g:checkBox name="accountLocked" value="${userInstance?.accountLocked}"/> <g:message code="kola.user.accountLocked" /></label>
 		</div>
 	</div>
 </div>
 --%>
 <div class="form-group">
-	<label class="col-sm-2 control-label"><g:message code="user.roles.label" default="Roles" /></label>
+	<label class="col-sm-2 control-label"><g:message code="kola.user.roles" />:</label>
 	<div class="col-sm-10">
 		<g:each in="${Role.list()}" var="role" >
 			<div class="checkbox">

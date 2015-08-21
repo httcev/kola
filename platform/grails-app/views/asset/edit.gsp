@@ -3,13 +3,14 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'asset.label', default: 'Asset')}" />
+		<g:set var="entityName" value="${message(code: 'kola.asset')}" />
+		<g:set var="entitiesName" value="${message(code: 'kola.assets')}" />
 		<title><g:message code="default.edit.label" args="[entityName]" /></title>
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><a class="home" href="${createLink(uri: '/')}"><g:message code="default.home.label"/></a></li>
-			<li><g:link class="index" action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
+			<li><a class="home" href="${createLink(uri: '/')}"><g:message code="kola.home"/></a></li>
+			<li><g:link class="index" action="index">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.edit.label" args="[entityName]" /></li>
 		</ol>
 		<g:form class="form-horizontal" url="[controller:'asset', id:assetInstance.id, action:'update']" method="put"  enctype="multipart/form-data">

@@ -4,15 +4,16 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: taskInstance.isTemplate ? 'taskTemplate.label' : 'task.label', default: taskInstance.isTemplate ? 'Arbeitsprozessbeschreibung' : 'Arbeitsauftrag')}" />
+		<g:set var="entityName" value="${message(code: taskInstance.isTemplate ? 'kola.taskTemplate' : 'kola.task')}" />
+		<g:set var="entitiesName" value="${message(code: taskInstance.isTemplate ? 'kola.taskTemplates' : 'kola.tasks')}" />
 		<title><g:message code="default.show.label" args="[entityName]" /></title>
 		<asset:stylesheet src="blueimp-gallery.min.css"/>
 		<asset:javascript src="jquery.blueimp-gallery.min.js"/>
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><g:link uri="/"><g:message code="default.home.label" default="Home" /></g:link></li>
-			<li><g:link action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
+			<li><g:link uri="/"><g:message code="kola.home" /></g:link></li>
+			<li><g:link action="index">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.show.label" args="[entityName]" /></li>
 		</ol>
 		<g:if test="${flash.message}">
@@ -31,21 +32,21 @@
 		</h1>
 		<g:if test="${taskInstance?.description}">
 			<div class="row">
-				<div class="col-sm-2"><label><g:message code="taskInstance.description.label" default="Description" />:</label></div>
+				<div class="col-sm-2"><label><g:message code="kola.meta.description" />:</label></div>
 				<div class="col-sm-10"><kola:markdown>${taskInstance.description}</kola:markdown></div>
 			</div>
 		</g:if>
 		<div class="row">
-			<div class="col-sm-2"><label><g:message code="taskInstance.creator.label" default="Creator" />:</label></div>
+			<div class="col-sm-2"><label><g:message code="kola.meta.creator" />:</label></div>
 			<div class="col-sm-10"><g:render bean="${taskInstance.creator.profile}" template="/profile/show" var="profile" /></div>
 		</div>
 		<div class="row">
-			<div class="col-sm-2"><label><g:message code="taskInstance.lastUpdated.label" default="Last updated" />:</label></div>
+			<div class="col-sm-2"><label><g:message code="kola.meta.lastUpdated" />:</label></div>
 			<div class="col-sm-10"><g:formatDate date="${taskInstance.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/></div>
 		</div>
 		<g:if test="${taskInstance?.attachments?.size() > 0}">
 		<div class="row">
-			<div class="col-sm-2"><label><g:message code="taskInstance.attachments.label" default="Anhänge" />:</label></div>
+			<div class="col-sm-2"><label><g:message code="kola.task.attachments" />:</label></div>
 			<div class="col-sm-10">
 				<g:render bean="${taskInstance?.attachments}" template="attachments" var="attachments" />
 			</div>
@@ -53,7 +54,7 @@
 		</g:if>
 		<g:if test="${taskInstance?.resources?.size() > 0}">
 		<div class="row">
-			<div class="col-sm-2"><label><g:message code="taskInstance.resources.label" default="Lernressourcen" />:</label></div>
+			<div class="col-sm-2"><label><g:message code="kola.assets" />:</label></div>
 			<div class="col-sm-10">
 				<ul class="list-group">
 					<g:each var="assetInstance" in="${taskInstance?.resources}">
@@ -74,7 +75,7 @@
 		</g:if>
 		<g:if test="${taskInstance?.steps?.size() > 0}">
 		<div class="row">
-			<div class="col-sm-2"><label><g:message code="task.steps.label" default="Teilschritte" />:</label></div>
+			<div class="col-sm-2"><label><g:message code="kola.task.steps" />:</label></div>
 			<div class="col-sm-10">
 				<ul class="list-group">
 					<g:each var="step" in="${taskInstance?.steps}">
@@ -93,7 +94,7 @@
 		</g:if>
 		<g:if test="${taskInstance?.reflectionQuestions?.size() > 0}">
 		<div class="row">
-			<div class="col-sm-2"><label><g:message code="taskInstance.reflectionQuestions.label" default="Reflexionsaufforderungen" />:</label></div>
+			<div class="col-sm-2"><label><g:message code="kola.reflectionQuestions" />:</label></div>
 			<div class="col-sm-10">
 				<ul class="list-group">
 					<g:each var="reflectionQuestion" in="${taskInstance?.reflectionQuestions}">

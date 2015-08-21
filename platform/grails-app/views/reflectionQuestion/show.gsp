@@ -4,13 +4,14 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'reflectionQuestion.label', default: 'Reflexionsaufforderung')}" />
+		<g:set var="entityName" value="${message(code: 'kola.reflectionQuestion')}" />
+		<g:set var="entitiesName" value="${message(code: 'kola.reflectionQuestions')}" />
 		<title><g:message code="default.show.label" args="[entityName]" /></title>
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><g:link uri="/"><g:message code="default.home.label" default="Home" /></g:link></li>
-			<li><g:link action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
+			<li><g:link uri="/"><g:message code="kola.home" /></g:link></li>
+			<li><g:link action="index">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.show.label" args="[entityName]" /></li>
 		</ol>
 		<g:if test="${flash.message}">
@@ -28,7 +29,7 @@
 			</div>
 		</h1>
 		<div class="row">
-			<div class="col-sm-2"><label><g:message code="reflectionQuestion.question.label" default="Aufforderung" />:</label></div>
+			<div class="col-sm-2"><label><g:message code="kola.reflectionQuestion.question" />:</label></div>
 			<div class="col-sm-10">${reflectionQuestionInstance?.name}</div>
 		</div>
 	</body>

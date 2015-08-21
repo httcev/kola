@@ -7,7 +7,7 @@
 			<div class="radio"><label>${it.radio}${it.label}</label></div>
 		</g:radioGroup>
 		<div class="buttons pull-right">
-			<button name="_eventId_submit" class="next btn btn-primary"><g:message code="default.button.next.label" default="Next" /> <i class="fa fa-chevron-right"></i></button>
+			<button name="_eventId_submit" class="next btn btn-primary"><g:message code="kola.next" /> <i class="fa fa-chevron-right"></i></button>
 		</div>
 	</body>
 </html>

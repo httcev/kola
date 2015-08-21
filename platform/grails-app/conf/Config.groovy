@@ -130,6 +130,7 @@ environments {
 
 kola {
     thumbnailSize = 80
+    avatarSize = 40
 }
 
 // log4j configuration

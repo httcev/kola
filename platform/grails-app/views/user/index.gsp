@@ -3,12 +3,13 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'user.label', default: 'User')}" />
-		<title><g:message code="default.list.label" args="[entityName]" /></title>
+		<g:set var="entityName" value="${message(code: 'kola.user')}" />
+		<g:set var="entitiesName" value="${message(code: 'kola.users')}" />
+		<title>${entitiesName}</title>
 	</head>
 	<body>
 		<h1 class="page-header">
-			<g:message code="default.list.label" args="[entityName]" />
+			${entitiesName}
 			<g:link class="create btn btn-primary pull-right" action="create" title="${message(code: 'default.new.label', args:[entityName])}">
 				<i class="fa fa-user-plus"></i>
 			</g:link>
@@ -19,9 +20,9 @@
 		<table class="table table-striped">
 			<thead>
 				<tr>
-					<g:sortableColumn property="username" title="${message(code: 'user.username.label', default: 'Username')}" />
-					<g:sortableColumn property="profile?.displayName" title="${message(code: 'user.displayName.label', default: 'Display Name')}" />
-					<g:sortableColumn property="profile?.company" title="${message(code: 'user.company.label', default: 'Company')}" />
+					<g:sortableColumn property="username" title="${message(code: 'kola.user.loginName')}" />
+					<g:sortableColumn property="profile?.displayName" title="${message(code: 'kola.user.displayName')}" />
+					<g:sortableColumn property="profile?.company" title="${message(code: 'kola.user.company')}" />
 				</tr>
 			</thead>
 			<tbody>

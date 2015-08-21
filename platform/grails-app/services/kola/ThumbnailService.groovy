@@ -8,11 +8,14 @@ import java.awt.RenderingHints
 class ThumbnailService {
 	def grailsApplication
 
-    def createThumbnailBytes(bytes) {
+	def createThumbnailBytes(bytes) {
+		return createThumbnailBytes(bytes, grailsApplication.config.kola.thumbnailSize)
+	}
+
+    def createThumbnailBytes(bytes, thumbnailSize) {
         def bis = new ByteArrayInputStream(bytes)
         def bos = new ByteArrayOutputStream()
     	try {
-			def thumbnailSize = grailsApplication.config.kola.thumbnailSize
 	        def image = ImageIO.read(bis)
 	        if (!image) {
 	        	return null

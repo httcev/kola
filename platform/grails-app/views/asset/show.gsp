@@ -3,13 +3,14 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'asset.label', default: 'Asset')}" />
+		<g:set var="entityName" value="${message(code: 'kola.asset')}" />
+		<g:set var="entitiesName" value="${message(code: 'kola.assets')}" />
 		<title><g:message code="default.show.label" args="[entityName]" /></title>
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><g:link uri="/"><g:message code="default.home.label" default="Home" /></g:link></li>
-			<li><g:link action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
+			<li><g:link uri="/"><g:message code="kola.home" /></g:link></li>
+			<li><g:link action="index">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.show.label" args="[entityName]" /></li>
 		</ol>
 		<g:if test="${flash.message}">
@@ -28,15 +29,15 @@
 			<p>${assetInstance.description}</p>
 		</g:if>
 		<div class="row">
-			<div class="col-sm-2"><label><g:message code="asset.mimeType.label" default="Mime type" />:</label></div>
+			<div class="col-sm-2"><label><g:message code="kola.meta.mimeType" />:</label></div>
 			<div class="col-sm-10"><code>${assetInstance.mimeType}</code></div>
 		</div>
 		<div class="row">
-			<div class="col-sm-2"><label><g:message code="asset.lastUpdated.label" default="Last updated" />:</label></div>
+			<div class="col-sm-2"><label><g:message code="kola.meta.lastUpdated" />:</label></div>
 			<div class="col-sm-10"><g:formatDate date="${assetInstance.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/></div>
 		</div>
 		<div class="row">
-			<div class="col-sm-2"><label>URL:</label></div>
+			<div class="col-sm-2"><label><g:message code="kola.asset.link" />:</label></div>
 			<g:set var="url" value="${assetService.createEncodedLink(assetInstance)}" />
 			<div class="col-sm-10"><a href="${url}" target="_blank"><i class="fa fa-external-link"></i> ${url}</a></div>
 		</div>

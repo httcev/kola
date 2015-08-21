@@ -3,14 +3,14 @@
 	<div class="modal-dialog" role="document">
 		<div class="modal-content">
 			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-				<h4 class="modal-title" id="myModalLabel">Reflexionsaufforderung hinzufügen</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="${message(code: 'kola.close')}"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="myModalLabel"><g:message code="default.add.label" args="${[message(code:'kola.reflectionQuestion')]}" /></h4>
 			</div>
 			<div class="modal-body">
 				<div id="reflectionQuestionResult" class="clearfix"></div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal"><g:message code="kola.close" /></button>
 			</div>
 		</div>
 	</div>
@@ -37,7 +37,7 @@
 			return false;
 		});
 		$("#reflectionQuestionResult :not(.pagination) a").attr("target", "_blank");
-		var $button = $("<button type='button' class='choose btn btn-primary pull-right' onclick='createReflectionQuestionRelation($(this).parent())'><i class='fa fa-check-square-o'></i> <g:message code='default.button.choose.label' default='Auswählen' /></button>");
+		var $button = $("<button type='button' class='choose btn btn-primary pull-right' onclick='createReflectionQuestionRelation($(this).parent())'><i class='fa fa-check-square-o'></i> <g:message code='kola.choose' /></button>");
 		$("#reflectionQuestionResult .search-result-hit").append($button);
 	}
 
@@ -48,7 +48,7 @@
 		$li.append($("<input type='hidden' name='reflectionQuestions' value='"+id+"'>"));
 		var $h4 = $("<h4 class='list-group-item-heading'>");
 		$li.append($h4);
-		$h4.append($("<div class='btn btn-default drag-handle' title='Verschieben mit Drag&amp;Drop'><i class='fa fa-arrows-v fa-lg'></i></div>"));
+		$h4.append($("<div class='btn btn-default drag-handle' title='${message(code:'kola.dnd')}'><i class='fa fa-arrows-v fa-lg'></i></div>"));
 		$h4.append("\n");
 		$h4.append($link);
 		$("#reflectionQuestion-list").append($li);

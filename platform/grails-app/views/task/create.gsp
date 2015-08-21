@@ -1,7 +1,8 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: taskInstance.isTemplate ? 'taskTemplate.label' : 'task.label', default: taskInstance.isTemplate ? 'Arbeitsprozessbeschreibung' : 'Arbeitsauftrag')}" />
+		<g:set var="entityName" value="${message(code: params.isTemplate ? 'kola.taskTemplate' : 'kola.task')}" />
+		<g:set var="entitiesName" value="${message(code: params.isTemplate ? 'kola.taskTemplates' : 'kola.tasks')}" />
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
 		<asset:stylesheet src="bootstrap-markdown.min.css"/>
 		<asset:javascript src="bootstrap-markdown.js"/>
@@ -9,8 +10,8 @@
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><g:link uri="/"><g:message code="default.home.label" default="Home" /></g:link></li>
-			<li><g:link action="index"><g:message code="default.list.label" args="[entityName]" /></g:link></li>
+			<li><g:link uri="/"><g:message code="kola.home" /></g:link></li>
+			<li><g:link action="index">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.create.label" args="[entityName]" /></li>
 		</ol>
 		<g:form action="save" class="form-horizontal" autocomplete="off" enctype="multipart/form-data">

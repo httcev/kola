@@ -1,5 +1,5 @@
 <g:if test="${results?.total > 0}">
-	<p class="margin">Zeige Treffer ${params.offset + 1} - ${Math.min(params.offset + params.max, results?.total)} von ${results?.total}</p>
+	<p class="margin"><g:message code="kola.search.hits" args="${[params.offset + 1, Math.min(params.offset + params.max, results?.total), results?.total]}" /></p>
 	<g:set var="searchResults" value="${results?.searchResults}"/>
 	<g:set var="highlights" value="${results?.highlight}"/>
 	<ul class="search-result list-group">
@@ -19,7 +19,7 @@
 					<div>${raw(fragment.toString())}</div>
 				</g:each>
 			</g:elseif>
-			<g:elseif test="${hit.description}">
+			<g:elseif test="${hit.hasProperty('description')}">
 				<div>${hit.description?.take(150)}</div>
 			</g:elseif>
 			</p>
@@ -31,5 +31,5 @@
 	</div>
 </g:if>
 <g:elseif test="${params.q}">
-	<div class="alert alert-warning margin">Die Suche nach '${params.q}' ergab keinen Treffer.</div>
+	<div class="alert alert-warning margin"><g:message code="kola.search.noHits" args="${[params.q]}" /></div>
 </g:elseif>

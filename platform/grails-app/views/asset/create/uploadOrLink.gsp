@@ -4,19 +4,20 @@
 	</head>
 	<body>
 		<div class="form-group ${hasErrors(bean: cmd, field: 'content', 'error')} required">
-			<label for="content" class="col-sm-2 control-label">
-				<g:message code="asset.content.label" default="Content" />
+			<label for="content" class="col-sm-3 control-label">
+				<g:message code="kola.asset.upload"/>:
 			</label>
-			<div class="col-sm-10"><input type="file" id="content" name="content" class="form-control" /></div>
+			<div class="col-sm-9"><input type="file" id="content" name="content" class="form-control" /></div>
 		</div>
+		<g:message code="kola.or" />
 		<div class="form-group ${hasErrors(bean: cmd, field: 'externalUrl', 'error')} ">
-			<label for="externalUrl" class="col-sm-2 control-label">
-				<g:message code="asset.externalUrl.label" default="External URL" />
+			<label for="externalUrl" class="col-sm-3 control-label">
+				<g:message code="kola.asset.link" />:
 			</label>
-			<div class="col-sm-10"><g:textField name="externalUrl" class="form-control" value="${cmd?.externalUrl}"/></div>
+			<div class="col-sm-9"><g:textField name="externalUrl" class="form-control" value="${cmd?.externalUrl}"/></div>
 		</div>
 		<div class="buttons pull-right">
-			<button name="_eventId_submit" class="next btn btn-primary"><g:message code="default.button.next.label" default="Next" /> <i class="fa fa-chevron-right"></i></button>
+			<button name="_eventId_submit" class="next btn btn-primary"><g:message code="kola.next" /> <i class="fa fa-chevron-right"></i></button>
 		</div>
 	</body>
 </html>

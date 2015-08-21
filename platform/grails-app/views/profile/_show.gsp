@@ -24,13 +24,13 @@ ${profile.displayName}
 			<form class="form-horizontal">
 				<g:if test="${profile.company}">
 					<div class="form-group">
-						<label class=" col-sm-3 control-label"><g:message code="user.company.label" default="Company" />:</label>
+						<label class=" col-sm-3 control-label"><g:message code="kola.user.company" />:</label>
 						<div class="col-sm-9 form-padding">${profile.company}</div>
 					</div>
 				</g:if>
 				<g:if test="${profile.phone}">
 					<div class="form-group">
-						<label class=" col-sm-3 control-label"><g:message code="user.phone.label" default="Phone" />:</label>
+						<label class=" col-sm-3 control-label"><g:message code="kola.user.phone" default="Phone" />:</label>
 						<div class="col-sm-9">
 							<a href="tel:${profile.phone}" class="btn btn-success"><i class="fa fa-phone fa-lg fa-fw"></i></a> ${profile.phone}
 						</div>
@@ -38,7 +38,7 @@ ${profile.displayName}
 				</g:if>
 				<g:if test="${profile.mobile}">
 					<div class="form-group">
-						<label class=" col-sm-3 control-label"><g:message code="user.mobile.label" default="Mobile" />:</label>
+						<label class=" col-sm-3 control-label"><g:message code="kola.user.mobile" default="Mobile" />:</label>
 						<div class="col-sm-9">
 							<a href="tel:${profile.mobile}" class="btn btn-success"><i class="fa fa-phone fa-lg fa-fw"></i></a> ${profile.mobile}
 						</div>
@@ -46,7 +46,7 @@ ${profile.displayName}
 				</g:if>
 				<g:if test="${profile.user.email}">
 					<div class="form-group">
-						<label class=" col-sm-3 control-label"><g:message code="user.email.label" default="Email" />:</label>
+						<label class=" col-sm-3 control-label"><g:message code="kola.user.email" default="Email" />:</label>
 						<div class="col-sm-9">
 							<a href="mailto:${profile.user.email}" class="btn btn-success"><i class="fa fa-envelope fa-lg fa-fw"></i></a> ${profile.user.email}
 						</div>
@@ -55,7 +55,7 @@ ${profile.displayName}
 			</form>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal"><g:message code="kola.close" /></button>
 			</div>
 		</div>
 	</div>

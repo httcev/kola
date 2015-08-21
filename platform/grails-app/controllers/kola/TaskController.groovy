@@ -53,6 +53,7 @@ class TaskController {
             }
             task.attachments = task.template.attachments
             task.resources = task.template.resources
+            task.reflectionQuestions = task.template.reflectionQuestions
         }
         respond task
     }

@@ -4,12 +4,13 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: 'reflectionQuestion.label', default: 'Reflexionsaufforderung')}" />
-		<title><g:message code="default.list.label" args="[entityName]" /></title>
+		<g:set var="entityName" value="${message(code: 'kola.reflectionQuestion')}" />
+		<g:set var="entitiesName" value="${message(code: 'kola.reflectionQuestions')}" />
+		<title>${entitiesName}</title>
 	</head>
 	<body>
 		<h1 class="page-header">
-			<g:message code="default.list.label" args="[entityName]" />
+			${entitiesName}
 			<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REFLECTION_QUESTION_CREATOR">
 				<g:link class="create btn btn-primary pull-right" action="create" title="${message(code: 'default.new.label', args:[entityName])}">
 					<i class="fa fa-plus"></i>
