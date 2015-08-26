@@ -18,6 +18,19 @@
 		<g:if test="${flash.message}">
 			<div class="message alert alert-success" role="status">${flash.message}</div>
 		</g:if>
+		<g:form controller="search" method="GET" class="form-horizontal">
+			<input type="hidden" name="hideFilter" value="true">
+			<input type="hidden" name="type" value="asset">
+			<input type="hidden" name="subType" value="learning-resource">
+			<div class="form-group">
+				<div class="col-xs-8">
+					<input type="search" name="q" class="form-control" placeholder="${message(code:'kola.search.assets')}..." autofocus>
+				</div>
+				<div class="col-xs-4">
+					<button type="submit" class="search btn btn-default"><i class="fa fa-search"></i> <g:message code="kola.search" /></button>
+				</div>
+			</div>
+		</g:form>
 		<table class="table">
 			<thead>
 				<tr>

@@ -16,7 +16,7 @@
 	<div class="col-sm-10"><g:textArea rows="8" name="description" class="form-control" data-provide="markdown" data-iconlibrary="fa" value="${taskInstance?.description}"/></div>
 </div>
 
-<g:if test="${!taskInstance?.isTemplate}">
+<g:if test="${!taskInstance?.isTemplate?.toBoolean()}">
 	<div class="form-group ${hasErrors(bean: taskInstance, field: 'assignee', 'error')} ">
 		<label for="assignee" class="col-sm-2 control-label">
 			<g:message code="kola.task.assign" />:
@@ -40,10 +40,10 @@
 </g:if>
 
 <div class="form-group ${hasErrors(bean: taskInstance, field: 'attachments', 'error')} ">
-	<label for="attachments" class="col-sm-2 control-label">
+	<label class="col-sm-2 control-label">
 		<g:message code="kola.task.attachments" />:
 	</label>
-	<div class="col-sm-10" id="attachments-container">
+	<div class="col-sm-10">
 		<g:if test="${taskInstance?.attachments?.size() > 0}">
 			<ul class="list-group sortable">
 				<g:each var="assetInstance" in="${taskInstance?.attachments}">
@@ -126,6 +126,37 @@
 							</label>
 							<div class="col-sm-10"><textarea name="steps[${i}].description" class="form-control" rows="6" data-provide="markdown" data-iconlibrary="fa">${step.description}</textarea></div>
 						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label">
+								<g:message code="kola.task.attachments" />:
+							</label>
+							<div class="col-sm-10">
+								<g:if test="${step.attachments?.size() > 0}">
+									<ul class="list-group sortable">
+										<g:each var="assetInstance" in="${step.attachments}">
+											<li class="list-group-item clearfix">
+												<input type="hidden" name="steps[${i}].attachments" value="${assetInstance.id}">
+												<h4 class="list-group-item-heading">
+													<g:if test="${step.attachments.size() > 1}">
+														<div class="btn btn-default drag-handle" title="${message(code:'kola.dnd')}"><i class="fa fa-arrows-v fa-lg"></i></div>
+													</g:if>
+													<a href="${assetService.createEncodedLink(assetInstance)}" target="_blank">${assetInstance.name}</a>
+													<button type="button" class="btn btn-danger pull-right" title="${message(code:'default.button.delete.label')}" onclick="$(this).closest('li').remove()"><i class="fa fa-times"></i></button>
+												</h4>
+												<p class="list-group-item-text">
+													<label><g:message code="kola.meta.mimeType" />:</label>
+													<code>${assetInstance.mimeType}</code>
+												</p>
+											</li>
+										</g:each>
+									</ul>
+								</g:if>
+								<div class="form-padding pull-left">
+									<label><g:message code="default.add.label" args="${[message(code:'kola.task.attachment')]}" />: </label>
+								</div>
+								<input type="file" name="steps[${i}]._newAttachment" class="new-attachment form-padding">
+							</div>
+						</div>
 					</div>
 				</li>
 			</g:each>
@@ -195,9 +226,10 @@
 			}
 		})
 		$(document).on("change", ".new-attachment", function() {
-			var emptyFileChooserCount = $("#attachments-container input:file").filter(function() { return $(this).val() == ""; }).length;
+			var $parent = $(this).parent();
+			var emptyFileChooserCount = $("input:file", $parent).filter(function() { return $(this).val() == ""; }).length;
 			if (emptyFileChooserCount == 0) {
-				$("#attachments-container").append($("<input type='file' name='_newAttachment' class='new-attachment form-padding'>"));
+				$parent.append($("<input type='file' name='_newAttachment' class='new-attachment form-padding'>"));
 			}
 		});
 	});

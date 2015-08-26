@@ -4,8 +4,8 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: taskInstance.isTemplate ? 'kola.taskTemplate' : 'kola.task')}" />
-		<g:set var="entitiesName" value="${message(code: taskInstance.isTemplate ? 'kola.taskTemplates' : 'kola.tasks')}" />
+		<g:set var="entityName" value="${message(code: taskInstance.isTemplate?.toBoolean() ? 'kola.taskTemplate' : 'kola.task')}" />
+		<g:set var="entitiesName" value="${message(code: taskInstance.isTemplate?.toBoolean() ? 'kola.taskTemplates' : 'kola.tasks')}" />
 		<title><g:message code="default.show.label" args="[entityName]" /></title>
 		<asset:stylesheet src="blueimp-gallery.min.css"/>
 		<asset:javascript src="jquery.blueimp-gallery.min.js"/>
@@ -13,7 +13,7 @@
 	<body>
 		<ol class="breadcrumb">
 			<li><g:link uri="/"><g:message code="kola.home" /></g:link></li>
-			<li><g:link action="index">${entitiesName}</g:link></li>
+			<li><g:link action="index" params="[isTemplate:taskInstance.isTemplate]">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.show.label" args="[entityName]" /></li>
 		</ol>
 		<g:if test="${flash.message}">
@@ -77,15 +77,18 @@
 		<div class="row">
 			<div class="col-sm-2"><label><g:message code="kola.task.steps" />:</label></div>
 			<div class="col-sm-10">
-				<ul class="list-group">
+				<ul class="list-group steps">
 					<g:each var="step" in="${taskInstance?.steps}">
-						<li class="list-group-item">
+						<li class="list-group-item clearfix">
 							<h4 class="list-group-item-heading">
 								${step.name}
 							</h4>
 							<p class="list-group-item-text">
 								${step.description}
 							</p>
+							<g:if test="${step.attachments?.size() > 0}">
+								<g:render bean="${step.attachments}" template="attachments" var="attachments" />
+							</g:if>
 						</li>
 					</g:each>
 				</ul>

@@ -2,14 +2,14 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: params.isTemplate ? 'kola.taskTemplate' : 'kola.task')}" />
-		<g:set var="entitiesName" value="${message(code: params.isTemplate ? 'kola.taskTemplates' : 'kola.tasks')}" />
+		<g:set var="entityName" value="${message(code: params.isTemplate?.toBoolean() ? 'kola.taskTemplate' : 'kola.task')}" />
+		<g:set var="entitiesName" value="${message(code: params.isTemplate?.toBoolean() ? 'kola.taskTemplates' : 'kola.tasks')}" />
 		<title>${entitiesName}</title>
 	</head>
 	<body>
 		<h1 class="page-header">
 			${entitiesName}
-			<g:link class="create btn btn-primary pull-right" action="createFromTemplate" title="${message(code: 'default.new.label', args:[entityName])}">
+			<g:link class="create btn btn-primary pull-right" action="${params.isTemplate?.toBoolean() ? 'createTemplate' : 'createFromTemplate'}" title="${message(code: 'default.new.label', args:[entityName])}">
 				<i class="fa fa-plus"></i>
 			</g:link>
 		</h1>
@@ -25,7 +25,7 @@
 						<label><input name="own" type="checkbox" onclick="$(this).closest('form').submit()"${params.own ? ' checked' : ''}> <g:message code="kola.filter.own" /></label>
 					</div>
 				</div>
-				<g:if test="${!params.isTemplate}">
+				<g:if test="${!params.isTemplate?.toBoolean()}">
 					<div class="col-sm-3">
 						<div class="checkbox">
 							<label><input name="assigned" type="checkbox" onclick="$(this).closest('form').submit()"${params.assigned ? ' checked' : ''}> <g:message code="kola.filter.assigned" /></label>
@@ -35,7 +35,7 @@
 			</div>
 		</form>
 		<g:if test="${taskInstanceList?.size() > 0}">
-			<g:set var="filterParams" value="${[own:params.own, assigned:params.assigned]}" />
+			<g:set var="filterParams" value="${[own:params.own, assigned:params.assigned, isTemplate:params.isTemplate]}" />
 			<table class="table table-striped">
 				<thead>
 					<tr>

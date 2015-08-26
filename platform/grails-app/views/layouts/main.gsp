@@ -16,7 +16,7 @@
 	<asset:javascript src="application.js"/>
 	<g:layoutHead/>
 </head>
-<body>
+<body class="${controllerName} ${actionName}">
 	<div id="wrapper">
 		<nav class="navbar navbar-default">
 			<div class="container-fluid">

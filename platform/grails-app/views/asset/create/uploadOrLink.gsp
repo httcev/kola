@@ -9,7 +9,9 @@
 			</label>
 			<div class="col-sm-9"><input type="file" id="content" name="content" class="form-control" /></div>
 		</div>
-		<g:message code="kola.or" />
+		<div class="form-group">
+			<label class="col-sm-3 control-label"><g:message code="kola.or" /></label>
+		</div>
 		<div class="form-group ${hasErrors(bean: cmd, field: 'externalUrl', 'error')} ">
 			<label for="externalUrl" class="col-sm-3 control-label">
 				<g:message code="kola.asset.link" />:

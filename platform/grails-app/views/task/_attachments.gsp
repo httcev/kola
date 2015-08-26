@@ -1,3 +1,6 @@
+<%@ page import="java.util.UUID" %>
+
+<g:set var="galleryId" value="id-${UUID.randomUUID().toString()}"/>
 <g:set var="assetService" bean="assetService"/>
 
 <div class="attachments">
@@ -5,7 +8,7 @@
 		<g:set var="url" value="${assetService.createEncodedLink(assetInstance)}" />
 		<div class="thumbnail text-center pull-left">
 			<g:if test="${assetInstance.mimeType?.startsWith("image")}">
-				<a href="${url}" data-gallery><img src="${url}" class="img-responsive"></a>
+				<a href="${url}" data-gallery="#${galleryId}"><img src="${url}" class="img-responsive"></a>
 			</g:if>
 			<g:elseif test="${assetInstance.mimeType?.startsWith("video")}">
 				<a href="${url}" type="${assetInstance.mimeType}" data-gallery><i class="fa fa-film fa-lg"></i></a>
@@ -16,7 +19,7 @@
 		</div>
 	</g:each>
 </div>
-<div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls">
+<div id="${galleryId}" class="blueimp-gallery blueimp-gallery-controls">
     <div class="slides"></div>
     <h3 class="title"></h3>
     <a class="prev">‹</a>

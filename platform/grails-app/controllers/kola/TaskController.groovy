@@ -27,6 +27,7 @@ class TaskController {
                     }
                 }
             }
+            eq("isTemplate", params.isTemplate?.toBoolean() ? true : false)
         }
         def result = query.list(params)
         respond result, model:[taskInstanceCount: result.totalCount]
@@ -94,7 +95,7 @@ class TaskController {
         taskInstance.save flush:true
 
         flash.message = message(code: 'default.created.message', args: [message(code: 'Task.label', default: 'Task'), taskInstance.id])
-        redirect taskInstance
+        redirect action:"edit", id:taskInstance.id
     }
 
     def edit(Task taskInstance) {
@@ -117,7 +118,6 @@ class TaskController {
             return
         }
 
-        println "--- steps before save -> " + taskInstance.steps*.name
         updateFromParams(taskInstance)
         taskInstance.validate()
 
@@ -130,7 +130,7 @@ class TaskController {
         println "--- steps after save -> " + taskInstance.steps*.name
 
         flash.message = message(code: 'default.updated.message', args: [message(code: 'Task.label', default: 'Task'), taskInstance.id])
-        redirect taskInstance
+        redirect action:"edit", id:taskInstance.id
     }
 
     @Transactional
@@ -200,6 +200,18 @@ class TaskController {
                 log.error "Couldn't add attachment: Asset not found: ${it}"
             }
         }
+        taskInstance.steps?.eachWithIndex { step, index ->
+            step?.attachments?.clear()
+            params.list("steps[$index].attachments")?.unique(false).each {
+                def asset = Asset.get(it)
+                if (asset) {
+                    step.addToAttachments(asset)
+                }
+                else {
+                    log.error "Couldn't add attachment: Asset not found: ${it}"
+                }
+            }
+        }  
         // update steps
         taskInstance.steps?.removeAll{ it == null || it.deleted }
         // update reflection questions
@@ -216,13 +228,28 @@ class TaskController {
         // create new attachments
         def f = request.multiFileMap?.each { k,files ->
             println "--- upload file with key " + k
+            def domainName = k - "._newAttachment" - "_newAttachment"
+            println "--- domainName=" + domainName
+            def domain = taskInstance
+            
+            if (domainName.length() > 0) {
+                def matcher = domainName =~ /(.*)\[(.*)\]/
+                if (matcher.matches()) {
+                    def prop = matcher[0][1]
+                    def index = matcher[0][2] as Integer
+                    //domain = taskInstance."${domainName}"
+                    domain = taskInstance."${prop}"?.get(index)
+                }
+            }
+            
+            println "--- domain=" + domain
             files?.each { f ->
                 if (!f.empty) {
                     def asset = new Asset(name:f.originalFilename, subType:"attachment", mimeType:f.getContentType(), content:f.bytes)
                     if (!asset.save(true)) {
                         asset.errors.allErrors.each { println it }
                     }
-                    taskInstance.addToAttachments(asset)
+                    domain?.addToAttachments(asset)
                 }
             }
         }

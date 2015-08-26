@@ -1,7 +1,7 @@
 package kola
 
 class TaskStep {
-	static hasMany = [attachments:Asset]
+	static hasMany = [resources:Asset, attachments:Asset]
 	static belongsTo = [ task:Task ]
     static constraints = {
     	name blank:false
@@ -17,5 +17,6 @@ class TaskStep {
     String description
     boolean deleted
 
-    List<Asset> attachments		// defined as list to keep order in which elements got added
+    List<Asset> resources       // defined as list to keep order in which elements got added
+    List<Asset> attachments     // defined as list to keep order in which elements got added
 }

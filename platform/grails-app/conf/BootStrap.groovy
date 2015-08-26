@@ -18,7 +18,7 @@ class BootStrap {
             def adminRole = new Role(authority: 'ROLE_ADMIN').save(flush: true)
             def repositoryAdminRole = new Role(authority: 'ROLE_REPOSITORY_ADMIN').save(flush: true)
             def taskTemplateCreatorRole = new Role(authority: 'ROLE_TASK_TEMPLATE_CREATOR').save(flush: true)
-            def reflexionQuestionCreatorRole = new Role(authority: 'ROLE_REFLEXION_QUESTION_CREATOR').save(flush: true)
+            def reflectionQuestionCreatorRole = new Role(authority: 'ROLE_REFLECTION_QUESTION_CREATOR').save(flush: true)
             assert Role.count() == 4
 
             def adminUser = new User(username:"admin", password:"admin", email:"stephan.tittel@httc.de", profile:[displayName:"Admin User", company:"KOLA"]).save(flush: true)

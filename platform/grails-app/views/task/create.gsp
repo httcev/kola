@@ -1,8 +1,8 @@
 <html>
 	<head>
 		<meta name="layout" content="main">
-		<g:set var="entityName" value="${message(code: params.isTemplate ? 'kola.taskTemplate' : 'kola.task')}" />
-		<g:set var="entitiesName" value="${message(code: params.isTemplate ? 'kola.taskTemplates' : 'kola.tasks')}" />
+		<g:set var="entityName" value="${message(code: params.isTemplate?.toBoolean() ? 'kola.taskTemplate' : 'kola.task')}" />
+		<g:set var="entitiesName" value="${message(code: params.isTemplate?.toBoolean() ? 'kola.taskTemplates' : 'kola.tasks')}" />
 		<title><g:message code="default.create.label" args="[entityName]" /></title>
 		<asset:stylesheet src="bootstrap-markdown.min.css"/>
 		<asset:javascript src="bootstrap-markdown.js"/>
@@ -11,7 +11,7 @@
 	<body>
 		<ol class="breadcrumb">
 			<li><g:link uri="/"><g:message code="kola.home" /></g:link></li>
-			<li><g:link action="index">${entitiesName}</g:link></li>
+			<li><g:link action="index" params="[isTemplate:params.isTemplate]">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.create.label" args="[entityName]" /></li>
 		</ol>
 		<g:form action="save" class="form-horizontal" autocomplete="off" enctype="multipart/form-data">

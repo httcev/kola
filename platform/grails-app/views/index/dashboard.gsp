@@ -6,6 +6,17 @@
 	<body>
 		<div class="row">
 			<div class="col-sm-9">
+				<g:form controller="search" method="GET" class="form-horizontal">
+					<div class="form-group">
+						<div class="col-xs-8">
+							<input type="search" name="q" class="form-control" placeholder="${message(code:'kola.search.query')}..." autofocus>
+						</div>
+						<div class="col-xs-4">
+							<button type="submit" class="search btn btn-default"><i class="fa fa-search"></i> <g:message code="kola.search" /></button>
+						</div>
+					</div>
+				</g:form>
+
 				<div class="panel panel-success">
 					<div class="panel-heading">
 						<h3 class="panel-title">
@@ -61,18 +72,18 @@
 						<h1 class="panel-title"><b><g:message code="default.button.create.label" />:</b></h1>
 					</div>
 					<div class="panel-body">
-						<g:link class="btn btn-default" style="margin-bottom:10px" controller="task" action="createFromTemplate"><i class="fa fa-plus"></i> <g:message code="kola.task" /></g:link><br>
+						<g:link class="btn btn-default btn-block" controller="task" action="createFromTemplate"><i class="fa fa-plus"></i> <g:message code="kola.task" /></g:link>
 						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_TASK_TEMPLATE_CREATOR">
-							<g:link class="btn btn-default" style="margin-bottom:10px" controller="task" action="createTemplate"><i class="fa fa-plus"></i> <g:message code="kola.taskTemplate" /></g:link><br>
+							<g:link class="btn btn-default btn-block" controller="task" action="createTemplate"><i class="fa fa-plus"></i> <g:message code="kola.taskTemplate" /></g:link>
 						</sec:ifAnyGranted>
 						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REPOSITORY_ADMIN">
-							<g:link class="btn btn-default" style="margin-bottom:10px" controller="asset" action="create"><i class="fa fa-plus"></i> <g:message code="kola.asset" /></g:link><br>
+							<g:link class="btn btn-default btn-block" controller="asset" action="create"><i class="fa fa-plus"></i> <g:message code="kola.asset" /></g:link>
 						</sec:ifAnyGranted>
 						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REFLECTION_QUESTION_CREATOR">
-							<g:link class="btn btn-default" style="margin-bottom:10px" controller="reflectionQuestion" action="create"><i class="fa fa-plus"></i> <g:message code="kola.reflectionQuestion" /></g:link><br>
+							<g:link class="btn btn-default btn-block" controller="reflectionQuestion" action="create"><i class="fa fa-plus"></i> <g:message code="kola.reflectionQuestion" /></g:link>
 						</sec:ifAnyGranted>
 						<sec:ifAnyGranted roles="ROLE_ADMIN">
-							<g:link class="btn btn-default" style="margin-bottom:10px" controller="user" action="create"><i class="fa fa-plus"></i> <g:message code="kola.user" /></g:link>
+							<g:link class="btn btn-default btn-block" controller="user" action="create"><i class="fa fa-plus"></i> <g:message code="kola.user" /></g:link>
 						</sec:ifAnyGranted>
 					</div>
 				</div>

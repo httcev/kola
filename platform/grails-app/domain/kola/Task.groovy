@@ -4,6 +4,12 @@ import org.apache.commons.collections.list.LazyList
 import org.apache.commons.collections.FactoryUtils
 
 class Task {
+    static searchable = {
+        all = [analyzer: 'german']
+        only = ['name', 'description']
+        name boost:3.0
+        description boost:2.0
+    }
     static hasMany = [steps:TaskStep, reflectionQuestions:ReflectionQuestion, resources:Asset, attachments:Asset]
     static constraints = {
         name blank:false
