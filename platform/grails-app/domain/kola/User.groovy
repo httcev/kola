@@ -72,4 +72,25 @@ class User implements Serializable {
 	static mapping = {
 		password column: '`password`'
 	}
+
+    static {
+        grails.converters.JSON.registerObjectMarshaller(User) {
+            def result = it.properties.findAll { k, v ->
+                k == "id" || k == "email" || k == "profile"
+            }
+            result.id = it.id
+            return result
+        }
+    }
+
+	static _exported = ["email", "profile"]
+    static {
+        grails.converters.JSON.registerObjectMarshaller(User) {
+            def result = it.properties.findAll { k, v ->
+                k in _exported
+            }
+            result.id = it.id
+            return result
+        }
+    }
 }

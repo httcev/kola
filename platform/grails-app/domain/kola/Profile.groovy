@@ -17,4 +17,15 @@ class Profile {
     String phone
     String mobile
     byte[] photo
+
+    static _exported = ["displayName", "company", "phone", "mobile", "photo"]
+    static {
+        grails.converters.JSON.registerObjectMarshaller(Profile) {
+            def result = it.properties.findAll { k, v ->
+                k in _exported
+            }
+            result.id = it.id
+            return result
+        }
+    }
 }

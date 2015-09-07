@@ -14,4 +14,15 @@ class ReflectionQuestion {
     }
 
     String name
+
+    static _exported = ["name"]
+    static {
+        grails.converters.JSON.registerObjectMarshaller(ReflectionQuestion) {
+            def result = it.properties.findAll { k, v ->
+                k in _exported
+            }
+            result.id = it.id
+            return result
+        }
+    }
 }

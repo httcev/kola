@@ -26,4 +26,7 @@ beans = {
     couchdbSecret(java.lang.String) { bean ->
         bean.constructorArgs = [ application.config.kola.couchdb.secret ]
     }
+    couchdbDatabase(java.lang.String) { bean ->
+        bean.constructorArgs = [ application.config.kola.couchdb.database ]
+    }
 }

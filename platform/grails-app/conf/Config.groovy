@@ -107,12 +107,13 @@ environments {
                 admin.user = "syncservice"
                 admin.pass = "pw4syncservice"
                 secret = "mySuperSecretSecret!;"
+                database = "kola"
             }
         }
     }
     production {
         grails.logging.jul.usebridge = false
-        grails.serverURL = "http://platform.kola-projekt.de"
+        grails.serverURL = "http://plattform.kola-projekt.de"
         kola {
             repository.directory = "/srv/kola/repository"
             couchdb {
@@ -122,6 +123,7 @@ environments {
                 admin.user = "syncservice"
                 admin.pass = "pw4syncservice"
                 secret = "mySuperSecretSecret!;"
+                database = "kola"
             }
         }
         // TODO: grails.serverURL = "http://www.changeme.com"

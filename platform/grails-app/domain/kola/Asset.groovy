@@ -44,6 +44,10 @@ class Asset {
 
     Date lastUpdated
 
+    def getUrl() {
+        assetService.createEncodedLink(this)
+    }
+
     def afterInsert() {
         assetService.deleteRepositoryFile(this)
     }
@@ -54,5 +58,17 @@ class Asset {
 
     def afterDelete() {
         assetService.deleteRepositoryFile(this)
+    }
+
+
+    static _exported = ["name", "description", "mimeType", "subType", "lastUpdated", "url"]
+    static {
+        grails.converters.JSON.registerObjectMarshaller(Asset) {
+            def result = it.properties.findAll { k, v ->
+                k in _exported || (it.subType == "attachment" && k == "content")
+            }
+            result.id = it.id
+            return result
+        }
     }
 }

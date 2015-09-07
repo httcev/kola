@@ -41,4 +41,21 @@ class Task {
     List<Asset> attachments                         // defined as list to keep order in which elements got added
     List<TaskStep> steps                            // defined as list to keep order in which elements got added
     List<ReflectionQuestion> reflectionQuestions    // defined as list to keep order in which elements got added
+
+    static _embedded = ["name", "description", "steps", "done", "due", "isTemplate", "templateId", "creatorId", "assigneeId", "lastUpdated"]
+    static _referenced = ["resources", "attachments", "reflectionQuestions"]
+    static {
+        grails.converters.JSON.registerObjectMarshaller(Task) { task ->
+            def result = task.properties.findAll { k, v ->
+                k in _embedded
+            }
+            _referenced.each {
+                result."$it" = task."$it"?.collect {
+                    it.id
+                }
+            }
+            result.id = task.id
+            return result
+        }
+    }
 }

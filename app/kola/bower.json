@@ -11,6 +11,6 @@
     "angular-i18n": "~1.4.1"
   },
   "resolutions": {
-    "pouchdb": "~3.6.0"
+//    "angular": "~1.4.1"
   }
 }
