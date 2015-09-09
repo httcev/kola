@@ -49,7 +49,7 @@ angular.module('kola.services', ['uuid'])
   };
 })
 
-.service('dbService', function ($q, $http, $cordovaSQLite, changesUrl) {
+.service('dbService', function ($q, $http, $cordovaSQLite, changesUrl, rfc4122) {
   var self = this;
 
   var conversions = {
@@ -66,6 +66,10 @@ angular.module('kola.services', ['uuid'])
       "resources": { "refTable":"asset" },
       "reflectionQuestions": { "refTable":"reflectionQuestion" }
     },
+    "taskDocumentation" : {
+      "creatorId": { "refTable":"user", "replaceField":"creator" },
+      "attachments": { "refTable":"asset" }
+    }
   }
 
   var dbApiHolder = window;
@@ -82,6 +86,7 @@ angular.module('kola.services', ['uuid'])
     {tableName : 'asset'},
     {tableName : 'reflectionQuestion'},
     {tableName : 'taskStep'},
+    {tableName : 'taskDocumentation'},
     {tableName : 'task'}
   ];
   db.transaction(function(tx) {
@@ -102,6 +107,7 @@ angular.module('kola.services', ['uuid'])
       tx.executeSql('CREATE TABLE IF NOT EXISTS reflectionQuestion (id integer primary key, doc text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS task (id varchar(255) not null primary key, doc text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS taskStep (id varchar(255) not null primary key, doc text not null)');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS taskDocumentation (id varchar(255) not null primary key, doc text not null)');
 
       // local
       tx.executeSql('CREATE TABLE IF NOT EXISTS profile (id integer primary key, name text, password text)');
@@ -113,6 +119,7 @@ angular.module('kola.services', ['uuid'])
   getProfile().then(function(profile) {
     DBSYNC.initSync(TABLES_TO_SYNC, db, {foo:"bar"}, changesUrl, function() {
       // INIT FINISHED
+      DBSYNC.syncNow();
     }, profile.name, profile.password);
   });
 
@@ -146,12 +153,15 @@ angular.module('kola.services', ['uuid'])
     */
   }
 
-  function query(sql, params) {
-    console.log("query: " + sql);
+  function all(tableName) {
     var d = $q.defer();
     db.transaction(function (t) {
-      t.executeSql(sql, params, function (tx, results) {
-        d.resolve(results);
+      t.executeSql("select doc from " + tableName, [], function (tx, results) {
+        var docs = []
+        for (var i=0; i<results.rows.length; i++) {
+          docs.push(JSON.parse(results.rows.item(i).doc));
+        }
+        d.resolve(docs);
       }, function (err) {
         d.reject(err);
       });
@@ -162,23 +172,58 @@ angular.module('kola.services', ['uuid'])
     return d.promise;
   }
 
-  function getTask(id) {
+  function get(id, tableName) {
     var d = $q.defer();
     db.transaction(function (t) {
-      t.executeSql("select doc from task where id=?", [id], function (tx, results) {
+      t.executeSql("select doc from " + tableName + " where id=?", [id], function (tx, results) {
         if (results.rows.length == 1) {
-          var task = JSON.parse(results.rows.item(0).doc);
+          var doc = JSON.parse(results.rows.item(0).doc);
           var promises = []
-          _resolveIds(task, conversions["task"], promises, tx);
+          _resolveIds(doc, conversions[tableName], promises, tx);
           $q.all(promises).then(function () {
-            d.resolve(task);
+            d.resolve(doc);
           });
         }
         else {
-          d.reject("task not found: " + id);
+          d.reject("object not found in DB: " + id);
         }
       }, function (err) {
         d.reject(err);
+      });
+    }, function (err) {
+        d.reject(err);
+    });
+
+    return d.promise;
+  }
+
+  function save(doc, tableName) {
+    if (!doc.id) {
+      doc.id = rfc4122.v4();
+    }
+    console.log("--- saving", doc);
+    var d = $q.defer();
+    db.transaction(function (t) {
+      t.executeSql("INSERT OR REPLACE INTO " + tableName + " (id, doc) values (?, ?)", [doc.id, JSON.stringify(doc)], function (tx, results) {
+        d.resolve();
+        DBSYNC.syncNow();
+      }, function (err) {
+        d.reject(err);
+      });
+    }, function (err) {
+        d.reject(err);
+    });
+
+    return d.promise;
+  }
+
+  function resolveIds(target, tableName) {
+    var d = $q.defer();
+    db.transaction(function (tx) {
+      var promises = []
+      _resolveIds(target, conversions[tableName], promises, tx);
+      $q.all(promises).then(function () {
+        d.resolve(target);
       });
     }, function (err) {
         d.reject(err);
@@ -242,12 +287,14 @@ angular.module('kola.services', ['uuid'])
   return {
     getProfile:getProfile,
     setProfile:setProfile,
-    query:query,
-    getTask:getTask
+    all:all,
+    get:get,
+    save:save,
+    resolveIds:resolveIds
   }
 })
 
-.service('syncService', function ($rootScope, $interval, $timeout, onlineStateService, dbService) {
+.service('syncService', function ($rootScope, $interval, $interval, onlineStateService, dbService) {
   function onSyncInfoChanged(newValue, oldValue) {
     console.log("--- online state changed: isOnline="+$rootScope.onlineState.isOnline+", isWifi="+$rootScope.onlineState.isWifi);
 
@@ -256,13 +303,15 @@ angular.module('kola.services', ['uuid'])
     var intervalPromise;
 
     if ($rootScope.onlineState.isOnline) {
-      intervalPromise = $timeout(function () {
+/*      
+      intervalPromise = $interval(function () {
         DBSYNC.syncNow(callBackSyncProgress, function(result) {
            if (result.syncOK === true) {
                //Synchronized successfully
            }
         });
-      }, 1000);
+      }, 5000);
+*/      
     }
     else {
       $interval.cancel(intervalPromise);
@@ -319,6 +368,7 @@ angular.module('kola.services', ['uuid'])
 
 .service('mediaAttachment', function ($cordovaCamera, $cordovaCapture, $cordovaFile, dbService, rfc4122) {
   this.attachPhoto = function(doc) {
+    /*
     var options = {
       quality: 90,
       destinationType: Camera.DestinationType.DATA_URL,
@@ -358,6 +408,26 @@ angular.module('kola.services', ['uuid'])
         console.log(property);
       }
     });
+*/
+    $cordovaCapture.captureImage().then(function(mediaFiles) {
+      if (mediaFiles.length === 1) {
+        var name = mediaFiles[0].name;
+        var type = mediaFiles[0].type;
+        var url = mediaFiles[0].fullPath;
+        console.log("--- TYPE=" + type + ", NAME=" + name + ", URL=" + url);
+        $cordovaFile.readAsArrayBuffer(url).then(function (buffer) {
+          console.log("--- SUCCESS -> " + buffer);
+          // success
+          
+        }, function (error) {
+          // error
+          console.log(error);
+        });
+      }
+    }, function(err) {
+      // An error occurred. Show a message to the user
+    });
+
   }
 
   this.attachVideo = function(doc) {

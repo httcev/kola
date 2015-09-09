@@ -127,6 +127,12 @@ var DBSYNC = {
         if (this.db === null) {
             throw 'You should call the initSync before (db is null)';
         }
+        if (!callBackProgress) {
+            callBackProgress = this.log;
+        }
+        if (!callBackEndSync) {
+            callBackEndSync = this.log;
+        }
 
         self.syncResult = {syncOK: false, codeStr: 'noSync', message: 'No Sync yet', nbSent : 0, nbUpdated:0};
 

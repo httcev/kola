@@ -3,11 +3,14 @@ angular.module('kola.controllers', [])
 .controller('TasksCtrl', function($scope, dbService) {
     //$scope.tasks = pouchCollection("all/by_type", { keys:["task", "homework"] }, "all/filterByTypes", { types:["task", "homework"] });
     $scope.tasks = [];
-    dbService.query("select doc from task").then(function(result) {
-        console.log(result);
-      for (var i=0; i<result.rows.length; i++) {
-        $scope.tasks.push(JSON.parse(result.rows.item(i).doc));
-      }
+    dbService.all("task").then(function(docs) {
+      var filtered = [];
+      angular.forEach(docs, function(doc) {
+        if (!doc["isTemplate"]) {
+          filtered.push(doc);
+        }
+      });
+      $scope.tasks = filtered;
     });
     /*
     pouchCollection("all/by_type", { keys:["task", "homework"] }, "all/filterByTypes", { types:["task", "homework"] }).then(function(result) {
@@ -23,6 +26,22 @@ angular.module('kola.controllers', [])
 
 .controller('NotesCtrl', function($scope, $stateParams, $ionicPopup, dbService, rfc4122, modalDialog, mediaAttachment) {
   $scope.notes = [];
+  loadNotes();
+
+  function loadNotes() {
+    dbService.all("taskDocumentation").then(function(docs) {
+      var filtered = [];
+      angular.forEach(docs, function(doc) {
+        if (doc.taskId == $stateParams.taskId) {
+          dbService.resolveIds(doc, "taskDocumentation").then(function() {
+            filtered.push(doc);
+          });
+        }
+      });
+      $scope.notes = filtered;
+    });
+  }
+
 //  $scope.$on('$ionicView.enter', function(e) {
 /*  
     pouchCollection("notes/by_task", { key:$stateParams.taskId   }, "notes/filterByTask", { taskId:$stateParams.taskId }).then(function(result) {
@@ -52,7 +71,7 @@ angular.module('kola.controllers', [])
   }
 
   $scope.remove = function(note) {
-    if (note === $scope.newNote && !$scope.newNote.text && !$scope.newNote._attachments) {
+    if (note === $scope.newNote && !$scope.newNote.text && !$scope.newNote.attachments) {
       $scope.newNote = false;
     }
     else {
@@ -73,10 +92,9 @@ angular.module('kola.controllers', [])
   };
 
   $scope.save = function(note) {
-    dbService.localDatabase.put(note).then(function() {
-      console.log("-----------------------");
-      console.log($scope.notes);
+    dbService.save(note, "taskDocumentation").then(function() {
       $scope.newNote = false;
+      loadNotes();
     });
   };
 
@@ -90,7 +108,7 @@ angular.module('kola.controllers', [])
     });
 */
     dbService.getProfile().then(function(profile) {
-      $scope.newNote = { "_id":rfc4122.v4(), "type":"note", "taskId":$stateParams.taskId, "created_at":new Date(), "creator":profile.name };
+      $scope.newNote = { "taskId":$stateParams.taskId };
     });
   };
 })
@@ -133,7 +151,7 @@ angular.module('kola.controllers', [])
 .controller('TaskDetailCtrl', function($scope, $stateParams, dbService) {
   $scope.task = {};
   
-  dbService.getTask($stateParams.taskId).then(function(task) {
+  dbService.get($stateParams.taskId, "task").then(function(task) {
     $scope.task = task;
   }, function() {
     // TODO: 404 error message and open default/main page
@@ -143,7 +161,7 @@ angular.module('kola.controllers', [])
 .controller('TaskStepCtrl', function($scope, $stateParams, dbService) {
   $scope.step = {};
 
-  dbService.getTask($stateParams.taskId).then(function(task) {
+  dbService.get($stateParams.taskId, "task").then(function(task) {
     console.log(task);
     $scope.step = task.steps[$stateParams.stepIndex];
   }, function() {
