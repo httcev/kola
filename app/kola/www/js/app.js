@@ -100,6 +100,6 @@ angular.module('kola', ['ionic', 'kola.controllers', 'kola.services', 'kola.dire
 
 })
 
-.constant("remoteDatabaseUrl", "http://130.83.139.161:8080/platform/db/tasks")
-//.constant("remoteDatabaseUrl", "http://koladb.httc.de/tasks")
+.constant("changesUrl", "http://130.83.139.161:8080/platform/api/changes")
+//.constant("changesUrl", "http://plattform.kola-projekt.de/api/changes")
 .constant("localDatabaseName", "tasks");

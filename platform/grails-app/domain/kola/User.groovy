@@ -75,22 +75,15 @@ class User implements Serializable {
 
     static {
         grails.converters.JSON.registerObjectMarshaller(User) {
-            def result = it.properties.findAll { k, v ->
-                k == "id" || k == "email" || k == "profile"
-            }
-            result.id = it.id
-            return result
-        }
-    }
-
-	static _exported = ["email", "profile"]
-    static {
-        grails.converters.JSON.registerObjectMarshaller(User) {
-            def result = it.properties.findAll { k, v ->
-                k in _exported
-            }
-            result.id = it.id
-            return result
+        	def doc = [:]
+            doc.id = it.id
+            doc.email = it.email
+            doc.displayName = it.profile?.displayName
+            doc.company = it.profile?.company
+            doc.phone = it.profile?.phone
+            doc.mobile = it.profile?.mobile
+            doc.photo = it.profile?.photo
+            return [id:it.id, doc:doc]
         }
     }
 }

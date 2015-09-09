@@ -14,23 +14,25 @@ class AssetService {
 	def repoDir
 
     def readAsset(encodedId) {
+        /*
     	def id = hashIds.decode(encodedId)
     	if (id) {
 	    	id = id[0]
 	    	return Asset.read(id)
     	}
+        */
+        Asset.read(encodedId)
     }
 
     def createEncodedLink(asset, file=null) {
-    	def link
+        def mapping = "viewAsset"
+        def params = [:]
     	if (file) {
-	    	link = grailsLinkGenerator.link(mapping:"viewAssetFile", id:hashIds.encode(asset.id), params:[file:file], absolute:true)
+            mapping = "viewAssetFile"
+            params.file = file
     	}
-    	else {
-	    	link = grailsLinkGenerator.link(mapping:"viewAsset", id:hashIds.encode(asset.id), absolute:true)
-	    }
-	    println link
-	    return link
+//        return grailsLinkGenerator.link(mapping:mapping, id:hashIds.encode(asset.id), params:params, absolute:true)
+	    return grailsLinkGenerator.link(mapping:mapping, id:asset.id, params:params, absolute:true)
     }
 
     def getOrCreateRepositoryFile(asset) {
@@ -57,11 +59,6 @@ class AssetService {
     }
 
     def getRepositoryFile(asset) {
-    	/*
-    	if (asset.externalUrl) {
-    		throw new IOException("asset is not local")
-    	}
-    	*/
         if (asset?.id) {
         	return new File(repoDir, asset.id as String)
         }

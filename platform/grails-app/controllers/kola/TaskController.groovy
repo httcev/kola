@@ -112,7 +112,6 @@ class TaskController {
             notFound()
             return
         }
-
         if (!authService.canEdit(taskInstance)) {
             forbidden()
             return

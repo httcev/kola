@@ -14,15 +14,16 @@ class ReflectionQuestion {
     }
 
     String name
+    Date lastUpdated
 
     static _exported = ["name"]
     static {
         grails.converters.JSON.registerObjectMarshaller(ReflectionQuestion) {
-            def result = it.properties.findAll { k, v ->
+            def doc = it.properties.findAll { k, v ->
                 k in _exported
             }
-            result.id = it.id
-            return result
+            doc.id = it.id
+            return [id:it.id, doc:doc]
         }
     }
 }

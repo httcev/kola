@@ -1,21 +1,12 @@
 <ion-view>
-  <ion-nav-title>Teilschritt: {{step.title}}</ion-nav-title>
+  <ion-nav-title>Teilschritt: {{step.name}}</ion-nav-title>
   <ion-content class="padding">
-    <h3>{{step.title}}</h3>
+    <h3>{{step.name}}</h3>
     <p>
       {{step.description}}
     </p>
-    <div ng-if="step._attachments">
-      <h1 class="task-section-header">Anhänge:</h1>
-      <a class="item item-list-detail">
-        <ion-scroll direction="x">
-          <img ng-repeat="image in step._attachments" ng-src="{{'data:'+image.content_type+';base64,'+image.data}}" ng-click="showImage($index, step._attachments)" class="image-list-thumb"/>
-        </ion-scroll>
-      </a>
-    </div>
-
-    <media-attachments ng-model="step._attachments"></media-attachments>
-    <learning-resources ng-model="step.resources"></learning-resources>
+    <media-attachments ng-model="step"></media-attachments>
+    <learning-resources ng-model="step"></learning-resources>
 
     <h1 class="task-section-header">Dokumentation und Fragen:</h1>
     <ion-list>

@@ -27,7 +27,7 @@ angular.module('kola.directives', [])
   };
 })
 
-.directive('mediaAttachments', function($q, $ionicModal, dbService) {
+.directive('mediaAttachments', function($q, $ionicModal, $timeout, dbService) {
   return {
   	restrict: 'E',
     //replace: true,
@@ -48,33 +48,34 @@ angular.module('kola.directives', [])
 */
 		var unbindWatch = $scope.$watch("ngModel", function(newValue) {
 			var doc = newValue;
-            if (doc && doc._attachments) {
+            if (doc && doc.attachments) {
             	unbindWatch();
-				$scope.$watchCollection("ngModel._attachments", updateAttachmentUrls);
+				$scope.$watchCollection("ngModel.attachments", updateAttachmentUrls);
             }
 		}, true);
 
 
         function updateAttachmentUrls(newValue, oldValue) {
-        	console.log(newValue, oldValue);
 			var doc = ngModel.$modelValue;
             var attachmentUrls = false;
-    		var promises = [];
-            if (doc && doc._attachments) {
+            var promises = [];
+            if (doc && doc.attachments) {
 	            attachmentUrls = [];
-				angular.forEach(doc._attachments, function(attachment, attachmentKey) {
+				angular.forEach(doc.attachments, function(attachment, attachmentKey) {
 					if (attachment.stub) {
-						promises.push(dbService.localDatabase.getAttachment(doc._id, attachmentKey).then(function(blob) {
-							attachmentUrls.push(URL.createObjectURL(blob));
+						//attachmentUrls.push(URL.createObjectURL(attachment.content));
+					}
+					else if (attachment.content) {
+						promises.push($timeout(function() {
+							attachmentUrls.push(URL.createObjectURL(new Blob([new Uint8Array(attachment.content)], { type: attachment.mimeType } )));
 						}));
 					}
 					else {
-						attachmentUrls.push('data:'+attachment.content_type+';base64,'+attachment.data);
+						attachmentUrls.push(attachment.url);
 					}
 				});
             }
 			$q.all(promises).then(function() {
-				console.log("--- SETTING URLS TO:", attachmentUrls);
 				$scope.attachmentUrls = attachmentUrls;
 			});
         }

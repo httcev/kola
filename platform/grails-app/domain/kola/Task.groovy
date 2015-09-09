@@ -1,5 +1,6 @@
 package kola
 
+import java.util.UUID
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.collections.FactoryUtils
 
@@ -19,10 +20,13 @@ class Task {
         assignee nullable:true
     }
     static mapping = {
-        steps cascade:"all-delete-orphan"
-        description type:"text"
+        id generator: "assigned"
+        steps cascade: "all-delete-orphan"
+        name type: "text"
+        description type: "text"
     }
  
+    String id = UUID.randomUUID().toString()
     String name
     String description
 
@@ -42,20 +46,24 @@ class Task {
     List<TaskStep> steps                            // defined as list to keep order in which elements got added
     List<ReflectionQuestion> reflectionQuestions    // defined as list to keep order in which elements got added
 
-    static _embedded = ["name", "description", "steps", "done", "due", "isTemplate", "templateId", "creatorId", "assigneeId", "lastUpdated"]
-    static _referenced = ["resources", "attachments", "reflectionQuestions"]
+    static _embedded = ["name", "description", "done", "due", "isTemplate", "templateId", "creatorId", "assigneeId", "lastUpdated"]
+    static _referenced = ["steps", "resources", "attachments", "reflectionQuestions"]
+    /*
+    static _embedded = ["name", "description", "done", "due", "isTemplate", "templateId", "creatorId", "assigneeId", "lastUpdated"]
+    static _referenced = []
+    */
     static {
         grails.converters.JSON.registerObjectMarshaller(Task) { task ->
-            def result = task.properties.findAll { k, v ->
+            def doc = task.properties.findAll { k, v ->
                 k in _embedded
             }
             _referenced.each {
-                result."$it" = task."$it"?.collect {
+                doc."$it" = task."$it"?.collect {
                     it.id
                 }
             }
-            result.id = task.id
-            return result
+            doc.id = task.id
+            return [id:task.id, doc:doc]
         }
     }
 }

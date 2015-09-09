@@ -1,23 +1,34 @@
 angular.module('kola.controllers', [])
 
-.controller('TasksCtrl', function($scope, pouchCollection) {
+.controller('TasksCtrl', function($scope, dbService) {
     //$scope.tasks = pouchCollection("all/by_type", { keys:["task", "homework"] }, "all/filterByTypes", { types:["task", "homework"] });
     $scope.tasks = [];
+    dbService.query("select doc from task").then(function(result) {
+        console.log(result);
+      for (var i=0; i<result.rows.length; i++) {
+        $scope.tasks.push(JSON.parse(result.rows.item(i).doc));
+      }
+    });
+    /*
     pouchCollection("all/by_type", { keys:["task", "homework"] }, "all/filterByTypes", { types:["task", "homework"] }).then(function(result) {
       $scope.tasks = result;
       console.log($scope.tasks);  
     });
+*/
 
     $scope.remove = function(task) {
       $scope.tasks.$remove(task);
     };
 })
 
-.controller('NotesCtrl', function($scope, $stateParams, $ionicPopup, dbService, pouchCollection, rfc4122, modalDialog, mediaAttachment) {
+.controller('NotesCtrl', function($scope, $stateParams, $ionicPopup, dbService, rfc4122, modalDialog, mediaAttachment) {
+  $scope.notes = [];
 //  $scope.$on('$ionicView.enter', function(e) {
+/*  
     pouchCollection("notes/by_task", { key:$stateParams.taskId   }, "notes/filterByTask", { taskId:$stateParams.taskId }).then(function(result) {
       $scope.notes = result;
     });
+*/    
 /*
     $scope.notes.$db.query("notes/by_task", {
       key: $stateParams.taskId,
@@ -120,13 +131,22 @@ angular.module('kola.controllers', [])
 })
 
 .controller('TaskDetailCtrl', function($scope, $stateParams, dbService) {
-  dbService.localDatabase.get($stateParams.taskId).then(function(result) {
-    $scope.task = result;
+  $scope.task = {};
+  
+  dbService.getTask($stateParams.taskId).then(function(task) {
+    $scope.task = task;
+  }, function() {
+    // TODO: 404 error message and open default/main page
   });
 })
 
 .controller('TaskStepCtrl', function($scope, $stateParams, dbService) {
-  dbService.localDatabase.get($stateParams.taskId).then(function(result) {
-    $scope.step = result.steps[$stateParams.stepIndex];
+  $scope.step = {};
+
+  dbService.getTask($stateParams.taskId).then(function(task) {
+    console.log(task);
+    $scope.step = task.steps[$stateParams.stepIndex];
+  }, function() {
+    // TODO: 404 error message and open default/main page
   });
 });

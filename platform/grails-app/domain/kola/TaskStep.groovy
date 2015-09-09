@@ -1,5 +1,7 @@
 package kola
 
+import java.util.UUID
+
 class TaskStep {
 	static hasMany = [resources:Asset, attachments:Asset]
 	static belongsTo = [ task:Task ]
@@ -10,9 +12,12 @@ class TaskStep {
     }
     static transients = ["deleted"]
     static mapping = {
-        description type:"text"
+        id generator: "assigned"
+        name type: "text"
+        description type: "text"
     }
 
+    String id = UUID.randomUUID().toString()
     String name
     String description
     boolean deleted
@@ -24,16 +29,16 @@ class TaskStep {
     static _referenced = ["resources", "attachments"]
     static {
         grails.converters.JSON.registerObjectMarshaller(TaskStep) { step ->
-            def result = step.properties.findAll { k, v ->
+            def doc = step.properties.findAll { k, v ->
                 k in _exported
             }
             _referenced.each {
-                result."$it" = step."$it"?.collect {
+                doc."$it" = step."$it"?.collect {
                     it.id
                 }
             }
-            result.id = step.id
-            return result
+            doc.id = step.id
+            return [id:step.id, doc:doc]
         }
     }
 }

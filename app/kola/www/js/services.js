@@ -1,4 +1,4 @@
-angular.module('kola.services', ['pouchdb', 'kola.pouchBinding', 'uuid'])
+angular.module('kola.services', ['uuid'])
 
 .factory('Chats', function() {
   // Might use a resource here that returns a JSON array
@@ -49,62 +49,93 @@ angular.module('kola.services', ['pouchdb', 'kola.pouchBinding', 'uuid'])
   };
 })
 
-.service('dbService', function ($q, pouchDB, localDatabaseName, remoteDatabaseUrl) {
+.service('dbService', function ($q, $http, $cordovaSQLite, changesUrl) {
   var self = this;
-  var localDatabase = pouchDB(localDatabaseName, { adapter:"websql" });
-  localDatabase.info().then(function(info) { console.log(info)});
 
-  var remoteDatabase = undefined;
+  var conversions = {
+    "task" : {
+      "creatorId": { "refTable":"user", "replaceField":"creator" },
+      "assigneeId": { "refTable":"user", "replaceField":"assignee" },
+      "steps": { "refTable":"taskStep" },
+      "attachments": { "refTable":"asset" },
+      "resources": { "refTable":"asset" },
+      "reflectionQuestions": { "refTable":"reflectionQuestion" }
+    },
+    "taskStep" : {
+      "attachments": { "refTable":"asset" },
+      "resources": { "refTable":"asset" },
+      "reflectionQuestions": { "refTable":"reflectionQuestion" }
+    },
+  }
+
+  var dbApiHolder = window;
+  var db;
+  if (window.cordova) {
+    db = window.sqlitePlugin.openDatabase("kola.db", '1', 'kola DB', 1024 * 1024 * 100); // device
+  }
+  else {
+    db = window.openDatabase("kola.db", '1', 'kola DB', 1024 * 1024 * 100); // browser
+  }
+
+  var TABLES_TO_SYNC = [
+    {tableName : 'user'},
+    {tableName : 'asset'},
+    {tableName : 'reflectionQuestion'},
+    {tableName : 'taskStep'},
+    {tableName : 'task'}
+  ];
+  db.transaction(function(tx) {
+    try {
 /*
-  function getWithAttachmentUrls(docId) {
-    return localDatabase.get(docId).then(function(result) {
-      return generateAttachmentUrls(result).then(function() {
-        return result;
-      });
-    });
-  }
+      tx.executeSql('CREATE TABLE IF NOT EXISTS user (id integer primary key, email varchar(255), company varchar(255), displayName varchar(255), mobile varchar(255), phone varchar(255), photo binary(512000))');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS asset (id varchar(255) not null primary key, content binary(104857600), description text, url text, mimeType varchar(255), name text, subType varchar(255))');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS reflectionQuestion (id integer primary key, name text)');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS task (id varchar(255) not null primary key, assigneeId varchar(255), creatorId varchar(255), dateCreated timestamp, description text, done boolean, due timestamp, isTemplate boolean, lastUpdated timestamp, name text, templateId varchar(255), FOREIGN KEY (assigneeId) REFERENCES user(assigneeId), FOREIGN KEY (creatorId) REFERENCES user(creatorId), FOREIGN KEY (templateId) REFERENCES task(templateId))');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS taskStep (id varchar(255) not null primary key, name text, description text, taskId varchar(255) not null, deleted boolean, FOREIGN KEY (taskId) REFERENCES task(taskId))');
 
-  function generateAttachmentUrls(docs) {
-    var promises = [];
-    var _self = this;
-    this._do = function(doc) {
-      if (doc._attachments) {
-        doc.attachmentUrls = [];
-        angular.forEach(doc._attachments, function(attachment, attachmentKey) {
-          promises.push(localDatabase.getAttachment(doc._id, attachmentKey).then(function(blob) {
-            var url = URL.createObjectURL(blob);
-            console.log(url);
-            doc.attachmentUrls.push(url);
-          }));
-        });
-      }
-    }
-
-    if (angular.isArray(docs)) {
-      angular.forEach(docs, function(doc) {
-        _self._do(doc);
-      });
-    }
-    else {
-      _self._do(docs);
-    }
-
-    return $q.all(promises);
-  }
+      tx.executeSql('CREATE TABLE IF NOT EXISTS task_asset (task_attachments_id varchar(255), assetId varchar(255), attachments_idx integer, task_resources_id varchar(255), resources_idx integer, FOREIGN KEY (assetId) REFERENCES asset(assetId))');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS task_reflection_question (task_reflection_questions_id varchar(255), reflection_question_id bigint, reflection_questions_idx integer, FOREIGN KEY (reflection_question_id) REFERENCES reflectionQuestion(reflection_question_id))');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS task_step_asset (task_step_attachments_id bigint, asset_id varchar(255), attachments_idx integer, task_step_resources_id bigint, resources_idx integer, foreign key (asset_id) references asset(asset_id))');
 */
+      tx.executeSql('CREATE TABLE IF NOT EXISTS user (id integer primary key, doc text not null)');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS asset (id varchar(255) not null primary key, doc text not null)');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS reflectionQuestion (id integer primary key, doc text not null)');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS task (id varchar(255) not null primary key, doc text not null)');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS taskStep (id varchar(255) not null primary key, doc text not null)');
+
+      // local
+      tx.executeSql('CREATE TABLE IF NOT EXISTS profile (id integer primary key, name text, password text)');
+    }
+    catch(e) {
+      console.log(e);
+    }
+  });
+  getProfile().then(function(profile) {
+    DBSYNC.initSync(TABLES_TO_SYNC, db, {foo:"bar"}, changesUrl, function() {
+      // INIT FINISHED
+    }, profile.name, profile.password);
+  });
+
   function getProfile() {
-    var profileDocId = "_local/profile";
-    return localDatabase.get(profileDocId).catch(function (err) {
-      if (err.status === 404) { // not found!
-        return { "_id":profileDocId };
-      } else {
-        console.log(err);
-        throw err;
-      }
+    var deferred = $q.defer();
+    db.transaction(function(tx) {
+      tx.executeSql('INSERT OR REPLACE INTO profile (id, name, password) values (1, "admin", "admin")');
     });
+    db.transaction(function(tx) {
+      tx.executeSql('SELECT * FROM profile where id=1', [], function (tx, results) {
+        if (results.rows.length == 1) {
+          deferred.resolve(results.rows.item(0));
+        }
+        else {
+          deferred.reject();
+        }
+      });
+    });
+    return deferred.promise;
   }
 
   function setProfile(profile) {
+    /*
     return getProfile().then(function(dbProfile) {
       angular.extend(dbProfile, profile);
       return localDatabase.put(dbProfile).catch(function (err) {
@@ -112,96 +143,129 @@ angular.module('kola.services', ['pouchdb', 'kola.pouchBinding', 'uuid'])
         throw err;
       });
     });
+    */
   }
 
-  function getRemoteDatabase() {
-    if (angular.isDefined(remoteDatabase)) {
-      return $q.when(remoteDatabase);
-    }
-    else {
-      return getProfile().then(function(profile) {
-        remoteDatabase = pouchDB(remoteDatabaseUrl, { skipSetup:true, ajax:{ headers:{ "Authorization":"Basic " + window.btoa(profile.name + ':' + profile.password) }}});
-        return remoteDatabase;
+  function query(sql, params) {
+    console.log("query: " + sql);
+    var d = $q.defer();
+    db.transaction(function (t) {
+      t.executeSql(sql, params, function (tx, results) {
+        d.resolve(results);
+      }, function (err) {
+        d.reject(err);
       });
-    }
+    }, function (err) {
+        d.reject(err);
+    });
+
+    return d.promise;
+  }
+
+  function getTask(id) {
+    var d = $q.defer();
+    db.transaction(function (t) {
+      t.executeSql("select doc from task where id=?", [id], function (tx, results) {
+        if (results.rows.length == 1) {
+          var task = JSON.parse(results.rows.item(0).doc);
+          var promises = []
+          _resolveIds(task, conversions["task"], promises, tx);
+          $q.all(promises).then(function () {
+            d.resolve(task);
+          });
+        }
+        else {
+          d.reject("task not found: " + id);
+        }
+      }, function (err) {
+        d.reject(err);
+      });
+    }, function (err) {
+        d.reject(err);
+    });
+
+    return d.promise;
+  }
+
+  function _resolveIds(target, tableConversions, promises, tx) {
+    angular.forEach(tableConversions, function(conversionDef, key) {
+      var ids = target[key];
+      if (ids != null) {
+        if (angular.isArray(ids)) {
+          angular.forEach(ids, function(id, index) {
+            var d = $q.defer();
+            promises.push(d.promise);
+//            console.log("will resolve id " + id + " from table " +conversionDef.refTable );
+            tx.executeSql("select doc from " + conversionDef.refTable + " where id=?", [id], function (tx, results) {
+              if (results.rows.length == 1) {
+                var resolved = JSON.parse(results.rows.item(0).doc);
+                target[key][index] = resolved;
+                _resolveIds(resolved, conversions[conversionDef.refTable], promises, tx);
+                d.resolve();
+              }
+              else {
+                d.reject("no document with id '" + id + "' in table '" + conversionDef.refTable + "'");
+              }
+            }, function (err) {
+              d.reject(err);
+            });
+          });
+        }
+        else {
+          var d = $q.defer();
+          promises.push(d.promise);
+//          console.log("will resolve id " + ids + " from table " +conversionDef.refTable );
+          tx.executeSql("select doc from " + conversionDef.refTable + " where id=?", [ids], function (tx, results) {
+            if (results.rows.length == 1) {
+              var resolved = JSON.parse(results.rows.item(0).doc);
+              if (conversionDef.replaceField) {
+                delete target[key];
+                target[conversionDef.replaceField] = resolved;
+              }
+              else {
+                target[key] = resolved;
+              }
+              _resolveIds(resolved, conversions[conversionDef.refTable], promises, tx);
+              d.resolve();
+            }
+            else {
+              d.reject("no document with id '" + ids + "' in table '" + conversionDef.refTable + "'");
+            }
+          }, function (err) {
+            d.reject(err);
+          });
+        }
+      }
+    });
   }
 
   return {
-    localDatabase:localDatabase,
-    getRemoteDatabase:getRemoteDatabase,
     getProfile:getProfile,
-    setProfile:setProfile
+    setProfile:setProfile,
+    query:query,
+    getTask:getTask
   }
 })
 
-.service('syncService', function ($rootScope, onlineStateService, dbService) {
-  var replicationTo, replicationFrom;
-
+.service('syncService', function ($rootScope, $interval, $timeout, onlineStateService, dbService) {
   function onSyncInfoChanged(newValue, oldValue) {
     console.log("--- online state changed: isOnline="+$rootScope.onlineState.isOnline+", isWifi="+$rootScope.onlineState.isWifi);
 
-    // first cancel possible previous replication processes and remote DB
-    if (angular.isDefined(replicationTo)) {
-      replicationTo.cancel();
-      replicationTo = undefined;
+    function callBackSyncProgress() {
     }
-    if (angular.isDefined(replicationFrom)) {
-      replicationFrom.cancel();
-      replicationFrom = undefined;
-    }
+    var intervalPromise;
 
     if ($rootScope.onlineState.isOnline) {
-      dbService.getRemoteDatabase().then(function(remoteDatabase) {
-        console.log("-- huehue");
-        console.log(remoteDatabase);
-        replicationTo = dbService.localDatabase.replicate.to(remoteDatabase, { live:true, retry:false })
-        .on('change', function (info) {
-          // handle change
-          console.log("--- outgoing sync changed");
-          console.log(info);
-        }).on('paused', function () {
-          // replication paused (e.g. user went offline)
-          console.log("--- outgoing sync paused");
-          $rootScope.onlineState.isSyncing = false;
-        }).on('active', function () {
-          // replicate resumed (e.g. user went back online)
-          console.log("--- outgoing sync active");
-          $rootScope.onlineState.isSyncing = true;
-        }).on('denied', function (info) {
-          // a document failed to replicate, e.g. due to permissions
-          console.log("--- outgoing sync denied");
-          $rootScope.onlineState.isSyncing = false;
-        }).on('complete', function (info) {
-          // handle complete
-          console.log("--- outgoing sync complete");
-          $rootScope.onlineState.isSyncing = false;
-        }).on('error', console.log.bind(console));
-
-        replicationFrom = dbService.localDatabase.replicate.from(remoteDatabase, { live:true, retry:false, filter:"all/filterByUser" })
-        .on('change', function (info) {
-          // handle change
-          console.log("--- incoming sync changed");
-          console.log(info);
-        }).on('paused', function () {
-          // replication paused (e.g. user went offline)
-          console.log("--- incoming sync paused");
-          $rootScope.onlineState.isSyncing = false;
-        }).on('active', function () {
-          // replicate resumed (e.g. user went back online)
-          console.log("--- incoming sync active");
-          $rootScope.onlineState.isSyncing = true;
-        }).on('denied', function (info) {
-          // a document failed to replicate, e.g. due to permissions
-          console.log("--- incoming sync denied");
-          $rootScope.onlineState.isSyncing = false;
-        }).on('complete', function (info) {
-          // handle complete
-          console.log("--- incoming sync complete");
-          $rootScope.onlineState.isSyncing = false;
-        }).on('error', console.log.bind(console));
-      });
+      intervalPromise = $timeout(function () {
+        DBSYNC.syncNow(callBackSyncProgress, function(result) {
+           if (result.syncOK === true) {
+               //Synchronized successfully
+           }
+        });
+      }, 1000);
     }
     else {
+      $interval.cancel(intervalPromise);
       $rootScope.onlineState.isSyncing = false;
     }
   }

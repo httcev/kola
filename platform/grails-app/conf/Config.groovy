@@ -90,7 +90,7 @@ grails.assets.plugin."twitter-bootstrap".excludes = ["**/*.less"]
 grails.assets.plugin."twitter-bootstrap".includes = ["bootstrap.less"]
 
 grails.databinding.dateFormats = [
-    'yyyy-MM-dd', 'yyyy-MM-dd HH:mm:ss.S', "yyyy-MM-dd'T'hh:mm:ss'Z'"
+    'yyyy-MM-dd', 'yyyy-MM-dd HH:mm:ss.S', "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'"
 ]
 
 environments {
@@ -187,8 +187,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 grails.plugin.springsecurity.useBasicAuth = true
 grails.plugin.springsecurity.basic.realmName = "kola db (proxy)"
 grails.plugin.springsecurity.filterChain.chainMap = [
-        '/db': 'JOINED_FILTERS,-exceptionTranslationFilter',
-        '/db/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
+        '/api/**': 'JOINED_FILTERS,-exceptionTranslationFilter',
         '/**': 'JOINED_FILTERS,-basicAuthenticationFilter,-basicExceptionTranslationFilter'
 ]
 grails.plugin.springsecurity.apf.storeLastUsername = true

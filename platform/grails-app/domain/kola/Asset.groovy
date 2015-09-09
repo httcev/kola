@@ -1,7 +1,9 @@
 package kola
 
+import java.util.UUID
+
 class Asset {
-    def assetService
+    def transient assetService
 
 	static searchable = {
 		all = [analyzer: 'german']
@@ -20,12 +22,15 @@ class Asset {
         indexText nullable: true
     }
     static mapping = {
+        id generator: "assigned"
+        description type: "text"
 		content lazy: true
         indexText lazy: true, type:"text"
     }
 
     //static transients = ['indexText']
 
+    String id = UUID.randomUUID().toString()
     String name
     String description
     String mimeType
@@ -61,14 +66,19 @@ class Asset {
     }
 
 
-    static _exported = ["name", "description", "mimeType", "subType", "lastUpdated", "url"]
+    static _exported = ["name", "description", "mimeType", "subType", "url"]
     static {
         grails.converters.JSON.registerObjectMarshaller(Asset) {
-            def result = it.properties.findAll { k, v ->
+            try {
+            def doc = it.properties.findAll { k, v ->
                 k in _exported || (it.subType == "attachment" && k == "content")
             }
-            result.id = it.id
-            return result
+            doc.id = it.id
+            return [id:it.id, doc:doc]
+            }catch(e) {
+                e.printStackTrace()
+                return null
+            }
         }
     }
 }
