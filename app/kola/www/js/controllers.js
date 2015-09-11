@@ -3,15 +3,18 @@ angular.module('kola.controllers', [])
 .controller('TasksCtrl', function($scope, dbService) {
     //$scope.tasks = pouchCollection("all/by_type", { keys:["task", "homework"] }, "all/filterByTypes", { types:["task", "homework"] });
     $scope.tasks = [];
-    dbService.all("task").then(function(docs) {
-      var filtered = [];
-      angular.forEach(docs, function(doc) {
-        if (!doc["isTemplate"]) {
-          filtered.push(doc);
-        }
+
+    $scope.reloadTasks = function() {
+      dbService.all("task").then(function(docs) {
+        var filtered = [];
+        angular.forEach(docs, function(doc) {
+          if (!doc["isTemplate"]) {
+            filtered.push(doc);
+          }
+        });
+        $scope.tasks = filtered;
       });
-      $scope.tasks = filtered;
-    });
+    }
     /*
     pouchCollection("all/by_type", { keys:["task", "homework"] }, "all/filterByTypes", { types:["task", "homework"] }).then(function(result) {
       $scope.tasks = result;
@@ -20,11 +23,14 @@ angular.module('kola.controllers', [])
 */
 
     $scope.remove = function(task) {
-      $scope.tasks.$remove(task);
+      task.deleted = true;
+      dbService.save(task);
     };
+
+    $scope.reloadTasks();
 })
 
-.controller('NotesCtrl', function($scope, $stateParams, $ionicPopup, dbService, rfc4122, modalDialog, mediaAttachment) {
+.controller('NotesCtrl', function($scope, $stateParams, $q, $ionicPopup, dbService, rfc4122, modalDialog, mediaAttachment) {
   $scope.notes = [];
   loadNotes();
 
@@ -32,7 +38,7 @@ angular.module('kola.controllers', [])
     dbService.all("taskDocumentation").then(function(docs) {
       var filtered = [];
       angular.forEach(docs, function(doc) {
-        if (doc.taskId == $stateParams.taskId) {
+        if (doc.task == $stateParams.taskId && !doc.deleted) {
           dbService.resolveIds(doc, "taskDocumentation").then(function() {
             filtered.push(doc);
           });
@@ -76,15 +82,17 @@ angular.module('kola.controllers', [])
     }
     else {
       $ionicPopup.confirm({
-        title: 'Notiz löschen',
-        template: 'Soll diese Notiz wirklich gelöscht werden?'
+        title: 'Dokumentation löschen',
+        template: 'Soll diese Dokumentation wirklich gelöscht werden?'
       }).then(function(result) {
         if(result) {
           if (note === $scope.newNote) {
             $scope.newNote = false;
           }
           else {
-            $scope.notes.$remove(note);
+            note.deleted = true;
+            dbService.save(note);
+            loadNotes();
           }
         }
      });
@@ -92,7 +100,13 @@ angular.module('kola.controllers', [])
   };
 
   $scope.save = function(note) {
-    dbService.save(note, "taskDocumentation").then(function() {
+    var objectsToSave = [];
+    angular.forEach(note.attachments, function(attachment) {
+      objectsToSave.push(attachment);
+    });
+    objectsToSave.push(note);
+
+    dbService.save(objectsToSave).then(function() {
       $scope.newNote = false;
       loadNotes();
     });
@@ -107,9 +121,7 @@ angular.module('kola.controllers', [])
       console.log($scope.notes);
     });
 */
-    dbService.getProfile().then(function(profile) {
-      $scope.newNote = { "taskId":$stateParams.taskId };
-    });
+    $scope.newNote = dbService.createTaskDocumentation($stateParams.taskId);
   };
 })
 
@@ -132,19 +144,15 @@ angular.module('kola.controllers', [])
   $scope.chat = Chats.get($stateParams.chatId);
 })
 
-.controller('AccountCtrl', function($scope, dbService) {
-  $scope.profile = {};
-
-  dbService.getProfile().then(function (profile) {
-    console.log("--- init profile to:");
-    console.log(profile);
-    $scope.profile.name = profile.name;
-    $scope.profile.password = profile.password;
-  });
+.controller('AccountCtrl', function($scope, $state, dbService) {
+  $scope.profile = { name:localStorage["user"], password:localStorage["password"] };
 
   $scope.updateProfile = function() {
-    console.log("--- update profile: name="+$scope.profile.name+", pass="+$scope.profile.password);
-    dbService.setProfile($scope.profile);
+    localStorage["user"] = $scope.profile.name;
+    localStorage["password"] = $scope.profile.password;
+    dbService.initSync().then(function() {
+      return $state.transitionTo("tab.tasks", {}, { reload: true, inherit: false, notify: true });  
+    });
   };
 })
 
@@ -153,6 +161,7 @@ angular.module('kola.controllers', [])
   
   dbService.get($stateParams.taskId, "task").then(function(task) {
     $scope.task = task;
+    console.log(task);
   }, function() {
     // TODO: 404 error message and open default/main page
   });

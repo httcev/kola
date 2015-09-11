@@ -7,9 +7,9 @@
     <div ng-if="!notes" class="center-horizontal">
       <ion-spinner></ion-spinner>
     </div>
-    <div class="list card" ng-repeat="note in notes track by note.id">
+    <div class="list card" ng-repeat="note in notes | orderBy:'lastUpdated'">
       <div class="item item-text-wrap">
-        <div class="created-date">{{note.lastUpdated | date}}, {{note.creator.displayName}}</div>
+        <div class="created-date">{{note.lastUpdated | date}} {{note.creator.displayName}}</div>
         {{note.text}}
       </div>
       <media-attachments ng-model="note" hide-header="true"></media-attachments>
@@ -33,7 +33,6 @@
       </div>
     </div>
     <div ng-hide="!notes || notes.length || newNote">Bisher ist noch keine Dokumentation angelegt.</div>
-
 
     <h1 class="task-section-header padding">Bitte beantworten Sie diese Fragen:</h1>
     <div class="list card">

@@ -9,6 +9,7 @@ class TaskStep {
     	name blank:false
     	description nullable:true
         deleted bindable:true
+        creator nullable:true
     }
     static transients = ["deleted"]
     static mapping = {
@@ -21,20 +22,26 @@ class TaskStep {
     String name
     String description
     boolean deleted
+    User creator
 
     List<Asset> resources       // defined as list to keep order in which elements got added
     List<Asset> attachments     // defined as list to keep order in which elements got added
 
     static _exported = ["name", "description", "deleted"]
-    static _referenced = ["resources", "attachments"]
+    static _referenced = ["resources", "attachments", "creator"]
     static {
         grails.converters.JSON.registerObjectMarshaller(TaskStep) { step ->
             def doc = step.properties.findAll { k, v ->
                 k in _exported
             }
             _referenced.each {
-                doc."$it" = step."$it"?.collect {
-                    it.id
+                if (step."$it" instanceof List) {
+                    doc."$it" = step."$it"?.collect {
+                        it.id
+                    }
+                }
+                else {
+                    doc."$it" = step."$it"?.id
                 }
             }
             doc.id = step.id

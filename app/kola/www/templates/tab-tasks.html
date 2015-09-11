@@ -1,8 +1,6 @@
-<ion-view view-title="Aufgaben">
+<ion-view view-title="Aufträge">
   <ion-nav-buttons side="secondary">
-    <ion-spinner ng-if="$root.onlineState.isSyncing" icon="dots"></ion-spinner>
-    <span ng-if="!$root.onlineState.isOnline"><i class="icon assertive ion-alert-circled"></i> Offline</span>
-    <i ng-if="$root.onlineState.isOnline" class="icon dark ion-checkmark-round"></i>
+    <sync-control></sync-control>
   </ion-nav-buttons>
   <ion-content>
     <ion-list>
@@ -11,14 +9,14 @@
         <i ng-if="task.type!='homework'" class="icon ion-clipboard"></i>
         <i ng-if="task.type=='homework'" class="icon ion-university"></i>
         <h2>{{task.name}}</h2>
-        <p ng-if="angular.isObject(task.due)"><b>Wann</b>: {{task.due | date:'fullDate'}}</p>
+        <p ng-if="task.due"><b>Wann</b>: {{task.due | date:'fullDate'}}</p>
         <i class="icon ion-chevron-right icon-accessory"></i>
 
         <ion-option-button class="button-balanced" ng-click="task.done=true">
           <i class="icon ion-checkmark-round"></i>
         </ion-option-button>
       </ion-item>
-      <div ng-hide="pendingTasks.length" class="padding">Keine anstehenden Aufgaben</div>
+      <div ng-hide="pendingTasks.length" class="padding">Keine anstehenden Aufträge</div>
 
       <div class="item item-divider item-stable item-icon-left"><i class="icon ion-checkmark-round balanced"></i><b>Erledigt:</b></div>
       <ion-item ng-repeat="task in completedTasks = (tasks | filter:{done:true} | orderBy:'-due') track by task.id" class="item-remove-animate item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}">
@@ -31,7 +29,7 @@
           <i class="icon ion-trash-a"></i>
         </ion-option-button>
       </ion-item>
-      <div ng-hide="completedTasks.length" class="padding">Keine erledigten Aufgaben</div>
+      <div ng-hide="completedTasks.length" class="padding">Keine erledigten Aufträge</div>
     </ion-list>
   </ion-content>
 </ion-view>

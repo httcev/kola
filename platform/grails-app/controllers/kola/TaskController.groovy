@@ -212,7 +212,9 @@ class TaskController {
             }
         }  
         // update steps
+        println "--- before -> " + taskInstance.steps
         taskInstance.steps?.removeAll{ it == null || it.deleted }
+        println "--- after -> " + taskInstance.steps
         // update reflection questions
         taskInstance.reflectionQuestions?.clear()
         params.list("reflectionQuestions")?.unique(false).each {
@@ -237,6 +239,9 @@ class TaskController {
                     def prop = matcher[0][1]
                     def index = matcher[0][2] as Integer
                     //domain = taskInstance."${domainName}"
+                    println "--- prop=${prop}"
+                    println taskInstance
+                    println taskInstance."${prop}"
                     domain = taskInstance."${prop}"?.get(index)
                 }
             }

@@ -20,6 +20,7 @@ class Asset {
         description nullable: true
         filename nullable: true
         indexText nullable: true
+        creator nullable:true
     }
     static mapping = {
         id generator: "assigned"
@@ -35,6 +36,7 @@ class Asset {
     String description
     String mimeType
     String subType = "learning-resource"
+    User creator
 
     // only external assets
     String externalUrl
@@ -67,18 +69,24 @@ class Asset {
 
 
     static _exported = ["name", "description", "mimeType", "subType", "url"]
+    static _referenced = ["creator"]
     static {
-        grails.converters.JSON.registerObjectMarshaller(Asset) {
-            try {
-            def doc = it.properties.findAll { k, v ->
-                k in _exported || (it.subType == "attachment" && k == "content")
+        grails.converters.JSON.registerObjectMarshaller(Asset) { asset ->
+            def doc = asset.properties.findAll { k, v ->
+                k in _exported || (asset.subType == "attachment" && k == "content")
             }
-            doc.id = it.id
-            return [id:it.id, doc:doc]
-            }catch(e) {
-                e.printStackTrace()
-                return null
+            _referenced.each {
+                if (asset."$it" instanceof List) {
+                    doc."$it" = asset."$it"?.collect {
+                        it.id
+                    }
+                }
+                else {
+                    doc."$it" = asset."$it"?.id
+                }
             }
+            doc.id = asset.id
+            return [id:asset.id, doc:doc]
         }
     }
 }

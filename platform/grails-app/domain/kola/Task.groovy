@@ -46,8 +46,8 @@ class Task {
     List<TaskStep> steps                            // defined as list to keep order in which elements got added
     List<ReflectionQuestion> reflectionQuestions    // defined as list to keep order in which elements got added
 
-    static _embedded = ["name", "description", "done", "due", "isTemplate", "templateId", "creatorId", "assigneeId", "lastUpdated"]
-    static _referenced = ["steps", "resources", "attachments", "reflectionQuestions"]
+    static _embedded = ["name", "description", "done", "due", "isTemplate", "lastUpdated"]
+    static _referenced = ["steps", "resources", "attachments", "reflectionQuestions", "template", "creator", "assignee"]
     /*
     static _embedded = ["name", "description", "done", "due", "isTemplate", "templateId", "creatorId", "assigneeId", "lastUpdated"]
     static _referenced = []
@@ -58,8 +58,13 @@ class Task {
                 k in _embedded
             }
             _referenced.each {
-                doc."$it" = task."$it"?.collect {
-                    it.id
+                if (task."$it" instanceof List) {
+                    doc."$it" = task."$it"?.collect {
+                        it.id
+                    }
+                }
+                else {
+                    doc."$it" = task."$it"?.id
                 }
             }
             doc.id = task.id

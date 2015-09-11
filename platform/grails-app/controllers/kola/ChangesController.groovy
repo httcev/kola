@@ -18,7 +18,7 @@ class ChangesController {
 	    	def user = springSecurityService.currentUser
     		def clientData = request.JSON
     		_update(clientData, user)
-
+println clientData?.info?.lastSyncDate
 	    	// TODO: incorporate current user in changes feed (return only relevant data)
 	    	def since = clientData?.info?.lastSyncDate ? DATEFORMAT.parse(clientData?.info?.lastSyncDate) : new Date(0)
 
@@ -54,8 +54,39 @@ class ChangesController {
 	    }
     }
 
+    def static DOMAIN_CLASS_MAPPING = ["asset":Asset, "taskStep":TaskStep, "taskDocumentation":TaskDocumentation, "reflectionAnswer":ReflectionAnswer, "task":Task]
+
     def _update(clientData, user) {
+    	["asset", "taskStep", "taskDocumentation", "reflectionAnswer", "task"].each { table ->
+    		def domainClass = DOMAIN_CLASS_MAPPING[table]
+    		clientData.data?."$table"?.each {
+				def doc = JSON.parse(it.doc)
+				println doc
+				def model = domainClass.get(doc.id)
+				if (!model) {
+					println "--- creating new " + domainClass + " with id " + doc.id
+					model = domainClass.newInstance()
+					model.id = doc.id
+				}
+				else {
+					println "--- found existing " + domainClass + " with id " + doc.id
+				}
+				model.properties = doc
+				if (!model.creator) {
+					model.creator = user
+				}
+				if (!model.save(true)) {
+	    			model.errors.allErrors.each { println it }
+				}
+				else {
+					println "------------- SAVED:"
+					println model
+				}
+    		}
+		}
+/*
     	clientData.data?.each { table, objects ->
+    		println "--- table=" + table
     		def domainClass
     		switch(table) {
     			case "taskDocumentation":
@@ -92,5 +123,6 @@ class ChangesController {
 	    		}
 	    	}
     	}
+*/    	
     }
 }

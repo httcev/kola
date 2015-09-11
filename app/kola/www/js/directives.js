@@ -103,4 +103,26 @@ angular.module('kola.directives', [])
 		};
     }
   };
+})
+
+.directive('syncControl', function($state, dbService) {
+  return {
+  	restrict: 'E',
+    //replace: true,
+    /*
+	require: '^ngModel',
+  	scope: {
+		ngModel: '='
+	},
+	*/
+    templateUrl: 'templates/directive-sync-control.html',
+    link: function($scope) {
+    	$scope.sync = function() {
+		    dbService.sync().then(function() {
+		    	$scope.reloadTasks();
+		    });
+    	}
+    }
+  };
 });
+

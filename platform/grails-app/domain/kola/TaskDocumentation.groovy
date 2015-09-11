@@ -7,9 +7,9 @@ class TaskDocumentation {
 	static belongsTo = [ task:Task ]
     static constraints = {
     	text nullable:true
-        deleted bindable:true
+//        deleted bindable:true
     }
-    static transients = ["deleted"]
+//    static transients = ["deleted"]
     static mapping = {
         id generator: "assigned"
         text type: "text"
@@ -23,16 +23,21 @@ class TaskDocumentation {
 
     List<Asset> attachments     // defined as list to keep order in which elements got added
 
-    static _exported = ["text", "creatorId", "taskId", "lastUpdated", "deleted"]
-    static _referenced = ["attachments"]
+    static _exported = ["text", "lastUpdated", "deleted"]
+    static _referenced = ["attachments", "creator", "task"]
     static {
         grails.converters.JSON.registerObjectMarshaller(TaskDocumentation) { taskDocumentation ->
             def doc = taskDocumentation.properties.findAll { k, v ->
                 k in _exported
             }
             _referenced.each {
-                doc."$it" = taskDocumentation."$it"?.collect {
-                    it.id
+                if (taskDocumentation."$it" instanceof List) {
+                    doc."$it" = taskDocumentation."$it"?.collect {
+                        it.id
+                    }
+                }
+                else {
+                    doc."$it" = taskDocumentation."$it"?.id
                 }
             }
             doc.id = taskDocumentation.id
