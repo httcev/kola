@@ -49,9 +49,8 @@ angular.module('kola.services', ['uuid'])
   };
 })
 
-.service('dbService', function ($rootScope, $q, $state, $ionicLoading, onlineStateService, changesUrl, rfc4122) {
+.service('dbService', function ($rootScope, $q, $state, $ionicLoading, $cordovaFile, onlineStateService, changesUrl, rfc4122) {
   var self = this;
-
   var CONVERSIONS = {
     "task" : {
       "creator": { "refTable":"user" },
@@ -78,6 +77,7 @@ angular.module('kola.services', ['uuid'])
   var TABLES_TO_SYNC = [
     {tableName : 'user'},
     {tableName : 'asset'},
+    {tableName : 'blob'},
     {tableName : 'reflectionQuestion'},
     {tableName : 'taskStep'},
     {tableName : 'taskDocumentation'},
@@ -229,7 +229,10 @@ angular.module('kola.services', ['uuid'])
     });
 
     return $q.all(promises).then(function() {
-      return sync();
+      // saving should succeed in offline mode. since sync() rejects when offline, check canSync() first.
+      if (canSync()) {
+        return sync();
+      }
     });
   }
 
@@ -243,6 +246,7 @@ angular.module('kola.services', ['uuid'])
     console.log("--- saving", doc);
     var d = $q.defer();
     var copy = angular.copy(doc);
+
     delete copy._table;
     _replaceIds(copy, CONVERSIONS[doc._table]);
     console.log("--- replaced", copy);
@@ -270,7 +274,7 @@ angular.module('kola.services', ['uuid'])
     return d.promise;
   }
 
-  function _resolveIds(target, tableConversions, promises, tx) {
+  function _resolveIds(target, tableConversions, promises, t) {
     angular.forEach(tableConversions, function(conversionDef, key) {
       var ids = target[key];
       if (ids != null) {
@@ -278,12 +282,14 @@ angular.module('kola.services', ['uuid'])
           angular.forEach(ids, function(id, index) {
             var d = $q.defer();
             promises.push(d.promise);
-//            console.log("will resolve id " + id + " from table " +conversionDef.refTable );
-            tx.executeSql("select doc from " + conversionDef.refTable + " where id=?", [id], function (tx, results) {
+            t.executeSql("select doc from " + conversionDef.refTable + " where id=?", [id], function (tx, results) {
               if (results.rows.length == 1) {
                 var resolved = JSON.parse(results.rows.item(0).doc);
                 resolved._table = conversionDef.refTable;
                 target[key][index] = resolved;
+                if (conversionDef.refTable == "asset" && resolved.subType == "attachment") {
+                  promises.push(_copyAttachmentToFileSystem(resolved, t));
+                }
                 _resolveIds(resolved, CONVERSIONS[conversionDef.refTable], promises, tx);
                 d.resolve();
               }
@@ -298,12 +304,14 @@ angular.module('kola.services', ['uuid'])
         else {
           var d = $q.defer();
           promises.push(d.promise);
-//          console.log("will resolve id " + ids + " from table " +conversionDef.refTable );
-          tx.executeSql("select doc from " + conversionDef.refTable + " where id=?", [ids], function (tx, results) {
+          t.executeSql("select doc from " + conversionDef.refTable + " where id=?", [ids], function (tx, results) {
             if (results.rows.length == 1) {
               var resolved = JSON.parse(results.rows.item(0).doc);
               resolved._table = conversionDef.refTable;
               target[key] = resolved;
+              if (conversionDef.refTable == "asset" && resolved.subType == "attachment") {
+                promises.push(_copyAttachmentToFileSystem(resolved, t));
+              }
               _resolveIds(resolved, CONVERSIONS[conversionDef.refTable], promises, tx);
               d.resolve();
             }
@@ -316,6 +324,53 @@ angular.module('kola.services', ['uuid'])
         }
       }
     });
+  }
+
+  function _copyAttachmentToFileSystem(attachment, tx) {
+    console.log("--- copying attachment to file system -> " + attachment.id);
+    console.log(self.fileSystem);
+    var d = $q.defer();
+    if (self.fileSystem) {
+      self.fileSystem.root.getFile(attachment.id, {}, function(fileEntry) {
+        console.log("--- FOUND FILE " + attachment.id);
+        attachment.url = fileEntry.toNativeURL();
+        d.resolve();
+        /*
+        fileEntry.file(function(file) {
+          attachment.localFile = file;
+        });
+      */
+      }, function() {
+        console.log("--- FILE NOT FOUND " + attachment.id);
+        self.fileSystem.root.getFile(attachment.id, {create: true, exclusive: true}, function(fileEntry) {
+          fileEntry.createWriter(function(fileWriter) {
+            tx.executeSql("select content from blob where id=?", [attachment.id], function (tx, results) {
+              if (results.rows.length == 1) {
+                fileWriter.write(new Blob(results.rows.item(0).content, {type: attachment.mimeType}), function() {
+                  attachment.url = fileEntry.toNativeURL();
+                  d.resolve();
+                });
+              }
+              else {
+                console.error("couldn't find blob in database for attachment " + attachment.id);
+                d.reject();
+            }
+            });
+          }, function() {
+            console.log("error writing to file " + fileEntry.name);
+            d.reject();
+          });
+        }, function(err) {
+          console.log("error writing to file " + attachment.id);
+          console.log(err);
+          d.reject();
+        });
+      });
+    }
+    else {
+      d.reject("no file system acquired");
+    }
+    return d.promise;
   }
 
   function _replaceIds(target, tableConversions) {
@@ -339,6 +394,7 @@ angular.module('kola.services', ['uuid'])
     try {
       tx.executeSql('CREATE TABLE IF NOT EXISTS user (id integer primary key, doc text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS asset (id varchar(255) not null primary key, doc text not null)');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS blob (id varchar(255) not null primary key, content text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS reflectionQuestion (id integer primary key, doc text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS task (id varchar(255) not null primary key, doc text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS taskStep (id varchar(255) not null primary key, doc text not null)');
@@ -350,6 +406,16 @@ angular.module('kola.services', ['uuid'])
   });
   initSync();
   $rootScope.$watch("onlineState.isOnline", onOnlineStateChanged);
+  window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+
+  navigator.webkitPersistentStorage.requestQuota(500*1024*1024, function(grantedBytes) {
+    window.requestFileSystem(window.PERSISTENT, grantedBytes, function(fs) {
+      self.fileSystem = fs;
+      console.log(fs);
+    });
+  }, function(e) {
+    console.log('Error', e);
+  });
 
   return {
     initSync:initSync,
@@ -363,97 +429,7 @@ angular.module('kola.services', ['uuid'])
     createTaskDocumentation:createTaskDocumentation
   }
 })
-/*
-.service('syncService', function ($rootScope, $state, $q, $ionicLoading, onlineStateService, dbService, changesUrl) {
-  var TABLES_TO_SYNC = [
-    {tableName : 'user'},
-    {tableName : 'asset'},
-    {tableName : 'reflectionQuestion'},
-    {tableName : 'taskStep'},
-    {tableName : 'taskDocumentation'},
-    {tableName : 'task'}
-  ];
 
-  function onOnlineStateChanged() {
-    console.log("--- online state changed:", $rootScope.onlineState);
-    if ($rootScope.onlineState.isOnline) {
-      sync();
-    }
-  }
-
-  function onEndSync(result) {
-    if (result && result.syncOK === true) {
-      // synchronized successfully
-    }
-    if (result && result.status == 401) {
-      $ionicLoading.show({template: "Login fehlgeschlagen. Bitte überprüfen Sie Nutzernamen und Passwort.", duration:2000});
-      $state.go("tab.account");
-    }
-
-    $rootScope.$apply(function() {
-      $rootScope.onlineState.isSyncing = false;
-    });
-  }
-
-  function onSyncProgress(msg) {
-  }
-
-  function canSync() {
-    return $rootScope.onlineState.isOnline && !$rootScope.onlineState.isSyncing;
-  }
-
-  function sync() {
-    var d = $q.defer();
-    if (canSync()) {
-      $rootScope.onlineState.isSyncing = true;
-      DBSYNC.syncNow(onSyncProgress, function(result) {
-        if (result && result.syncOK === true) {
-          // synchronized successfully
-        }
-        if (result && result.status == 401) {
-          $ionicLoading.show({template: "Login fehlgeschlagen. Bitte überprüfen Sie Nutzernamen und Passwort.", duration:2000});
-          $state.go("tab.account");
-          d.reject();
-        }
-
-        $rootScope.$apply(function() {
-          $rootScope.onlineState.isSyncing = false;
-        });
-        d.resolve();
-      });
-    }
-    else {
-      d.reject();
-    }
-    return d.promise;
-  }
-
-  function init() {
-    var deferred = $q.defer();
-    DBSYNC.initSync(TABLES_TO_SYNC, dbService.db, {foo:"bar"}, changesUrl, function() {
-      if (canSync()) {
-        sync().then(function() {
-          deferred.resolve();
-        }, function() {
-          deferred.reject();
-        });
-      }
-      else {
-        deferred.resolve();
-      }
-    }, localStorage["user"], localStorage["password"]);
-    return deferred.promise;
-  }
-
-  init();
-  $rootScope.$watch("onlineState.isOnline", onOnlineStateChanged);
-
-  return {
-    sync:sync,
-    init:init
-  }
-})
-*/
 .service('onlineStateService', function ($ionicPlatform, $rootScope, $cordovaNetwork) {
   $rootScope.onlineState = {"isOnline":false, "isWifi":false, "isSyncing":false};
   function onOnlineStateChange(event, networkState) {
@@ -501,11 +477,11 @@ angular.module('kola.services', ['uuid'])
 
 .service('mediaAttachment', function ($cordovaCamera, $cordovaCapture, $ionicLoading, $cordovaFile, dbService, rfc4122) {
   this.attachPhoto = function(doc) {
-    /*
+    
     var options = {
       quality: 90,
-      destinationType: Camera.DestinationType.DATA_URL,
-//      destinationType: Camera.DestinationType.FILE_URI,
+//      destinationType: Camera.DestinationType.DATA_URL,
+      destinationType: Camera.DestinationType.FILE_URI,
       sourceType: Camera.PictureSourceType.CAMERA,
       allowEdit: false,
       encodingType: Camera.EncodingType.JPEG,
@@ -514,7 +490,7 @@ angular.module('kola.services', ['uuid'])
       popoverOptions: CameraPopoverOptions,
       saveToPhotoAlbum: false
     };
-*/    
+    
 /*
 $cordovaCamera.getPicture(options).then(
     function(imageURI) {
@@ -530,11 +506,31 @@ $cordovaCamera.getPicture(options).then(
     });
 */
 /*
+            var attachment = { test:"hallo" };
+            attachment.name = "Test";
+            attachment.mimeType = "image/jpeg";
+            var int8 = new Int8Array(1);
+            int8[0] = 42;
+            attachment.content = Array.prototype.slice.call(int8);
+            var doc = JSON.stringify(attachment);
+            console.log(doc);
+*/
+
     return $cordovaCamera.getPicture(options).then(function(imageData) {
-      var attachment = { id:rfc4122.v4(), name:"Foto", mimeType:"image/jpeg", subType:"attachment", content:imageData };
-      doc.attachments = doc.attachments || [];
-      doc.attachments.push(attachment);
-      return dbService.save(doc, tableName);
+      window.resolveLocalFileSystemURL(imageData, function(fileEntry) {
+        fileEntry.file(function(file) {
+          var reader = new FileReader();
+          reader.onloadend = function () {
+            var attachment = dbService.createAttachment(doc);
+            attachment.name = file.name;
+            attachment.mimeType = file.type;
+            //attachment.url = imageData;
+            attachment.content = Array.prototype.slice.call(new Int8Array(reader.result));
+          }
+          reader.readAsArrayBuffer(file);
+        });
+      });
+
     }, function(err) {
       console.error(err);
       console.log("--- Error:");
@@ -543,10 +539,6 @@ $cordovaCamera.getPicture(options).then(
         console.log(property);
       }
     });
-*/
-  
-    var attachment = dbService.createAttachment(doc);
-    angular.extend(attachment, { name:"Foto", mimeType:"text/plain", content:[-1, 0] });
 
 //    return dbService.save(doc, tableName);
 

@@ -62,8 +62,10 @@ angular.module('kola.directives', [])
             if (doc && doc.attachments) {
 	            attachmentUrls = [];
 				angular.forEach(doc.attachments, function(attachment, attachmentKey) {
-					if (attachment.stub) {
-						//attachmentUrls.push(URL.createObjectURL(attachment.content));
+        	console.log(attachment);
+					if (attachment.localFile) {
+						console.log(typeof attachment.localFile);
+						attachmentUrls.push(URL.createObjectURL(attachment.localFile));
 					}
 					else if (attachment.content) {
 						promises.push($timeout(function() {

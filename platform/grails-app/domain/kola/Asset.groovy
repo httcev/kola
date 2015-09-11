@@ -73,7 +73,7 @@ class Asset {
     static {
         grails.converters.JSON.registerObjectMarshaller(Asset) { asset ->
             def doc = asset.properties.findAll { k, v ->
-                k in _exported || (asset.subType == "attachment" && k == "content")
+                k in _exported
             }
             _referenced.each {
                 if (asset."$it" instanceof List) {

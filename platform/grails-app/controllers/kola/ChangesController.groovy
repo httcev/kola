@@ -33,6 +33,13 @@ println clientData?.info?.lastSyncDate
 	    		taskSteps.addAll(it.steps)
 	    		taskDocumentations.addAll(TaskDocumentation.findAllByTaskAndCreator(it, user))
     		}
+    		def assets = Asset.findAllByLastUpdatedBetween(since, now)
+    		def blobs = new ArrayList()
+    		assets?.each {
+    			if (it.subType == "attachment") {
+    				blobs.add([id:it.id, content:it.content])
+    			}
+    		}
 
 
 	    	def result = [
@@ -40,7 +47,8 @@ println clientData?.info?.lastSyncDate
 	    		"data" : [
 		    		"user" : User.findAllByLastUpdatedBetween(since, now),
 		    		"reflectionQuestion" : ReflectionQuestion.findAllByLastUpdatedBetween(since, now),
-		    		"asset" : Asset.findAllByLastUpdatedBetween(since, now),
+		    		"asset" : assets,
+		    		"blob" : blobs,
 		    		"taskStep" : taskSteps,
 		    		"taskDocumentation" : taskDocumentations,
 		    		"task" : tasks
