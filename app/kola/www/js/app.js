@@ -100,6 +100,12 @@ angular.module('kola', ['ionic', 'kola.controllers', 'kola.services', 'kola.dire
 
 })
 
+.config(function($compileProvider) {
+  var oldWhiteList = $compileProvider.imgSrcSanitizationWhitelist();
+  console.log("--- old white list", oldWhiteList);
+  $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|file|blob|cdvfile|content):|data:image\//);
+})
+
 .constant("changesUrl", "http://130.83.139.161:8080/platform/api/changes")
 //.constant("changesUrl", "http://plattform.kola-projekt.de/api/changes")
 .constant("localDatabaseName", "tasks");

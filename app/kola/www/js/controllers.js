@@ -39,9 +39,8 @@ angular.module('kola.controllers', [])
       var filtered = [];
       angular.forEach(docs, function(doc) {
         if (doc.task == $stateParams.taskId && !doc.deleted) {
-          dbService.resolveIds(doc, "taskDocumentation").then(function() {
-            filtered.push(doc);
-          });
+          dbService.resolveIds(doc, "taskDocumentation");
+          filtered.push(doc);
         }
       });
       $scope.notes = filtered;

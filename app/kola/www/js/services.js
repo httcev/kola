@@ -49,7 +49,7 @@ angular.module('kola.services', ['uuid'])
   };
 })
 
-.service('dbService', function ($rootScope, $q, $state, $ionicLoading, $cordovaFile, onlineStateService, changesUrl, rfc4122) {
+.service('dbService', function ($rootScope, $q, $state, $ionicLoading, $cordovaFile, $window, onlineStateService, changesUrl, rfc4122) {
   var self = this;
   var CONVERSIONS = {
     "task" : {
@@ -188,29 +188,10 @@ angular.module('kola.services', ['uuid'])
   }
 
   function get(id, tableName) {
-    var d = $q.defer();
-    db.transaction(function (t) {
-      t.executeSql("select doc from " + tableName + " where id=?", [id], function (tx, results) {
-        if (results.rows.length == 1) {
-          var doc = JSON.parse(results.rows.item(0).doc);
-          doc._table = tableName;
-          var promises = []
-          _resolveIds(doc, CONVERSIONS[tableName], promises, tx);
-          $q.all(promises).then(function () {
-            d.resolve(doc);
-          });
-        }
-        else {
-          d.reject("object not found in DB: " + id);
-        }
-      }, function (err) {
-        d.reject(err);
-      });
-    }, function (err) {
-        d.reject(err);
+    return _get(id, tableName).then(function(doc) {
+      _resolveIds(doc, CONVERSIONS[tableName]);
+      return doc;
     });
-
-    return d.promise;
   }
 
   function save(doc) {
@@ -260,115 +241,115 @@ angular.module('kola.services', ['uuid'])
   }
 
   function resolveIds(target, tableName) {
-    var d = $q.defer();
-    db.transaction(function (tx) {
-      var promises = []
-      _resolveIds(target, CONVERSIONS[tableName], promises, tx);
-      $q.all(promises).then(function () {
-        d.resolve(target);
-      });
-    }, function (err) {
-        d.reject(err);
-    });
-
-    return d.promise;
+    return _resolveIds(target, CONVERSIONS[tableName], tx);
   }
 
-  function _resolveIds(target, tableConversions, promises, t) {
+  function _resolveIds(target, tableConversions) {
     angular.forEach(tableConversions, function(conversionDef, key) {
       var ids = target[key];
       if (ids != null) {
         if (angular.isArray(ids)) {
           angular.forEach(ids, function(id, index) {
-            var d = $q.defer();
-            promises.push(d.promise);
-            t.executeSql("select doc from " + conversionDef.refTable + " where id=?", [id], function (tx, results) {
-              if (results.rows.length == 1) {
-                var resolved = JSON.parse(results.rows.item(0).doc);
-                resolved._table = conversionDef.refTable;
-                target[key][index] = resolved;
-                if (conversionDef.refTable == "asset" && resolved.subType == "attachment") {
-                  promises.push(_copyAttachmentToFileSystem(resolved, t));
-                }
-                _resolveIds(resolved, CONVERSIONS[conversionDef.refTable], promises, tx);
-                d.resolve();
-              }
-              else {
-                d.reject("no document with id '" + id + "' in table '" + conversionDef.refTable + "'");
-              }
-            }, function (err) {
-              d.reject(err);
-            });
+            _get(id, conversionDef.refTable).then(function(doc) {
+                target[key][index] = doc;
+                _resolveIds(doc, CONVERSIONS[conversionDef.refTable]);
+              });
           });
         }
         else {
-          var d = $q.defer();
-          promises.push(d.promise);
-          t.executeSql("select doc from " + conversionDef.refTable + " where id=?", [ids], function (tx, results) {
-            if (results.rows.length == 1) {
-              var resolved = JSON.parse(results.rows.item(0).doc);
-              resolved._table = conversionDef.refTable;
-              target[key] = resolved;
-              if (conversionDef.refTable == "asset" && resolved.subType == "attachment") {
-                promises.push(_copyAttachmentToFileSystem(resolved, t));
-              }
-              _resolveIds(resolved, CONVERSIONS[conversionDef.refTable], promises, tx);
-              d.resolve();
-            }
-            else {
-              d.reject("no document with id '" + ids + "' in table '" + conversionDef.refTable + "'");
-            }
-          }, function (err) {
-            d.reject(err);
+          _get(ids, conversionDef.refTable).then(function(doc) {
+            target[key] = doc;
+            _resolveIds(doc, CONVERSIONS[conversionDef.refTable]);
           });
         }
       }
     });
   }
 
-  function _copyAttachmentToFileSystem(attachment, tx) {
-    console.log("--- copying attachment to file system -> " + attachment.id);
-    console.log(self.fileSystem);
+  function _get(id, tableName) {
     var d = $q.defer();
-    if (self.fileSystem) {
-      self.fileSystem.root.getFile(attachment.id, {}, function(fileEntry) {
-        console.log("--- FOUND FILE " + attachment.id);
-        attachment.url = fileEntry.toNativeURL();
-        d.resolve();
-        /*
-        fileEntry.file(function(file) {
-          attachment.localFile = file;
-        });
-      */
-      }, function() {
-        console.log("--- FILE NOT FOUND " + attachment.id);
-        self.fileSystem.root.getFile(attachment.id, {create: true, exclusive: true}, function(fileEntry) {
-          fileEntry.createWriter(function(fileWriter) {
-            tx.executeSql("select content from blob where id=?", [attachment.id], function (tx, results) {
-              if (results.rows.length == 1) {
-                fileWriter.write(new Blob(results.rows.item(0).content, {type: attachment.mimeType}), function() {
-                  attachment.url = fileEntry.toNativeURL();
-                  d.resolve();
-                });
-              }
-              else {
-                console.error("couldn't find blob in database for attachment " + attachment.id);
-                d.reject();
-            }
+    db.transaction(function (tx) {
+      tx.executeSql("select doc from " + tableName + " where id=?", [id], function (tx, results) {
+        if (results.rows.length == 1) {
+          var doc = JSON.parse(results.rows.item(0).doc);
+          doc._table = tableName;
+          if (tableName == "asset" && doc.subType == "attachment") {
+            _copyAttachmentToFileSystem(doc, tx).then(function() {
+              d.resolve(doc);
+            }, function() {
+              d.reject();
             });
-          }, function() {
-            console.log("error writing to file " + fileEntry.name);
-            d.reject();
-          });
-        }, function(err) {
-          console.log("error writing to file " + attachment.id);
-          console.log(err);
-          d.reject();
+          }
+          else {
+            d.resolve(doc);
+          }
+        }
+        else {
+          d.reject("no document with id '" + id + "' in table '" + conversionDef.refTable + "'");
+        }
+      }, function (err) {
+        d.reject(err);
+      });
+    }, function (err) {
+        d.reject(err);
+    });
+    return d.promise;    
+  }
+
+  function _copyAttachmentToFileSystem(attachment, tx) {
+    var d = $q.defer();
+    if (window.cordova) {
+      console.log("--- copying attachment to file system -> " + attachment.id);
+      $cordovaFile.checkFile(cordova.file.dataDirectory, attachment.id).then(function (fileEntry) {
+  console.log("------------------- 1", fileEntry);
+        // file exists
+        fileEntry.file(function(f) {
+          console.log(f);
+          attachment.url = f.localURL;
+          d.resolve();
         });
+      }, function () {
+  console.log("------------------- 2");
+  try {
+        // file not found
+        db.transaction(function(tx) {
+          tx.executeSql("select content from blob where id=?", [attachment.id], function (tx, results) {
+            if (results.rows.length == 1) {
+    console.log("------------------- 3");
+              var data = results.rows.item(0).content;
+              $cordovaFile.writeFile(cordova.file.dataDirectory, attachment.id, data, false).then(function(success) {
+    console.log("------------------- 5");
+                alert("written -> " + success.target.localURL);
+                attachment.url = success.target.localURL;
+                d.resolve();
+              });
+            }
+            else {
+    console.log("------------------- 4");
+              console.error("couldn't find blob in database for attachment " + attachment.id);
+              d.reject();
+            }
+          }, function(err) {
+              d.reject();
+    console.log("------------------- 6");
+            console.log(err);
+            for (var prop in err) {
+              console.log(prop);
+            }
+          });
+        });
+  }
+  catch(err) {
+  console.log("------------------- 7");
+          console.log(err.message);
+          d.reject();
+
+  }
+  console.log("------------------- 8");
       });
     }
     else {
-      d.reject("no file system acquired");
+      d.resolve();
     }
     return d.promise;
   }
@@ -406,8 +387,9 @@ angular.module('kola.services', ['uuid'])
   });
   initSync();
   $rootScope.$watch("onlineState.isOnline", onOnlineStateChanged);
-  window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
 
+/*
+  window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
   navigator.webkitPersistentStorage.requestQuota(500*1024*1024, function(grantedBytes) {
     window.requestFileSystem(window.PERSISTENT, grantedBytes, function(fs) {
       self.fileSystem = fs;
@@ -416,7 +398,7 @@ angular.module('kola.services', ['uuid'])
   }, function(e) {
     console.log('Error', e);
   });
-
+*/
   return {
     initSync:initSync,
     sync:sync,
