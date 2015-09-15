@@ -38,6 +38,9 @@ class AssetService {
     def getOrCreateRepositoryFile(asset) {
     	def file = getRepositoryFile(asset)
     	if (!file.exists()) {
+            if (!asset.content) {
+                return null
+            }
     		if (asset.mimeType == "application/zip" && asset.anchor) {
 				ZipInputStream zin = new ZipInputStream(new BufferedInputStream(new ByteArrayInputStream(asset.content)))
 				ZipUtil.unzip(zin, file)

@@ -9,6 +9,7 @@
     </author>
     <content src="index.html" />
     <access origin="*" />
+    <access origin="cdvfile://*" />
     <preference name="webviewbounce" value="false" />
     <preference name="UIWebViewBounce" value="false" />
     <preference name="DisallowOverscroll" value="true" />
@@ -71,4 +72,5 @@
     <plugin name="cordova-plugin-camera" spec="^1.1.0" />
     <plugin name="com.lampa.startapp" spec="^0.0.5" />
     <icon src="resources/android/icon/drawable-xhdpi-icon.png" />
+    <plugin name="cordova-plugin-file-transfer" spec="~1.2.1" />
 </widget>

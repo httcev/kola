@@ -9,8 +9,9 @@ import java.text.DateFormat
 @Secured(['IS_AUTHENTICATED_FULLY'])
 @Transactional
 class ChangesController {
-//	static allowedMethods = [index: "GET"]
+	static allowedMethods = [index: ["GET", "POST"], upload:"POST"]
 	static DateFormat DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+    static DOMAIN_CLASS_MAPPING = ["asset":Asset, "taskStep":TaskStep, "taskDocumentation":TaskDocumentation, "reflectionAnswer":ReflectionAnswer, "task":Task]
     def springSecurityService
 
     def index() {
@@ -34,13 +35,6 @@ println clientData?.info?.lastSyncDate
 	    		taskDocumentations.addAll(TaskDocumentation.findAllByTaskAndCreator(it, user))
     		}
     		def assets = Asset.findAllByLastUpdatedBetween(since, now)
-    		def blobs = new ArrayList()
-    		assets?.each {
-    			if (it.subType == "attachment") {
-    				blobs.add([id:it.id, content:it.content])
-    			}
-    		}
-
 
 	    	def result = [
 	    		"now"  : DATEFORMAT.format(now),
@@ -48,7 +42,6 @@ println clientData?.info?.lastSyncDate
 		    		"user" : User.findAllByLastUpdatedBetween(since, now),
 		    		"reflectionQuestion" : ReflectionQuestion.findAllByLastUpdatedBetween(since, now),
 		    		"asset" : assets,
-		    		"blob" : blobs,
 		    		"taskStep" : taskSteps,
 		    		"taskDocumentation" : taskDocumentations,
 		    		"task" : tasks
@@ -62,7 +55,47 @@ println clientData?.info?.lastSyncDate
 	    }
     }
 
-    def static DOMAIN_CLASS_MAPPING = ["asset":Asset, "taskStep":TaskStep, "taskDocumentation":TaskDocumentation, "reflectionAnswer":ReflectionAnswer, "task":Task]
+    def uploadAttachment(String id) {
+    	println "--- UPLOAD TO ATTACHMENT " + id
+    	println "--- req params:"
+    	print params
+    	if (!id) {
+			println "--- ERROR 400, no id in url"
+    		render status:400, contentType:"text/plain", text:"missing id in URL"
+    		return
+    	}
+    	if (!params.file) {
+			println "--- ERROR 400, no file in request"
+    		render status:400, contentType:"text/plain", text:"missing parameter 'file'"
+    		return
+    	}
+    	try {
+	    	def user = springSecurityService.currentUser
+
+    		// TODO: check write access
+    		Asset asset = Asset.get(id)
+    		if (!asset) {
+    			println "--- ERROR 404"
+		    	render status:404, contentType:"text/plain", text:"not found"
+		    	return
+    		}
+
+    		asset.content = request.getFile("file").bytes
+    		if (asset.save(true)) {
+    			println "--- SUCCESS"
+		    	render status:200, contentType:"text/plain", text:"success"
+		    	return
+		    }
+		    else {
+    			println "--- ERROR 400, couldn't save"
+	    		render status:400, contentType:"text/plain", text:"couldn't save"
+		    }
+	    }
+	    catch(e) {
+	    	e.printStackTrace()
+	    	render status:400, contentType:"text/plain", text:e.message
+	    }
+    }
 
     def _update(clientData, user) {
     	["asset", "taskStep", "taskDocumentation", "reflectionAnswer", "task"].each { table ->

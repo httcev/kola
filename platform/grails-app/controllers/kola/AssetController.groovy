@@ -198,6 +198,7 @@ class AssetController {
     def viewAsset(String id, String file) {
     	def asset = assetService.readAsset(id)
     	if (!asset) {
+            println "--- no asset with id " + id
 			response.sendError(404)
 			return
     	}
@@ -209,6 +210,11 @@ class AssetController {
     	}
 		// local asset
     	def repoFile = assetService.getOrCreateRepositoryFile(asset)
+        if (!repoFile) {
+            println "--- no content for attachment with id " + id
+            response.sendError(404)
+            return
+        }
 		if (repoFile.isDirectory()) {
 			// handle special case: zip files
 			viewZipFile(asset, file, repoFile)

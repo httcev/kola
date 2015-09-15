@@ -31,7 +31,6 @@ angular.module('kola.controllers', [])
 })
 
 .controller('NotesCtrl', function($scope, $stateParams, $q, $ionicPopup, dbService, rfc4122, modalDialog, mediaAttachment) {
-  $scope.notes = [];
   loadNotes();
 
   function loadNotes() {
@@ -90,8 +89,12 @@ angular.module('kola.controllers', [])
           }
           else {
             note.deleted = true;
-            dbService.save(note);
-            loadNotes();
+            dbService.save(note).then(function() {
+              loadNotes();
+            }, function(err) {
+              alert("Speichern fehlgeschlagen");
+              console.log(err);
+            });
           }
         }
      });
@@ -108,6 +111,8 @@ angular.module('kola.controllers', [])
     dbService.save(objectsToSave).then(function() {
       $scope.newNote = false;
       loadNotes();
+    }, function(err) {
+      alert("Speichern fehlgeschlagen!");
     });
   };
 

@@ -49,8 +49,9 @@ angular.module('kola.services', ['uuid'])
   };
 })
 
-.service('dbService', function ($rootScope, $q, $state, $ionicLoading, $cordovaFile, $window, onlineStateService, changesUrl, rfc4122) {
+.service('dbService', function ($rootScope, $q, $state, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, onlineStateService, databaseName, serverUrl, rfc4122) {
   var self = this;
+  var assetsDir = window.cordova ? cordova.file.dataDirectory + "assets/" : null;
   var CONVERSIONS = {
     "task" : {
       "creator": { "refTable":"user" },
@@ -77,7 +78,6 @@ angular.module('kola.services', ['uuid'])
   var TABLES_TO_SYNC = [
     {tableName : 'user'},
     {tableName : 'asset'},
-    {tableName : 'blob'},
     {tableName : 'reflectionQuestion'},
     {tableName : 'taskStep'},
     {tableName : 'taskDocumentation'},
@@ -124,9 +124,10 @@ angular.module('kola.services', ['uuid'])
           d.reject();
         }
 
-        $rootScope.$apply(function() {
-          $rootScope.onlineState.isSyncing = false;
-        });
+        $rootScope.onlineState.isSyncing = false;
+        if (!$rootScope.$$phase) {
+          $rootScope.$apply();
+        }
         d.resolve();
       });
     }
@@ -138,7 +139,8 @@ angular.module('kola.services', ['uuid'])
 
   function initSync() {
     var deferred = $q.defer();
-    DBSYNC.initSync(TABLES_TO_SYNC, db, {foo:"bar"}, changesUrl, function() {
+    // theTablesToSync, dbObject, theSyncInfo, theServerUrl, assetUrl, assetDir, callBack, $cordovaFileTransfer, username, password, timeout) 
+    DBSYNC.initSync(TABLES_TO_SYNC, db, {foo:"bar"}, serverUrl + "/api/changes", serverUrl + "/api/upload", assetsDir, function() {
       if (canSync()) {
         sync().then(function() {
           deferred.resolve();
@@ -149,7 +151,7 @@ angular.module('kola.services', ['uuid'])
       else {
         deferred.resolve();
       }
-    }, localStorage["user"], localStorage["password"]);
+    }, $cordovaFileTransfer, $q, localStorage["user"], localStorage["password"]);
     return deferred.promise;
   }
 
@@ -174,7 +176,9 @@ angular.module('kola.services', ['uuid'])
       t.executeSql("select doc from " + tableName, [], function (tx, results) {
         var docs = []
         for (var i=0; i<results.rows.length; i++) {
-          docs.push(JSON.parse(results.rows.item(i).doc));
+          var doc = JSON.parse(results.rows.item(i).doc);
+          doc._table = tableName;
+          docs.push(doc);
         }
         d.resolve(docs);
       }, function (err) {
@@ -189,27 +193,35 @@ angular.module('kola.services', ['uuid'])
 
   function get(id, tableName) {
     return _get(id, tableName).then(function(doc) {
-      _resolveIds(doc, CONVERSIONS[tableName]);
-      return doc;
+      return _resolveIds(doc, CONVERSIONS[tableName]).then(function() {
+        return doc;
+      });
     });
   }
 
   function save(doc) {
-    var promises = [];
+    var d = $q.defer();
     db.transaction(function (tx) {
+      var promises = [];
       if (angular.isArray(doc)) {
         angular.forEach(doc, function(o) {
           promises.push(_save(o, tx));
         });
+
       }
       else {
         promises.push(_save(doc, tx));
       }
+      $q.all(promises).then(function() {
+        d.resolve();
+      }, function(err) {
+        d.reject(err);
+      })
     }, function (err) {
         throw err;
     });
 
-    return $q.all(promises).then(function() {
+    return d.promise.then(function() {
       // saving should succeed in offline mode. since sync() rejects when offline, check canSync() first.
       if (canSync()) {
         return sync();
@@ -218,52 +230,74 @@ angular.module('kola.services', ['uuid'])
   }
 
   function _save(doc, tx) {
-    if (!doc._table) {
-      throw "Object has no _table property";
-    }
-    if (!doc.id) {
-      doc.id = rfc4122.v4();
-    }
-    console.log("--- saving", doc);
     var d = $q.defer();
-    var copy = angular.copy(doc);
+    if (!doc._table) {
+      d.reject("Object has no _table property");
+    }
+    else {
+      if (!doc.id) {
+        doc.id = rfc4122.v4();
+      }
+      console.log("--- saving", doc);
+      var copy = angular.copy(doc);
 
-    delete copy._table;
-    _replaceIds(copy, CONVERSIONS[doc._table]);
-    console.log("--- replaced", copy);
+      delete copy._table;
+      _replaceIds(copy, CONVERSIONS[doc._table]);
+      console.log("--- replaced", copy);
 
-    tx.executeSql("INSERT OR REPLACE INTO " + doc._table + " (id, doc) values (?, ?)", [copy.id, JSON.stringify(copy)], function (tx, results) {
-      d.resolve();
-    }, function (err) {
-      d.reject(err);
-    });
+      tx.executeSql("INSERT OR REPLACE INTO " + doc._table + " (id, doc) values (?, ?)", [copy.id, JSON.stringify(copy)], function (tx, results) {
+        if (doc._table == "asset" && copy.subType == "attachment" && copy.url && copy.url.indexOf("file:") == 0) {
+          // copy attachment data from temp dir to assets dir
+          window.resolveLocalFileSystemURL(copy.url, function(fileEntry) {
+            console.log(fileEntry);
+            console.log("--- moving attachment from " + (fileEntry.filesystem.root.nativeURL + fileEntry.name) + " to " + (assetsDir + copy.id));
+            $cordovaFile.moveFile(fileEntry.filesystem.root.nativeURL, fileEntry.name, assetsDir, copy.id).then(function (success) {
+              console.log("MOOOVED!");
+              d.resolve();
+            }, function (error) {
+              // error
+              console.log("ERROR MOOOVING!");
+              console.log(error);
+              d.reject();
+            });
+          });
+        }
+        else {
+          d.resolve();
+        }
+      }, function (err) {
+        d.reject(err);
+      });
+    }
     return d.promise;
   }
 
   function resolveIds(target, tableName) {
-    return _resolveIds(target, CONVERSIONS[tableName], tx);
+    return _resolveIds(target, CONVERSIONS[tableName]);
   }
 
   function _resolveIds(target, tableConversions) {
+    var promises = [];
     angular.forEach(tableConversions, function(conversionDef, key) {
       var ids = target[key];
       if (ids != null) {
         if (angular.isArray(ids)) {
           angular.forEach(ids, function(id, index) {
-            _get(id, conversionDef.refTable).then(function(doc) {
-                target[key][index] = doc;
-                _resolveIds(doc, CONVERSIONS[conversionDef.refTable]);
-              });
+            promises.push(_get(id, conversionDef.refTable).then(function(doc) {
+              target[key][index] = doc;
+              return _resolveIds(doc, CONVERSIONS[conversionDef.refTable]);
+            }));
           });
         }
         else {
-          _get(ids, conversionDef.refTable).then(function(doc) {
+          promises.push(_get(ids, conversionDef.refTable).then(function(doc) {
             target[key] = doc;
-            _resolveIds(doc, CONVERSIONS[conversionDef.refTable]);
-          });
+            return _resolveIds(doc, CONVERSIONS[conversionDef.refTable]);
+          }));
         }
       }
     });
+    return $q.all(promises);
   }
 
   function _get(id, tableName) {
@@ -274,7 +308,7 @@ angular.module('kola.services', ['uuid'])
           var doc = JSON.parse(results.rows.item(0).doc);
           doc._table = tableName;
           if (tableName == "asset" && doc.subType == "attachment") {
-            _copyAttachmentToFileSystem(doc, tx).then(function() {
+            _replaceUrlWithLocal(doc).then(function() {
               d.resolve(doc);
             }, function() {
               d.reject();
@@ -296,57 +330,56 @@ angular.module('kola.services', ['uuid'])
     return d.promise;    
   }
 
-  function _copyAttachmentToFileSystem(attachment, tx) {
+  function _replaceUrlWithLocal(attachment) {
     var d = $q.defer();
     if (window.cordova) {
-      console.log("--- copying attachment to file system -> " + attachment.id);
-      $cordovaFile.checkFile(cordova.file.dataDirectory, attachment.id).then(function (fileEntry) {
-  console.log("------------------- 1", fileEntry);
+      console.log("--- replacing attachment url with local url -> " + attachment.id);
+
+      $cordovaFile.checkFile(assetsDir, attachment.id).then(function (fileEntry) {
+        console.log("--- asset file found " + attachment.id)
         // file exists
         fileEntry.file(function(f) {
-          console.log(f);
           attachment.url = f.localURL;
           d.resolve();
         });
-      }, function () {
-  console.log("------------------- 2");
-  try {
+      }, function() {
+        console.log("--- asset file NOT found " + attachment.id)
         // file not found
-        db.transaction(function(tx) {
-          tx.executeSql("select content from blob where id=?", [attachment.id], function (tx, results) {
-            if (results.rows.length == 1) {
-    console.log("------------------- 3");
-              var data = results.rows.item(0).content;
-              $cordovaFile.writeFile(cordova.file.dataDirectory, attachment.id, data, false).then(function(success) {
-    console.log("------------------- 5");
-                alert("written -> " + success.target.localURL);
-                attachment.url = success.target.localURL;
-                d.resolve();
-              });
-            }
-            else {
-    console.log("------------------- 4");
-              console.error("couldn't find blob in database for attachment " + attachment.id);
-              d.reject();
-            }
-          }, function(err) {
-              d.reject();
-    console.log("------------------- 6");
-            console.log(err);
-            for (var prop in err) {
-              console.log(prop);
-            }
-          });
-        });
-  }
-  catch(err) {
-  console.log("------------------- 7");
-          console.log(err.message);
-          d.reject();
-
-  }
-  console.log("------------------- 8");
+        d.reject();        
       });
+/*
+      , function () {
+        // file not found
+      console.log("--- url=" +attachment.url);
+      console.log("--- target=" +assetsDir + attachment.id);
+      var options = {};
+      try {
+
+      $cordovaFileTransfer.download(attachment.url, assetsDir + attachment.id, options, false)
+      .then(function(fileEntry) {
+        console.log("--- success");
+        console.log(fileEntry);
+        fileEntry.file(function(f) {
+          attachment.url = f.localURL;
+          d.resolve();
+        });
+        // Success!
+      }, function(err) {
+        // Error
+        console.log("--- error");
+        console.error(err);
+        d.reject();
+      }, function (progress) {
+        console.log("--- progress: " +((progress.loaded / progress.total) * 100));
+      });
+    }catch(e) {
+      console.error(e);
+        d.reject();
+    }
+
+
+      });
+*/      
     }
     else {
       d.resolve();
@@ -375,7 +408,6 @@ angular.module('kola.services', ['uuid'])
     try {
       tx.executeSql('CREATE TABLE IF NOT EXISTS user (id integer primary key, doc text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS asset (id varchar(255) not null primary key, doc text not null)');
-      tx.executeSql('CREATE TABLE IF NOT EXISTS blob (id varchar(255) not null primary key, content text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS reflectionQuestion (id integer primary key, doc text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS task (id varchar(255) not null primary key, doc text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS taskStep (id varchar(255) not null primary key, doc text not null)');
@@ -457,7 +489,7 @@ angular.module('kola.services', ['uuid'])
   }
 })
 
-.service('mediaAttachment', function ($cordovaCamera, $cordovaCapture, $ionicLoading, $cordovaFile, dbService, rfc4122) {
+.service('mediaAttachment', function ($cordovaCamera, $cordovaCapture, $ionicLoading, $rootScope, $cordovaFile, dbService, rfc4122) {
   this.attachPhoto = function(doc) {
     
     var options = {
@@ -499,19 +531,22 @@ $cordovaCamera.getPicture(options).then(
 */
 
     return $cordovaCamera.getPicture(options).then(function(imageData) {
+      try{
       window.resolveLocalFileSystemURL(imageData, function(fileEntry) {
         fileEntry.file(function(file) {
-          var reader = new FileReader();
-          reader.onloadend = function () {
-            var attachment = dbService.createAttachment(doc);
-            attachment.name = file.name;
-            attachment.mimeType = file.type;
-            //attachment.url = imageData;
-            attachment.content = Array.prototype.slice.call(new Int8Array(reader.result));
-          }
-          reader.readAsArrayBuffer(file);
+          var attachment = dbService.createAttachment(doc);
+          attachment.name = file.name;
+          attachment.mimeType = file.type;
+          attachment.url = imageData;
+          console.log("--- new attachment", attachment);
+          console.log("--- doc after attachment creation -> ", doc);
+          $rootScope.$apply();
         });
       });
+    }catch(e) {
+      console.error(e);
+    }
+      
 
     }, function(err) {
       console.error(err);

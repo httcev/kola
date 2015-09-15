@@ -64,7 +64,7 @@ var DBSYNC = {
      * @param {Object} password : password for basci authentication support
      * @param {Object} timeout : the timeout in milliseconds for the ajax request making the sync
      */
-    initSync: function(theTablesToSync, dbObject, theSyncInfo, theServerUrl, callBack, username, password, timeout) {
+    initSync: function(theTablesToSync, dbObject, theSyncInfo, theServerUrl, attachmentUploadUrl, assetsDir, callBack, $cordovaFileTransfer, $q, username, password, timeout) {
         var self = this, i = 0;
         this.db = dbObject;
         this.serverUrl = theServerUrl;
@@ -73,6 +73,10 @@ var DBSYNC = {
         this.username=username;
         this.password=password;
         this.timeout = timeout;
+        this.$cordovaFileTransfer = $cordovaFileTransfer;
+        this.attachmentUploadUrl = attachmentUploadUrl;
+        this.assetsDir = assetsDir;
+        this.$q = $q;
         
         //Handle optional id :
         for (i = 0; i < self.tablesToSync.length; i++) {
@@ -157,17 +161,20 @@ var DBSYNC = {
             callBackProgress('Sending ' + self.syncResult.nbSent + ' elements to the server', 20, 'sendData');
 
             self._sendDataToServer(data, function(serverData) {
-
-                callBackProgress('Updating local data', 70, 'updateData');
-
-                self._updateLocalDb(serverData, function() {
-                    self.syncResult.localDataUpdated = self.syncResult.nbUpdated > 0;
-                    self.syncResult.syncOK = true;
-                    self.syncResult.codeStr = 'syncOk';
-                    self.syncResult.message = 'Data synchronized successfully. ('+self.syncResult.nbSent+
-                        ' new/modified element saved, '+self.syncResult.nbUpdated+' updated)';
-                    self.syncResult.serverAnswer = serverData;//include the original server answer, just in case
-                    self.cbEndSync(self.syncResult);
+                self._uploadAttachments(data.data.asset).then(function() {
+                    callBackProgress('Updating local data', 70, 'updateData');
+                    console.log("--- data", data);
+                    self._downloadAttachments(serverData.data ? serverData.data.asset : []).then(function() {
+                        self._updateLocalDb(serverData, function() {
+                            self.syncResult.localDataUpdated = self.syncResult.nbUpdated > 0;
+                            self.syncResult.syncOK = true;
+                            self.syncResult.codeStr = 'syncOk';
+                            self.syncResult.message = 'Data synchronized successfully. ('+self.syncResult.nbSent+
+                                ' new/modified element saved, '+self.syncResult.nbUpdated+' updated)';
+                            self.syncResult.serverAnswer = serverData;//include the original server answer, just in case
+                            self.cbEndSync(self.syncResult);
+                        });
+                    });
                 });
             }, function() {
                 // Called when a timeout occurred
@@ -433,6 +440,66 @@ var DBSYNC = {
         callBack();
         self.clientData = null;
         self.serverData = null;
+    },
+    _uploadAttachments: function(attachments) {
+        var self = this;
+        var promises = [];
+        if (ionic.Platform.isWebView()) {
+            console.log("--- upload assets", attachments);
+            var options = { headers: { "Authorization": "Basic " + this._encodeBase64(self.username + ':' + self.password) }};
+            console.log("--- options", options);
+            angular.forEach(attachments, function(attachment) {
+                var doc = JSON.parse(attachment.doc);
+                if (doc.subType == "attachment") {
+                    console.log("--- uploading "+(self.assetsDir + doc.id)+" to " +(self.attachmentUploadUrl + "/" + doc.id));
+                    promises.push(self.$cordovaFileTransfer.upload(self.attachmentUploadUrl + "/" + doc.id, self.assetsDir + doc.id, options)
+                    .then(function(result) {
+                        // Success!
+                        console.log("--- upload success", result);
+                    }, function(err) {
+                        // Error
+                        console.error("--- upload error", err);
+                    }, function (progress) {
+                        // constant progress updates
+                        console.log("--- upload progress", progress);
+                    }));
+                }
+            });
+        }
+        return this.$q.all(promises);
+    },
+    _downloadAttachments: function(attachments) {
+        var self = this;
+        var promises = [];
+        if (ionic.Platform.isWebView()) {
+            var options = { headers: { "Authorization": "Basic " + this._encodeBase64(self.username + ':' + self.password) }};
+            angular.forEach(attachments, function(attachment) {
+                var att = attachment.doc;
+                if (att && att.subType == "attachment") {
+                    console.log("--- downloading attachment from " + (att.url) + " to " + (self.assetsDir + att.id));
+                    console.log(attachment);
+                    promises.push(self.$cordovaFileTransfer.download(att.url, self.assetsDir + att.id, options, false)
+                    .then(function(fileEntry) {
+                        // Success!
+                        console.log("--- success");
+                        console.log(fileEntry);
+                        /*
+                        fileEntry.file(function(f) {
+                          attachment.url = f.localURL;
+                          d.resolve();
+                        });
+        */
+                    }, function(err) {
+                        // Error
+                        console.log("--- error");
+                        console.error(err);
+                    }, function (progress) {
+                        console.log("--- progress: " +((progress.loaded / progress.total) * 100));
+                    }));
+                }
+            });
+        }
+        return this.$q.all(promises);
     },
 
 

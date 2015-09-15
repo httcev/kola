@@ -46,6 +46,7 @@ angular.module('kola.directives', [])
 			updateAttachmentUrls();
 		});
 */
+
 		var unbindWatch = $scope.$watch("ngModel", function(newValue) {
 			var doc = newValue;
             if (doc && doc.attachments) {
@@ -78,6 +79,7 @@ angular.module('kola.directives', [])
 				});
             }
 			$q.all(promises).then(function() {
+				console.log("--- attachment urls", attachmentUrls);
 				$scope.attachmentUrls = attachmentUrls;
 			});
         }
@@ -85,6 +87,7 @@ angular.module('kola.directives', [])
 		$scope.showImage = function(index, imageUrls) {
 			$scope.activeSlide = index;
 			$scope.imageUrls = imageUrls;
+			console.log("--- showing image " + index + " from urls -> ", imageUrls);
 			showImageModal('templates/image-popover.html');
 		};
 

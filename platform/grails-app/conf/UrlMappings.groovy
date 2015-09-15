@@ -9,6 +9,10 @@ class UrlMappings {
             controller = "changes"
             action = [GET:"index", POST:"index"]
         }
+        "/api/upload/$id"{
+            controller = "changes"
+            action = [POST:"uploadAttachment"]
+        }
 
         name viewAsset: "/v/$id"{
             controller = "asset"
