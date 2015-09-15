@@ -51,7 +51,12 @@ angular.module('kola.services', ['uuid'])
 
 .service('dbService', function ($rootScope, $q, $state, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, onlineStateService, databaseName, serverUrl, rfc4122) {
   var self = this;
-  var assetsDir = window.cordova ? cordova.file.dataDirectory + "assets/" : null;
+  var assetsDir = null;
+  if (window.cordova) {
+    assetsDir = cordova.file.dataDirectory + "assets/";
+    $cordovaFile.createDir(cordova.file.dataDirectory, "assets", false);//.then(function() {alert("created asset dir")},function() {alert("not created asset dir")});
+  }
+
   var CONVERSIONS = {
     "task" : {
       "creator": { "refTable":"user" },
@@ -71,6 +76,9 @@ angular.module('kola.services', ['uuid'])
       "creator": { "refTable":"user" },
       "attachments": { "refTable":"asset" }
     },
+    "reflectionAnswer" : {
+      "creator": { "refTable":"user" }
+    },
     "asset" : {
       "creator": { "refTable":"user" }
     }
@@ -79,6 +87,7 @@ angular.module('kola.services', ['uuid'])
     {tableName : 'user'},
     {tableName : 'asset'},
     {tableName : 'reflectionQuestion'},
+    {tableName : 'reflectionAnswer'},
     {tableName : 'taskStep'},
     {tableName : 'taskDocumentation'},
     {tableName : 'task'}
@@ -98,9 +107,10 @@ angular.module('kola.services', ['uuid'])
       $state.go("tab.account");
     }
 
-    $rootScope.$apply(function() {
-      $rootScope.onlineState.isSyncing = false;
-    });
+    $rootScope.onlineState.isSyncing = false;
+    if (!$rootScope.$$phase) {
+      $rootScope.$apply();
+    }
   }
 
   function onSyncProgress(msg) {
@@ -160,7 +170,7 @@ angular.module('kola.services', ['uuid'])
   }
 
   function createAttachment(parent) {
-    var attachment = _create("asset", {subType:"attachment"});
+    var attachment = _create("asset", { subType:"attachment" });
     parent.attachments = parent.attachments || [];
     parent.attachments.push(attachment);
     return attachment;
@@ -168,6 +178,10 @@ angular.module('kola.services', ['uuid'])
 
   function createTaskDocumentation(taskId) {
     return _create("taskDocumentation", { task:taskId });
+  }
+
+  function createReflectionAnswer(taskId, questionId) {
+    return _create("reflectionAnswer", { task:taskId, question:questionId });
   }
 
   function all(tableName) {
@@ -240,15 +254,18 @@ angular.module('kola.services', ['uuid'])
       }
       console.log("--- saving", doc);
       var copy = angular.copy(doc);
+      var localURL = copy._localURL;
 
       delete copy._table;
+      delete copy._localURL;
+
       _replaceIds(copy, CONVERSIONS[doc._table]);
       console.log("--- replaced", copy);
 
       tx.executeSql("INSERT OR REPLACE INTO " + doc._table + " (id, doc) values (?, ?)", [copy.id, JSON.stringify(copy)], function (tx, results) {
-        if (doc._table == "asset" && copy.subType == "attachment" && copy.url && copy.url.indexOf("file:") == 0) {
+        if (doc._table == "asset" && copy.subType == "attachment" && localURL && localURL.indexOf(assetsDir) != 0) {
           // copy attachment data from temp dir to assets dir
-          window.resolveLocalFileSystemURL(copy.url, function(fileEntry) {
+          window.resolveLocalFileSystemURL(localURL, function(fileEntry) {
             console.log(fileEntry);
             console.log("--- moving attachment from " + (fileEntry.filesystem.root.nativeURL + fileEntry.name) + " to " + (assetsDir + copy.id));
             $cordovaFile.moveFile(fileEntry.filesystem.root.nativeURL, fileEntry.name, assetsDir, copy.id).then(function (success) {
@@ -308,7 +325,7 @@ angular.module('kola.services', ['uuid'])
           var doc = JSON.parse(results.rows.item(0).doc);
           doc._table = tableName;
           if (tableName == "asset" && doc.subType == "attachment") {
-            _replaceUrlWithLocal(doc).then(function() {
+            _setLocalURL(doc).then(function() {
               d.resolve(doc);
             }, function() {
               d.reject();
@@ -330,7 +347,7 @@ angular.module('kola.services', ['uuid'])
     return d.promise;    
   }
 
-  function _replaceUrlWithLocal(attachment) {
+  function _setLocalURL(attachment) {
     var d = $q.defer();
     if (window.cordova) {
       console.log("--- replacing attachment url with local url -> " + attachment.id);
@@ -339,7 +356,7 @@ angular.module('kola.services', ['uuid'])
         console.log("--- asset file found " + attachment.id)
         // file exists
         fileEntry.file(function(f) {
-          attachment.url = f.localURL;
+          attachment._localURL = f.localURL;
           d.resolve();
         });
       }, function() {
@@ -409,6 +426,7 @@ angular.module('kola.services', ['uuid'])
       tx.executeSql('CREATE TABLE IF NOT EXISTS user (id integer primary key, doc text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS asset (id varchar(255) not null primary key, doc text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS reflectionQuestion (id integer primary key, doc text not null)');
+      tx.executeSql('CREATE TABLE IF NOT EXISTS reflectionAnswer (id varchar(255) not null primary key, doc text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS task (id varchar(255) not null primary key, doc text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS taskStep (id varchar(255) not null primary key, doc text not null)');
       tx.executeSql('CREATE TABLE IF NOT EXISTS taskDocumentation (id varchar(255) not null primary key, doc text not null)');
@@ -417,6 +435,7 @@ angular.module('kola.services', ['uuid'])
       console.log(e);
     }
   });
+
   initSync();
   $rootScope.$watch("onlineState.isOnline", onOnlineStateChanged);
 
@@ -440,7 +459,9 @@ angular.module('kola.services', ['uuid'])
     resolveIds:resolveIds,
     db:db,
     createAttachment:createAttachment,
-    createTaskDocumentation:createTaskDocumentation
+    createTaskDocumentation:createTaskDocumentation,
+    createReflectionAnswer:createReflectionAnswer,
+    assetsDir:assetsDir
   }
 })
 
@@ -489,16 +510,15 @@ angular.module('kola.services', ['uuid'])
   }
 })
 
-.service('mediaAttachment', function ($cordovaCamera, $cordovaCapture, $ionicLoading, $rootScope, $cordovaFile, dbService, rfc4122) {
+.service('mediaAttachment', function ($cordovaCamera, $cordovaCapture, $ionicLoading, $rootScope, $cordovaFile, $q, dbService, rfc4122) {
   this.attachPhoto = function(doc) {
-    
     var options = {
       quality: 90,
 //      destinationType: Camera.DestinationType.DATA_URL,
       destinationType: Camera.DestinationType.FILE_URI,
       sourceType: Camera.PictureSourceType.CAMERA,
       allowEdit: false,
-      encodingType: Camera.EncodingType.JPEG,
+      //encodingType: Camera.EncodingType.JPEG,
 //      targetWidth: 100,
 //      targetHeight: 100,
       popoverOptions: CameraPopoverOptions,
@@ -530,31 +550,25 @@ $cordovaCamera.getPicture(options).then(
             console.log(doc);
 */
 
-    return $cordovaCamera.getPicture(options).then(function(imageData) {
-      try{
-      window.resolveLocalFileSystemURL(imageData, function(fileEntry) {
+    return $cordovaCamera.getPicture(options).then(function(imageUrl) {
+      var d = $q.defer();
+      window.resolveLocalFileSystemURL(imageUrl, function(fileEntry) {
+        console.log(fileEntry);
         fileEntry.file(function(file) {
+          console.log(file);
           var attachment = dbService.createAttachment(doc);
           attachment.name = file.name;
           attachment.mimeType = file.type;
-          attachment.url = imageData;
+          attachment._localURL = file.localURL;
           console.log("--- new attachment", attachment);
           console.log("--- doc after attachment creation -> ", doc);
-          $rootScope.$apply();
+          if (!$rootScope.$$phase) {
+            $rootScope.$apply();
+          }
+          d.resolve(attachment);
         });
       });
-    }catch(e) {
-      console.error(e);
-    }
-      
-
-    }, function(err) {
-      console.error(err);
-      console.log("--- Error:");
-      console.log(err);
-      for (var property in err) {
-        console.log(property);
-      }
+      return d.promise;
     });
 
 //    return dbService.save(doc, tableName);
@@ -592,30 +606,72 @@ $cordovaCamera.getPicture(options).then(
   this.attachVideo = function(doc) {
     $cordovaCapture.captureVideo().then(function(mediaFiles) {
       if (mediaFiles.length === 1) {
-        var name = mediaFiles[0].name;
-        var type = mediaFiles[0].type;
-        var url = mediaFiles[0].localURL;
-        console.log("--- TYPE=" + type + ", NAME=" + name + ", URL=" + url);
-        $cordovaFile.readAsArrayBuffer(url).then(function (buffer) {
-          console.log("--- SUCCESS -> " + buffer);
-          // success
-          dbService.localDatabase.post({
-            title:"test3",
-            "_attachments": {
-              name: {
-                "content_type": type,
-                "data": buffer
-              }
-            }
-          });
-        }, function (error) {
-          // error
-          console.log(error);
-        });
+        var file = mediaFiles[0];
+        console.log("--- captured video file -> ", file);
+        var attachment = dbService.createAttachment(doc);
+        attachment.name = file.name;
+        attachment.mimeType = file.type;
+        attachment._localURL = file.fullPath;
+//        attachment._localURL = file.localURL;
+        console.log("--- new attachment", attachment);
+        console.log("--- doc after attachment creation -> ", doc);
+        if (!$rootScope.$$phase) {
+          $rootScope.$apply();
+        }
       }
     }, function(err) {
       // An error occurred. Show a message to the user
     });
+  }
+
+  _createAttachment = function(doc, fileEntry) {
+    return _moveMediaFile(fileEntry).then(function(assetId, assetFile) {
+      console.log("--- move result asset file -> ", assetFile);
+      var attachment = dbService.createAttachment(doc, assetId);
+      attachment.name = fileEntry.name;
+      attachment.mimeType = fileEntry.type;
+      attachment.url = assetFile.localURL;
+      console.log("--- new attachment", attachment);
+      console.log("--- doc after attachment creation -> ", doc);
+      if (!$rootScope.$$phase) {
+        $rootScope.$apply();
+      }
+      return attachment;
+    });
+  }
+
+  _moveMediaFile = function(fileEntry) {
+    var d = $q.defer();
+    // copy attachment data from temp dir to assets dir
+    var assetId = rfc4122.v4();
+    console.log(fileEntry);
+    console.log("--- moving attachment from " + (fileEntry.filesystem.root.nativeURL + fileEntry.name) + " to " + (dbService.assetsDir + assetId));
+/*    
+    $cordovaFile.moveFile(fileEntry.filesystem.root.nativeURL, fileEntry.name, dbService.assetsDir, assetId).then(function (success) {
+      console.log("MOOOVED!");
+      d.resolve(assetId, success);
+    }, function (error) {
+      // error
+      console.log("ERROR MOOOVING!");
+      console.log(error);
+      d.reject();
+    });
+*/
+    window.resolveLocalFileSystemURL(dbService.assetsDir, function(targetDir) {
+      fileEntry.moveTo(targetDir, assetId, function(success) {
+        console.log("MOOOVED!");
+        d.resolve(assetId, success);
+      }, function (error) {
+        // error
+        console.log("ERROR MOOOVING!");
+        console.log(error);
+        d.reject();
+      });
+    }, function(error) {
+      console.log(error);
+      d.reject(error);
+    });
+    return d.promise;
   }
 })
 

@@ -8,7 +8,6 @@
 			  <ion-scroll direction="x">
 			  <img ng-repeat="(key, value) in attachmentUrls" ng-src="{{value}}" class="image-list-thumb" ng-click="
 showImage($index, attachmentUrls)"/>
-			    <span ng-repeat="attachment in ngModel.attachments">{{attachment.url}}</span>
 			  </ion-scroll>
 		</div>
 	</a>

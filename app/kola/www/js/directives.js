@@ -58,30 +58,26 @@ angular.module('kola.directives', [])
 
         function updateAttachmentUrls(newValue, oldValue) {
 			var doc = ngModel.$modelValue;
-            var attachmentUrls = false;
-            var promises = [];
+            var attachmentUrls = [];
             if (doc && doc.attachments) {
-	            attachmentUrls = [];
 				angular.forEach(doc.attachments, function(attachment, attachmentKey) {
         	console.log(attachment);
-					if (attachment.localFile) {
-						console.log(typeof attachment.localFile);
-						attachmentUrls.push(URL.createObjectURL(attachment.localFile));
+					if (attachment._localURL) {
+						attachmentUrls.push(attachment._localURL);
 					}
+/*					
 					else if (attachment.content) {
 						promises.push($timeout(function() {
 							attachmentUrls.push(URL.createObjectURL(new Blob([new Uint8Array(attachment.content)], { type: attachment.mimeType } )));
 						}));
 					}
+*/					
 					else {
 						attachmentUrls.push(attachment.url);
 					}
 				});
             }
-			$q.all(promises).then(function() {
-				console.log("--- attachment urls", attachmentUrls);
-				$scope.attachmentUrls = attachmentUrls;
-			});
+			$scope.attachmentUrls = attachmentUrls;
         }
 
 		$scope.showImage = function(index, imageUrls) {

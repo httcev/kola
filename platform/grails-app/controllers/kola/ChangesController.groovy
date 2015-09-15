@@ -41,6 +41,7 @@ println clientData?.info?.lastSyncDate
 	    		"data" : [
 		    		"user" : User.findAllByLastUpdatedBetween(since, now),
 		    		"reflectionQuestion" : ReflectionQuestion.findAllByLastUpdatedBetween(since, now),
+		    		"reflectionAnswer" : ReflectionAnswer.findAllByLastUpdatedBetween(since, now),
 		    		"asset" : assets,
 		    		"taskStep" : taskSteps,
 		    		"taskDocumentation" : taskDocumentations,

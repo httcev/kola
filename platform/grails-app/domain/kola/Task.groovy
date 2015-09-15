@@ -32,6 +32,7 @@ class Task {
 
     // task
     boolean done
+    boolean deleted
     Date due
     boolean isTemplate
     Task template
@@ -46,7 +47,7 @@ class Task {
     List<TaskStep> steps                            // defined as list to keep order in which elements got added
     List<ReflectionQuestion> reflectionQuestions    // defined as list to keep order in which elements got added
 
-    static _embedded = ["name", "description", "done", "due", "isTemplate", "lastUpdated"]
+    static _embedded = ["name", "description", "done", "deleted", "due", "isTemplate", "lastUpdated"]
     static _referenced = ["steps", "resources", "attachments", "reflectionQuestions", "template", "creator", "assignee"]
     /*
     static _embedded = ["name", "description", "done", "due", "isTemplate", "templateId", "creatorId", "assigneeId", "lastUpdated"]

@@ -1,6 +1,6 @@
 angular.module('kola.controllers', [])
 
-.controller('TasksCtrl', function($scope, dbService) {
+.controller('TasksCtrl', function($scope, $filter, dbService) {
     //$scope.tasks = pouchCollection("all/by_type", { keys:["task", "homework"] }, "all/filterByTypes", { types:["task", "homework"] });
     $scope.tasks = [];
 
@@ -8,12 +8,17 @@ angular.module('kola.controllers', [])
       dbService.all("task").then(function(docs) {
         var filtered = [];
         angular.forEach(docs, function(doc) {
-          if (!doc["isTemplate"]) {
+          if (!doc["isTemplate"] && !doc.deleted) {
             filtered.push(doc);
           }
         });
         $scope.tasks = filtered;
       });
+    }
+
+    $scope.markDone = function(task) {
+      task.done = true;
+      dbService.save(task);
     }
     /*
     pouchCollection("all/by_type", { keys:["task", "homework"] }, "all/filterByTypes", { types:["task", "homework"] }).then(function(result) {
@@ -30,19 +35,59 @@ angular.module('kola.controllers', [])
     $scope.reloadTasks();
 })
 
-.controller('NotesCtrl', function($scope, $stateParams, $q, $ionicPopup, dbService, rfc4122, modalDialog, mediaAttachment) {
+.controller('NotesCtrl', function($scope, $stateParams, $q, $ionicPopup, $ionicLoading, dbService, rfc4122, mediaAttachment) {
   loadNotes();
 
   function loadNotes() {
     dbService.all("taskDocumentation").then(function(docs) {
       var filtered = [];
+      var promises = [];
       angular.forEach(docs, function(doc) {
         if (doc.task == $stateParams.taskId && !doc.deleted) {
-          dbService.resolveIds(doc, "taskDocumentation");
+          promises.push(dbService.resolveIds(doc, "taskDocumentation"));
           filtered.push(doc);
         }
       });
-      $scope.notes = filtered;
+      $q.all(promises).finally(function() {
+        $scope.notes = filtered;
+      });
+    });
+    /*
+    dbService.all("reflectionQuestion").then(function(docs) {
+      var filtered = [];
+      angular.forEach(docs, function(doc) {
+        if (doc.task == $stateParams.taskId && !doc.deleted) {
+          filtered.push(doc);
+        }
+      });
+      console.log("--- reflectionQuestions -> ", filtered);
+      $scope.reflectionQuestions = filtered;
+    });
+    */
+    dbService.all("reflectionAnswer").then(function(allReflectionAnswers) {
+      var reflectionAnswers = {};
+      var promises = [];
+      angular.forEach(allReflectionAnswers, function(doc) {
+        if (doc.task == $stateParams.taskId && !doc.deleted) {
+          promises.push(dbService.resolveIds(doc, "reflectionAnswer").then(function() {
+            reflectionAnswers[doc.question] = doc;
+          }));
+        }
+      });
+      $q.all(promises).finally(function() {
+        dbService.get($stateParams.taskId, "task").then(function(task) {
+          angular.forEach(task.reflectionQuestions, function(reflectionQuestion) {
+            if (!reflectionAnswers[reflectionQuestion.id]) {
+              console.log("--- creating stub answer");
+              reflectionAnswers[reflectionQuestion.id] = dbService.createReflectionAnswer(task.id, reflectionQuestion.id);
+            }
+          });
+
+          console.log("--- reflectionAnswers -> ", reflectionAnswers);
+          $scope.reflectionAnswers = reflectionAnswers;
+          $scope.task = task;
+        });
+      });
     });
   }
 
@@ -52,25 +97,12 @@ angular.module('kola.controllers', [])
       $scope.notes = result;
     });
 */    
-/*
-    $scope.notes.$db.query("notes/by_task", {
-      key: $stateParams.taskId,
-      include_docs: true
-    }).then(function(res) {
-      console.log("---resu:");
-      console.log(res);
-    }).catch(function (err) {
-      console.log(err);
-    });
-    */
-//  });
-
-  modalDialog.createModalDialog($scope, "templates/modal-note-edit.html");
 
   $scope.attachPhoto = function(note) {
     mediaAttachment.attachPhoto(note);
   }
-  $scope.attachVideo = function() {
+
+  $scope.attachVideo = function(note) {
     mediaAttachment.attachVideo(note);
   }
 
@@ -107,25 +139,25 @@ angular.module('kola.controllers', [])
       objectsToSave.push(attachment);
     });
     objectsToSave.push(note);
-
+    $scope.newNoteSaving = true;
     dbService.save(objectsToSave).then(function() {
       $scope.newNote = false;
       loadNotes();
     }, function(err) {
-      alert("Speichern fehlgeschlagen!");
+      $ionicLoading.show({template: "Speichern fehlgeschlagen!", duration:2000});
+    }).finally(function() {
+      $scope.newNoteSaving = false;
     });
   };
 
  $scope.addNote = function() {
-    //$scope.newNote = {};
-    //$scope.openModal();
-    /*
-    dbService.localDatabase.put({"_id":rfc4122.v4(), "type":"note", "taskId":$stateParams.taskId}).then(function() {
-      console.log("-----------------------");
-      console.log($scope.notes);
-    });
-*/
-    $scope.newNote = dbService.createTaskDocumentation($stateParams.taskId);
+    if (!$scope.newNote) {
+      $scope.newNote = dbService.createTaskDocumentation($stateParams.taskId);
+    }
+  };
+
+  $scope.saveReflectionAnswer = function(reflectionAnswer) {
+    dbService.save(reflectionAnswer);
   };
 })
 

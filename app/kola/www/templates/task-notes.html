@@ -18,7 +18,10 @@
       </div>
     </div>
 
-    <div ng-if="newNote" class="list card">
+    <div ng-if="newNoteSaving" class="center-horizontal">
+      <ion-spinner></ion-spinner>
+    </div>
+    <div ng-if="newNote && !newNoteSaving" class="list card">
       <div class="item item-text-wrap">
         <textarea ng-model="newNote.text" class="fullwidth" rows="6" placeholder="Geben Sie hier Ihren Dokumentationstext ein..." autofocus></textarea>
       </div>
@@ -33,21 +36,15 @@
       </div>
     </div>
     <div ng-hide="!notes || notes.length || newNote">Bisher ist noch keine Dokumentation angelegt.</div>
-
-    <h1 class="task-section-header padding">Bitte beantworten Sie diese Fragen:</h1>
-    <div class="list card">
-      <div class="item item-text-wrap">
-        <div class="positive">Kam es bei der Durchführung der Arbeitshandlung zu Schwierigkeiten (technisch/fachlich)?</div>
-        <div class="created-date">{{"2015-20-07" | date}}, test</div>
-        <textarea class="fullwidth" rows="8">Beim ersten Funktionstest hat die KNX-Steuerung nicht funktioniert. Wir mussten dann auf Fehlersuche gehen. Problem war ein Fehler in der Programmierung.</textarea>
-      </div>
-      <div class="item item-text-wrap">
-        <div class="positive">Was kann bei einer erneuten Durchführung der verschiedenen Arbeitsschritte besser/anders durchgeführt werden?</div>
-        <textarea class="fullwidth" rows="8" placeholder="Geben Sie hier Ihre Antwort ein..."></textarea>
-      </div>
-      <div class="item item-text-wrap">
-        <div class="positive">Welcher Arbeitsschritt war am zeitintensivsten? Begründen Sie ihre Aussage.</div>
-        <textarea class="fullwidth" rows="8" placeholder="Geben Sie hier Ihre Antwort ein..."></textarea>
+    <div ng-if="task.reflectionQuestions.length">
+      <h1 class="task-section-header padding">Bitte beantworten Sie diese Fragen:</h1>
+      <div class="list card">
+        <div ng-repeat="reflectionQuestion in task.reflectionQuestions" class="item item-text-wrap">
+          <div class="positive">{{reflectionQuestion.name}}</div>
+          <div class="created-date">{{reflectionAnswers[reflectionQuestion.id].lastUpdated | date}} {{reflectionAnswers[reflectionQuestion.id].creator.displayName}}</div>
+          <textarea ng-model="reflectionAnswers[reflectionQuestion.id].text" ng-change="reflectionAnswers[reflectionQuestion.id]._dirty=true" class="fullwidth" rows="8"></textarea>
+          <button class="button button-clear button-positive" ng-show="reflectionAnswers[reflectionQuestion.id]._dirty" ng-click="saveReflectionAnswer(reflectionAnswers[reflectionQuestion.id])"><i class="icon balanced ion-paper-airplane"></i></button>
+        </div>
       </div>
     </div>
   </ion-content>

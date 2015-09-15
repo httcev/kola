@@ -1,11 +1,14 @@
 package kola
 
+import java.util.UUID
+
 class ReflectionAnswer {
 
     static constraints = {
     	text blank:false
     }
     static mapping = {
+        id generator: "assigned"
         text type:"text"
     }
 	static searchable = {
@@ -14,11 +17,12 @@ class ReflectionAnswer {
     }
     static belongsTo = [task:Task, question:ReflectionQuestion]
 
+    String id = UUID.randomUUID().toString()
     String text
     Date lastUpdated
     User creator
 
-    static _exported = ["text"]
+    static _exported = ["text", "lastUpdated"]
     static _referenced = ["creator", "task", "question"]
     static {
         grails.converters.JSON.registerObjectMarshaller(ReflectionAnswer) { answer ->
