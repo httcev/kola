@@ -38,7 +38,14 @@ class TaskController {
             notFound()
             return
         }
-        respond taskInstance
+        def reflectionAnswers = [:]
+        taskInstance.reflectionQuestions?.each { reflectionQuestion ->
+            reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestion(taskInstance, reflectionQuestion)
+        }
+
+        def taskDocumentations = TaskDocumentation.findAllByTaskAndDeleted(taskInstance, false)
+
+        ["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations]
     }
 
     def create() {

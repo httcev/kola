@@ -44,6 +44,18 @@
 			<div class="col-sm-2"><label><g:message code="kola.meta.lastUpdated" />:</label></div>
 			<div class="col-sm-10"><g:formatDate date="${taskInstance.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/></div>
 		</div>
+		<g:if test="${taskInstance?.assignee}">
+		<div class="row">
+			<div class="col-sm-2"><label><g:message code="kola.task.assignee" />:</label></div>
+			<div class="col-sm-10"><g:render bean="${taskInstance.assignee.profile}" template="/profile/show" var="profile" /></div>
+		</div>
+		</g:if>
+		<g:if test="${taskInstance?.due}">
+		<div class="row">
+			<div class="col-sm-2"><label><g:message code="kola.task.due" />:</label></div>
+			<div class="col-sm-10"><g:formatDate date="${taskInstance.due}" type="date"/></div>
+		</div>
+		</g:if>
 		<g:if test="${taskInstance?.attachments?.size() > 0}">
 		<div class="row">
 			<div class="col-sm-2"><label><g:message code="kola.task.attachments" />:</label></div>
@@ -102,9 +114,41 @@
 				<ul class="list-group">
 					<g:each var="reflectionQuestion" in="${taskInstance?.reflectionQuestions}">
 						<li class="list-group-item">
-							<p class="list-group-item-text text-default">
+							<p class="text-warning reflection-question">
 								${reflectionQuestion.name}
 							</p>
+							<g:each var="reflectionAnswer" in="${reflectionAnswers[reflectionQuestion.id]}">
+								<div class="panel panel-default">
+									<div class="panel-heading small">
+										<g:render bean="${reflectionAnswer.creator.profile}" template="/profile/show" var="profile" />,
+										<g:formatDate date="${reflectionAnswer.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
+									</div>
+									<div class="panel-body reflection-answer">${reflectionAnswer.text}</div>
+								</div>
+							</g:each>
+						</li>
+					</g:each>
+				</ul>
+			</div>
+		</div>
+		</g:if>
+		<g:if test="${taskDocumentations?.size() > 0}">
+		<div class="row">
+			<div class="col-sm-2"><label><g:message code="kola.task.documentations" />:</label></div>
+			<div class="col-sm-10">
+				<ul class="list-group">
+					<g:each var="taskDocumentation" in="${taskDocumentations}">
+						<li class="list-group-item">
+							<div class="panel panel-default">
+								<div class="panel-heading small">
+									<g:render bean="${taskDocumentation.creator.profile}" template="/profile/show" var="profile" />,
+									<g:formatDate date="${taskDocumentation.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
+								</div>
+								<div class="panel-body">
+									<p>${taskDocumentation.text}</p>
+									<g:render bean="${taskDocumentation.attachments}" template="attachments" var="attachments" />
+								</div>
+							</div>
 						</li>
 					</g:each>
 				</ul>

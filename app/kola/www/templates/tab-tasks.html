@@ -22,7 +22,7 @@
       <ion-item ng-repeat="task in completedTasks = (tasks | filter:{done:true, deleted:!true} | orderBy:'-due') track by task.id" class="item-remove-animate item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}">
         <i class="icon ion-clipboard"></i>
         <h2>{{task.name}}</h2>
-        <p ng-if="angular.isObject(task.due)"><b>Wann</b>: {{task.due | date:'fullDate'}}</p>
+        <p ng-if="angular.isObject(task.due)"><b>Fällig</b>: {{task.due | date:'fullDate'}}</p>
         <i class="icon ion-chevron-right icon-accessory"></i>
 
         <ion-option-button class="button-assertive" ng-click="remove(task)">
