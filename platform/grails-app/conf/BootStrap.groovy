@@ -39,7 +39,7 @@ class BootStrap {
             new ReflectionQuestion(name:"Welche Rückmeldungen haben Sie vom Team vor Ort erhalten?").save(true)
             new ReflectionQuestion(name:"Welche Teilschritte des gesamten Kundenauftrags ging den durchgeführten Arbeiten voraus? Welche schließen sich an?").save(true)
             new ReflectionQuestion(name:"War die durchgeführte Arbeit eher über- oder unterfordernd? Begründen Sie Ihre Meinung.").save(true)
-             assert ReflectionQuestion.count() == 11
+            assert ReflectionQuestion.count() == 11
         }
 
         environments {

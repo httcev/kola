@@ -126,7 +126,7 @@ environments {
                 database = "kola"
             }
         }
-        // TODO: grails.serverURL = "http://www.changeme.com"
+        elasticSearch.path.data = "/srv/kola/index"
     }
 }
 
@@ -200,9 +200,7 @@ grails {
    mail {
         host = "mailserver.kom.e-technik.tu-darmstadt.de"
         port = 465
-        username = "tittel@kom.tu-darmstadt.de"
-        password = "sys64738"
-        props = ["mail.smtp.auth":"true",                     
+        props = [
             "mail.smtp.socketFactory.port":"465",
             "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
             "mail.smtp.socketFactory.fallback":"false"]
