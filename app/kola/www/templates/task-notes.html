@@ -23,7 +23,7 @@
     </div>
     <div ng-if="newNote && !newNoteSaving" class="list card">
       <div class="item item-text-wrap">
-        <textarea ng-model="newNote.text" class="fullwidth" rows="6" placeholder="Geben Sie hier Ihren Dokumentationstext ein..." autofocus></textarea>
+        <textarea ng-model="newNote.text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier Ihren Dokumentationstext ein..." autofocus></textarea>
       </div>
       <media-attachments ng-model="newNote" hide-header="true"></media-attachments>
 

@@ -1,4 +1,4 @@
-angular.module('kola', ['ionic', 'kola.controllers', 'kola.services', 'kola.directives', 'ngCordova'])
+angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'kola.controllers', 'kola.services', 'kola.directives'])
 
 .run(function($ionicPlatform) {
   // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
