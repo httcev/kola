@@ -10,7 +10,7 @@
     <div class="list card" ng-repeat="note in notes | orderBy:'lastUpdated'">
       <div class="item item-text-wrap">
         <div class="created-date">{{note.lastUpdated | date}} {{note.creator.displayName}}</div>
-        {{note.text}}
+        <div class="text">{{note.text}}</div>
       </div>
       <media-attachments ng-model="note" hide-header="true"></media-attachments>
       <div class="item tabs tabs-secondary">
@@ -39,13 +39,13 @@
     <div ng-if="task.reflectionQuestions.length">
       <h1 class="task-section-header padding">Bitte beantworten Sie diese Fragen:</h1>
       <div class="list card">
-        <div ng-repeat="reflectionQuestion in task.reflectionQuestions" class="item item-text-wrap">
-          <div class="positive">{{reflectionQuestion.name}}</div>
+        <form name="form" ng-repeat="reflectionQuestion in task.reflectionQuestions" class="item item-text-wrap">
+          <div class="positive reflection-question">{{reflectionQuestion.name}}</div>
           <div class="created-date">{{reflectionAnswers[reflectionQuestion.id].lastUpdated | date}} {{reflectionAnswers[reflectionQuestion.id].creator.displayName}}</div>
-          <textarea ng-model="reflectionAnswers[reflectionQuestion.id].text" ng-change="reflectionAnswers[reflectionQuestion.id]._dirty=true" class="fullwidth" rows="8"></textarea>
-          <button class="button button-clear button-positive" ng-show="reflectionAnswers[reflectionQuestion.id]._dirty" ng-click="saveReflectionAnswer(reflectionAnswers[reflectionQuestion.id])"><i class="icon balanced ion-paper-airplane"></i></button>
+          <textarea ng-model="reflectionAnswers[reflectionQuestion.id].text" ng-change="reflectionAnswers[reflectionQuestion.id]._dirty=true" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier Ihre Antwort ein..."></textarea>
+          <button class="button button-clear button-positive" ng-show="form.$dirty" ng-click="saveReflectionAnswer(reflectionAnswers[reflectionQuestion.id], form)"><i class="icon balanced ion-paper-airplane"></i></button>
         </div>
-      </div>
+      </form>
     </div>
   </ion-content>
 </ion-view>

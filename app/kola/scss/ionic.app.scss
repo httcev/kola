@@ -67,3 +67,11 @@ media-attachments .center-horizontal { padding:24.5px }
 .center-horizontal { text-align:center }
 .created-date { font-size:60% }
 .task-description ul { margin-left:20px; list-style:disc }
+.reflection-question { padding-bottom:10px }
+.text { white-space:pre }
+.animate:focus {
+    -webkit-transition: height 50ms ease-in-out;
+    -moz-transition: height 50ms ease-in-out;
+    -o-transition: height 50ms ease-in-out;
+    transition: height 50ms ease-in-out;
+}

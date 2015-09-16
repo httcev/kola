@@ -156,8 +156,11 @@ angular.module('kola.controllers', [])
     }
   };
 
-  $scope.saveReflectionAnswer = function(reflectionAnswer) {
-    dbService.save(reflectionAnswer);
+  $scope.saveReflectionAnswer = function(reflectionAnswer, form) {
+    dbService.save(reflectionAnswer).then(function() {
+      form.$dirty = false;
+      $ionicLoading.show({template: "Antwort gespeichert", duration:2000});
+    });
   };
 })
 
