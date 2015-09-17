@@ -8,7 +8,7 @@
     <p class="task-description" ng-bind-html="task.description"></p>
     <ion-list ng-if="task.steps.length">
       <h1 class="task-section-header">Teilschritte:</h1>
-      <ion-item ng-repeat="step in task.steps" class="item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}/step/{{$index}}">
+      <ion-item ng-repeat="step in task.steps" class="item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}/step/{{step.id}}">
         {{$index+1}}. {{step.name}}
         <i class="icon ion-chevron-right icon-accessory"></i>
       </ion-item>
@@ -26,7 +26,6 @@
         <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 1}}</span>
         -->
         <i class="icon ion-chevron-right icon-accessory"></i>
-        <ion-option-button class="button-positive" ng-click="addNote(task)"><i class="icon ion-plus-round"></i></ion-option-button>
       </ion-item>
 <!--      
       <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}/chats">

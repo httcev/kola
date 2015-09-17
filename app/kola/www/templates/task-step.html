@@ -10,19 +10,10 @@
 
     <h1 class="task-section-header">Dokumentation und Fragen:</h1>
     <ion-list>
-      <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task._id}}/notes">
+      <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{step.task}}/step/{{step.id}}/notes">
         <i class="icon ion-compose"></i>
         Meine Dokumentation des Teilschritts
-        <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 0}}</span>
         <i class="icon ion-chevron-right icon-accessory"></i>
-        <ion-option-button class="button-positive" ng-click="addNote(task)"><i class="icon ion-plus-round"></i></ion-option-button>
-      </ion-item>
-      <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task._id}}/chats">
-        <i class="icon ion-help"></i>
-        Meine Fragen zum Teilschritt
-        <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 0}}</span>
-        <i class="icon ion-chevron-right icon-accessory"></i>
-        <ion-option-button class="button-positive" ng-click="addQuestion(task)"><i class="icon ion-plus-round"></i></ion-option-button>
       </ion-item>
     </ion-list>
 

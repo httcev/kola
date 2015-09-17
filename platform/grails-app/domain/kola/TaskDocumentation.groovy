@@ -3,9 +3,12 @@ package kola
 import java.util.UUID
 
 class TaskDocumentation {
-	static hasMany = [attachments:Asset]
-	static belongsTo = [ task:Task ]
+	static hasMany = [ attachments:Asset ]
+	static belongsTo = [ task:Task, step:TaskStep ]
     static constraints = {
+        // ensure that either task or step is set
+        task(nullable: true, validator: {field, inst -> inst.step || field})
+        step(nullable: true)
     	text nullable:true
 //        deleted bindable:true
     }
@@ -24,7 +27,7 @@ class TaskDocumentation {
     List<Asset> attachments     // defined as list to keep order in which elements got added
 
     static _exported = ["text", "lastUpdated", "deleted"]
-    static _referenced = ["attachments", "creator", "task"]
+    static _referenced = ["attachments", "creator", "task", "step"]
     static {
         grails.converters.JSON.registerObjectMarshaller(TaskDocumentation) { taskDocumentation ->
             def doc = taskDocumentation.properties.findAll { k, v ->
@@ -33,7 +36,7 @@ class TaskDocumentation {
             _referenced.each {
                 if (taskDocumentation."$it" instanceof List) {
                     doc."$it" = taskDocumentation."$it"?.collect {
-                        it.id
+                        it?.id
                     }
                 }
                 else {

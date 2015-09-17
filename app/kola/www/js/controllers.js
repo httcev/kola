@@ -36,6 +36,10 @@ angular.module('kola.controllers', [])
 })
 
 .controller('NotesCtrl', function($scope, $stateParams, $q, $ionicPopup, $ionicLoading, dbService, rfc4122, mediaAttachment) {
+  var isStep = $stateParams.stepId != null;
+  var targetId = isStep ? $stateParams.stepId : $stateParams.taskId;
+  var taskDocumentationProp = isStep ? "step" : "task";
+
   loadNotes();
 
   function loadNotes() {
@@ -43,7 +47,7 @@ angular.module('kola.controllers', [])
       var filtered = [];
       var promises = [];
       angular.forEach(docs, function(doc) {
-        if (doc.task == $stateParams.taskId && !doc.deleted) {
+        if (doc[taskDocumentationProp] == targetId && !doc.deleted) {
           promises.push(dbService.resolveIds(doc, "taskDocumentation"));
           filtered.push(doc);
         }
@@ -52,43 +56,34 @@ angular.module('kola.controllers', [])
         $scope.notes = filtered;
       });
     });
-    /*
-    dbService.all("reflectionQuestion").then(function(docs) {
-      var filtered = [];
-      angular.forEach(docs, function(doc) {
-        if (doc.task == $stateParams.taskId && !doc.deleted) {
-          filtered.push(doc);
-        }
-      });
-      console.log("--- reflectionQuestions -> ", filtered);
-      $scope.reflectionQuestions = filtered;
-    });
-    */
-    dbService.all("reflectionAnswer").then(function(allReflectionAnswers) {
-      var reflectionAnswers = {};
-      var promises = [];
-      angular.forEach(allReflectionAnswers, function(doc) {
-        if (doc.task == $stateParams.taskId && !doc.deleted) {
-          promises.push(dbService.resolveIds(doc, "reflectionAnswer").then(function() {
-            reflectionAnswers[doc.question] = doc;
-          }));
-        }
-      });
-      $q.all(promises).finally(function() {
-        dbService.get($stateParams.taskId, "task").then(function(task) {
-          angular.forEach(task.reflectionQuestions, function(reflectionQuestion) {
-            if (!reflectionAnswers[reflectionQuestion.id]) {
-              console.log("--- creating stub answer");
-              reflectionAnswers[reflectionQuestion.id] = dbService.createReflectionAnswer(task.id, reflectionQuestion.id);
-            }
-          });
 
-          console.log("--- reflectionAnswers -> ", reflectionAnswers);
-          $scope.reflectionAnswers = reflectionAnswers;
-          $scope.task = task;
+    if (!isStep) {
+      dbService.all("reflectionAnswer").then(function(allReflectionAnswers) {
+        var reflectionAnswers = {};
+        var promises = [];
+        angular.forEach(allReflectionAnswers, function(doc) {
+          if (doc.task == $stateParams.taskId && !doc.deleted) {
+            promises.push(dbService.resolveIds(doc, "reflectionAnswer").then(function() {
+              reflectionAnswers[doc.question] = doc;
+            }));
+          }
+        });
+        $q.all(promises).finally(function() {
+          dbService.get($stateParams.taskId, "task").then(function(task) {
+            angular.forEach(task.reflectionQuestions, function(reflectionQuestion) {
+              if (!reflectionAnswers[reflectionQuestion.id]) {
+                console.log("--- creating stub answer");
+                reflectionAnswers[reflectionQuestion.id] = dbService.createReflectionAnswer(task.id, reflectionQuestion.id);
+              }
+            });
+
+            console.log("--- reflectionAnswers -> ", reflectionAnswers);
+            $scope.reflectionAnswers = reflectionAnswers;
+            $scope.task = task;
+          });
         });
       });
-    });
+    }
   }
 
 //  $scope.$on('$ionicView.enter', function(e) {
@@ -152,7 +147,7 @@ angular.module('kola.controllers', [])
 
  $scope.addNote = function() {
     if (!$scope.newNote) {
-      $scope.newNote = dbService.createTaskDocumentation($stateParams.taskId);
+      $scope.newNote = dbService.createTaskDocumentation(targetId, isStep);
     }
   };
 
@@ -209,9 +204,9 @@ angular.module('kola.controllers', [])
 .controller('TaskStepCtrl', function($scope, $stateParams, dbService) {
   $scope.step = {};
 
-  dbService.get($stateParams.taskId, "task").then(function(task) {
-    console.log(task);
-    $scope.step = task.steps[$stateParams.stepIndex];
+  dbService.get($stateParams.stepId, "taskStep").then(function(taskStep) {
+    console.log(taskStep);
+    $scope.step = taskStep;
   }, function() {
     // TODO: 404 error message and open default/main page
   });

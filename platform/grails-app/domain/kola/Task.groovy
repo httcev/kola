@@ -61,7 +61,7 @@ class Task {
             _referenced.each {
                 if (task."$it" instanceof List) {
                     doc."$it" = task."$it"?.collect {
-                        it.id
+                        it?.id
                     }
                 }
                 else {

@@ -78,7 +78,7 @@ class Asset {
             _referenced.each {
                 if (asset."$it" instanceof List) {
                     doc."$it" = asset."$it"?.collect {
-                        it.id
+                        it?.id
                     }
                 }
                 else {

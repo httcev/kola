@@ -176,8 +176,16 @@ angular.module('kola.services', ['uuid'])
     return attachment;
   }
 
-  function createTaskDocumentation(taskId) {
-    return _create("taskDocumentation", { task:taskId });
+  function createTaskDocumentation(targetId, isStep) {
+    var options = {};
+    if (isStep) {
+      options.step = targetId;
+    }
+    else {
+      options.task = targetId;
+    }
+    console.log("--- options -> ", options);
+    return _create("taskDocumentation", options);
   }
 
   function createReflectionAnswer(taskId, questionId) {
@@ -336,7 +344,7 @@ angular.module('kola.services', ['uuid'])
           }
         }
         else {
-          d.reject("no document with id '" + id + "' in table '" + conversionDef.refTable + "'");
+          d.reject("no document with id '" + id + "' in table '" + tableName + "'");
         }
       }, function (err) {
         d.reject(err);
@@ -623,7 +631,7 @@ $cordovaCamera.getPicture(options).then(
       // An error occurred. Show a message to the user
     });
   }
-
+/*
   _createAttachment = function(doc, fileEntry) {
     return _moveMediaFile(fileEntry).then(function(assetId, assetFile) {
       console.log("--- move result asset file -> ", assetFile);
@@ -646,17 +654,7 @@ $cordovaCamera.getPicture(options).then(
     var assetId = rfc4122.v4();
     console.log(fileEntry);
     console.log("--- moving attachment from " + (fileEntry.filesystem.root.nativeURL + fileEntry.name) + " to " + (dbService.assetsDir + assetId));
-/*    
-    $cordovaFile.moveFile(fileEntry.filesystem.root.nativeURL, fileEntry.name, dbService.assetsDir, assetId).then(function (success) {
-      console.log("MOOOVED!");
-      d.resolve(assetId, success);
-    }, function (error) {
-      // error
-      console.log("ERROR MOOOVING!");
-      console.log(error);
-      d.reject();
-    });
-*/
+
     window.resolveLocalFileSystemURL(dbService.assetsDir, function(targetDir) {
       fileEntry.moveTo(targetDir, assetId, function(success) {
         console.log("MOOOVED!");
@@ -673,73 +671,5 @@ $cordovaCamera.getPicture(options).then(
     });
     return d.promise;
   }
-})
-
-/*
-.service('Tasks', function(rfc4122, ngPouch) {
-  ngPouch.saveSettings({ database: "http://130.83.139.161:5984/tasks", username: undefined, password: undefined, stayConnected: true });
-
-  return {
-    destroy: function(obj) {
-      ngPouch.db.remove(obj.doc);
-    },
-
-    update: function(obj) {
-      ngPouch.db.put(obj.doc);
-    },
-
-    add: function(obj) {
-      obj._id = 'task_'+rfc4122.v4();
-      obj.type = 'task';
-      obj.created_at = new Date();
-      return ngPouch.db.put(obj);
-    },
-
-    get: function(id) {
-      return ngPouch.db.get(id);
-    },
-
-    all: function() {
-      var allTasks = function(doc) {
-        if (doc.type === 'task') {
-          emit(doc.due, doc._id);
-        }
-      }
-      return ngPouch.db.query(allTasks, {descending: true, include_docs : true});
-    }
-  };
-})
-
-.service('Notes', function(rfc4122, ngPouch) {
-  return {
-    destroy: function(obj) {
-      ngPouch.db.remove(obj.doc);
-    },
-
-    update: function(obj) {
-      ngPouch.db.put(obj.doc);
-    },
-
-    add: function(obj, taskId) {
-      obj._id = 'note_'+rfc4122.v4();
-      obj.type = 'note';
-      obj.taskId = taskId;
-      obj.created_at = new Date();
-      return ngPouch.db.put(obj);
-    },
-
-    get: function(id) {
-      return ngPouch.db.get(id);
-    },
-
-    all: function(taskId) {
-      var allNotes = function(doc) {
-        if (doc.type === 'note' && doc.taskId === taskId) {
-          emit(doc.created_at, doc._id);
-        }
-      }
-      return ngPouch.db.query(allNotes, {include_docs : true});
-    }
-  };
-});
 */
+})

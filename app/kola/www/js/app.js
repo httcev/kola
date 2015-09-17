@@ -56,8 +56,17 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'kola.contro
       }
     }
   })
+  .state('tab.step-notes', {
+    url: '/tasks/:taskId/step/:stepId/notes',
+    views: {
+      'tab-tasks': {
+        templateUrl: 'templates/task-notes.html',
+        controller: 'NotesCtrl'
+      }
+    }
+  })
   .state('tab.task-step', {
-    url: '/tasks/:taskId/step/:stepIndex',
+    url: '/tasks/:taskId/step/:stepId',
     views: {
       'tab-tasks': {
         templateUrl: 'templates/task-step.html',

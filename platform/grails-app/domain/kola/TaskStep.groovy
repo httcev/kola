@@ -28,7 +28,7 @@ class TaskStep {
     List<Asset> attachments     // defined as list to keep order in which elements got added
 
     static _exported = ["name", "description", "deleted"]
-    static _referenced = ["resources", "attachments", "creator"]
+    static _referenced = ["resources", "attachments", "creator", "task"]
     static {
         grails.converters.JSON.registerObjectMarshaller(TaskStep) { step ->
             def doc = step.properties.findAll { k, v ->
@@ -37,7 +37,7 @@ class TaskStep {
             _referenced.each {
                 if (step."$it" instanceof List) {
                     doc."$it" = step."$it"?.collect {
-                        it.id
+                        it?.id
                     }
                 }
                 else {

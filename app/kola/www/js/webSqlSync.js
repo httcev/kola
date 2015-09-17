@@ -164,6 +164,7 @@ var DBSYNC = {
                 self._uploadAttachments(data.data.asset).then(function() {
                     callBackProgress('Updating local data', 70, 'updateData');
                     console.log("--- data", data);
+                    
                     self._downloadAttachments(serverData.data ? serverData.data.asset : []).then(function() {
                         self._updateLocalDb(serverData, function() {
                             self.syncResult.localDataUpdated = self.syncResult.nbUpdated > 0;

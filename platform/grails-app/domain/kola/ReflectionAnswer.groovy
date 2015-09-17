@@ -32,7 +32,7 @@ class ReflectionAnswer {
             _referenced.each {
                 if (answer."$it" instanceof List) {
                     doc."$it" = answer."$it"?.collect {
-                        it.id
+                        it?.id
                     }
                 }
                 else {

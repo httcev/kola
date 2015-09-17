@@ -19,33 +19,51 @@ class ChangesController {
 	    	def user = springSecurityService.currentUser
     		def clientData = request.JSON
     		_update(clientData, user)
-println clientData?.info?.lastSyncDate
+
 	    	// TODO: incorporate current user in changes feed (return only relevant data)
 	    	def since = clientData?.info?.lastSyncDate ? DATEFORMAT.parse(clientData?.info?.lastSyncDate) : new Date(0)
 
 	    	def now = new Date()
-	    	since = new Date(0)
-	    	println "between $since and $now"
+	    	println "handing out changes between $since and $now"
 
-	    	def tasks = Task.findAllByLastUpdatedBetween(since, now)
-	    	def taskSteps = new HashSet()
-	    	def taskDocumentations = new HashSet()
-	    	tasks?.each { 
-	    		taskSteps.addAll(it.steps)
-	    		taskDocumentations.addAll(TaskDocumentation.findAllByTaskAndCreator(it, user))
+    		// learning resources may change without having a changed task, so hand out all modified ones.
+    		def assets = Asset.findAllByLastUpdatedBetweenAndSubType(since, now, "learning-resource")
+
+			def c = Task.createCriteria()
+	    	def tasks = c {
+	    		between("lastUpdated", since, now)
+	    		or {
+	    			eq("creator", user)
+	    			eq("assignee", user)
+	    		}
+	    	}
+	    	def taskSteps = [] as Set
+	    	tasks?.each { task ->
+	    		// add modified attachments
+	    		_addMofifiedDocs(task.attachments, assets, since, now)
+	    		task.steps?.each { step ->
+		    		taskSteps.add(step)
+		    		// add modified attachments
+		    		_addMofifiedDocs(step.attachments, assets, since, now)
+	    		}
     		}
-    		def assets = Asset.findAllByLastUpdatedBetween(since, now)
+	    	def taskDocumentations = TaskDocumentation.findAllByLastUpdatedBetweenAndCreator(since, now, user);
+	    	taskDocumentations?.each { taskDocumentation ->
+	    		// add modified attachments
+	    		_addMofifiedDocs(taskDocumentation.attachments, assets, since, now)
+	    	}
 
 	    	def result = [
 	    		"now"  : DATEFORMAT.format(now),
 	    		"data" : [
 		    		"user" : User.findAllByLastUpdatedBetween(since, now),
+		    		// reflection questions may change without having a changed task, so hand out all modified ones.
 		    		"reflectionQuestion" : ReflectionQuestion.findAllByLastUpdatedBetween(since, now),
-		    		"reflectionAnswer" : ReflectionAnswer.findAllByLastUpdatedBetween(since, now),
+		    		"reflectionAnswer" : ReflectionAnswer.findAllByLastUpdatedBetweenAndCreator(since, now, user),
 		    		"asset" : assets,
 		    		"taskStep" : taskSteps,
-		    		"taskDocumentation" : taskDocumentations,
-		    		"task" : tasks
+		    		"task" : tasks,
+		    		"taskDocumentation" : taskDocumentations
 	    		]
     		]
 	    	render result as JSON
@@ -57,9 +75,6 @@ println clientData?.info?.lastSyncDate
     }
 
     def uploadAttachment(String id) {
-    	println "--- UPLOAD TO ATTACHMENT " + id
-    	println "--- req params:"
-    	print params
     	if (!id) {
 			println "--- ERROR 400, no id in url"
     		render status:400, contentType:"text/plain", text:"missing id in URL"
@@ -98,6 +113,21 @@ println clientData?.info?.lastSyncDate
 	    }
     }
 
+    def _addMofifiedDocs(docs, target, start, end) {
+    	docs?.each { doc ->
+    		if (!doc) {
+    			println "--- doc is null"
+    			println docs
+    			println target
+    		}
+    		if (doc) {
+	    		if (!(doc.lastUpdated.before(start) || doc.lastUpdated.after(end))) {
+	    			target.add(doc)
+	    		}
+	    	}
+    	}
+    }
+
     def _update(clientData, user) {
     	["asset", "taskStep", "taskDocumentation", "reflectionAnswer", "task"].each { table ->
     		def domainClass = DOMAIN_CLASS_MAPPING[table]
@@ -106,7 +136,7 @@ println clientData?.info?.lastSyncDate
 				println doc
 				def model = domainClass.get(doc.id)
 				if (!model) {
-					println "--- creating new " + domainClass + " with id " + doc.id
+					println "--- creating new " + domainClass + " with id " + doc.id + ", user=" + user
 					model = domainClass.newInstance()
 					model.id = doc.id
 				}
