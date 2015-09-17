@@ -19,7 +19,7 @@
 			<p class="text-danger"><b><g:message code="kola.task.chooseTemplate.prompt" /></b></p>
 			<div class="well">
 				<g:message code="kola.task.chooseTemplate.none" />
-				<button class="choose btn btn-primary pull-right" name="template.id" value=""><i class="fa fa-check-square-o"></i> <g:message code="default.button.choose.label" default="Auswählen" /></button>
+				<button class="choose btn btn-primary pull-right" name="template.id" value=""><i class="fa fa-check-square-o"></i> <g:message code="kola.choose" /></button>
 			</div>
 			<ul class="list-group">
 				<g:each var="taskInstance" in="${taskInstanceList}">
@@ -29,7 +29,7 @@
 							<button class="choose btn btn-primary pull-right" name="template.id" value="${taskInstance.id}"><i class="fa fa-check-square-o"></i> <g:message code="kola.choose" /></button>
 						</h4>
 						<p class="list-group-item-text">
-							${taskInstance.description}
+							${taskInstance.description?.take(400)}
 						</p>
 					</li>
 				</g:each>

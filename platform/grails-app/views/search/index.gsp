@@ -21,6 +21,7 @@
 				<input type="hidden" name="hideFilter" value="true">
 			</g:if>
 			<g:else>
+<%--
 				<div class="form-group">
 					<label class="col-sm-2 control-label"><g:message code="kola.filter"/>:</label>
 					<div class="col-sm-3">
@@ -31,6 +32,7 @@
 						</div>
 					</div>
 				</div>
+--%>
 			</g:else>
 		</g:form>
 		<g:if test="${params.q}">

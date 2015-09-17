@@ -32,127 +32,122 @@
 		</h1>
 		<g:if test="${taskInstance?.description}">
 			<div class="row">
-				<div class="col-sm-2"><label><g:message code="kola.meta.description" />:</label></div>
-				<div class="col-sm-10"><kola:markdown>${taskInstance.description}</kola:markdown></div>
+				<div class="col-sm-8"><kola:markdown>${taskInstance.description}</kola:markdown></div>
+				<div class="col-sm-4">
+					<div class="well">
+						<g:if test="${taskInstance?.due}">
+							<div class="row">
+								<div class="col-md-5"><label><g:message code="kola.task.due" />:</label></div>
+								<div class="col-md-7"><g:formatDate date="${taskInstance.due}" type="date"/></div>
+							</div>
+							</g:if>
+						<div class="row">
+							<div class="col-md-5"><label><g:message code="kola.meta.creator" />:</label></div>
+							<div class="col-md-7"><g:render bean="${taskInstance.creator.profile}" template="/profile/show" var="profile" /></div>
+						</div>
+						<div class="row">
+							<div class="col-md-5"><label><g:message code="kola.meta.lastUpdated" />:</label></div>
+							<div class="col-md-7"><g:formatDate date="${taskInstance.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/></div>
+						</div>
+						<g:if test="${taskInstance?.assignee}">
+							<div class="row">
+								<div class="col-md-5"><label><g:message code="kola.task.assignee" />:</label></div>
+								<div class="col-md-7"><g:render bean="${taskInstance.assignee.profile}" template="/profile/show" var="profile" /></div>
+							</div>
+						</g:if>
+					</div>
+				</div>
 			</div>
-		</g:if>
-		<div class="row">
-			<div class="col-sm-2"><label><g:message code="kola.meta.creator" />:</label></div>
-			<div class="col-sm-10"><g:render bean="${taskInstance.creator.profile}" template="/profile/show" var="profile" /></div>
-		</div>
-		<div class="row">
-			<div class="col-sm-2"><label><g:message code="kola.meta.lastUpdated" />:</label></div>
-			<div class="col-sm-10"><g:formatDate date="${taskInstance.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/></div>
-		</div>
-		<g:if test="${taskInstance?.assignee}">
-		<div class="row">
-			<div class="col-sm-2"><label><g:message code="kola.task.assignee" />:</label></div>
-			<div class="col-sm-10"><g:render bean="${taskInstance.assignee.profile}" template="/profile/show" var="profile" /></div>
-		</div>
-		</g:if>
-		<g:if test="${taskInstance?.due}">
-		<div class="row">
-			<div class="col-sm-2"><label><g:message code="kola.task.due" />:</label></div>
-			<div class="col-sm-10"><g:formatDate date="${taskInstance.due}" type="date"/></div>
-		</div>
 		</g:if>
 		<g:if test="${taskInstance?.attachments?.size() > 0}">
-		<div class="row">
-			<div class="col-sm-2"><label><g:message code="kola.task.attachments" />:</label></div>
-			<div class="col-sm-10">
-				<g:render bean="${taskInstance?.attachments}" template="attachments" var="attachments" />
-			</div>
-		</div>
+			<g:render bean="${taskInstance?.attachments}" template="attachments" var="attachments" />
 		</g:if>
 		<g:if test="${taskInstance?.resources?.size() > 0}">
-		<div class="row">
-			<div class="col-sm-2"><label><g:message code="kola.assets" />:</label></div>
-			<div class="col-sm-10">
-				<ul class="list-group">
-					<g:each var="assetInstance" in="${taskInstance?.resources}">
-						<li class="list-group-item">
-							<a href="${assetService.createEncodedLink(assetInstance)}" target="_blank">
-								<h4 class="list-group-item-heading">
-									<i class="fa fa-external-link"></i> ${assetInstance.name}
-								</h4>
-								<p class="list-group-item-text text-default">
-									${assetInstance.description?.take(100)}
-								</p>
-							</a>
-						</li>
-					</g:each>
-				</ul>
+		<div class="panel panel-default">
+			<div class="panel-heading"><h3 class="panel-title"><g:message code="kola.assets" /></h3></div>
+			<div class="list-group">
+				<g:each var="assetInstance" in="${taskInstance?.resources}">
+					<a href="${assetService.createEncodedLink(assetInstance)}" class="list-group-item" target="_blank">
+						<h4 class="list-group-item-heading">
+							<i class="fa fa-external-link"></i> ${assetInstance.name}
+						</h4>
+						<p class="list-group-item-text text-default">${assetInstance.description?.take(100)}</p>
+					</a>
+				</g:each>
 			</div>
 		</div>
 		</g:if>
 		<g:if test="${taskInstance?.steps?.size() > 0}">
-		<div class="row">
-			<div class="col-sm-2"><label><g:message code="kola.task.steps" />:</label></div>
-			<div class="col-sm-10">
-				<ul class="list-group steps">
-					<g:each var="step" in="${taskInstance?.steps}">
-						<li class="list-group-item clearfix">
-							<h4 class="list-group-item-heading">
-								${step.name}
-							</h4>
-							<p class="list-group-item-text">
-								${step.description}
-							</p>
-							<g:if test="${step.attachments?.size() > 0}">
-								<g:render bean="${step.attachments}" template="attachments" var="attachments" />
-							</g:if>
-						</li>
-					</g:each>
-				</ul>
-			</div>
+		<div class="panel panel-default">
+			<div class="panel-heading"><h3 class="panel-title"><g:message code="kola.task.steps" /></h3></div>
+			<ul class="list-group steps">
+				<g:each var="step" in="${taskInstance?.steps}">
+					<li class="list-group-item">
+						<h4 class="list-group-item-heading">${step.name}</h4>
+						<p class="list-group-item-text">${step.description}</p>
+						<g:if test="${step.attachments?.size() > 0}">
+							<g:render bean="${step.attachments}" template="attachments" var="attachments" />
+						</g:if>
+					</li>
+				</g:each>
+			</ul>
 		</div>
 		</g:if>
 		<g:if test="${taskInstance?.reflectionQuestions?.size() > 0}">
-		<div class="row">
-			<div class="col-sm-2"><label><g:message code="kola.reflectionQuestions" />:</label></div>
-			<div class="col-sm-10">
-				<ul class="list-group">
-					<g:each var="reflectionQuestion" in="${taskInstance?.reflectionQuestions}">
+		<div class="panel panel-default">
+			<div class="panel-heading"><h3 class="panel-title"><g:message code="kola.reflectionQuestions" /></h3></div>
+			<ul class="list-group">
+				<g:each var="reflectionQuestion" in="${taskInstance?.reflectionQuestions}">
+					<li class="list-group-item"><b class="text-warning">${reflectionQuestion.name}</b></li>
+					<g:each var="reflectionAnswer" in="${reflectionAnswers[reflectionQuestion.id]}">
 						<li class="list-group-item">
-							<p class="text-warning reflection-question">
-								${reflectionQuestion.name}
-							</p>
-							<g:each var="reflectionAnswer" in="${reflectionAnswers[reflectionQuestion.id]}">
-								<div class="panel panel-default">
-									<div class="panel-heading small">
-										<g:render bean="${reflectionAnswer.creator.profile}" template="/profile/show" var="profile" />,
-										<g:formatDate date="${reflectionAnswer.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
-									</div>
-									<div class="panel-body reflection-answer">${reflectionAnswer.text}</div>
-								</div>
-							</g:each>
-						</li>
-					</g:each>
-				</ul>
-			</div>
-		</div>
-		</g:if>
-		<g:if test="${taskDocumentations?.size() > 0}">
-		<div class="row">
-			<div class="col-sm-2"><label><g:message code="kola.task.documentations" />:</label></div>
-			<div class="col-sm-10">
-				<ul class="list-group">
-					<g:each var="taskDocumentation" in="${taskDocumentations}">
-						<li class="list-group-item">
-							<div class="panel panel-default">
-								<div class="panel-heading small">
-									<g:render bean="${taskDocumentation.creator.profile}" template="/profile/show" var="profile" />,
-									<g:formatDate date="${taskDocumentation.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
-								</div>
-								<div class="panel-body">
-									<p>${taskDocumentation.text}</p>
-									<g:render bean="${taskDocumentation.attachments}" template="attachments" var="attachments" />
-								</div>
+							<div class="list-group-item-text clearfix">
+								<p>${reflectionAnswer.text}</p>
+								<small class="pull-right">
+									<g:render bean="${reflectionAnswer.creator.profile}" template="/profile/show" var="profile" />,
+									<g:formatDate date="${reflectionAnswer.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
+								</small>
 							</div>
 						</li>
 					</g:each>
-				</ul>
-			</div>
+				</g:each>
+			</ul>
+		</div>
+		</g:if>
+		<g:if test="${taskDocumentations?.size() > 0}">
+		<div class="panel panel-success">
+			<div class="panel-heading"><h3 class="panel-title"><g:message code="kola.task.documentations" /></h3></div>
+			<ul class="list-group">
+				<g:each var="taskDocumentation" in="${taskDocumentations[taskInstance.id]}">
+					<li class="list-group-item">
+						<div class="list-group-item-text clearfix">
+							<p>${taskDocumentation.text}</p>
+							<g:render bean="${taskDocumentation.attachments}" template="attachments" var="attachments" />
+							<small class="pull-right">
+								<g:render bean="${taskDocumentation.creator.profile}" template="/profile/show" var="profile" />,
+								<g:formatDate date="${taskDocumentation.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
+							</small>
+						</div>
+					</li>
+				</g:each>
+				<g:each var="step" in="${taskInstance?.steps}">
+					<g:if test="${taskDocumentations[step.id]?.size() > 0}">
+					<li class="list-group-item"><b><g:message code="kola.task.documentation.forStep"/> "${step.name}":</b></li>
+					<g:each var="taskDocumentation" in="${taskDocumentations[step.id]}">
+						<li class="list-group-item">
+							<div class="list-group-item-text clearfix">
+								<p>${taskDocumentation.text}</p>
+								<g:render bean="${taskDocumentation.attachments}" template="attachments" var="attachments" />
+								<small class="pull-right">
+									<g:render bean="${taskDocumentation.creator.profile}" template="/profile/show" var="profile" />,
+									<g:formatDate date="${taskDocumentation.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
+								</small>
+							</div>
+						</li>
+					</g:each>
+					</g:if>
+				</g:each>
+			</ul>
 		</div>
 		</g:if>
 	</body>

@@ -2,6 +2,7 @@ package kola
 
 
 
+import grails.converters.JSON
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 import org.springframework.security.access.annotation.Secured
@@ -28,6 +29,7 @@ class TaskController {
                 }
             }
             eq("isTemplate", params.isTemplate?.toBoolean() ? true : false)
+            eq("deleted", false)
         }
         def result = query.list(params)
         respond result, model:[taskInstanceCount: result.totalCount]
@@ -39,11 +41,24 @@ class TaskController {
             return
         }
         def reflectionAnswers = [:]
-        taskInstance.reflectionQuestions?.each { reflectionQuestion ->
-            reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestion(taskInstance, reflectionQuestion)
+        def taskDocumentations = [:]
+        if (!taskInstance.isTemplate) {
+            taskInstance.reflectionQuestions?.each { reflectionQuestion ->
+                reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false)
+            }
+            
+            def docs = TaskDocumentation.findAllByTaskAndDeleted(taskInstance, false)
+            if (docs) {
+                taskDocumentations[taskInstance.id] = docs
+            }
+            taskInstance.steps?.each { step ->
+                docs = TaskDocumentation.findAllByStepAndDeleted(step, false)
+                if (docs) {
+                    taskDocumentations[step.id] = docs
+                }
+            }
         }
-
-        def taskDocumentations = TaskDocumentation.findAllByTaskAndDeleted(taskInstance, false)
+        println taskDocumentations.entrySet()
 
         ["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations]
     }
@@ -56,12 +71,12 @@ class TaskController {
             task.name = task.template.name
             task.description = task.template.description
             task.template = task.template
-            task.template.steps?.each {
-                task.addToSteps(new TaskStep(name:it.name, description:it.description, attachments:it.attachments))
-            }
             task.attachments = task.template.attachments
             task.resources = task.template.resources
             task.reflectionQuestions = task.template.reflectionQuestions
+            task.template.steps?.each { step ->
+                task.addToSteps(new TaskStep(name:step.name, description:step.description, attachments:step.attachments))
+            }
         }
         respond task
     }
@@ -70,7 +85,7 @@ class TaskController {
         params.max = Math.min(max ?: 10, 100)
         params.sort = params.sort ?: "lastUpdated"
         params.order = params.order ?: "desc"
-        def query = Task.where { isTemplate == true }
+        def query = Task.where { isTemplate == true && deleted == false }
         respond query.list(params), model:[taskInstanceCount: query.count()]
     }
 
@@ -82,19 +97,17 @@ class TaskController {
 
     @Transactional
     def save(Task taskInstance) {
-        println params
-        println taskInstance.name
-        if (taskInstance == null) {
-            notFound()
-            return
-        }
+        // TODO: data binding is somehow broken because of the steps in the form- need to bind manually here.
+        taskInstance.name = params.name
+        taskInstance.description = params.description
+        taskInstance.assignee = params.assignee?.id ? User.get(params.assignee.id) : null
+        taskInstance.due = params.due ? new java.text.SimpleDateFormat("yyyy-MM-dd").parse(params.due) : null
         taskInstance.creator = springSecurityService.currentUser
         updateFromParams(taskInstance)
         taskInstance.validate()
 
-        taskInstance.errors.allErrors.each { println it }
-
         if (taskInstance.hasErrors()) {
+            taskInstance.errors.allErrors.each { println it }
             respond taskInstance.errors, view:'create'
             return
         }
@@ -133,27 +146,9 @@ class TaskController {
         }
 
         taskInstance.save flush:true
-        println "--- steps after save -> " + taskInstance.steps*.name
 
         flash.message = message(code: 'default.updated.message', args: [message(code: 'Task.label', default: 'Task'), taskInstance.id])
         redirect action:"edit", id:taskInstance.id
-    }
-
-    @Transactional
-    def addStep(Task taskInstance) {
-        if (taskInstance == null) {
-            notFound()
-            return
-        }
-
-        if (!authService.canEdit(taskInstance)) {
-            forbidden()
-            return
-        }
-
-        updateFromParams(taskInstance)
-
-        redirect controller:"taskStep", action:"create"
     }
 
     @Transactional
@@ -167,7 +162,8 @@ class TaskController {
             return
         }
 
-        taskInstance.delete flush:true
+        taskInstance.deleted = true
+        taskInstance.save flush:true
 
         flash.message = message(code: 'default.deleted.message', args: [message(code: 'Task.label', default: 'Task'), taskInstance.id])
         redirect action:"index", method:"GET"
@@ -206,6 +202,17 @@ class TaskController {
                 log.error "Couldn't add attachment: Asset not found: ${it}"
             }
         }
+        // update steps
+        taskInstance.steps?.clear()
+        // TODO: UGLY HACK!!
+        for (i in 0..19) {
+            def stepDef = params["steps[$i]"]
+            if (stepDef) {
+                println "--- $i=" + stepDef
+                taskInstance.addToSteps(new TaskStep(stepDef))
+            }
+        }
+/*
         taskInstance.steps?.eachWithIndex { step, index ->
             step?.attachments?.clear()
             params.list("steps[$index].attachments")?.unique(false).each {
@@ -218,10 +225,7 @@ class TaskController {
                 }
             }
         }  
-        // update steps
-        println "--- before -> " + taskInstance.steps
-        taskInstance.steps?.removeAll{ it == null || it.deleted }
-        println "--- after -> " + taskInstance.steps
+*/
         // update reflection questions
         taskInstance.reflectionQuestions?.clear()
         params.list("reflectionQuestions")?.unique(false).each {

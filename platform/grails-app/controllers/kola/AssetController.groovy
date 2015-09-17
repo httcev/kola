@@ -31,7 +31,7 @@ class AssetController {
         params.max = Math.min(max ?: 10, 100)
         params.sort = params.sort ?: "lastUpdated"
         params.order = params.order ?: "desc"
-        def query = Asset.where { subType == "learning-resource" }
+        def query = Asset.where { subType == "learning-resource" && deleted == false }
         respond query.list(params), model:[assetInstanceCount: query.count()]
     }
 
@@ -189,7 +189,8 @@ class AssetController {
             return
         }
 
-        assetInstance.delete flush:true
+        assetInstance.deleted = true
+        assetInstance.save flush:true
         flash.message = message(code: 'default.deleted.message', args: [message(code: 'Asset.label', default: 'Asset'), assetInstance.id])
         redirect action:"index", method:"GET"
     }

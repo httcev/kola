@@ -21,8 +21,9 @@ class ReflectionAnswer {
     String text
     Date lastUpdated
     User creator
+    boolean deleted
 
-    static _exported = ["text", "lastUpdated"]
+    static _exported = ["text", "lastUpdated", "deleted"]
     static _referenced = ["creator", "task", "question"]
     static {
         grails.converters.JSON.registerObjectMarshaller(ReflectionAnswer) { answer ->

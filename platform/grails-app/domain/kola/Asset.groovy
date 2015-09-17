@@ -37,6 +37,7 @@ class Asset {
     String mimeType
     String subType = "learning-resource"
     User creator
+    boolean deleted
 
     // only external assets
     String externalUrl
@@ -68,7 +69,7 @@ class Asset {
     }
 
 
-    static _exported = ["name", "description", "mimeType", "subType", "url"]
+    static _exported = ["name", "description", "mimeType", "subType", "url", "deleted"]
     static _referenced = ["creator"]
     static {
         grails.converters.JSON.registerObjectMarshaller(Asset) { asset ->

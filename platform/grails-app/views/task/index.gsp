@@ -49,7 +49,7 @@
 				<tbody>
 				<g:each in="${taskInstanceList}" status="i" var="taskInstance">
 					<tr>
-						<td><g:link action="show" id="${taskInstance.id}">${fieldValue(bean: taskInstance, field: "name")}</g:link></td>
+						<td><g:link action="show" id="${taskInstance.id}" params="${[isTemplate:params.isTemplate]}">${fieldValue(bean: taskInstance, field: "name")}</g:link></td>
 						<td>${fieldValue(bean: taskInstance, field: "description")?.take(100)}</td>
 						<td>${fieldValue(bean: taskInstance.creator?.profile, field: "displayName")}</td>
 						<td>${fieldValue(bean: taskInstance.creator?.profile, field: "company")}</td>

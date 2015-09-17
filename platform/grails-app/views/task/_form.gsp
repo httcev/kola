@@ -35,7 +35,7 @@
 		<label for="due" class="col-sm-2 control-label">
 			<g:message code="kola.task.due" />:
 		</label>
-		<div class="col-sm-10"><input type="date" class="form-control" name="due" value="${formatDate(format:'yyyy-MM-dd',date:taskInstance?.due)}" placeholder="yyyy-MM-dd"></div>
+		<div class="col-sm-10"><input type="date" id="due" class="form-control" name="due" value="${formatDate(format:'yyyy-MM-dd',date:taskInstance?.due)}" placeholder="yyyy-MM-dd"></div>
 	</div>
 </g:if>
 
@@ -64,8 +64,8 @@
 				</g:each>
 			</ul>
 		</g:if>
-		<div class="form-padding pull-left">
-			<label><g:message code="default.add.label" args="${[message(code:'kola.task.attachment')]}" />: </label>
+		<div class="form-padding">
+			<label class="text-muted"><g:message code="default.add.label" args="${[message(code:'kola.task.attachment')]}" />: </label>
 		</div>
 		<input type="file" name="_newAttachment" class="new-attachment form-padding">
 	</div>
@@ -105,7 +105,7 @@
 		<ul id="step-list" class="list-group sortable">
 			<g:each var="step" in="${taskInstance?.steps}" status="i">
 				<li class="list-group-item clearfix">
-					<g:if test="${step.id}"><input type="hidden" name="steps[${i}].id" value="${step.id}"></g:if>
+					<input type="hidden" name="steps[${i}].id" value="${step.id}">
 					<input type="hidden" name="steps[${i}].deleted" class="deleteFlag" value="false">
 					<h4 class="list-group-item-heading clearfix">
 						<div class="btn btn-default drag-handle" title="${message(code:'kola.dnd')}"><i class="fa fa-arrows-v fa-lg"></i></div>
@@ -114,14 +114,14 @@
 					</h4>
 					<div class="list-group-item-text">
 						<div class="form-group">
-							<label for="name" class="col-sm-2 control-label">
+							<label class="col-sm-2 control-label">
 								<g:message code="kola.meta.name" />
 								<span class="required-indicator">*</span>:
 							</label>
 							<div class="col-sm-10"><input type="text" name="steps[${i}].name" class="form-control" value="${step.name}" required></div>
 						</div>
 						<div class="form-group">
-							<label for="name" class="col-sm-2 control-label">
+							<label class="col-sm-2 control-label">
 								<g:message code="kola.meta.description" />
 							</label>
 							<div class="col-sm-10"><textarea name="steps[${i}].description" class="form-control" rows="6" data-provide="markdown" data-iconlibrary="fa">${step.description}</textarea></div>
@@ -151,7 +151,7 @@
 										</g:each>
 									</ul>
 								</g:if>
-								<div class="form-padding pull-left">
+								<div class="form-padding">
 									<label><g:message code="default.add.label" args="${[message(code:'kola.task.attachment')]}" />: </label>
 								</div>
 								<input type="file" name="steps[${i}]._newAttachment" class="new-attachment form-padding">
@@ -210,7 +210,7 @@
 				sortable.option("onUpdate", function() {
 					// update all step indices according to new sort order
 					$("#step-list li").each(function(index) {
-						var prefix = "step[" + index + "]";
+						var prefix = "steps[" + index + "]";
 						$(":input", $(this)).each(function() {
 							var field = $(this);
 							var name = field.attr("name");
@@ -224,14 +224,16 @@
 
 				});
 			}
-		})
+		});
 		$(document).on("change", ".new-attachment", function() {
 			var $parent = $(this).parent();
 			var emptyFileChooserCount = $("input:file", $parent).filter(function() { return $(this).val() == ""; }).length;
 			if (emptyFileChooserCount == 0) {
-				$parent.append($("<input type='file' name='_newAttachment' class='new-attachment form-padding'>"));
+//				$parent.append($("<input type='file' name='_newAttachment' class='new-attachment form-padding'>"));
+				$parent.append($(this.cloneNode()));
 			}
 		});
+		$("#due").pickadate({format: 'yyyy-mm-dd'});
 	});
 </script>
 

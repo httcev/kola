@@ -49,10 +49,7 @@ class Task {
 
     static _embedded = ["name", "description", "done", "deleted", "due", "isTemplate", "lastUpdated"]
     static _referenced = ["steps", "resources", "attachments", "reflectionQuestions", "template", "creator", "assignee"]
-    /*
-    static _embedded = ["name", "description", "done", "due", "isTemplate", "templateId", "creatorId", "assigneeId", "lastUpdated"]
-    static _referenced = []
-    */
+
     static {
         grails.converters.JSON.registerObjectMarshaller(Task) { task ->
             def doc = task.properties.findAll { k, v ->
