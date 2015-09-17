@@ -1,3 +1,5 @@
+<%@ page import="kola.TaskStep" %>
+
 <g:set var="assetService" bean="assetService"/>
 <g:set var="authService" bean="authService"/>
 
@@ -104,61 +106,7 @@
 	<div class="col-sm-10">
 		<ul id="step-list" class="list-group sortable">
 			<g:each var="step" in="${taskInstance?.steps}" status="i">
-				<li class="list-group-item clearfix">
-					<input type="hidden" name="steps[${i}].id" value="${step.id}">
-					<input type="hidden" name="steps[${i}].deleted" class="deleteFlag" value="false">
-					<h4 class="list-group-item-heading clearfix">
-						<div class="btn btn-default drag-handle" title="${message(code:'kola.dnd')}"><i class="fa fa-arrows-v fa-lg"></i></div>
-						<span class="text-muted"><g:message code="kola.task.step" /> <span class="step-index">${i+1}</span></span>
-						<button type="button" class="btn btn-danger pull-right" onclick="deleteStep($(this))"><i class="fa fa-times" title="${message(code:'default.button.delete.label')}"></i></button>
-					</h4>
-					<div class="list-group-item-text">
-						<div class="form-group">
-							<label class="col-sm-2 control-label">
-								<g:message code="kola.meta.name" />
-								<span class="required-indicator">*</span>:
-							</label>
-							<div class="col-sm-10"><input type="text" name="steps[${i}].name" class="form-control" value="${step.name}" required></div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-2 control-label">
-								<g:message code="kola.meta.description" />
-							</label>
-							<div class="col-sm-10"><textarea name="steps[${i}].description" class="form-control" rows="6" data-provide="markdown" data-iconlibrary="fa">${step.description}</textarea></div>
-						</div>
-						<div class="form-group">
-							<label class="col-sm-2 control-label">
-								<g:message code="kola.task.attachments" />:
-							</label>
-							<div class="col-sm-10">
-								<g:if test="${step.attachments?.size() > 0}">
-									<ul class="list-group sortable">
-										<g:each var="assetInstance" in="${step.attachments}">
-											<li class="list-group-item clearfix">
-												<input type="hidden" name="steps[${i}].attachments" value="${assetInstance.id}">
-												<h4 class="list-group-item-heading">
-													<g:if test="${step.attachments.size() > 1}">
-														<div class="btn btn-default drag-handle" title="${message(code:'kola.dnd')}"><i class="fa fa-arrows-v fa-lg"></i></div>
-													</g:if>
-													<a href="${assetService.createEncodedLink(assetInstance)}" target="_blank">${assetInstance.name}</a>
-													<button type="button" class="btn btn-danger pull-right" title="${message(code:'default.button.delete.label')}" onclick="$(this).closest('li').remove()"><i class="fa fa-times"></i></button>
-												</h4>
-												<p class="list-group-item-text">
-													<label><g:message code="kola.meta.mimeType" />:</label>
-													<code>${assetInstance.mimeType}</code>
-												</p>
-											</li>
-										</g:each>
-									</ul>
-								</g:if>
-								<div class="form-padding">
-									<label><g:message code="default.add.label" args="${[message(code:'kola.task.attachment')]}" />: </label>
-								</div>
-								<input type="file" name="steps[${i}]._newAttachment" class="new-attachment form-padding">
-							</div>
-						</div>
-					</div>
-				</li>
+				<g:render template="stepEditor" model="${[step:step, index:i]}" />
 			</g:each>
 		</ul>
 		<button type="button" class="btn btn-primary" onclick="addStep()"><i class="fa fa-plus"></i> <g:message code="default.add.label" args="${[message(code:'kola.task.step')]}" /></button>
@@ -188,6 +136,10 @@
 	</div>
 </div>
 
+<script id="newStepTemplate" type="text/template">
+	<g:render template="stepEditor" model="${[step:new TaskStep(), index:1, isNew:true]}" />
+</script>
+
 <script>
 	function deleteStep($button) {
 		var $li = $button.closest("li");
@@ -196,10 +148,23 @@
 	}
 
 	function addStep() {
-		var stepCount = $("#step-list li").size()
-		var $li = $("<li class='list-group-item clearfix'>");
-		$li.append($("<input type='text' name='steps["+stepCount+"].name'>"));
-		$("#step-list").append($li);
+		$("#step-list").append($("#newStepTemplate").html());
+		updateStepIndices();
+	}
+
+	function updateStepIndices() {
+		$("#step-list li").each(function(index) {
+			$(".step-index", this).text(index + 1);
+			var prefix = "steps[" + index + "]";
+			$(":input", $(this)).each(function() {
+				var field = $(this);
+				var name = field.attr("name");
+				if (name) {
+					var replaced = name.replace(/steps\[.*?\]/, prefix);
+					field.attr("name", replaced);
+				}
+			})
+		});
 	}
 
 	$(document).ready(function() {
@@ -209,22 +174,11 @@
 			if ($(this).attr("id") == "step-list") {
 				sortable.option("onUpdate", function() {
 					// update all step indices according to new sort order
-					$("#step-list li").each(function(index) {
-						var prefix = "steps[" + index + "]";
-						$(":input", $(this)).each(function() {
-							var field = $(this);
-							var name = field.attr("name");
-							if (name) {
-								var replaced = name.replace(/steps\[.*?\]/, prefix);
-								field.attr("name", replaced);
-								console.log(field.attr("name") + "=" + field.val());
-							}
-						})
-					});
-
+					updateStepIndices();
 				});
 			}
 		});
+
 		$(document).on("change", ".new-attachment", function() {
 			var $parent = $(this).parent();
 			var emptyFileChooserCount = $("input:file", $parent).filter(function() { return $(this).val() == ""; }).length;

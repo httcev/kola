@@ -207,7 +207,7 @@ class TaskController {
         // TODO: UGLY HACK!!
         for (i in 0..19) {
             def stepDef = params["steps[$i]"]
-            if (stepDef) {
+            if (stepDef && stepDef.deleted != "true") {
                 println "--- $i=" + stepDef
                 taskInstance.addToSteps(new TaskStep(stepDef))
             }
@@ -253,7 +253,9 @@ class TaskController {
                     println "--- prop=${prop}"
                     println taskInstance
                     println taskInstance."${prop}"
-                    domain = taskInstance."${prop}"?.get(index)
+                    if (taskInstance."${prop}"?.size() > index) {
+                        domain = taskInstance."${prop}"?.get(index)
+                    }
                 }
             }
             

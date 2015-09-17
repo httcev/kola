@@ -32,7 +32,7 @@
 		</h1>
 		<g:if test="${taskInstance?.description}">
 			<div class="row">
-				<div class="col-sm-8"><kola:markdown>${taskInstance.description}</kola:markdown></div>
+				<div class="col-sm-8 formatted"><kola:markdown>${taskInstance.description}</kola:markdown></div>
 				<div class="col-sm-4">
 					<div class="well">
 						<g:if test="${taskInstance?.due}">
@@ -71,7 +71,7 @@
 						<h4 class="list-group-item-heading">
 							<i class="fa fa-external-link"></i> ${assetInstance.name}
 						</h4>
-						<p class="list-group-item-text text-default">${assetInstance.description?.take(100)}</p>
+						<p class="list-group-item-text text-default formatted">${assetInstance.description?.take(100)}</p>
 					</a>
 				</g:each>
 			</div>
@@ -84,7 +84,7 @@
 				<g:each var="step" in="${taskInstance?.steps}">
 					<li class="list-group-item">
 						<h4 class="list-group-item-heading">${step.name}</h4>
-						<p class="list-group-item-text">${step.description}</p>
+						<p class="list-group-item-text formatted">${step.description}</p>
 						<g:if test="${step.attachments?.size() > 0}">
 							<g:render bean="${step.attachments}" template="attachments" var="attachments" />
 						</g:if>
@@ -102,7 +102,7 @@
 					<g:each var="reflectionAnswer" in="${reflectionAnswers[reflectionQuestion.id]}">
 						<li class="list-group-item">
 							<div class="list-group-item-text clearfix">
-								<p>${reflectionAnswer.text}</p>
+								<p class="formatted">${reflectionAnswer.text}</p>
 								<small class="pull-right">
 									<g:render bean="${reflectionAnswer.creator.profile}" template="/profile/show" var="profile" />,
 									<g:formatDate date="${reflectionAnswer.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
@@ -121,7 +121,7 @@
 				<g:each var="taskDocumentation" in="${taskDocumentations[taskInstance.id]}">
 					<li class="list-group-item">
 						<div class="list-group-item-text clearfix">
-							<p>${taskDocumentation.text}</p>
+							<p class="formatted">${taskDocumentation.text}</p>
 							<g:render bean="${taskDocumentation.attachments}" template="attachments" var="attachments" />
 							<small class="pull-right">
 								<g:render bean="${taskDocumentation.creator.profile}" template="/profile/show" var="profile" />,
@@ -136,7 +136,7 @@
 					<g:each var="taskDocumentation" in="${taskDocumentations[step.id]}">
 						<li class="list-group-item">
 							<div class="list-group-item-text clearfix">
-								<p>${taskDocumentation.text}</p>
+								<p class="formatted">${taskDocumentation.text}</p>
 								<g:render bean="${taskDocumentation.attachments}" template="attachments" var="attachments" />
 								<small class="pull-right">
 									<g:render bean="${taskDocumentation.creator.profile}" template="/profile/show" var="profile" />,
