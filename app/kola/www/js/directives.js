@@ -6,7 +6,8 @@ angular.module('kola.directives', [])
     //replace: true,
 	require: '^ngModel',
   	scope: {
-		ngModel: '='
+		ngModel: '=',
+		hideHeader: '@'
 	},
     templateUrl: 'templates/directive-learning-resources.html',
     link: function($scope) {

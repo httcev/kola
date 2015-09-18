@@ -77,6 +77,7 @@ class User implements Serializable {
         grails.converters.JSON.registerObjectMarshaller(User) {
         	def doc = [:]
             doc.id = it.id
+            doc.username = it.username
             doc.email = it.email
             doc.displayName = it.profile?.displayName
             doc.company = it.profile?.company

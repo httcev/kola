@@ -169,6 +169,10 @@ angular.module('kola.services', ['uuid'])
     return angular.extend({ id:rfc4122.v4(), _table:tableName }, props);
   }
 
+  function createTask() {
+    return _create("task", { isTemplate:false });
+  }
+
   function createAttachment(parent) {
     var attachment = _create("asset", { subType:"attachment" });
     parent.attachments = parent.attachments || [];
@@ -418,11 +422,15 @@ angular.module('kola.services', ['uuid'])
       if (values != null) {
         if (angular.isArray(values)) {
           angular.forEach(values, function(value, index) {
-            target[key][index] = value.id;
+            if (value.id) {
+              target[key][index] = value.id;
+            }
           });
         }
         else {
-          target[key] = values.id;
+          if (values.id) {
+            target[key] = values.id;
+          }
         }
       }
     });
@@ -466,6 +474,7 @@ angular.module('kola.services', ['uuid'])
     save:save,
     resolveIds:resolveIds,
     db:db,
+    createTask:createTask,
     createAttachment:createAttachment,
     createTaskDocumentation:createTaskDocumentation,
     createReflectionAnswer:createReflectionAnswer,

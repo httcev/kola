@@ -48,7 +48,7 @@
 					</ul>
 				</g:if>
 				<div class="form-padding">
-					<label><g:message code="default.add.label" args="${[message(code:'kola.task.attachment')]}" />: </label>
+					<label class="text-muted"><g:message code="default.add.label" args="${[message(code:'kola.task.attachment')]}" />: </label>
 				</div>
 				<input type="file" name="steps[${index}]._newAttachment" class="new-attachment form-padding">
 			</div>

@@ -1,0 +1,36 @@
+<ion-view>
+  <ion-nav-title>Neuer Auftrag</ion-nav-title>
+  <ion-content>
+    <div class="list">
+      <label class="item item-input item-floating-label">
+        <span class="input-label positive">Name</span>
+        <input type="text" ng-model="task.name" placeholder="Geben Sie hier den Namen des Auftrags ein..." required autofocus>
+      </label>
+      <label class="item item-input item-floating-label">
+        <span class="input-label positive">Beschreibung</span>
+        <textarea ng-model="task.description" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier die Beschreibung des Auftrags ein..."></textarea>
+      </label>
+      <label class="item item-input">
+        <span class="input-label positive">Fällig</span>
+        <input type="date" ng-model="task.due" placeholder="Fällig">
+      </label>
+      <label class="item item-input item-select">
+        <span class="input-label positive">Zuweisen an</span>
+        <select ng-model="task.assignee">
+          <option ng-repeat="user in assignableUsers" value="{{user.id}}">{{user.displayName}}</option>
+        </select>
+      </label>
+      <div class="item item-divider item-stable">Anhänge</div>
+      <div class="item"><media-attachments ng-model="task" hide-header="true"></media-attachments></div>
+      <div class="item item-divider item-stable">Lernressourcen</div>
+      <div class="item"><learning-resources ng-model="task" hide-header="true"></learning-resources></div>
+      <div class="item item-divider item-stable">Teilschritte</div>
+      <div ng-repeat="step in task.steps" class="item">
+        <div>{{$index+1}}. <b>{{step.name}}</b></div>
+        <div>{{step.description}}</div>
+        <div><media-attachments ng-model="step" hide-header="true"></media-attachments></div>
+      </div>
+    </div>
+    <div class="text-center" ng-if="task.name"><button class="button button-balanced" ng-click="save()"><i class="icon ion-paper-airplane"></i> Speichern</button></div>
+  </ion-content>
+</ion-view>

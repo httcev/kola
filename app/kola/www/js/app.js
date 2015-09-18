@@ -38,6 +38,24 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'kola.contro
       }
     }
   })
+  .state('tab.task-choose-template', {
+    url: '/tasks/chooseTemplate',
+    views: {
+      'tab-tasks': {
+        templateUrl: 'templates/task-choose-template.html',
+        controller: 'TaskChooseTemplateCtrl'
+      }
+    }
+  })
+  .state('tab.task-create', {
+    url: '/tasks/create/:templateId',
+    views: {
+      'tab-tasks': {
+        templateUrl: 'templates/task-create.html',
+        controller: 'TaskCreateCtrl'
+      }
+    }
+  })
   .state('tab.task-detail', {
     url: '/tasks/:taskId',
     views: {

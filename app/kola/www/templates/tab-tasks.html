@@ -1,11 +1,16 @@
 <ion-view view-title="Aufträge">
-  <ion-nav-buttons side="secondary">
+  <ion-nav-buttons side="primary">
     <sync-control></sync-control>
+  </ion-nav-buttons>
+  <ion-nav-buttons side="secondary">
+    <button class="button icon ion-plus-round" ng-click="create()"></button>
   </ion-nav-buttons>
   <ion-content>
     <ion-list>
-      <div class="item item-divider item-stable item-icon-left"><i class="icon ion-alert assertive"></i><b>Anstehend:</b></div>
-      <ion-item ng-repeat="task in pendingTasks = (tasks | filter:{done:!true, deleted:!true} | orderBy:'due') track by task.id" class="item-remove-animate item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}">
+      <div class="item item-divider item-stable item-icon-left item-button-right">
+        <i class="icon ion-alert"></i><b>Anstehend:</b>
+      </div>
+      <ion-item ng-repeat="task in pendingTasks = (tasks | filter:{done:!true, deleted:!true} | orderBy:[sortByDue, '-lastUpdated']) track by task.id" class="item-remove-animate item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}">
         <i ng-if="task.type!='homework'" class="icon ion-clipboard"></i>
         <i ng-if="task.type=='homework'" class="icon ion-university"></i>
         <h2>{{task.name}}</h2>

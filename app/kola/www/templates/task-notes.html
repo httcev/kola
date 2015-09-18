@@ -43,7 +43,7 @@
           <div class="positive reflection-question">{{reflectionQuestion.name}}</div>
           <div class="created-date">{{reflectionAnswers[reflectionQuestion.id].lastUpdated | date}} {{reflectionAnswers[reflectionQuestion.id].creator.displayName}}</div>
           <textarea ng-model="reflectionAnswers[reflectionQuestion.id].text" ng-change="reflectionAnswers[reflectionQuestion.id]._dirty=true" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier Ihre Antwort ein..."></textarea>
-          <button class="button button-clear button-positive" ng-show="form.$dirty" ng-click="saveReflectionAnswer(reflectionAnswers[reflectionQuestion.id], form)"><i class="icon balanced ion-paper-airplane"></i></button>
+          <div class="text-center" ng-show="form.$dirty"><button class="button button-balanced" ng-click="saveReflectionAnswer(reflectionAnswers[reflectionQuestion.id], form)"><i class="icon ion-paper-airplane"></i> Speichern</button></div>
         </div>
       </form>
     </div>

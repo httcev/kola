@@ -15,7 +15,7 @@
 	<label for="description" class="col-sm-2 control-label">
 		<g:message code="kola.meta.description" />:
 	</label>
-	<div class="col-sm-10"><g:textArea rows="8" name="description" class="form-control" data-provide="markdown" data-iconlibrary="fa" value="${taskInstance?.description}"/></div>
+	<div class="col-sm-10"><g:textArea rows="8" name="description" class="form-control" data-provide="markdown-editable" data-iconlibrary="fa" data-language="de" value="${taskInstance?.description}"/></div>
 </div>
 
 <g:if test="${!taskInstance?.isTemplate?.toBoolean()}">

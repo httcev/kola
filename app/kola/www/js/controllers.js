@@ -1,6 +1,6 @@
 angular.module('kola.controllers', [])
 
-.controller('TasksCtrl', function($scope, $filter, dbService) {
+.controller('TasksCtrl', function($scope, $filter, $state, dbService) {
     //$scope.tasks = pouchCollection("all/by_type", { keys:["task", "homework"] }, "all/filterByTypes", { types:["task", "homework"] });
     $scope.tasks = [];
 
@@ -30,6 +30,14 @@ angular.module('kola.controllers', [])
     $scope.remove = function(task) {
       task.deleted = true;
       dbService.save(task);
+    };
+
+    $scope.create = function() {
+      $state.go("tab.task-choose-template");
+    };
+
+    $scope.sortByDue = function(task) {
+        return task.due ? task.due : 'zzzzzzz'; 
     };
 
     $scope.reloadTasks();
@@ -185,7 +193,7 @@ angular.module('kola.controllers', [])
     localStorage["user"] = $scope.profile.name;
     localStorage["password"] = $scope.profile.password;
     dbService.initSync().then(function() {
-      return $state.transitionTo("tab.tasks", {}, { reload: true, inherit: false, notify: true });  
+      return $state.go("tab.tasks");
     });
   };
 })
@@ -210,4 +218,84 @@ angular.module('kola.controllers', [])
   }, function() {
     // TODO: 404 error message and open default/main page
   });
+})
+
+.controller('TaskChooseTemplateCtrl', function($scope, $state, $q, dbService) {
+  dbService.all("task").then(function(docs) {
+    var filtered = [];
+    var promises = [];
+    angular.forEach(docs, function(doc) {
+      if (doc["isTemplate"] == true && !doc.deleted) {
+        //promises.push(dbService.resolveIds(doc, "task"));
+        filtered.push(doc);
+      }
+    });
+    $q.all(promises).finally(function() {
+      $scope.templates = filtered;
+    });
+  });
+
+  $scope.choose = function(template) {
+    var params = {};
+    if (template) {
+      params.templateId = template.id;
+    }
+    console.log(params);
+    $state.go("tab.task-create", params);
+  }
+})
+
+.controller('TaskCreateCtrl', function($scope, $state, $stateParams, $ionicLoading, dbService) {
+  console.log("--- GOT template id " + $stateParams.templateId);
+  if ($stateParams.templateId) {
+    dbService.get($stateParams.templateId, "task").then(function(template) {
+      console.log("--- got template -> ", template);
+      var task = angular.copy(template);
+      delete task.id;
+      task.isTemplate = false;
+      task.template = template.id;
+      task.isTemplate = false;
+      $scope.task = task;
+      console.log("--- created new task WITH template");
+    }, function() {
+      // TODO: 404 error message and open default/main page
+    });
+  }
+  else {
+    console.log("--- created new task without template");
+    $scope.task = dbService.createTask();
+  }
+
+  dbService.all("user").then(function(docs) {
+    var filtered = [];
+    var currentUser = {};
+    angular.forEach(docs, function(doc) {
+      if (localStorage["user"] == doc.username) {
+        currentUser = doc;
+        filtered.push(currentUser);
+      }
+    });
+    console.log("--- current user -> ", currentUser);
+    angular.forEach(docs, function(doc) {
+      if (!doc.deleted && currentUser.id != doc.id && currentUser.company && currentUser.company == doc.company) {
+        filtered.push(doc);
+      }
+    });
+    console.log("--- assignableUsers -> ", filtered);
+    $scope.assignableUsers = filtered;
+  });
+
+  $scope.save = function() {
+    // TODO: save new task steps too
+    if ($scope.task.name) {
+      console.log("--- assignee -> ", $scope.task.assignee);
+      dbService.save($scope.task).then(function() {
+        $ionicLoading.show({template: "Neuer Auftrag gespeichert.", duration:2000});
+        $state.go("tab.tasks");
+      }, function(err) {
+        console.log(err);
+        $ionicLoading.show({template: "Speichern fehlgeschlagen!", duration:2000});
+      });
+    }
+  }
 });

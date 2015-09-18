@@ -33,9 +33,14 @@ class ChangesController {
 	    	def tasks = c {
 	    		between("lastUpdated", since, now)
 	    		or {
-	    			eq("creator", user)
-	    			eq("assignee", user)
-	    		}
+	    			// always deliver task templates
+	    			eq("isTemplate", true)
+	    			// otherwise deliver only tasks created by or assigned to requesting user
+		    		or {
+		    			eq("creator", user)
+		    			eq("assignee", user)
+		    		}
+		    	}
 	    	}
 	    	def taskSteps = [] as Set
 	    	tasks?.each { task ->

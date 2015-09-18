@@ -26,9 +26,6 @@
 			<h1 class="page-header">
 				<g:message code="default.edit.label" args="[entityName]" />
 				<div class="buttons pull-right">
-					<g:link class="delete btn btn-danger" action="delete" id="${taskInstance.id}" title="${message(code: 'default.button.delete.label', args:[entityName])}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
-						<i class="fa fa-times"></i>
-					</g:link>
 					<button class="save btn btn-success"><i class="fa fa-save"></i> <g:message code="default.button.update.label" default="Update" /></button>
 				</div>
 			</h1>
