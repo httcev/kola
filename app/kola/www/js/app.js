@@ -131,6 +131,6 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'kola.contro
   $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|file|blob|cdvfile|content):|data:image\//);
 })
 
-.constant("serverUrl", "http://130.83.139.161:8080/platform")
-//.constant("serverUrl", "http://plattform.kola-projekt.de")
+//.constant("serverUrl", "http://130.83.139.161:8080/platform")
+.constant("serverUrl", "http://plattform.kola-projekt.de")
 .constant("databaseName", "tasks");

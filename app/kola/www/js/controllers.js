@@ -1,10 +1,10 @@
 angular.module('kola.controllers', [])
 
-.controller('TasksCtrl', function($scope, $filter, $state, dbService) {
+.controller('TasksCtrl', function($scope, $filter, $state, $rootScope, dbService) {
     //$scope.tasks = pouchCollection("all/by_type", { keys:["task", "homework"] }, "all/filterByTypes", { types:["task", "homework"] });
     $scope.tasks = [];
 
-    $scope.reloadTasks = function() {
+    function reloadTasks() {
       dbService.all("task").then(function(docs) {
         var filtered = [];
         angular.forEach(docs, function(doc) {
@@ -37,10 +37,13 @@ angular.module('kola.controllers', [])
     };
 
     $scope.sortByDue = function(task) {
-        return task.due ? task.due : 'zzzzzzz'; 
+        return task.due ? task.due : (task.lastUpdated ? 'zzzzzzz' : '0'); 
     };
+    $rootScope.$on("syncFinished", function () {
+      reloadTasks();
+    });
 
-    $scope.reloadTasks();
+    reloadTasks();
 })
 
 .controller('NotesCtrl', function($scope, $stateParams, $q, $ionicPopup, $ionicLoading, dbService, rfc4122, mediaAttachment) {
@@ -80,12 +83,10 @@ angular.module('kola.controllers', [])
           dbService.get($stateParams.taskId, "task").then(function(task) {
             angular.forEach(task.reflectionQuestions, function(reflectionQuestion) {
               if (!reflectionAnswers[reflectionQuestion.id]) {
-                console.log("--- creating stub answer");
                 reflectionAnswers[reflectionQuestion.id] = dbService.createReflectionAnswer(task.id, reflectionQuestion.id);
               }
             });
 
-            console.log("--- reflectionAnswers -> ", reflectionAnswers);
             $scope.reflectionAnswers = reflectionAnswers;
             $scope.task = task;
           });
@@ -193,7 +194,10 @@ angular.module('kola.controllers', [])
     localStorage["user"] = $scope.profile.name;
     localStorage["password"] = $scope.profile.password;
     dbService.initSync().then(function() {
-      return $state.go("tab.tasks");
+      return $state.go("tab.tasks").then(function(a,b,c) {
+        console.log("----1", a.views);
+        console.log(a,b,c);
+      });
     });
   };
 })
@@ -203,7 +207,6 @@ angular.module('kola.controllers', [])
   
   dbService.get($stateParams.taskId, "task").then(function(task) {
     $scope.task = task;
-    console.log(task);
   }, function() {
     // TODO: 404 error message and open default/main page
   });
@@ -213,7 +216,7 @@ angular.module('kola.controllers', [])
   $scope.step = {};
 
   dbService.get($stateParams.stepId, "taskStep").then(function(taskStep) {
-    console.log(taskStep);
+    $scope.taskId = $stateParams.taskId;
     $scope.step = taskStep;
   }, function() {
     // TODO: 404 error message and open default/main page
@@ -240,56 +243,61 @@ angular.module('kola.controllers', [])
     if (template) {
       params.templateId = template.id;
     }
-    console.log(params);
     $state.go("tab.task-create", params);
   }
 })
 
-.controller('TaskCreateCtrl', function($scope, $state, $stateParams, $ionicLoading, dbService) {
-  console.log("--- GOT template id " + $stateParams.templateId);
+.controller('TaskCreateCtrl', function($scope, $state, $stateParams, $ionicLoading, $rootScope, dbService, rfc4122) {
   if ($stateParams.templateId) {
     dbService.get($stateParams.templateId, "task").then(function(template) {
-      console.log("--- got template -> ", template);
       var task = angular.copy(template);
-      delete task.id;
+      task.id = rfc4122.v4();
       task.isTemplate = false;
       task.template = template.id;
-      task.isTemplate = false;
-      $scope.task = task;
-      console.log("--- created new task WITH template");
+      angular.forEach(task.steps, function(step) {
+        step.id = rfc4122.v4();
+      });
+
+      dbService.all("user").then(function(docs) {
+        var filtered = [];
+        var currentUser = {};
+        angular.forEach(docs, function(doc) {
+          if (localStorage["user"] == doc.username) {
+            currentUser = doc;
+            if (!task.assignee) {
+              console.log("--- setting assignee to " +currentUser.id);
+              task.assignee = currentUser.id;
+            }
+            filtered.push(currentUser);
+          }
+        });
+        angular.forEach(docs, function(doc) {
+          if (!doc.deleted && currentUser.id != doc.id && currentUser.company && currentUser.company == doc.company) {
+            filtered.push(doc);
+          }
+        });
+        $scope.task = task;
+        $scope.assignableUsers = filtered;
+      });
     }, function() {
       // TODO: 404 error message and open default/main page
     });
   }
   else {
-    console.log("--- created new task without template");
     $scope.task = dbService.createTask();
   }
 
-  dbService.all("user").then(function(docs) {
-    var filtered = [];
-    var currentUser = {};
-    angular.forEach(docs, function(doc) {
-      if (localStorage["user"] == doc.username) {
-        currentUser = doc;
-        filtered.push(currentUser);
-      }
-    });
-    console.log("--- current user -> ", currentUser);
-    angular.forEach(docs, function(doc) {
-      if (!doc.deleted && currentUser.id != doc.id && currentUser.company && currentUser.company == doc.company) {
-        filtered.push(doc);
-      }
-    });
-    console.log("--- assignableUsers -> ", filtered);
-    $scope.assignableUsers = filtered;
-  });
 
   $scope.save = function() {
-    // TODO: save new task steps too
     if ($scope.task.name) {
-      console.log("--- assignee -> ", $scope.task.assignee);
-      dbService.save($scope.task).then(function() {
+      var objectsToSave = [];
+      angular.forEach($scope.task.steps, function(step) {
+        objectsToSave.push(step);
+      });
+      objectsToSave.push($scope.task);
+      dbService.save(objectsToSave).then(function() {
+        // TODO: this is a hack to reload tasks
+        $rootScope.$broadcast("syncFinished");
         $ionicLoading.show({template: "Neuer Auftrag gespeichert.", duration:2000});
         $state.go("tab.tasks");
       }, function(err) {

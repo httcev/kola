@@ -135,9 +135,12 @@ angular.module('kola.services', ['uuid'])
         }
 
         $rootScope.onlineState.isSyncing = false;
+        $rootScope.$broadcast("syncFinished");
+        /*
         if (!$rootScope.$$phase) {
           $rootScope.$apply();
         }
+        */
         d.resolve();
       });
     }

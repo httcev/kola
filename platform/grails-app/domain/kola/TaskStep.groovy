@@ -4,7 +4,7 @@ import java.util.UUID
 
 class TaskStep {
 	static hasMany = [resources:Asset, attachments:Asset]
-	static belongsTo = [ task:Task ]
+	//static belongsTo = [ task:Task ]
     static constraints = {
     	name blank:false
     	description nullable:true
@@ -28,7 +28,7 @@ class TaskStep {
     List<Asset> attachments     // defined as list to keep order in which elements got added
 
     static _exported = ["name", "description", "deleted"]
-    static _referenced = ["resources", "attachments", "creator", "task"]
+    static _referenced = ["resources", "attachments", "creator"]
     static {
         grails.converters.JSON.registerObjectMarshaller(TaskStep) { step ->
             def doc = step.properties.findAll { k, v ->

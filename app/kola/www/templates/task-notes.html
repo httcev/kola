@@ -29,10 +29,12 @@
 
       <div class="item tabs tabs-secondary">
         <button class="button button-clear button-positive" ng-click="attachPhoto(newNote)"><i class="icon ion-camera"></i></button>
+<!--        
         <button class="button button-clear button-positive" ng-click="attachVideo(newNote)"><i class="icon ion-videocamera"></i></button>
         <button class="button button-clear button-positive" ng-click="attachAudio(newNote)"><i class="icon ion-mic-a"></i></button>
+-->        
         <button class="button button-clear icon ion-trash-a" ng-click="remove(newNote)"></button>
-        <button class="button button-clear button-positive" ng-click="save(newNote)"><i class="icon balanced ion-paper-airplane"></i></button>
+        <button ng-if="newNote.text || newNote.attachments" class="button button-balanced" ng-click="save(newNote)"><i class="icon ion-paper-airplane"></i> Speichern</button>
       </div>
     </div>
     <div ng-hide="!notes || notes.length || newNote">Bisher ist noch keine Dokumentation angelegt.</div>

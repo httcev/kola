@@ -152,7 +152,7 @@ class ChangesController {
 				if (!model.creator) {
 					model.creator = user
 				}
-				if (!model.save(true)) {
+				if (!model.save()) {
 	    			model.errors.allErrors.each { println it }
 				}
 				else {

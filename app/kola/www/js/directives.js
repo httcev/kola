@@ -120,9 +120,7 @@ angular.module('kola.directives', [])
     templateUrl: 'templates/directive-sync-control.html',
     link: function($scope) {
     	$scope.sync = function() {
-		    dbService.sync().then(function() {
-		    	$scope.reloadTasks();
-		    });
+		    dbService.sync();
     	}
     }
   };
