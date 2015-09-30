@@ -31,7 +31,8 @@ th.sortable.sorted.desc a:after { font-family:"FontAwesome"; content:" \f0d7" }
  avatar { width:40px; height:40px; font-size:28px }
 .form-padding { padding-top:6px }
 .margin { margin-top:10px; }
-.attachments .thumbnail { width:80px; height:auto; min-height:70px; margin-right:15px; vertical-align:middle }
+.attachments .thumbnail { width:80px; height:auto; min-height:70px; line-height:70px; margin-right:15px; vertical-align:middle }
+.attachments .thumbnail .caption { word-break:break-all; line-height:initial; font-size:75% }
 .drag-handle { cursor:move; cursor:-webkit-grabbing }
 
 body.task.create .list-group, body.task.createTemplate .list-group, body.task.edit .list-group { margin-bottom:0 }
@@ -39,5 +40,5 @@ body.task.create .list-group li:last-child, body.task.createTemplate .list-group
 body.task.show .steps { counter-reset:step-counter }
 body.task.show .steps .list-group-item-heading:before { content:counter(step-counter) ". "; counter-increment:step-counter; color:#CCC; font-weight:bold }
 .reflection-question { font-weight:bold }
-.formatted { white-space:pre }
+.formatted { white-space:pre-line }
 .panel-title { font-weight:bold }

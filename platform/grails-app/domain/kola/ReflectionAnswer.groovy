@@ -13,7 +13,7 @@ class ReflectionAnswer {
     }
 	static searchable = {
 		all = [analyzer: 'german']
-        only = ['text']
+        only = ['text', 'deleted']
     }
     static belongsTo = [task:Task, question:ReflectionQuestion]
 

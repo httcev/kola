@@ -10,7 +10,7 @@ class ReflectionQuestion {
     }
 	static searchable = {
 		all = [analyzer: 'german']
-        only = ['name']
+        only = ['name', 'deleted']
     }
 
     String name

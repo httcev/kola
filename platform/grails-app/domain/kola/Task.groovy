@@ -7,7 +7,7 @@ import org.apache.commons.collections.FactoryUtils
 class Task {
     static searchable = {
         all = [analyzer: 'german']
-        only = ['name', 'description']
+        only = ['name', 'description', 'deleted']
         name boost:3.0
         description boost:2.0
     }

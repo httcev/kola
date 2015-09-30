@@ -111,11 +111,14 @@ class AssetController {
 
                 if (assetInstance.save(true)) {
                     RequestContextHolder.currentRequestAttributes().flashScope.message = message(code: 'default.created.message', args: [message(code: 'asset.label', default: 'Asset'), assetInstance.id])
+                    // need to clear the flow's persistence context, otherwise we get a NotSerializableException for the newly saved Asset
+                    flow.persistenceContext.clear()
                     return success()
                 }
                 else {
                     return error()  
                 }
+                return success()
     		}.to "finish"
         }
         finish {

@@ -7,7 +7,7 @@ class Asset {
 
 	static searchable = {
 		all = [analyzer: 'german']
-        only = ['name', 'description', 'mimeType', 'subType', 'externalUrl', 'filename', 'anchor', 'indexText']
+        only = ['name', 'description', 'mimeType', 'subType', 'externalUrl', 'filename', 'anchor', 'indexText', 'deleted']
         name boost:3.0
         description boost:2.0
         subType index:"not_analyzed"

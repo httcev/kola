@@ -24,10 +24,10 @@ class ChangesController {
 	    	def since = clientData?.info?.lastSyncDate ? DATEFORMAT.parse(clientData?.info?.lastSyncDate) : new Date(0)
 
 	    	def now = new Date()
-	    	println "handing out changes between $since and $now"
+	    	println "handing out changes for $user between $since and $now"
 
     		// learning resources may change without having a changed task, so hand out all modified ones.
-    		def assets = Asset.findAllByLastUpdatedBetweenAndSubType(since, now, "learning-resource")
+    		def assets = Asset.findAllByLastUpdatedBetweenAndSubType(since, now, "learning-resource") as Set
 
 			def c = Task.createCriteria()
 	    	def tasks = c {

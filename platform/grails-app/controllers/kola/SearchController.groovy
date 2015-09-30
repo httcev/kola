@@ -62,8 +62,6 @@ class SearchController {
 */
 //        def results = elasticSearchServic.search(esQuery, [highlight: highlighter, size:params.max, from:params.offset])    	
 		def query = params.q ? escapeQuery(params.q) : null
-println "---- HERE -> query=" + query
-
         def results = null
         if (params.q) {
 	        results = elasticSearchService.search([searchType:'dfs_query_and_fetch', highlight: highlighter, size:params.max, from:params.offset]) {
@@ -71,9 +69,11 @@ println "---- HERE -> query=" + query
 			      must {
 			          query_string(query: query)
 			      }
+			      must {
+			          term(deleted:false)
+			      }
 			      if (params.subType) {
 			          must {
-			          	println "--- setting subType=" + params.subType
 			              term(subType: params.subType)
 			          }
 			      }
