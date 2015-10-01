@@ -45,17 +45,17 @@ class ChangesController {
 	    	def taskSteps = [] as Set
 	    	tasks?.each { task ->
 	    		// add modified attachments
-	    		_addMofifiedDocs(task.attachments, assets, since, now)
+	    		_addModifiedDocs(task.attachments, assets, since, now)
 	    		task.steps?.each { step ->
 		    		taskSteps.add(step)
 		    		// add modified attachments
-		    		_addMofifiedDocs(step.attachments, assets, since, now)
+		    		_addModifiedDocs(step.attachments, assets, since, now)
 	    		}
     		}
 	    	def taskDocumentations = TaskDocumentation.findAllByLastUpdatedBetweenAndCreator(since, now, user);
 	    	taskDocumentations?.each { taskDocumentation ->
 	    		// add modified attachments
-	    		_addMofifiedDocs(taskDocumentation.attachments, assets, since, now)
+	    		_addModifiedDocs(taskDocumentation.attachments, assets, since, now)
 	    	}
 
 	    	def result = [
@@ -71,6 +71,7 @@ class ChangesController {
 		    		"taskDocumentation" : taskDocumentations
 	    		]
     		]
+    		println result
 	    	render result as JSON
 	    }
 	    catch(e) {
@@ -118,7 +119,7 @@ class ChangesController {
 	    }
     }
 
-    def _addMofifiedDocs(docs, target, start, end) {
+    def _addModifiedDocs(docs, target, start, end) {
     	docs?.each { doc ->
     		if (!doc) {
     			println "--- doc is null"

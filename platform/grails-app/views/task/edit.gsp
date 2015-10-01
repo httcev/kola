@@ -11,6 +11,7 @@
 		<asset:javascript src="Sortable.min.js"/>
 		<asset:javascript src="picker.js"/>
 		<asset:javascript src="picker.date.js"/>
+		<asset:javascript src="picker.time.js"/>
 		<asset:javascript src="picker.de_DE.js"/>
 	</head>
 	<body>

@@ -56,7 +56,7 @@
 	}
 
 	$(document).ready(function() {
-		$.get("${raw(createLink(controller:'search', action:'index', params:[hideFilter:true, type:'reflectionQuestion']))}", function(data) {
+		$.get("${raw(createLink(controller:'search', action:'index', params:[q:'*', hideFilter:true, type:'reflectionQuestion']))}", function(data) {
 			updateReflectionQuestionModalContent(data);
 		});
 		$("#reflectionQuestionModal").on("shown.bs.modal", function () {

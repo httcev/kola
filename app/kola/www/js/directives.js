@@ -11,9 +11,9 @@ angular.module('kola.directives', [])
 	},
     templateUrl: 'templates/directive-learning-resources.html',
     link: function($scope) {
-    	$scope.openResource = function(resource) {
+    	$scope.openUrlNative = function(url) {
 		    if (ionic.Platform.isWebView()) {
-		      navigator.startApp.start([["action", "VIEW"], [resource.url]], function(message) {
+		      navigator.startApp.start([["action", "VIEW"], [url]], function(message) {
 		        console.log(message);
 		      }, 
 		      function(error) {
@@ -21,7 +21,7 @@ angular.module('kola.directives', [])
 		      });
 		    }
 		    else {
-		      window.open(resource.url);
+		      window.open(url);
 		    }
     	}
     }
@@ -62,7 +62,6 @@ angular.module('kola.directives', [])
             var attachmentUrls = [];
             if (doc && doc.attachments) {
 				angular.forEach(doc.attachments, function(attachment, attachmentKey) {
-        	console.log(attachment);
 					if (attachment._localURL) {
 						attachmentUrls.push(attachment._localURL);
 					}
@@ -84,7 +83,6 @@ angular.module('kola.directives', [])
 		$scope.showImage = function(index, imageUrls) {
 			$scope.activeSlide = index;
 			$scope.imageUrls = imageUrls;
-			console.log("--- showing image " + index + " from urls -> ", imageUrls);
 			showImageModal('templates/image-popover.html');
 		};
 
@@ -103,6 +101,21 @@ angular.module('kola.directives', [])
 			$scope.modal.hide();
 			$scope.modal.remove()
 		};
+
+    	$scope.openUrlNative = function(url, mimeType) {
+		    if (ionic.Platform.isWebView()) {
+		    	console.log("opening " + url + ", type=" + mimeType);
+		      navigator.startApp.start([["action", "VIEW"], [url]], function(message) {
+		        console.log(message);
+		      }, 
+		      function(error) {
+		          console.log(error);
+		      });
+		    }
+		    else {
+		      window.open(url);
+		    }
+    	};
     }
   };
 })

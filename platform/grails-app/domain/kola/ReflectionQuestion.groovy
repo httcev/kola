@@ -16,8 +16,9 @@ class ReflectionQuestion {
     String name
     Date lastUpdated
     boolean deleted
+    boolean autoLink
 
-    static _exported = ["name", "deleted"]
+    static _exported = ["name", "deleted", "autoLink"]
     static {
         grails.converters.JSON.registerObjectMarshaller(ReflectionQuestion) {
             def doc = it.properties.findAll { k, v ->

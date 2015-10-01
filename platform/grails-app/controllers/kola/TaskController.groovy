@@ -58,7 +58,6 @@ class TaskController {
                 }
             }
         }
-        println taskDocumentations.entrySet()
 
         ["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations]
     }
@@ -66,6 +65,8 @@ class TaskController {
     def create() {
         params.isTemplate = false
         def task = new Task(params)
+        // auto link reflection questions
+        task.reflectionQuestions = ReflectionQuestion.where { autoLink == true && deleted != true }.list()
         if (task.template) {
             // copy relevant values from template into new task
             task.name = task.template.name
@@ -73,7 +74,10 @@ class TaskController {
             task.template = task.template
             task.attachments = task.template.attachments
             task.resources = task.template.resources
-            task.reflectionQuestions = task.template.reflectionQuestions
+            // join reflection questions from template
+            task.reflectionQuestions.addAll(task.template.reflectionQuestions)
+            task.reflectionQuestions.unique()
+
             task.template.steps?.each { step ->
                 task.addToSteps(new TaskStep(name:step.name, description:step.description, attachments:step.attachments))
             }
@@ -92,6 +96,8 @@ class TaskController {
     @Secured(['ROLE_ADMIN', 'ROLE_TASK_TEMPLATE_CREATOR'])
     def createTemplate() {
         params.isTemplate = true
+        // auto link reflection questions
+        params.reflectionQuestions = ReflectionQuestion.where { autoLink == true && deleted != true }.list()
         respond new Task(params), view:"create"
     }
 
@@ -169,6 +175,28 @@ class TaskController {
         redirect action:"index", method:"GET"
     }
 
+    def export(Task taskInstance) {
+        def reflectionAnswers = [:]
+        def taskDocumentations = [:]
+        if (!taskInstance.isTemplate) {
+            taskInstance.reflectionQuestions?.each { reflectionQuestion ->
+                reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false)
+            }
+            
+            def docs = TaskDocumentation.findAllByTaskAndDeleted(taskInstance, false)
+            if (docs) {
+                taskDocumentations[taskInstance.id] = docs
+            }
+            taskInstance.steps?.each { step ->
+                docs = TaskDocumentation.findAllByStepAndDeleted(step, false)
+                if (docs) {
+                    taskDocumentations[step.id] = docs
+                }
+            }
+        }
+        renderPdf(template:"export", model:["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations])//, filename:taskInstance.name + ".pdf")
+    }
+
     protected void notFound() {
         flash.message = message(code: 'default.not.found.message', args: [message(code: 'Task.label', default: 'Task'), params.id])
         redirect action: "index", method: "GET"
@@ -209,7 +237,9 @@ class TaskController {
             def stepDef = params["steps[$i]"]
             if (stepDef && stepDef.deleted != "true") {
                 println "--- $i=" + stepDef
-                taskInstance.addToSteps(new TaskStep(stepDef))
+                def step = stepDef.id ? TaskStep.get(stepDef.id) : new TaskStep()
+                step.properties = stepDef
+                taskInstance.addToSteps(step)
             }
         }
 /*
@@ -237,9 +267,11 @@ class TaskController {
                 log.error "Couldn't add reflection question: ReflectionQuestion not found: ${it}"
             }
         }
+        
         // create new attachments
-        def f = request.multiFileMap?.each { k,files ->
+        request.multiFileMap?.each { k,files ->
             println "--- upload file with key " + k
+            println files
             def domainName = k - "._newAttachment" - "_newAttachment"
             println "--- domainName=" + domainName
             def domain = taskInstance
@@ -251,7 +283,7 @@ class TaskController {
                     def index = matcher[0][2] as Integer
                     //domain = taskInstance."${domainName}"
                     println "--- prop=${prop}"
-                    println taskInstance
+                    println taskInstance.properties
                     println taskInstance."${prop}"
                     if (taskInstance."${prop}"?.size() > index) {
                         domain = taskInstance."${prop}"?.get(index)
@@ -266,7 +298,9 @@ class TaskController {
                     if (!asset.save(true)) {
                         asset.errors.allErrors.each { println it }
                     }
-                    domain?.addToAttachments(asset)
+                    else {
+                        domain?.addToAttachments(asset)
+                    }
                 }
             }
         }

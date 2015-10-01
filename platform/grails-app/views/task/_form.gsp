@@ -153,15 +153,16 @@
 	}
 
 	function updateStepIndices() {
-		$("#step-list li").each(function(index) {
+		$("#step-list>li").each(function(index) {
 			$(".step-index", this).text(index + 1);
 			var prefix = "steps[" + index + "]";
-			$(":input", $(this)).each(function() {
+			$(":input", this).each(function() {
 				var field = $(this);
 				var name = field.attr("name");
 				if (name) {
 					var replaced = name.replace(/steps\[.*?\]/, prefix);
 					field.attr("name", replaced);
+					console.log(field, "name -> ", replaced);
 				}
 			})
 		});

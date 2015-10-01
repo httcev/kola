@@ -98,21 +98,6 @@ angular.module('kola.services', ['uuid'])
     sync();
   }
 
-  function onEndSync(result) {
-    if (result && result.syncOK === true) {
-      // synchronized successfully
-    }
-    if (result && result.status == 401) {
-      $ionicLoading.show({template: "Login fehlgeschlagen. Bitte überprüfen Sie Nutzernamen und Passwort.", duration:2000});
-      $state.go("tab.account");
-    }
-
-    $rootScope.onlineState.isSyncing = false;
-    if (!$rootScope.$$phase) {
-      $rootScope.$apply();
-    }
-  }
-
   function onSyncProgress(msg) {
   }
 
@@ -129,7 +114,14 @@ angular.module('kola.services', ['uuid'])
           // synchronized successfully
         }
         if (result && result.status == 401) {
-          $ionicLoading.show({template: "Login fehlgeschlagen. Bitte überprüfen Sie Nutzernamen und Passwort.", duration:2000});
+          var message;
+          if (localStorage["user"]) {
+            message = "Login fehlgeschlagen. Bitte überprüfen Sie Nutzernamen und Passwort.";
+          }
+          else {
+            message = "Willommen bei KOLA! Bitte geben Sie Ihren Nutzernamen und Passwort ein.";
+          }
+          $ionicLoading.show({template:message, duration:2000});
           $state.go("tab.account");
           d.reject();
         }
@@ -191,7 +183,6 @@ angular.module('kola.services', ['uuid'])
     else {
       options.task = targetId;
     }
-    console.log("--- options -> ", options);
     return _create("taskDocumentation", options);
   }
 
@@ -281,14 +272,11 @@ angular.module('kola.services', ['uuid'])
         if (doc._table == "asset" && copy.subType == "attachment" && localURL && localURL.indexOf(assetsDir) != 0) {
           // copy attachment data from temp dir to assets dir
           window.resolveLocalFileSystemURL(localURL, function(fileEntry) {
-            console.log(fileEntry);
             console.log("--- moving attachment from " + (fileEntry.filesystem.root.nativeURL + fileEntry.name) + " to " + (assetsDir + copy.id));
             $cordovaFile.moveFile(fileEntry.filesystem.root.nativeURL, fileEntry.name, assetsDir, copy.id).then(function (success) {
-              console.log("MOOOVED!");
               d.resolve();
             }, function (error) {
               // error
-              console.log("ERROR MOOOVING!");
               console.log(error);
               d.reject();
             });
@@ -369,11 +357,20 @@ angular.module('kola.services', ['uuid'])
 
       $cordovaFile.checkFile(assetsDir, attachment.id).then(function (fileEntry) {
         console.log("--- asset file found " + attachment.id)
-        // file exists
-        fileEntry.file(function(f) {
-          attachment._localURL = f.localURL;
-          d.resolve();
-        });
+        // file exists.
+        // for images (and TODO: videos) use cdvfile:// url to let the cordova webview load the attachments.
+        // for other file types (e.g. PDFs), use fileEntry's nativeURL, so that Android can open it natively.
+        console.log(fileEntry);
+        if (attachment.mimeType.indexOf("image/") == 0) {
+          fileEntry.file(function(f) {
+            attachment._localURL = f.localURL;
+            d.resolve();
+          });
+        }
+        else {
+            attachment._localURL = fileEntry.nativeURL;
+            d.resolve();
+        }
       }, function() {
         console.log("--- asset file NOT found " + attachment.id)
         // file not found

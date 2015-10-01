@@ -1,67 +1,60 @@
 
-<g:set var="authService" bean="authService"/>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <g:set var="assetService" bean="assetService"/>
 <html>
 	<head>
-		<meta name="layout" content="main">
 		<g:set var="entityName" value="${message(code: taskInstance.isTemplate?.toBoolean() ? 'kola.taskTemplate' : 'kola.task')}" />
 		<g:set var="entitiesName" value="${message(code: taskInstance.isTemplate?.toBoolean() ? 'kola.taskTemplates' : 'kola.tasks')}" />
 		<title><g:message code="default.show.label" args="[entityName]" /></title>
-		<asset:stylesheet src="blueimp-gallery.min.css"/>
-		<asset:javascript src="jquery.blueimp-gallery.min.js"/>
+		<link rel="stylesheet" href="${resource(dir:'assets', file:'application.css')}" type="text/css" media="all" />
+
+		<style  type="text/css">
+		  @page { size:210mm 297mm; @bottom-left { content: element(header); }}
+		  *::after, *::before { display:block !important; }
+		  #print-footer { position:running(header); font-size:10px; line-height:11px; vertical-align: middle; text-align: right }
+		  img { width: 200px }
+		  .panel { page-break-inside: avoid; }
+		</style>
 	</head>
 	<body>
-		<ol class="breadcrumb">
-			<li><g:link uri="/"><g:message code="kola.home" /></g:link></li>
-			<li><g:link action="index" params="[isTemplate:taskInstance.isTemplate]">${entitiesName}</g:link></li>
-			<li class="active"><g:message code="default.show.label" args="[entityName]" /></li>
-		</ol>
-		<g:if test="${flash.message}">
-			<div class="message alert alert-success" role="status">${flash.message}</div>
-		</g:if>
+		<div id="print-footer">
+			<img src="${assetPath(src: 'Kola-h-100.png', absolute:true)}" width="44"/>
+			Kompetenzorientiertes Lernen im Arbeitsprozess mit digitalen Medien
+		</div>
 		<h1 class="page-header">
 			${taskInstance?.name}
-			<div class="buttons pull-right">
-				<g:if test="${authService.canDelete(taskInstance)}">
-					<g:link class="delete btn btn-danger" action="delete" id="${taskInstance.id}" title="${message(code: 'default.button.delete.label', args:[entityName])}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><i class="fa fa-times"></i></g:link>
-				</g:if>
-				<g:if test="${authService.canEdit(taskInstance)}">
-					<g:link class="export btn btn-primary" action="export" id="${taskInstance.id}" title="${message(code: 'default.export.label', args:[entityName])}"><i class="fa fa-cloud-download"></i></g:link>
-					<g:link class="edit btn btn-primary" action="edit" id="${taskInstance.id}" title="${message(code: 'default.edit.label', args:[entityName])}"><i class="fa fa-pencil"></i></g:link>
-				</g:if>
-			</div>
 		</h1>
+
 		<g:if test="${taskInstance?.description}">
 			<div class="row">
-				<div class="col-sm-8 formatted"><kola:markdown>${taskInstance.description}</kola:markdown></div>
-				<div class="col-sm-4">
-					<div class="well">
-						<g:if test="${taskInstance?.due}">
-							<div class="row">
-								<div class="col-md-5"><label><g:message code="kola.task.due" />:</label></div>
-								<div class="col-md-7"><g:formatDate date="${taskInstance.due}" type="date"/></div>
-							</div>
-							</g:if>
+				<div class="formatted"><kola:markdown>${taskInstance.description}</kola:markdown></div>
+				<div class="well">
+					<g:if test="${taskInstance?.due}">
 						<div class="row">
-							<div class="col-md-5"><label><g:message code="kola.meta.creator" />:</label></div>
-							<div class="col-md-7"><g:render bean="${taskInstance.creator.profile}" template="/profile/show" var="profile" /></div>
+							<div class="col-md-5"><label><g:message code="kola.task.due" />:</label></div>
+							<div class="col-md-7"><g:formatDate date="${taskInstance.due}" type="date"/></div>
 						</div>
-						<div class="row">
-							<div class="col-md-5"><label><g:message code="kola.meta.lastUpdated" />:</label></div>
-							<div class="col-md-7"><g:formatDate date="${taskInstance.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/></div>
-						</div>
-						<g:if test="${taskInstance?.assignee}">
-							<div class="row">
-								<div class="col-md-5"><label><g:message code="kola.task.assignee" />:</label></div>
-								<div class="col-md-7"><g:render bean="${taskInstance.assignee.profile}" template="/profile/show" var="profile" /></div>
-							</div>
 						</g:if>
+					<div class="row">
+						<div class="col-md-5"><label><g:message code="kola.meta.creator" />:</label></div>
+						<div class="col-md-7">${taskInstance.creator.profile.displayName}</div>
 					</div>
+					<div class="row">
+						<div class="col-md-5"><label><g:message code="kola.meta.lastUpdated" />:</label></div>
+						<div class="col-md-7"><g:formatDate date="${taskInstance.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/></div>
+					</div>
+					<g:if test="${taskInstance?.assignee}">
+						<div class="row">
+							<div class="col-md-5"><label><g:message code="kola.task.assignee" />:</label></div>
+							<div class="col-md-7">${taskInstance.assignee.profile.displayName}</div>
+						</div>
+					</g:if>
 				</div>
 			</div>
 		</g:if>
 		<g:if test="${taskInstance?.attachments?.size() > 0}">
-			<g:render bean="${taskInstance?.attachments}" template="attachments" var="attachments" />
+			<g:render bean="${taskInstance?.attachments}" template="exportAttachments" var="attachments" />
 		</g:if>
 		<g:if test="${taskInstance?.resources?.size() > 0}">
 		<div class="panel panel-default">
@@ -72,7 +65,7 @@
 						<h4 class="list-group-item-heading">
 							<i class="fa fa-external-link"></i> ${assetInstance.name}
 						</h4>
-						<p class="list-group-item-text text-default formatted">${assetInstance.description?.take(100)}</p>
+						<p class="list-group-item-text text-default formatted">${assetInstance.description}</p>
 					</a>
 				</g:each>
 			</div>
@@ -87,7 +80,7 @@
 						<h4 class="list-group-item-heading">${step.name}</h4>
 						<p class="list-group-item-text formatted">${step.description}</p>
 						<g:if test="${step.attachments?.size() > 0}">
-							<g:render bean="${step.attachments}" template="attachments" var="attachments" />
+							<g:render bean="${step.attachments}" template="exportAttachments" var="attachments" />
 						</g:if>
 					</li>
 				</g:each>
@@ -105,7 +98,7 @@
 							<div class="list-group-item-text clearfix">
 								<p class="formatted">${reflectionAnswer.text}</p>
 								<small class="pull-right">
-									<g:render bean="${reflectionAnswer.creator.profile}" template="/profile/show" var="profile" />,
+									${reflectionAnswer.creator.profile.displayName},
 									<g:formatDate date="${reflectionAnswer.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
 								</small>
 							</div>
@@ -123,9 +116,9 @@
 					<li class="list-group-item">
 						<div class="list-group-item-text clearfix">
 							<p class="formatted">${taskDocumentation.text}</p>
-							<g:render bean="${taskDocumentation.attachments}" template="attachments" var="attachments" />
+							<g:render bean="${taskDocumentation.attachments}" template="exportAttachments" var="attachments" />
 							<small class="pull-right">
-								<g:render bean="${taskDocumentation.creator.profile}" template="/profile/show" var="profile" />,
+								${taskDocumentation.creator.profile.displayName},
 								<g:formatDate date="${taskDocumentation.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
 							</small>
 						</div>
@@ -138,9 +131,9 @@
 						<li class="list-group-item">
 							<div class="list-group-item-text clearfix">
 								<p class="formatted">${taskDocumentation.text}</p>
-								<g:render bean="${taskDocumentation.attachments}" template="attachments" var="attachments" />
+								<g:render bean="${taskDocumentation.attachments}" template="exportAttachments" var="attachments" />
 								<small class="pull-right">
-									<g:render bean="${taskDocumentation.creator.profile}" template="/profile/show" var="profile" />,
+									${taskDocumentation.creator.profile.displayName},
 									<g:formatDate date="${taskDocumentation.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
 								</small>
 							</div>

@@ -19,7 +19,7 @@ class SearchController {
 			preTags '<strong>'
   			postTags '</strong>'
 		}
-		def options = [highlight: highlighter, size:params.max, from:params.offset]
+		def options = [searchType:'dfs_query_and_fetch', highlight: highlighter, size:params.max, from:params.offset]
 		def types = params.list("type")?.unique(false).collect {
 			switch (it) {
 				case "asset":
@@ -31,43 +31,14 @@ class SearchController {
 		if (types) {
 			options.types = types
 		}
-		println "--- options=" + options
-		//def query = params.q ? QueryParser.escape(params.q) : null
-		//println "q=" + query
-//		def results = elasticSearchService.search("${params.q}", [highlight: highlighter, size:params.max, from:params.offset])    	
 
-/*
-		def esQuery = {
-            filtered {
-                query {
-                    if (params.q) {
-                        query_string {
-                            //fields = ["venue.name","artists.name"]
-                            query = params.q.encodeAsElasticSearchQuery()
-                            default_operator = "AND"
-                        }
-                    } else {
-                        match_all {}
-                    }
-                }
-                filter {
-                    if (params.subType) {
-                        //geo_distance("venue.coords":coords,distance:"20mi")
-                    } else {
-                        match_all {}
-                    }
-                }
-            }
-        }
-*/
-//        def results = elasticSearchServic.search(esQuery, [highlight: highlighter, size:params.max, from:params.offset])    	
-		def query = params.q ? escapeQuery(params.q) : null
+		def query = escapeQuery(params.q)
         def results = null
-        if (params.q) {
-	        results = elasticSearchService.search([searchType:'dfs_query_and_fetch', highlight: highlighter, size:params.max, from:params.offset]) {
+        if (query) {
+	        results = elasticSearchService.search(options) {
 			  bool {
 			      must {
-			          query_string(query: query)
+			          query_string(query:query, analyze_wildcard:true)
 			      }
 			      must {
 			          term(deleted:false)
@@ -88,6 +59,13 @@ class SearchController {
 		def escapedCharacters = Regexp.escape('\\+-&|!(){}[]^~*?:')
 		return query?.gsub(/([#{escaped_characters}])/, '\\\\\1')
 		*/
-		return QueryParser.escape(query)
+		if ("*".equals(query)) {
+			return query;
+		}
+		query = query?.trim()
+		if (query) {
+			return "*" + QueryParser.escape(query) + "*"
+		}
+		return null
 	}
 }

@@ -204,8 +204,9 @@ angular.module('kola.controllers', [])
   
   dbService.get($stateParams.taskId, "task").then(function(task) {
     $scope.task = task;
-  }, function() {
+  }, function(err) {
     // TODO: 404 error message and open default/main page
+    console.log(err);
   });
 })
 
@@ -254,34 +255,36 @@ angular.module('kola.controllers', [])
       angular.forEach(task.steps, function(step) {
         step.id = rfc4122.v4();
       });
-
-      dbService.all("user").then(function(docs) {
-        var filtered = [];
-        var currentUser = {};
-        angular.forEach(docs, function(doc) {
-          if (localStorage["user"] == doc.username) {
-            currentUser = doc;
-            if (!task.assignee) {
-              console.log("--- setting assignee to " +currentUser.id);
-              task.assignee = currentUser.id;
-            }
-            filtered.push(currentUser);
-          }
-        });
-        angular.forEach(docs, function(doc) {
-          if (!doc.deleted && currentUser.id != doc.id && currentUser.company && currentUser.company == doc.company) {
-            filtered.push(doc);
-          }
-        });
-        $scope.task = task;
-        $scope.assignableUsers = filtered;
-      });
+      setTaskAndAssignableUsers(task)
     }, function() {
       // TODO: 404 error message and open default/main page
     });
   }
   else {
-    $scope.task = dbService.createTask();
+    setTaskAndAssignableUsers(dbService.createTask());
+  }
+
+  function setTaskAndAssignableUsers(task) {
+    dbService.all("user").then(function(docs) {
+      var filtered = [];
+      var currentUser = {};
+      angular.forEach(docs, function(doc) {
+        if (localStorage["user"] == doc.username) {
+          currentUser = doc;
+          if (!task.assignee) {
+            task.assignee = currentUser.id;
+          }
+          filtered.push(currentUser);
+        }
+      });
+      angular.forEach(docs, function(doc) {
+        if (!doc.deleted && currentUser.id != doc.id && currentUser.company && currentUser.company == doc.company) {
+          filtered.push(doc);
+        }
+      });
+      $scope.assignableUsers = filtered;
+      $scope.task = task;
+    });
   }
 
 

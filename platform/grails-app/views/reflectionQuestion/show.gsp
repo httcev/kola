@@ -30,7 +30,12 @@
 		</h1>
 		<div class="row">
 			<div class="col-sm-2"><label><g:message code="kola.reflectionQuestion.question" />:</label></div>
-			<div class="col-sm-10">${reflectionQuestionInstance?.name}</div>
+			<div class="col-sm-10"><b class="text-warning">${reflectionQuestionInstance?.name}</b></div>
+		</div>
+		<div class="row">
+			<div class="col-sm-offset-2 col-sm-10 form-padding${reflectionQuestionInstance.autoLink ? '' : ' struck'}">
+				<i class="fa fa-${reflectionQuestionInstance.autoLink ? 'check-' : ''}square-o"></i> <g:message code="kola.reflectionQuestion.autoLink" />
+			</div>
 		</div>
 	</body>
 </html>

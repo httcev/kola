@@ -28,6 +28,7 @@ class BootStrap {
             assert UserRole.count() == 1
         }
         if (ReflectionQuestion.count() == 0) {
+/*            
             new ReflectionQuestion(name:"Kam es bei der Durchführung der Arbeitshandlung zu Schwierigkeiten (technisch/fachlich)?").save(true)
             new ReflectionQuestion(name:"Wodurch kann die Funktionstüchtigkeit grundsätzlich beeinträchtigt werden?").save(true)
             new ReflectionQuestion(name:"Was kann bei einer erneuten Durchführung der verschiedenen Arbeitsschritte besser/anders durchgeführt werden?").save(true)
@@ -39,20 +40,33 @@ class BootStrap {
             new ReflectionQuestion(name:"Welche Rückmeldungen haben Sie vom Team vor Ort erhalten?").save(true)
             new ReflectionQuestion(name:"Welche Teilschritte des gesamten Kundenauftrags ging den durchgeführten Arbeiten voraus? Welche schließen sich an?").save(true)
             new ReflectionQuestion(name:"War die durchgeführte Arbeit eher über- oder unterfordernd? Begründen Sie Ihre Meinung.").save(true)
-            assert ReflectionQuestion.count() == 11
+*/
+            new ReflectionQuestion(name:"Was ist mir gut gelungen?", autoLink:true).save(true)
+            new ReflectionQuestion(name:"Was ist mir schwer gefallen (z.B. technisch oder fachlich)?", autoLink:true).save(true)
+            new ReflectionQuestion(name:"Was würde ich beim nächsten Mal besser oder anders machen?", autoLink:true).save(true)
+            new ReflectionQuestion(name:"Welche Fragen sind mir noch offen geblieben?", autoLink:true).save(true)
+            new ReflectionQuestion(name:"Welche Fragen habe ich bereits zu den anstehenden Aufträgen?", autoLink:true).save(true)
+
+            new ReflectionQuestion(name:"Zu welchem Thema wünsche ich mir noch Erklärungen?").save(true)
+            new ReflectionQuestion(name:"Welche neuen Tätigkeiten würde ich gerne noch kennenlernen?").save(true)
+            new ReflectionQuestion(name:"Welche Probleme/Störungen sind bei der Arbeit entstanden? Wie bin ich vorgegangen um die Probleme zu lösen?").save(true)
+            new ReflectionQuestion(name:"Was habe ich bei diesem Auftrag neu gelernt? Was kann ich jetzt besser? ").save(true)
+            new ReflectionQuestion(name:"Welche Aufgaben waren interessant und würde ich gerne vertiefen?").save(true)
+
+            assert ReflectionQuestion.count() == 10
         }
 
         environments {
             development {
                 def testUser = new User(username:"tittel", password:"tittel", email:"stephan.tittel@kom.tu-darmstadt.de", profile:[displayName:"Stephan Tittel", company:"httc e.V.", phone:"+49615116882", mobile:"+4915114474556"]).save(flush: true)
 
-                def numAssets = 20
+                def numAssets = 5
                 for (i in 1..numAssets) {
                     new Asset(name:"Asset $i", description:"$i Huhu sfsdflkfj lsjkdfl sjdflk sjldkfj slkdfj lskdjf lskjdf lkjlekrjtlwke4l rlwem rlwekrm wlekrmw elkrmwlekmr lwekrmwlekrmwlerm welkrmwlekmr wlekrmwlekr lwkemr lwkemr lwekrmwlkermw lekmr weklrm wermll23mr2l 3km rlk3mr lwekm welrkm  $i", mimeType:"text/plain", content:"Das ist ein Text! $i" as byte[]).save(true)
                 }
                 assert Asset.count() == numAssets
 
-                def numTaskTemplates = 15
+                def numTaskTemplates = 5
                 for (i in 1..numTaskTemplates) {
                     def task = new Task(name:"Example Task Template $i", description:"Description for Example Task Template $i", creator:testUser, isTemplate:true)
                     task.addToSteps(new TaskStep(name:"Step 1 example", description:"Step 1 example description"))
@@ -61,7 +75,7 @@ class BootStrap {
                 }
                 assert Task.count() == numTaskTemplates
 
-                def numTasks = 15
+                def numTasks = 2
                 for (i in 1..numTasks) {
                     new Task(name:"Example Task $i", description:"Description for Example Task $i", creator:testUser).save(true)
                 }

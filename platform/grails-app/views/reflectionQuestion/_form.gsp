@@ -4,3 +4,8 @@
 		<textarea name="name" class="form-control" id="question" rows="4" required autofocus>${reflectionQuestionInstance?.name}</textarea>
 	</div>
 </div>
+<div class="col-sm-offset-2 col-sm-10">
+	<div class="checkbox">
+		<label><g:checkBox name="autoLink" value="${reflectionQuestionInstance?.autoLink}"/> <g:message code="kola.reflectionQuestion.autoLink" /></label>
+	</div>
+</div>

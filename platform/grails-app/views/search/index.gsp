@@ -9,7 +9,7 @@
 		<g:form action="." method="GET" class="form-horizontal">
 			<div class="form-group">
 				<div class="col-xs-8">
-					<input type="search" name="q" class="form-control" value="${params.q}" placeholder="${message(code:'kola.search.query')}..." autofocus>
+					<input type="search" name="q" class="form-control" value="${params.q}" placeholder="${message(code:'kola.search.query')}..." onfocus="this.value = this.value;" autofocus>
 				</div>
 				<div class="col-xs-4">
 					<button type="submit" class="search btn btn-default"><i class="fa fa-search"></i> <g:message code="kola.search" /></button>
