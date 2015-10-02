@@ -28,7 +28,7 @@ angular.module('kola.directives', [])
   };
 })
 
-.directive('mediaAttachments', function($q, $ionicModal, $timeout) {
+.directive('mediaAttachments', function($q, $ionicModal, $ionicLoading, $timeout) {
   return {
   	restrict: 'E',
     //replace: true,
@@ -105,11 +105,12 @@ angular.module('kola.directives', [])
     	$scope.openUrlNative = function(url, mimeType) {
 		    if (ionic.Platform.isWebView()) {
 		    	console.log("opening " + url + ", type=" + mimeType);
-		      navigator.startApp.start([["action", "VIEW"], [url]], function(message) {
+		      navigator.startApp.start([["action", "VIEW"], [url, mimeType]], function(message) {
 		        console.log(message);
 		      }, 
 		      function(error) {
 		          console.log(error);
+		          $ionicLoading.show({template:error, duration:4000});
 		      });
 		    }
 		    else {

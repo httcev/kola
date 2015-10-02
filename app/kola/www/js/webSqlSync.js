@@ -495,7 +495,7 @@ var DBSYNC = {
                         console.log("--- error");
                         console.error(err);
                     }, function (progress) {
-                        console.log("--- progress: " +((progress.loaded / progress.total) * 100));
+                       // console.log("--- progress: " +((progress.loaded / progress.total) * 100));
                     }));
                 }
             });

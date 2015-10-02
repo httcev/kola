@@ -102,7 +102,8 @@ angular.module('kola.services', ['uuid'])
 
   function _init() {
     if (window.cordova) {
-      self._assetsDir = cordova.file.dataDirectory + "assets/";
+//      self._assetsDir = cordova.file.dataDirectory + "assets/";
+      self._assetsDir = cordova.file.externalDataDirectory + "assets/";
       $cordovaFile.createDir(cordova.file.dataDirectory, "assets", false);//.then(function() {alert("created asset dir")},function() {alert("not created asset dir")});
     }
     self.db = (window.cordova ? window.sqlitePlugin : window).openDatabase("kola.db", '1', 'kola DB', 1024 * 1024 * 100);
@@ -401,9 +402,8 @@ angular.module('kola.services', ['uuid'])
               d.resolve();
           }
         }, function() {
-          console.log("--- asset file NOT found " + attachment.id)
           // file not found
-          d.reject();        
+          d.reject("asset file NOT found " + attachment.id);        
         });
       }
       else {

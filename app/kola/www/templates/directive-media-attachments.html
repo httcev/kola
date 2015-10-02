@@ -8,7 +8,7 @@
 			<ion-scroll direction="x">
 				<span ng-repeat="attachment in ngModel.attachments">
 					<img ng-if="attachment.mimeType.indexOf('image/') == 0" class="image-list-thumb" ng-src="{{attachmentUrls[$index]}}" ng-click="showImage($index, attachmentUrls)"/>
-					<span ng-if="attachment.mimeType.indexOf('image/') != 0" class="image-list-thumb" ng-click="openUrlNative(attachmentUrls[$index], attachment.mimeType)"><span class="ion-android-open"></span> {{attachment.name}}</span>
+					<span ng-if="attachment.mimeType.indexOf('image/') != 0" class="image-list-thumb external-attachment" ng-click="openUrlNative(attachmentUrls[$index], attachment.mimeType)"><span class="ion-android-open"></span> {{attachment.name}}</span>
 				</span>
 			</ion-scroll>
 		</div>
