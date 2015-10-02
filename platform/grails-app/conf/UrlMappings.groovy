@@ -1,10 +1,6 @@
 class UrlMappings {
 
 	static mappings = {
-        "/api/db/**?"{
-            controller = "couchProxy"
-            action = [OPTIONS:"proxyOptionsRequest", GET:"proxy", POST:"proxy", PUT:"proxy", DELETE:"proxy", PATCH:"proxy", TRACE:"proxy", HEAD:"proxy"]
-        }
         "/api/changes"{
             controller = "changes"
             action = [GET:"index", POST:"index"]

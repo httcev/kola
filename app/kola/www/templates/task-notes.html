@@ -35,6 +35,7 @@
 -->        
         <button class="button button-clear icon ion-trash-a" ng-click="remove(newNote)"></button>
         <button ng-if="newNote.text || newNote.attachments" class="button button-balanced" ng-click="save(newNote)"><i class="icon ion-paper-airplane"></i> Speichern</button>
+        <br>
       </div>
     </div>
     <div ng-hide="!notes || notes.length || newNote">Bisher ist noch keine Dokumentation angelegt.</div>

@@ -193,7 +193,11 @@ angular.module('kola.controllers', [])
   $scope.updateProfile = function() {
     localStorage["user"] = $scope.profile.name;
     localStorage["password"] = $scope.profile.password;
-    dbService.initSync().then(function() {
+    dbService.updateLogin()
+    .then(function() {
+      return dbService.sync();
+    })
+    .then(function() {
       return $state.go("tab.tasks");
     });
   };

@@ -194,7 +194,7 @@ class TaskController {
                 }
             }
         }
-        renderPdf(template:"export", model:["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations])//, filename:taskInstance.name + ".pdf")
+        renderPdf(template:"export", model:["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations], filename:taskInstance.name + ".pdf")
     }
 
     protected void notFound() {

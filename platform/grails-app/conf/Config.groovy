@@ -100,33 +100,31 @@ environments {
 
         kola {
             repository.directory = "./repository"
-            couchdb {
-                protocol = "http"
-                host = "10.0.17.7"
-                port = "5984"
-                admin.user = "syncservice"
-                admin.pass = "pw4syncservice"
-                secret = "mySuperSecretSecret!;"
-                database = "kola"
-            }
         }
     }
     production {
         grails.logging.jul.usebridge = false
         grails.serverURL = "http://plattform.kola-projekt.de"
         kola {
-            repository.directory = "/srv/kola/repository"
-            couchdb {
-                protocol = "http"
-                host = "localhost"
-                port = "5984"
-                admin.user = "syncservice"
-                admin.pass = "pw4syncservice"
-                secret = "mySuperSecretSecret!;"
-                database = "kola"
-            }
+            repository.directory = "/srv/kola/prod/repository"
         }
-        elasticSearch.path.data = "/srv/kola/index"
+        elasticSearch.path.data = "/srv/kola/prod/index"
+    }
+    demo {
+        grails.logging.jul.usebridge = false
+        grails.serverURL = "http://demo.kola-projekt.de"
+        kola {
+            repository.directory = "/srv/kola/demo/repository"
+        }
+        elasticSearch.path.data = "/srv/kola/demo/index"
+    }
+    staging {
+        grails.logging.jul.usebridge = false
+        grails.serverURL = "http://staging.kola-projekt.de"
+        kola {
+            repository.directory = "/srv/kola/staging/repository"
+        }
+        elasticSearch.path.data = "/srv/kola/staging/index"
     }
 }
 

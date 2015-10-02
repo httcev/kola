@@ -27,30 +27,28 @@
 		</h1>
 
 		<g:if test="${taskInstance?.description}">
-			<div class="row">
-				<div class="formatted"><kola:markdown>${taskInstance.description}</kola:markdown></div>
-				<div class="well">
-					<g:if test="${taskInstance?.due}">
-						<div class="row">
-							<div class="col-md-5"><label><g:message code="kola.task.due" />:</label></div>
-							<div class="col-md-7"><g:formatDate date="${taskInstance.due}" type="date"/></div>
-						</div>
-						</g:if>
+			<div class="formatted"><kola:markdown>${taskInstance.description}</kola:markdown></div>
+			<div class="well">
+				<g:if test="${taskInstance?.due}">
 					<div class="row">
-						<div class="col-md-5"><label><g:message code="kola.meta.creator" />:</label></div>
-						<div class="col-md-7">${taskInstance.creator.profile.displayName}</div>
+						<div class="col-md-5"><label><g:message code="kola.task.due" />:</label></div>
+						<div class="col-md-7"><g:formatDate date="${taskInstance.due}" type="date"/></div>
 					</div>
-					<div class="row">
-						<div class="col-md-5"><label><g:message code="kola.meta.lastUpdated" />:</label></div>
-						<div class="col-md-7"><g:formatDate date="${taskInstance.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/></div>
-					</div>
-					<g:if test="${taskInstance?.assignee}">
-						<div class="row">
-							<div class="col-md-5"><label><g:message code="kola.task.assignee" />:</label></div>
-							<div class="col-md-7">${taskInstance.assignee.profile.displayName}</div>
-						</div>
 					</g:if>
+				<div class="row">
+					<div class="col-md-5"><label><g:message code="kola.meta.creator" />:</label></div>
+					<div class="col-md-7">${taskInstance.creator.profile.displayName}</div>
 				</div>
+				<div class="row">
+					<div class="col-md-5"><label><g:message code="kola.meta.lastUpdated" />:</label></div>
+					<div class="col-md-7"><g:formatDate date="${taskInstance.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/></div>
+				</div>
+				<g:if test="${taskInstance?.assignee}">
+					<div class="row">
+						<div class="col-md-5"><label><g:message code="kola.task.assignee" />:</label></div>
+						<div class="col-md-7">${taskInstance.assignee.profile.displayName}</div>
+					</div>
+				</g:if>
 			</div>
 		</g:if>
 		<g:if test="${taskInstance?.attachments?.size() > 0}">

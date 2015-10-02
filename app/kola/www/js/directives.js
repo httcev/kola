@@ -28,7 +28,7 @@ angular.module('kola.directives', [])
   };
 })
 
-.directive('mediaAttachments', function($q, $ionicModal, $timeout, dbService) {
+.directive('mediaAttachments', function($q, $ionicModal, $timeout) {
   return {
   	restrict: 'E',
     //replace: true,

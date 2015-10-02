@@ -59,7 +59,6 @@ grails.project.dependency.resolution = {
         compile('org.apache.tika:tika-core:1.9')
         compile('org.apache.tika:tika-parsers:1.9') { excludes "xercesImpl", "xmlParserAPIs", "xml-apis", "log4j", "httpcore" }
         compile('org.hashids:hashids:1.0.1')
-        compile('org.lightcouch:lightcouch:0.1.8')
         compile('org.pegdown:pegdown:1.5.0')
         // needed for rendering-plugin to work (PDF generation)
         runtime ('org.springframework:spring-test:4.1.5.RELEASE')
