@@ -7,7 +7,7 @@
 		<title>${entitiesName}</title>
 	</head>
 	<body>
-		<h1 class="page-header">
+		<h1 class="page-header clearfix">
 			${entitiesName}
 			<g:link class="create btn btn-primary pull-right" action="${params.isTemplate?.toBoolean() ? 'createTemplate' : 'createFromTemplate'}" title="${message(code: 'default.new.label', args:[entityName])}">
 				<i class="fa fa-plus"></i>

@@ -16,7 +16,7 @@
 		<g:if test="${flash.message}">
 			<div class="message alert alert-success" role="status">${flash.message}</div>
 		</g:if>
-		<h1 class="page-header">
+		<h1 class="page-header clearfix">
 			${assetInstance?.name}
 			<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REPOSITORY_ADMIN">
 				<div class="buttons pull-right">

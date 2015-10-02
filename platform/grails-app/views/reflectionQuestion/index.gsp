@@ -9,7 +9,7 @@
 		<title>${entitiesName}</title>
 	</head>
 	<body>
-		<h1 class="page-header">
+		<h1 class="page-header clearfix">
 			${entitiesName}
 			<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REFLECTION_QUESTION_CREATOR">
 				<g:link class="create btn btn-primary pull-right" action="create" title="${message(code: 'default.new.label', args:[entityName])}">

@@ -14,7 +14,7 @@
 			<li class="active"><g:message code="default.edit.label" args="[entityName]" /></li>
 		</ol>
 		<g:form url="[resource:userInstance, action:'update']" method="PUT" class="form-horizontal" enctype="multipart/form-data" autocomplete="off">
-			<h1 class="page-header">
+			<h1 class="page-header clearfix">
 				<g:message code="default.edit.label" args="[entityName]" />
 				<div class="buttons pull-right">
 					<g:link class="delete btn btn-danger" action="delete" id="${userInstance.id}" title="${message(code: 'default.button.delete.label', args:[entityName])}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">

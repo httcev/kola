@@ -19,7 +19,7 @@
 		<g:if test="${flash.message}">
 			<div class="message alert alert-success" role="status">${flash.message}</div>
 		</g:if>
-		<h1 class="page-header">
+		<h1 class="page-header clearfix">
 			${taskInstance?.name}
 			<div class="buttons pull-right">
 				<g:if test="${authService.canDelete(taskInstance)}">

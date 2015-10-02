@@ -50,7 +50,7 @@ class BootStrap {
             new ReflectionQuestion(name:"Zu welchem Thema wünsche ich mir noch Erklärungen?").save(true)
             new ReflectionQuestion(name:"Welche neuen Tätigkeiten würde ich gerne noch kennenlernen?").save(true)
             new ReflectionQuestion(name:"Welche Probleme/Störungen sind bei der Arbeit entstanden? Wie bin ich vorgegangen um die Probleme zu lösen?").save(true)
-            new ReflectionQuestion(name:"Was habe ich bei diesem Auftrag neu gelernt? Was kann ich jetzt besser? ").save(true)
+            new ReflectionQuestion(name:"Was habe ich bei diesem Auftrag neu gelernt? Was kann ich jetzt besser?").save(true)
             new ReflectionQuestion(name:"Welche Aufgaben waren interessant und würde ich gerne vertiefen?").save(true)
 
             assert ReflectionQuestion.count() == 10

@@ -14,7 +14,8 @@ class ReflectionQuestionController {
     @Secured(['IS_AUTHENTICATED_FULLY'])
     def index(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        respond ReflectionQuestion.list(params), model:[reflectionQuestionInstanceCount: ReflectionQuestion.count()]
+        def query = ReflectionQuestion.where { deleted == false }
+        respond query.list(params), model:[reflectionQuestionInstanceCount: query.count()]
     }
 
     @Secured(['IS_AUTHENTICATED_FULLY'])
@@ -75,7 +76,8 @@ class ReflectionQuestionController {
             return
         }
 
-        reflectionQuestionInstance.delete flush:true
+        reflectionQuestionInstance.deleted = true
+        reflectionQuestionInstance.save flush:true
 
         flash.message = message(code: 'default.deleted.message', args: [message(code: 'reflectionQuestion.label', default: 'Reflexionsaufforderung'), reflectionQuestionInstance.id])
         redirect action:"index", method:"GET"

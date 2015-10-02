@@ -24,7 +24,7 @@
 			<div class="message alert alert-success" role="status">${flash.message}</div>
 		</g:if>
 		<g:form url="[resource:taskInstance, action:'update']" method="PUT" class="form-horizontal" enctype="multipart/form-data" autocomplete="off">
-			<h1 class="page-header">
+			<h1 class="page-header clearfix">
 				<g:message code="default.edit.label" args="[entityName]" />
 				<div class="buttons pull-right">
 					<button class="save btn btn-success"><i class="fa fa-save"></i> <g:message code="default.button.update.label" default="Update" /></button>

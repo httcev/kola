@@ -13,7 +13,7 @@
 			<li class="active"><g:message code="default.create.label" args="[entityName]" /></li>
 		</ol>
 		<g:form url="[resource:userInstance, action:'save']" class="form-horizontal" autocomplete="off" enctype="multipart/form-data">
-			<h1 class="page-header">
+			<h1 class="page-header clearfix">
 				<g:message code="default.create.label" args="[entityName]" />
 				<div class="buttons pull-right">
 					<button class="save btn btn-success"><i class="fa fa-save"></i> <g:message code="default.button.create.label" default="Create" /></button>

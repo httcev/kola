@@ -7,6 +7,7 @@ class ReflectionQuestion {
     }
     static mapping = {
         name type:"text"
+        autoLink defaultValue:"0"
     }
 	static searchable = {
 		all = [analyzer: 'german']

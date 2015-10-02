@@ -181,7 +181,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/register/**':     ['permitAll']
 ]
 
-// enable basic authentication for couchdb proxy
+// enable basic authentication for api access for app
 grails.plugin.springsecurity.useBasicAuth = true
 grails.plugin.springsecurity.basic.realmName = "kola db (proxy)"
 grails.plugin.springsecurity.filterChain.chainMap = [
