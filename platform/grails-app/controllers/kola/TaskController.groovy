@@ -236,8 +236,10 @@ class TaskController {
         for (i in 0..19) {
             def stepDef = params["steps[$i]"]
             if (stepDef && stepDef.deleted != "true") {
-                println "--- $i=" + stepDef
-                def step = stepDef.id ? TaskStep.get(stepDef.id) : new TaskStep()
+                def step = stepDef.id ? TaskStep.get(stepDef.id) : null
+                if (!step) {
+                    step = new TaskStep()
+                }
                 step.properties = stepDef
                 taskInstance.addToSteps(step)
             }
