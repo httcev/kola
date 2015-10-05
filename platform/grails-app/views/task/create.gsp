@@ -7,7 +7,9 @@
 		<asset:stylesheet src="bootstrap-markdown.min.css"/>
 		<asset:stylesheet src="picker-default.css"/>
 		<asset:stylesheet src="picker-default.date.css"/>
+		<asset:javascript src="marked.min.js"/>
 		<asset:javascript src="bootstrap-markdown.js"/>
+		<asset:javascript src="bootstrap-markdown.de.js"/>
 		<asset:javascript src="Sortable.min.js"/>
 		<asset:javascript src="picker.js"/>
 		<asset:javascript src="picker.date.js"/>

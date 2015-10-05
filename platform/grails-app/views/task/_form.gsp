@@ -15,7 +15,7 @@
 	<label for="description" class="col-sm-2 control-label">
 		<g:message code="kola.meta.description" />:
 	</label>
-	<div class="col-sm-10"><g:textArea rows="8" name="description" class="form-control" data-provide="markdown-editable" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdBold" value="${taskInstance?.description}"/></div>
+	<div class="col-sm-10"><g:textArea rows="8" name="description" class="form-control" data-provide="markdown-editable" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdImage cmdCode cmdQuote" value="${taskInstance?.description}"/></div>
 </div>
 
 <g:if test="${!taskInstance?.isTemplate?.toBoolean()}">
@@ -162,7 +162,6 @@
 				if (name) {
 					var replaced = name.replace(/steps\[.*?\]/, prefix);
 					field.attr("name", replaced);
-					console.log(field, "name -> ", replaced);
 				}
 			})
 		});
@@ -182,11 +181,8 @@
 
 		$(document).on("change", ".new-attachment", function() {
 			var $parent = $(this).parent();
-			console.log("parent -> ", $parent);
 			var emptyFileChooserCount = $("input:file", $parent).filter(function() { return $(this).val() == ""; }).length;
-			console.log("emptyFileChooserCount -> ", emptyFileChooserCount);
 			if (emptyFileChooserCount == 0) {
-//				$parent.append($("<input type='file' name='_newAttachment' class='new-attachment form-padding'>"));
 				var $newChooser = $(this.cloneNode());
 				$newChooser.val(null);
 				$parent.append($newChooser);
