@@ -462,7 +462,7 @@ var DBSYNC = {
                         console.error("--- upload error", err);
                     }, function (progress) {
                         // constant progress updates
-                        console.log("--- upload progress", progress);
+                        //console.log("--- upload progress", progress);
                     }));
                 }
             });

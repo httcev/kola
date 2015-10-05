@@ -122,9 +122,6 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'kola.contro
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/tasks');
-
-  
-
 })
 
 .config(function($compileProvider) {

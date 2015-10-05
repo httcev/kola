@@ -18,15 +18,18 @@
 			<g:if test="${assetInstance.mimeType?.startsWith("image")}">
 				<img src="${url}" class="img-responsive">
 			</g:if>
-			<g:elseif test="${assetInstance.mimeType?.startsWith("video")}">
-				<i class="fa fa-film fa-lg"></i>
-			</g:elseif>
 			<g:else>
-				<g:if test="${assetInstance.mimeType?.indexOf("pdf") > -1}">
-					<i class="fa fa-file-pdf-o fa-lg"></i>
+				<g:if test="${assetInstance.mimeType?.startsWith("video/")}">
+					<i class="fa fa-film fa-3x"></i>
 				</g:if>
+				<g:elseif test="${assetInstance.mimeType?.startsWith("audio/")}">
+					<i class="fa fa-audio-o fa-3x"></i>
+				</g:elseif>
+				<g:elseif test="${assetInstance.mimeType?.indexOf("pdf") > -1}">
+					<i class="fa fa-file-pdf-o fa-3x"></i>
+				</g:elseif>
 				<g:else>
-					<i class="fa fa-external-link fa-lg"></i>
+					<i class="fa fa-external-link fa-3x"></i>
 				</g:else>
 				<div class="caption">
 					<p>${assetInstance.name}</p>

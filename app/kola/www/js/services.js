@@ -299,8 +299,11 @@ angular.module('kola.services', ['uuid'])
         if (doc._table == "asset" && copy.subType == "attachment" && localURL && localURL.indexOf(self._assetsDir) != 0) {
           // copy attachment data from temp dir to assets dir
           window.resolveLocalFileSystemURL(localURL, function(fileEntry) {
-            console.log("--- moving attachment from " + (fileEntry.filesystem.root.nativeURL + fileEntry.name) + " to " + (self._assetsDir + copy.id));
-            $cordovaFile.moveFile(fileEntry.filesystem.root.nativeURL, fileEntry.name, self._assetsDir, copy.id).then(function (success) {
+            console.log(fileEntry);
+            var name = fileEntry.name;
+            var dir = fileEntry.nativeURL.split(name)[0];
+            console.log("--- moving attachment from " + (dir + name) + " to " + (self._assetsDir + copy.id));
+            $cordovaFile.moveFile(dir, name, self._assetsDir, copy.id).then(function (success) {
               d.resolve();
             }, function (error) {
               // error
@@ -390,7 +393,6 @@ angular.module('kola.services', ['uuid'])
           // file exists.
           // for images (and TODO: videos) use cdvfile:// url to let the cordova webview load the attachments.
           // for other file types (e.g. PDFs), use fileEntry's nativeURL, so that Android can open it natively.
-          console.log(fileEntry);
           if (attachment.mimeType.indexOf("image/") == 0) {
             fileEntry.file(function(f) {
               attachment._localURL = f.localURL;
@@ -522,19 +524,45 @@ angular.module('kola.services', ['uuid'])
         });
       });
       return d.promise;
+    }, function(err) {
+      // An error occurred. Show a message to the user, but only if not a normal "Canceled" event.
+      console.log(err);
+      if (typeof err == "string" && err.indexOf("cancel") < 0) {
+        $ionicLoading.show({template:err, duration:2000});
+      }
     });
-  }
+  };
 
   this.attachVideo = function(doc) {
-    $cordovaCapture.captureVideo().then(function(mediaFiles) {
+    return $cordovaCapture.captureVideo().then(function(mediaFiles) {
       if (mediaFiles.length === 1) {
         var file = mediaFiles[0];
-        console.log("--- captured video file -> ", file);
         var attachment = dbService.createAttachment(doc);
         attachment.name = file.name;
         attachment.mimeType = file.type;
         attachment._localURL = file.fullPath;
-//        attachment._localURL = file.localURL;
+        if (!$rootScope.$$phase) {
+          $rootScope.$apply();
+        }
+      }
+    }, function(err) {
+      // An error occurred. Show a message to the user, but only if not a normal "Canceled" event.
+      console.log(err);
+      if (err && err.code != 3) {
+        $ionicLoading.show({template:err, duration:2000});
+      }
+    });
+  };
+
+  this.attachAudio = function(doc) {
+    return $cordovaCapture.captureAudio().then(function(mediaFiles) {
+      if (mediaFiles.length === 1) {
+        var file = mediaFiles[0];
+        console.log("--- captured audio file -> ", file);
+        var attachment = dbService.createAttachment(doc);
+        attachment.name = file.name;
+        attachment.mimeType = file.type;
+        attachment._localURL = file.fullPath;
         console.log("--- new attachment", attachment);
         console.log("--- doc after attachment creation -> ", doc);
         if (!$rootScope.$$phase) {
@@ -543,6 +571,8 @@ angular.module('kola.services', ['uuid'])
       }
     }, function(err) {
       // An error occurred. Show a message to the user
+      console.log(err);
+      $ionicLoading.show({template:err, duration:2000});
     });
-  }
+  };
 })

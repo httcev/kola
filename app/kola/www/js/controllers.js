@@ -96,11 +96,6 @@ angular.module('kola.controllers', [])
   }
 
 //  $scope.$on('$ionicView.enter', function(e) {
-/*  
-    pouchCollection("notes/by_task", { key:$stateParams.taskId   }, "notes/filterByTask", { taskId:$stateParams.taskId }).then(function(result) {
-      $scope.notes = result;
-    });
-*/    
 
   $scope.attachPhoto = function(note) {
     mediaAttachment.attachPhoto(note);
@@ -108,6 +103,10 @@ angular.module('kola.controllers', [])
 
   $scope.attachVideo = function(note) {
     mediaAttachment.attachVideo(note);
+  }
+
+  $scope.attachAudio = function(note) {
+    mediaAttachment.attachAudio(note);
   }
 
   $scope.remove = function(note) {

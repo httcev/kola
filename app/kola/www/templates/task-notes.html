@@ -21,7 +21,7 @@
     <div ng-if="newNoteSaving" class="center-horizontal">
       <ion-spinner></ion-spinner>
     </div>
-    <div ng-if="newNote && !newNoteSaving" class="list card">
+    <div ng-if="newNote && !newNoteSaving" class="list card new-note">
       <div class="item item-text-wrap">
         <textarea ng-model="newNote.text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier Ihren Dokumentationstext ein..." autofocus></textarea>
       </div>
@@ -29,12 +29,10 @@
 
       <div class="item tabs tabs-secondary">
         <button class="button button-clear button-positive" ng-click="attachPhoto(newNote)"><i class="icon ion-camera"></i></button>
-<!--        
         <button class="button button-clear button-positive" ng-click="attachVideo(newNote)"><i class="icon ion-videocamera"></i></button>
         <button class="button button-clear button-positive" ng-click="attachAudio(newNote)"><i class="icon ion-mic-a"></i></button>
--->        
         <button class="button button-clear icon ion-trash-a" ng-click="remove(newNote)"></button>
-        <button ng-if="newNote.text || newNote.attachments" class="button button-balanced" ng-click="save(newNote)"><i class="icon ion-paper-airplane"></i> Speichern</button>
+        <button ng-disabled="!(newNote.text || newNote.attachments)" class="button button-balanced" ng-click="save(newNote)"><i class="icon ion-paper-airplane"></i> Speichern</button>
         <br>
       </div>
     </div>

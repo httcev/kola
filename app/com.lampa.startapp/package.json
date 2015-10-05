@@ -9,10 +9,6 @@
       "ios"
     ]
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lampaa/com.lampa.startapp.git"
-  },
   "keywords": [
     "cordova",
     "startapp",
