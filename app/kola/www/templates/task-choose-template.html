@@ -5,12 +5,12 @@
     <div class="list">
       <div class="item item-stable item-button-right" ng-click="choose()">
         <div class="positive">Keine Vorlage</div>
-        <div><small>Neuen Auftrag komplett neu anlegen</small></div>
+        <div><small>Auftrag komplett neu anlegen</small></div>
         <button class="button"><i class="icon ion-forward"></i></button>
       </div>
       <div ng-repeat="template in templates" class="item item-button-right" ng-click="choose(template)">
         <div class="positive">{{template.name}}</div>
-        <div class="text"><small>{{template.description}}</small></div>
+        <div class="text small" marked="template.description"></div>
         <button class="button "><i class="icon ion-forward"></i></button>
       </div>
     </div>

@@ -27,7 +27,7 @@
       <div class="item item-divider item-stable">Teilschritte</div>
       <div ng-repeat="step in task.steps" class="item">
         <div>{{$index+1}}. <b>{{step.name}}</b></div>
-        <div>{{step.description}}</div>
+        <div class="text" marked="step.description"></div>
         <div><media-attachments ng-model="step" hide-header="true"></media-attachments></div>
       </div>
     </div>

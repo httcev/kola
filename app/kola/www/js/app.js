@@ -1,4 +1,4 @@
-angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'kola.controllers', 'kola.services', 'kola.directives'])
+angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked', 'kola.controllers', 'kola.services', 'kola.directives'])
 
 .run(function($ionicPlatform) {
   // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -128,6 +128,15 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'kola.contro
   $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|file|blob|cdvfile|content):|data:image\//);
 })
 
-//.constant("serverUrl", "http://130.83.139.161:8080/platform")
-.constant("serverUrl", "http://plattform.kola-projekt.de")
+.config(['markedProvider', function(markedProvider) {
+  // configure markdown links (e.g. in task descriptions) to open in external app
+  markedProvider.setRenderer({
+    link: function(href, title, text) {
+      return "<a href='#'" + (title ? " title='" + title + "'" : '') + " onclick='ionic.Platform.isWebView() ? navigator.startApp.start([[\"action\", \"VIEW\"], [\"" + href + "\"]]) :  window.open(\"" + href + "\")'>" + text + "</a>";
+    }
+  });
+}])
+
+.constant("serverUrl", "http://130.83.139.161:8080/platform")
+//.constant("serverUrl", "http://plattform.kola-projekt.de")
 .constant("databaseName", "tasks");

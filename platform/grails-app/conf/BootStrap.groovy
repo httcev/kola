@@ -67,17 +67,18 @@ class BootStrap {
                 assert Asset.count() == numAssets
 
                 def numTaskTemplates = 5
+                def description = "### Abschnitt 1\n\n1. Aufzählungstext 1\n1. Aufzählungstext 2\n1. Aufzählungstext 3\n\n### Abschnitt 2\n\n- Aufzählungstext 1\n- Aufzählungstext 2\n- Aufzählungstext 3\n\n**Fett**\n_Kursiv_\n[Link](http://www.example.com)"
                 for (i in 1..numTaskTemplates) {
-                    def task = new Task(name:"Example Task Template $i", description:"Description for Example Task Template $i", creator:testUser, isTemplate:true)
-                    task.addToSteps(new TaskStep(name:"Step 1 example", description:"Step 1 example description"))
-                    task.addToSteps(new TaskStep(name:"Step 2 example", description:"Step 2 example description"))
+                    def task = new Task(name:"Example Task Template $i", description:description, creator:testUser, isTemplate:true)
+                    task.addToSteps(new TaskStep(name:"Step 1 example", description:description))
+                    task.addToSteps(new TaskStep(name:"Step 2 example", description:description))
                     task.save(true)
                 }
                 assert Task.count() == numTaskTemplates
 
                 def numTasks = 2
                 for (i in 1..numTasks) {
-                    new Task(name:"Example Task $i", description:"Description for Example Task $i", creator:testUser).save(true)
+                    new Task(name:"Example Task $i", description:description, creator:testUser).save(true)
                 }
                 assert Task.count() == numTaskTemplates + numTasks
             }

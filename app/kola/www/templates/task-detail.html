@@ -5,7 +5,7 @@
     <!--
     <p ng-if="task.due"><b>Wann:</b> {{task.due | date:'fullDate'}}</p>
     -->
-    <p class="text" ng-bind-html="task.description"></p>
+    <div class="text" marked="task.description"></div>
 
     <media-attachments ng-model="task"></media-attachments>
     <learning-resources ng-model="task"></learning-resources>
