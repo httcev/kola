@@ -19,19 +19,17 @@
 		<form method="get">
 			<input type="hidden" name="isTemplate" value="${params.isTemplate}">
 			<div class="row filter">
-				<div class="col-sm-1 margin"><b><g:message code="kola.filter" /></b>:</div>
-				<div class="col-sm-3">
-					<div class="checkbox">
+				<div class="col-xs-12">
+					<b><g:message code="kola.filter" /></b>:
+					<span class="checkbox">
 						<label><input name="own" type="checkbox" onclick="$(this).closest('form').submit()"${params.own ? ' checked' : ''}> <g:message code="kola.filter.own" /></label>
-					</div>
-				</div>
-				<g:if test="${!params.isTemplate?.toBoolean()}">
-					<div class="col-sm-3">
-						<div class="checkbox">
+					</span>
+					<g:if test="${!params.isTemplate?.toBoolean()}">
+						<span class="checkbox">
 							<label><input name="assigned" type="checkbox" onclick="$(this).closest('form').submit()"${params.assigned ? ' checked' : ''}> <g:message code="kola.filter.assigned" /></label>
-						</div>
-					</div>
-				</g:if>
+						</span>
+					</g:if>
+				</div>
 			</div>
 		</form>
 		<g:if test="${taskInstanceList?.size() > 0}">

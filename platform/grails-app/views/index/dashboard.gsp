@@ -67,7 +67,7 @@
 			</div>
 
 			<div class="col-sm-3">
-				<div class="panel panel-primary">
+				<div class="panel panel-primary dashboard-create-links-panel">
 					<div class="panel-heading">
 						<h1 class="panel-title"><b><g:message code="default.button.create.label" />:</b></h1>
 					</div>
