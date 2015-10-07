@@ -36,9 +36,9 @@
 				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
 					<sec:ifLoggedIn>
 					<ul class="nav navbar-nav">
-						<li class="${(controllerName == 'task' && params.isTemplate != "true") ? 'active' : ''}"><g:link controller="task" action="index"><g:message code="kola.tasks" /></g:link></li>
+						<li class="${(controllerName == 'task' && !params.isTemplate?.toBoolean()) ? 'active' : ''}"><g:link controller="task" action="index"><g:message code="kola.tasks" /></g:link></li>
 						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_TASK_TEMPLATE_CREATOR">
-							<li class="${(controllerName == 'task' && params.isTemplate == "true") ? 'active' : ''}"><g:link controller="task" action="index" params="[isTemplate:true]"><g:message code="kola.taskTemplates" /></g:link></li>
+							<li class="${(controllerName == 'task' && params.isTemplate?.toBoolean()) ? 'active' : ''}"><g:link controller="task" action="index" params="[isTemplate:true]"><g:message code="kola.taskTemplates" /></g:link></li>
 						</sec:ifAnyGranted>
 						<li class="${controllerName == 'asset' ? 'active' : ''}"><g:link controller="asset" action="index"><g:message code="kola.assets" /></g:link></li>
 					</ul>

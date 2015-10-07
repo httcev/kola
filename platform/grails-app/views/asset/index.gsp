@@ -31,28 +31,38 @@
 				</div>
 			</div>
 		</g:form>
-		<table class="table">
-			<thead>
-				<tr>
-					<g:sortableColumn property="name" title="${message(code: 'kola.meta.name')}" />
-					<g:sortableColumn property="description" title="${message(code: 'kola.meta.description')}" />
-					<g:sortableColumn property="lastUpdated" title="${message(code: 'kola.meta.lastUpdated')}" />
-					<g:sortableColumn property="mimeType" title="${message(code: 'kola.meta.mimeType')}" />
-				</tr>
-			</thead>
-			<tbody>
-			<g:each in="${assetInstanceList}" var="assetInstance">
-				<tr>
-					<td><g:link action="show" id="${assetInstance.id}">${fieldValue(bean: assetInstance, field: "name")}</g:link></td>
-					<td>${fieldValue(bean: assetInstance, field: "description")?.take(100)}</td>
-					<td><g:formatDate date="${assetInstance.lastUpdated}" type="date"/></td>
-					<td>${fieldValue(bean: assetInstance, field: "mimeType")}</td>
-				</tr>
-			</g:each>
-			</tbody>
-		</table>
-		<div class="pagination pull-right">
-			<g:paginate total="${assetInstanceCount ?: 0}" />
-		</div>
+		<g:if test="${assetInstanceList?.size() > 0}">
+			<p class="margin text-muted small"><g:message code="kola.search.hits.displaying" args="${[entitiesName, params.offset + 1, Math.min(params.offset + params.max, assetInstanceCount), assetInstanceCount]}" />:</p>
+			<div class="table-responsive">
+				<table class="table">
+					<thead>
+						<tr>
+							<g:sortableColumn property="name" title="${message(code: 'kola.meta.name')}" />
+							<g:sortableColumn property="description" title="${message(code: 'kola.meta.description')}" />
+							<g:sortableColumn property="lastUpdated" title="${message(code: 'kola.meta.lastUpdated')}" />
+							<g:sortableColumn property="mimeType" title="${message(code: 'kola.meta.mimeType')}" />
+						</tr>
+					</thead>
+					<tbody>
+					<g:each in="${assetInstanceList}" var="assetInstance">
+						<tr>
+							<td><g:link action="show" id="${assetInstance.id}">${fieldValue(bean: assetInstance, field: "name")}</g:link></td>
+							<td>${fieldValue(bean: assetInstance, field: "description")?.take(100)}</td>
+							<td><g:formatDate date="${assetInstance.lastUpdated}" type="date"/></td>
+							<td>${fieldValue(bean: assetInstance, field: "mimeType")}</td>
+						</tr>
+					</g:each>
+					</tbody>
+				</table>
+			</div>
+			<g:if test="${params.max < assetInstanceCount}">
+				<div class="pagination pull-right">
+					<g:paginate total="${assetInstanceCount ?: 0}" />
+				</div>
+			</g:if>
+		</g:if>
+		<g:else>
+			<div class="alert alert-danger margin"><g:message code="kola.filter.empty" args="${[entitiesName]}" /></div>
+		</g:else>
 	</body>
 </html>

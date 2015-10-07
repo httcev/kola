@@ -1,5 +1,5 @@
 <g:if test="${results?.total > 0}">
-	<p class="margin text-muted"><g:message code="kola.search.hits" args="${[params.offset + 1, Math.min(params.offset + params.max, results?.total), results?.total]}" />:</p>
+	<p class="margin text-muted small"><g:message code="kola.search.hits.displaying" args="${[message(code:'kola.search.hits'), params.offset + 1, Math.min(params.offset + params.max, results?.total), results?.total]}" />:</p>
 	<g:set var="searchResults" value="${results?.searchResults}"/>
 	<g:set var="highlights" value="${results?.highlight}"/>
 	<ul class="search-result list-group">
@@ -28,7 +28,7 @@
 	</ul>
 	<g:if test="${params.max < results?.total}">
 		<div class="pagination pull-right">
-			<g:paginate total="${results.total}" params="${[q:params.q]}"/>
+			<g:paginate total="${results.total}" params="${params}"/>
 		</div>
 	</g:if>
 </g:if>

@@ -137,6 +137,6 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
   });
 }])
 
-.constant("serverUrl", "http://130.83.139.161:8080/platform")
-//.constant("serverUrl", "http://plattform.kola-projekt.de")
+//.constant("serverUrl", "http://130.83.139.161:8080/platform")
+.constant("serverUrl", "http://plattform.kola-projekt.de")
 .constant("databaseName", "tasks");

@@ -15,9 +15,15 @@ class TaskController {
     def authService
 
     def index(Integer max) {
+        params.offset = params.offset ? (params.offset as int) : 0
         params.max = Math.min(max ?: 10, 100)
+        params.sort = params.sort ?: "lastUpdated"
+        params.order = params.order ?: "desc"
+        
         def filtered = params.own || params.assigned
-        def query = new grails.gorm.DetachedCriteria(Task).build {
+        def results = Task.createCriteria().list(max:params.max, offset:params.offset) {
+            eq("deleted", false)
+            eq("isTemplate", params.isTemplate?.toBoolean() ? true : false)
             if (filtered) {
                 or {
                     if (params.own) {
@@ -28,11 +34,19 @@ class TaskController {
                     }
                 }
             }
-            eq("isTemplate", params.isTemplate?.toBoolean() ? true : false)
-            eq("deleted", false)
+            if (params.sort?.startsWith("cp.")) {
+                // left join allows null values in the association
+                createAlias('creator', 'c', org.hibernate.Criteria.LEFT_JOIN)
+                createAlias('c.profile', 'cp', org.hibernate.Criteria.LEFT_JOIN)
+            }
+            else if (params.sort?.startsWith("ap.")) {
+                // left join allows null values in the association
+                createAlias('assignee', 'a', org.hibernate.Criteria.LEFT_JOIN)
+                createAlias('a.profile', 'ap', org.hibernate.Criteria.LEFT_JOIN)
+            }
+            order(params.sort, params.order)
         }
-        def result = query.list(params)
-        respond result, model:[taskInstanceCount: result.totalCount]
+        respond results, model:[taskInstanceCount:results.totalCount]
     }
 
     def show(Task taskInstance) {
@@ -108,6 +122,7 @@ class TaskController {
         taskInstance.description = params.description
         taskInstance.assignee = params.assignee?.id ? User.get(params.assignee.id) : null
         taskInstance.due = params.due ? new java.text.SimpleDateFormat("yyyy-MM-dd").parse(params.due) : null
+        taskInstance.done = params.done ? params.done : false
         taskInstance.creator = springSecurityService.currentUser
         updateFromParams(taskInstance)
         taskInstance.validate()
@@ -197,6 +212,28 @@ class TaskController {
         renderPdf(template:"export", model:["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations], filename:taskInstance.name + ".pdf")
     }
 
+    def export2(Task taskInstance) {
+        def reflectionAnswers = [:]
+        def taskDocumentations = [:]
+        if (!taskInstance.isTemplate) {
+            taskInstance.reflectionQuestions?.each { reflectionQuestion ->
+                reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false)
+            }
+            
+            def docs = TaskDocumentation.findAllByTaskAndDeleted(taskInstance, false)
+            if (docs) {
+                taskDocumentations[taskInstance.id] = docs
+            }
+            taskInstance.steps?.each { step ->
+                docs = TaskDocumentation.findAllByStepAndDeleted(step, false)
+                if (docs) {
+                    taskDocumentations[step.id] = docs
+                }
+            }
+        }
+        render(template:"export", model:["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations], filename:taskInstance.name + ".pdf")
+    }
+
     protected void notFound() {
         flash.message = message(code: 'default.not.found.message', args: [message(code: 'Task.label', default: 'Task'), params.id])
         redirect action: "index", method: "GET"
@@ -272,10 +309,7 @@ class TaskController {
         
         // create new attachments
         request.multiFileMap?.each { k,files ->
-            println "--- upload file with key " + k
-            println files
             def domainName = k - "._newAttachment" - "_newAttachment"
-            println "--- domainName=" + domainName
             def domain = taskInstance
             
             if (domainName.length() > 0) {
@@ -284,16 +318,12 @@ class TaskController {
                     def prop = matcher[0][1]
                     def index = matcher[0][2] as Integer
                     //domain = taskInstance."${domainName}"
-                    println "--- prop=${prop}"
-                    println taskInstance.properties
-                    println taskInstance."${prop}"
                     if (taskInstance."${prop}"?.size() > index) {
                         domain = taskInstance."${prop}"?.get(index)
                     }
                 }
             }
             
-            println "--- domain=" + domain
             files?.each { f ->
                 if (!f.empty) {
                     def asset = new Asset(name:f.originalFilename, subType:"attachment", mimeType:f.getContentType(), content:f.bytes)

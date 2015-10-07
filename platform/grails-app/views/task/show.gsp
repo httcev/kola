@@ -33,31 +33,39 @@
 		</h1>
 		<g:if test="${taskInstance?.description}">
 			<div class="row">
-				<div class="col-sm-8 formatted"><kola:markdown>${taskInstance.description}</kola:markdown></div>
-				<div class="col-sm-4">
+				<div class="col-md-4 col-md-push-8">
 					<div class="well">
-						<g:if test="${taskInstance?.due}">
-							<div class="row">
-								<div class="col-md-5"><label><g:message code="kola.task.due" />:</label></div>
-								<div class="col-md-7"><g:formatDate date="${taskInstance.due}" type="date"/></div>
-							</div>
+						<table class="task-info-table">
+							<g:if test="${taskInstance?.due}">
+								<tr class="text-danger">
+									<td><g:message code="kola.task.due" />:</td>
+									<td><g:formatDate date="${taskInstance.due}" type="date"/></td>
+								</tr>
 							</g:if>
-						<div class="row">
-							<div class="col-md-5"><label><g:message code="kola.meta.creator" />:</label></div>
-							<div class="col-md-7"><g:render bean="${taskInstance.creator.profile}" template="/profile/show" var="profile" /></div>
-						</div>
-						<div class="row">
-							<div class="col-md-5"><label><g:message code="kola.meta.lastUpdated" />:</label></div>
-							<div class="col-md-7"><g:formatDate date="${taskInstance.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/></div>
-						</div>
-						<g:if test="${taskInstance?.assignee}">
-							<div class="row">
-								<div class="col-md-5"><label><g:message code="kola.task.assignee" />:</label></div>
-								<div class="col-md-7"><g:render bean="${taskInstance.assignee.profile}" template="/profile/show" var="profile" /></div>
-							</div>
-						</g:if>
+							<g:if test="${taskInstance?.assignee}">
+								<tr>
+									<td><g:message code="kola.task.assignee" />:</td>
+									<td><g:render bean="${taskInstance.assignee.profile}" template="/profile/show" var="profile" /></td>
+								</tr>
+							</g:if>
+							<g:if test="${!taskInstance?.isTemplate}">
+								<tr>
+									<td><g:message code="kola.task.done" />:</td>
+									<td><i class="fa fa-lg fa-${taskInstance.done ? 'check text-success' : 'minus text-muted'}"></i></td>
+								</tr>
+							</g:if>
+							<tr>
+								<td><g:message code="kola.meta.creator" />:</td>
+								<td><g:render bean="${taskInstance.creator.profile}" template="/profile/show" var="profile" /></td>
+							</tr>
+							<tr>
+								<td><g:message code="kola.meta.lastUpdated" />:</td>
+								<td><g:formatDate date="${taskInstance.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/></td>
+							</tr>
+						</table>
 					</div>
 				</div>
+				<div class="col-md-8 col-md-pull-4"><div class="formatted"><kola:markdown>${taskInstance.description}</kola:markdown></div></div>
 			</div>
 		</g:if>
 		<g:if test="${taskInstance?.attachments?.size() > 0}">

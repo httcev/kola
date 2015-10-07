@@ -12,7 +12,10 @@ class UserController {
     def grailsApplication
 
     def index(Integer max) {
+        params.offset = params.offset ? (params.offset as int) : 0
         params.max = Math.min(max ?: 10, 100)
+        params.sort = params.sort ?: "username"
+        params.order = params.order ?: "asc"
         respond User.list(params), model:[userInstanceCount: User.count()]
     }
 

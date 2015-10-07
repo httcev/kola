@@ -11,10 +11,12 @@ class ReflectionAnswer {
         id generator: "assigned"
         text type:"text"
     }
+    /*
 	static searchable = {
 		all = [analyzer: 'german']
         only = ['text', 'deleted']
     }
+    */
     static belongsTo = [task:Task, question:ReflectionQuestion]
 
     String id = UUID.randomUUID().toString()

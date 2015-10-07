@@ -30,7 +30,9 @@
       <div class="item tabs tabs-secondary">
         <button class="button button-clear button-positive" ng-click="attachPhoto(newNote)"><i class="icon ion-camera"></i></button>
         <button class="button button-clear button-positive" ng-click="attachVideo(newNote)"><i class="icon ion-videocamera"></i></button>
+        <!--
         <button class="button button-clear button-positive" ng-click="attachAudio(newNote)"><i class="icon ion-mic-a"></i></button>
+        -->
         <button class="button button-clear icon ion-trash-a" ng-click="remove(newNote)"></button>
         <button ng-disabled="!(newNote.text || newNote.attachments)" class="button button-balanced" ng-click="save(newNote)"><i class="icon ion-paper-airplane"></i> Speichern</button>
         <br>

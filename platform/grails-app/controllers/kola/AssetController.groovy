@@ -28,6 +28,7 @@ class AssetController {
 
     @Secured(['IS_AUTHENTICATED_FULLY'])
     def index(Integer max) {
+        params.offset = params.offset ? (params.offset as int) : 0
         params.max = Math.min(max ?: 10, 100)
         params.sort = params.sort ?: "lastUpdated"
         params.order = params.order ?: "desc"

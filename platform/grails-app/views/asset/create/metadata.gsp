@@ -12,7 +12,8 @@
 		</div>
 		<div class="form-group ${hasErrors(bean: cmd, field: 'description', 'error')}">
 			<label for="description" class="col-sm-2 control-label">
-				<g:message code="kola.meta.description" />:
+				<g:message code="kola.meta.description" />
+				<span class="required-indicator">*</span>:
 			</label>
 			<div class="col-sm-10"><g:textArea name="description" class="form-control" rows="10" required="" value="${cmd?.description}"/></div>
 		</div>

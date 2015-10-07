@@ -29,13 +29,13 @@
 							<button class="choose btn btn-primary pull-right" name="template.id" value="${taskInstance.id}"><i class="fa fa-check-square-o"></i> <g:message code="kola.choose" /></button>
 						</h4>
 						<p class="list-group-item-text">
-							${taskInstance.description?.take(400)}
+							<kola:markdown>${taskInstance.description?.take(400)}</kola:markdown>
 						</p>
 					</li>
 				</g:each>
 			</ul>
 		</g:form>
-		<g:if test="${taskInstanceCount > 0}">
+		<g:if test="${params.max < taskInstanceCount}">
 			<div class="pagination pull-right">
 				<g:paginate total="${taskInstanceCount ?: 0}" />
 			</div>
