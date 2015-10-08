@@ -8,11 +8,11 @@
 			<div class="col-sm-9">
 				<g:form controller="search" method="GET" class="form-horizontal">
 					<div class="form-group">
-						<div class="col-xs-8">
+						<div class="col-xs-9 col-sm-10">
 							<input type="search" name="q" class="form-control" placeholder="${message(code:'kola.search.query')}..." autofocus>
 						</div>
-						<div class="col-xs-4">
-							<button type="submit" class="search btn btn-default"><i class="fa fa-search"></i> <g:message code="kola.search" /></button>
+						<div class="col-xs-3 col-sm-2">
+							<button type="submit" class="search btn btn-default pull-right"><i class="fa fa-search"></i> <g:message code="kola.search" /></button>
 						</div>
 					</div>
 				</g:form>
@@ -21,7 +21,7 @@
 					<div class="panel-heading">
 						<h3 class="panel-title">
 							<g:message code="kola.tasks.assigned" />:
-							<a href="${createLink(controller:'task', action:'index', params:[assigned:'on'])}" class="pull-right"><g:message code="kola.all" /> <i class="fa fa-chevron-right"></i></a>
+							<a href="${createLink(controller:'task', action:'index', params:[own:'on', assigned:'on'])}" class="pull-right"><g:message code="kola.all" /> <i class="fa fa-chevron-right"></i></a>
 						</h3>
 					</div>
 					<g:if test="${assignedTasks?.size() > 0}">
@@ -29,12 +29,15 @@
 							<g:each var="task" in="${assignedTasks}">
 								<a href="${createLink(resource:task, action:'show')}" class="list-group-item">
 									<h4 class="list-group-item-heading">${task.name}</h4>
-									<p class="list-group-item-text">
-										${task.description?.take(100)}<br>
+									<div class="list-group-item-text">
+										<div>
+											<g:message code="kola.meta.creator" />:
+											${task.creator?.profile?.displayName}
+										</div>
 										<g:if test="${task.due}">
-											<span class="text-danger"><g:message code="kola.task.due" />: <g:formatDate date="${task.due}" type="date"/></span>
+											<div class="text-danger"><g:message code="kola.task.due" />: <g:formatDate date="${task.due}" type="date"/></div>
 										</g:if>
-									</p>
+									</div>
 								</a>
 							</g:each>
 						</ul>
@@ -58,7 +61,7 @@
 							<a href="${createLink(resource:asset, action:'show')}" class="list-group-item">
 								<h4 class="list-group-item-heading">${asset.name}</h4>
 								<p class="list-group-item-text">
-									${asset.description?.take(100)}<br>
+									${asset.description?.take(100)}
 								</p>
 							</a>
 						</g:each>

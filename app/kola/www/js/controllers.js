@@ -255,16 +255,20 @@ angular.module('kola.controllers', [])
       task.id = rfc4122.v4();
       task.isTemplate = false;
       task.template = template.id;
+      delete task.creator
       angular.forEach(task.steps, function(step) {
         step.id = rfc4122.v4();
       });
       setTaskAndAssignableUsers(task)
-    }, function() {
+    }, function(err) {
       // TODO: 404 error message and open default/main page
+      console.log(err);
     });
   }
   else {
-    setTaskAndAssignableUsers(dbService.createTask());
+    dbService.createTask().then(function(task) {
+      setTaskAndAssignableUsers(task);
+    });
   }
 
   function setTaskAndAssignableUsers(task) {
@@ -290,6 +294,11 @@ angular.module('kola.controllers', [])
     });
   }
 
+  $scope.removeReflectionQuestion = function(index) {
+    if (index > -1 && $scope.task && $scope.task.reflectionQuestions && $scope.task.reflectionQuestions.length > index) {
+      $scope.task.reflectionQuestions.splice(index, 1);
+    }
+  }
 
   $scope.save = function() {
     if ($scope.task.name) {

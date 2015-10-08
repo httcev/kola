@@ -1,5 +1,8 @@
 <ion-view>
   <ion-nav-title>Neuer Auftrag</ion-nav-title>
+  <ion-nav-buttons side="secondary">
+    <button class="button icon ion-paper-airplane" ng-disabled="!task.name" ng-click="save()"></button>
+  </ion-nav-buttons>
   <ion-content>
     <div class="list">
       <label class="item item-input item-floating-label">
@@ -20,17 +23,20 @@
           <option ng-repeat="user in assignableUsers" value="{{user.id}}">{{user.displayName}}</option>
         </select>
       </label>
-      <div class="item item-divider item-stable">Anhänge</div>
-      <div class="item"><media-attachments ng-model="task" hide-header="true"></media-attachments></div>
-      <div class="item item-divider item-stable">Lernressourcen</div>
-      <div class="item"><learning-resources ng-model="task" hide-header="true"></learning-resources></div>
-      <div class="item item-divider item-stable">Teilschritte</div>
-      <div ng-repeat="step in task.steps" class="item">
+      <media-attachments ng-model="task" edit-mode="true"></media-attachments>
+      <learning-resources ng-model="task" edit-mode="true"></learning-resources>
+      <div ng-if="task.steps.length" class="item item-divider item-stable">Teilschritte</div>
+      <div ng-if="task.steps.length" ng-repeat="step in task.steps" class="item item-button-right">
         <div>{{$index+1}}. <b>{{step.name}}</b></div>
         <div class="text" marked="step.description"></div>
-        <div><media-attachments ng-model="step" hide-header="true"></media-attachments></div>
+        <div><media-attachments ng-model="step" edit-mode="true" hide-header="true"></media-attachments></div>
+        <button class="button button-clear icon ion-trash-a" ng-click="task.steps.splice($index, 1)"></button>
+      </div>
+      <div ng-if="task.reflectionQuestions.length" class="item item-divider item-stable">Reflexionsaufforderungen</div>
+      <div ng-if="task.reflectionQuestions.length" ng-repeat="reflectionQuestion in task.reflectionQuestions" class="item item-button-right">
+        {{reflectionQuestion.name}}
+        <button class="button button-clear icon ion-trash-a" ng-click="task.reflectionQuestions.splice($index, 1)"></button>
       </div>
     </div>
-    <div class="text-center" ng-if="task.name"><button class="button button-balanced" ng-click="save()"><i class="icon ion-paper-airplane"></i> Speichern</button></div>
   </ion-content>
 </ion-view>

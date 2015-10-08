@@ -189,7 +189,16 @@ angular.module('kola.services', ['uuid'])
   }
 
   function createTask() {
-    return _create("task", { isTemplate:false });
+    var task = _create("task", { isTemplate:false, reflectionQuestions:[] });
+    // auto link standard reflection questions
+    return all("reflectionQuestion").then(function(reflectionQuestions) {
+      angular.forEach(reflectionQuestions, function(reflectionQuestion) {
+        if (reflectionQuestion.autoLink) {
+          task.reflectionQuestions.push(reflectionQuestion);
+        }
+      });
+      return task;
+    });
   }
 
   function createAttachment(parent) {

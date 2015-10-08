@@ -1,16 +1,20 @@
 <div ng-if="ngModel.attachments.length">
-	<h1 ng-if="hideHeader != 'true'" class="task-section-header">Anhänge:</h1>
-	<a class="item item-list-detail">
-	    <div ng-if="!attachmentUrls" class="center-horizontal">
-			<ion-spinner></ion-spinner>
-	    </div>
-	    <div ng-if="attachmentUrls">
-			<ion-scroll direction="x">
-				<span ng-repeat="attachment in ngModel.attachments">
-					<img ng-if="attachment.mimeType.indexOf('image/') == 0" class="image-list-thumb" ng-src="{{attachmentUrls[$index]}}" ng-click="showImage($index, attachmentUrls)"/>
-					<span ng-if="attachment.mimeType.indexOf('image/') != 0" class="image-list-thumb external-attachment" ng-click="openUrlNative(attachmentUrls[$index], attachment.mimeType)"><span class="ion-android-open"></span> {{attachment.name}}</span>
-				</span>
-			</ion-scroll>
-		</div>
+	<h1 ng-if="hideHeader != 'true' && editMode != 'true'" class="task-section-header">Anhänge:</h1>
+	<div ng-if="hideHeader != 'true' && editMode == 'true'" class="item item-divider item-stable">Anhänge</div>
+    <div ng-if="!attachmentUrls" class="center-horizontal">
+		<ion-spinner></ion-spinner>
+    </div>
+	<a ng-if="attachmentUrls && editMode != 'true'" class="item item-list-detail">
+		<ion-scroll direction="x">
+			<span ng-repeat="attachment in ngModel.attachments">
+				<img ng-if="attachment.mimeType.indexOf('image/') == 0" class="image-list-thumb" ng-src="{{attachmentUrls[$index]}}" ng-click="showImage($index, attachmentUrls)"/>
+				<span ng-if="attachment.mimeType.indexOf('image/') != 0" class="image-list-thumb external-attachment" ng-click="openUrlNative(attachmentUrls[$index], attachment.mimeType)"><span class="ion-android-open"></span> {{attachment.name}}</span>
+			</span>
+		</ion-scroll>
 	</a>
+	<div ng-if="attachmentUrls && editMode == 'true'" ng-repeat="attachment in ngModel.attachments" class="item item-button-right">
+		<img ng-if="attachment.mimeType.indexOf('image/') == 0" class="image-list-thumb" ng-src="{{attachmentUrls[$index]}}" ng-click="showImage($index, attachmentUrls)"/>
+		<span ng-if="attachment.mimeType.indexOf('image/') != 0" class="image-list-thumb external-attachment" ng-click="openUrlNative(attachmentUrls[$index], attachment.mimeType)"><span class="ion-android-open"></span> {{attachment.name}}</span>
+		<button class="button button-clear icon ion-trash-a" ng-click="ngModel.attachments.splice($index, 1)"></button>
+	</div>
 </div>

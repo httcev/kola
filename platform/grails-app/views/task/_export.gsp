@@ -52,7 +52,7 @@
 				</tr>
 			</table>
 		</div>
-		<div class="formatted clearfix"><kola:markdown>${taskInstance.description}</kola:markdown></div>
+		<kola:markdown>${taskInstance.description}</kola:markdown>
 		<g:if test="${taskInstance?.attachments?.size() > 0}">
 			<g:render bean="${taskInstance?.attachments}" template="exportAttachments" var="attachments" />
 		</g:if>
@@ -78,7 +78,7 @@
 					<g:each var="step" in="${taskInstance?.steps}">
 						<li class="list-group-item">
 							<h4 class="list-group-item-heading">${step.name}</h4>
-							<p class="list-group-item-text formatted">${step.description}</p>
+							<p class="list-group-item-text"><kola:markdown>${step.description}</kola:markdown></p>
 							<g:if test="${step.attachments?.size() > 0}">
 								<g:render bean="${step.attachments}" template="exportAttachments" var="attachments" />
 							</g:if>
@@ -89,7 +89,7 @@
 		</g:if>
 		<g:if test="${taskInstance?.reflectionQuestions?.size() > 0}">
 			<div class="panel panel-default">
-				<div class="panel-heading"><h3 class="panel-title"><g:message code="kola.reflectionQuestions" /></h3></div>
+				<div class="panel-heading"><h3 class="panel-title"><g:message code="kola.reflectionQuestions.noshy"/></h3></div>
 				<ul class="list-group">
 					<g:each var="reflectionQuestion" in="${taskInstance?.reflectionQuestions}">
 						<li class="list-group-item"><b class="text-warning">${reflectionQuestion.name}</b></li>

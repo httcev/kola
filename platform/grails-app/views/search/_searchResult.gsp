@@ -16,11 +16,11 @@
 			</g:if>
 			<g:elseif test="${highlights[hitIndex]['description']?.fragments}">
 				<g:each var="fragment" in="${highlights[hitIndex]['description']?.fragments}">
-					<div>${raw(fragment.toString())}</div>
+					<kola:markdown>${raw(fragment.toString())}</kola:markdown>
 				</g:each>
 			</g:elseif>
 			<g:elseif test="${hit.hasProperty('description')}">
-				<div>${hit.description?.take(150)}</div>
+				<kola:markdown>${hit.description?.take(100)}</kola:markdown>
 			</g:elseif>
 			</p>
 		</li>

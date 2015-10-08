@@ -40,10 +40,17 @@
 		<div class="col-sm-10"><input type="date" id="due" class="form-control" name="due" value="${formatDate(format:'yyyy-MM-dd',date:taskInstance?.due)}" placeholder="yyyy-MM-dd"></div>
 	</div>
 
-	<div class="checkbox col-sm-offset-2 form-padding-all ${hasErrors(bean: taskInstance, field: 'done', 'error')}">
-		<label>
-			<g:checkBox name="done" value="${taskInstance?.done}" /> <g:message code="kola.task.done" />
+	<div class="form-group ${hasErrors(bean: taskInstance, field: 'done', 'error')}">
+		<label for="done" class="col-sm-2 control-label">
+			<g:message code="kola.task.done" />:
 		</label>
+		<div class="col-sm-10">
+			<div class="checkbox">
+				<label>
+					<g:checkBox name="done" value="${taskInstance?.done}" /> <g:message code="kola.task.done" />
+				</label>
+			</div>
+		</div>
 	</div>
 </g:if>
 

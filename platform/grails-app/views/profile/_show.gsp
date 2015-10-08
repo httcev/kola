@@ -3,13 +3,13 @@
 <g:set var="dialogId" value="id-${UUID.randomUUID().toString()}"/>
 
 <a href="#" data-toggle="modal" data-target="#${dialogId}">
-<g:if test="${profile.photo?.length > 0}">
-	<img class="avatar img-circle" src="data:image/png;base64,${profile.photo.encodeBase64().toString()}">
-</g:if>
-<g:else>
-	<i class="avatar fa fa-user fa-lg text-muted"></i>
-</g:else>
-${profile.displayName}
+	<g:if test="${profile.photo?.length > 0}">
+		<img class="avatar img-circle" src="data:image/png;base64,${profile.photo.encodeBase64().toString()}">
+	</g:if>
+	<g:else>
+		<i class="fa fa-user fa-lg text-muted"></i>
+	</g:else>
+	${profile.displayName}
 </a>
 
 <!-- Modal -->

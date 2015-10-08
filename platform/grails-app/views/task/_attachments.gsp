@@ -3,7 +3,7 @@
 <g:set var="galleryId" value="id-${UUID.randomUUID().toString()}"/>
 <g:set var="assetService" bean="assetService"/>
 
-<div class="attachments clearfix">
+<div class="attachments clearfix form-padding">
 	<g:each var="assetInstance" in="${attachments}">
 		<g:set var="url" value="${assetService.createEncodedLink(assetInstance)}" />
 		<a href="${url}"

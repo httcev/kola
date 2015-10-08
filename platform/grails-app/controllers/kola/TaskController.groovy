@@ -209,7 +209,11 @@ class TaskController {
                 }
             }
         }
-        renderPdf(template:"export", model:["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations], filename:taskInstance.name + ".pdf")
+        def filename = taskInstance.name?.replaceAll("\\W+", "_");
+        if (!filename) {
+            fielname = "export"
+        }
+        renderPdf(template:"export", model:["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations], filename:"${filename}.pdf")
     }
 
     def export2(Task taskInstance) {
@@ -281,7 +285,7 @@ class TaskController {
                 taskInstance.addToSteps(step)
             }
         }
-/*
+
         taskInstance.steps?.eachWithIndex { step, index ->
             step?.attachments?.clear()
             params.list("steps[$index].attachments")?.unique(false).each {
@@ -294,7 +298,7 @@ class TaskController {
                 }
             }
         }  
-*/
+
         // update reflection questions
         taskInstance.reflectionQuestions?.clear()
         params.list("reflectionQuestions")?.unique(false).each {

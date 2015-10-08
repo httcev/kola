@@ -7,7 +7,8 @@ angular.module('kola.directives', [])
 	require: '^ngModel',
   	scope: {
 		ngModel: '=',
-		hideHeader: '@'
+		hideHeader: '@',
+		editMode: '@'
 	},
     templateUrl: 'templates/directive-learning-resources.html',
     link: function($scope) {
@@ -35,7 +36,8 @@ angular.module('kola.directives', [])
 	require: '^ngModel',
   	scope: {
 		ngModel: '=',
-		hideHeader: '@'
+		hideHeader: '@',
+		editMode: '@'
 	},
     templateUrl: 'templates/directive-media-attachments.html',
     link: function($scope, $element, $attrs, ngModel) {

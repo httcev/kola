@@ -2,7 +2,7 @@
 
 <g:set var="assetService" bean="assetService"/>
 
-<div class="attachments clearfix">
+<div class="attachments clearfix form-padding-all">
 	<g:each var="assetInstance" in="${attachments}">
 		<g:set var="url" value="${assetService.createEncodedLink(assetInstance)}" />
 		<div class="text-center pull-left">

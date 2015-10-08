@@ -1,7 +1,12 @@
 <div ng-if="ngModel.resources.length">
-	<h1 ng-if="hideHeader != 'true'" class="task-section-header">Lernressourcen:</h1>
-	<a ng-repeat="resource in ngModel.resources" class="item item-list-detail" ng-click="openUrlNative(resource.url)">
+	<h1 ng-if="hideHeader != 'true' && editMode != 'true'" class="task-section-header">Lernressourcen:</h1>
+	<div ng-if="hideHeader != 'true' && editMode == 'true'" class="item item-divider item-stable">Lernressourcen</div>
+	<a ng-if="editMode != 'true'" ng-repeat="resource in ngModel.resources" class="item item-list-detail" ng-click="openUrlNative(resource.url)">
 		<i class="icon ion-ios-book-outline"></i>
-	{{resource.name}}
+		{{resource.name}}
 	</a>
+	<div ng-if="editMode == 'true'" ng-repeat="resource in ngModel.resources" class="item item-button-right">
+		<a ng-click="openUrlNative(resource.url)"><i class="icon ion-ios-book-outline"></i>{{resource.name}}</a>
+		<button class="button button-clear icon ion-trash-a" ng-click="ngModel.resources.splice($index, 1)"></button>
+	</div>
 </div>
