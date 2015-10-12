@@ -60,24 +60,7 @@
 	</label>
 	<div class="col-sm-10">
 		<g:if test="${taskInstance?.attachments?.size() > 0}">
-			<ul class="list-group sortable">
-				<g:each var="assetInstance" in="${taskInstance?.attachments}">
-					<li class="list-group-item clearfix">
-						<input type="hidden" name="attachments" value="${assetInstance.id}">
-						<h4 class="list-group-item-heading">
-							<g:if test="${taskInstance?.attachments?.size() > 1}">
-								<div class="btn btn-default drag-handle" title="${message(code:'kola.dnd')}"><i class="fa fa-arrows-v fa-lg"></i></div>
-							</g:if>
-							<a href="${assetService.createEncodedLink(assetInstance)}" target="_blank">${assetInstance.name}</a>
-							<button type="button" class="btn btn-danger pull-right" title="${message(code:'default.button.delete.label')}" onclick="$(this).closest('li').remove()"><i class="fa fa-times"></i></button>
-						</h4>
-						<p class="list-group-item-text">
-							<label><g:message code="kola.meta.mimeType" />:</label>
-							<code>${assetInstance.mimeType}</code>
-						</p>
-					</li>
-				</g:each>
-			</ul>
+			<g:render model="${[attachments:taskInstance?.attachments, mode:'edit']}" template="attachments" />
 		</g:if>
 		<div class="form-padding">
 			<label class="text-muted"><g:message code="default.add.label" args="${[message(code:'kola.task.attachment')]}" />: </label>

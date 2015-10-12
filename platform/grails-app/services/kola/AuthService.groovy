@@ -7,6 +7,20 @@ import grails.plugin.springsecurity.SpringSecurityUtils
 class AuthService {
     def springSecurityService
 
+    // e.g.: is user allowed to create documentations or question answers on document?
+    def canAttach(domain, user = springSecurityService.currentUser) {
+        if (user) {
+            if (domain?.hasProperty("creator") && domain.creator == user) {
+                return true
+            }
+            if (domain?.hasProperty("assignee") && domain.assignee == user) {
+                return true
+            }
+            return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
+        }
+        return false
+    }
+
     def canEdit(domain, user = springSecurityService.currentUser) {
         if (user) {
             if (domain?.hasProperty("creator") && domain.creator == user) {

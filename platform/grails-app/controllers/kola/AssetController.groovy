@@ -111,7 +111,7 @@ class AssetController {
                 assetInstance.errors.allErrors.each { println it }
 
                 if (assetInstance.save(true)) {
-                    RequestContextHolder.currentRequestAttributes().flashScope.message = message(code: 'default.created.message', args: [message(code: 'asset.label', default: 'Asset'), assetInstance.id])
+                    RequestContextHolder.currentRequestAttributes().flashScope.message = message(code: 'default.created.message', args: [message(code: 'kola.asset', default: 'Asset'), assetInstance.name])
                     // need to clear the flow's persistence context, otherwise we get a NotSerializableException for the newly saved Asset
                     flow.persistenceContext.clear()
                     return success()
@@ -178,7 +178,7 @@ class AssetController {
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'Asset.label', default: 'Asset'), assetInstance.id])
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'kola.asset', default: 'Asset'), assetInstance.name])
                 redirect action:"show", id:assetInstance.id
             }
             '*'{ respond assetInstance, [status: OK] }
@@ -195,7 +195,7 @@ class AssetController {
 
         assetInstance.deleted = true
         assetInstance.save flush:true
-        flash.message = message(code: 'default.deleted.message', args: [message(code: 'Asset.label', default: 'Asset'), assetInstance.id])
+        flash.message = message(code: 'default.deleted.message', args: [message(code: 'kola.asset', default: 'Asset'), assetInstance.name])
         redirect action:"index", method:"GET"
     }
 
@@ -280,7 +280,7 @@ class AssetController {
     }
 
     protected void notFound() {
-        flash.message = message(code: 'default.not.found.message', args: [message(code: 'asset.label', default: 'Asset'), params.id])
+        flash.message = message(code: 'default.not.found.message', args: [message(code: 'kola.asset', default: 'Asset'), params.id])
         redirect action: "index", method: "GET"
     }
 

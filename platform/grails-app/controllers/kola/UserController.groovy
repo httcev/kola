@@ -45,7 +45,7 @@ class UserController {
         }
         updateRoles(userInstance)
 
-        flash.message = message(code: 'default.created.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])
+        flash.message = message(code: 'default.created.message', args: [message(code: 'kola.user', default: 'User'), userInstance.id])
         redirect action:"index", method:"GET"
     }
 
@@ -78,7 +78,7 @@ class UserController {
         }
         updateRoles(userInstance)
 
-        flash.message = message(code: 'default.updated.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])
+        flash.message = message(code: 'default.updated.message', args: [message(code: 'kola.user', default: 'User'), userInstance.id])
         redirect action:"index", method:"GET"
     }
 
@@ -91,7 +91,7 @@ class UserController {
 
         userInstance.delete flush:true
 
-        flash.message = message(code: 'default.deleted.message', args: [message(code: 'user.label', default: 'User'), userInstance.id])
+        flash.message = message(code: 'default.deleted.message', args: [message(code: 'kola.user', default: 'User'), userInstance.id])
         redirect action:"index", method:"GET"
     }
 
@@ -147,7 +147,7 @@ class UserController {
     }
 
     protected void notFound() {
-        flash.message = message(code: 'default.not.found.message', args: [message(code: 'user.label', default: 'User'), params.id])
+        flash.message = message(code: 'default.not.found.message', args: [message(code: 'kola.user', default: 'User'), params.id])
         redirect action: "index", method: "GET"
     }
 

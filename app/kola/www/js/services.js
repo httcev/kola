@@ -174,7 +174,7 @@ angular.module('kola.services', ['uuid'])
     // theTablesToSync, dbObject, theSyncInfo, theServerUrl, assetUrl, assetDir, callBack, $cordovaFileTransfer, username, password, timeout) 
     DBSYNC.initSync(TABLES_TO_SYNC, self.db, {foo:"bar"}, serverUrl + "/api/changes", serverUrl + "/api/upload", self._assetsDir, function() {
       deferred.resolve();
-    }, $cordovaFileTransfer, $q, localStorage["user"], localStorage["password"]);
+    }, $cordovaFileTransfer, $cordovaFile, $q, localStorage["user"], localStorage["password"]);
     return deferred.promise;
   }
 

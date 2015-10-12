@@ -58,15 +58,15 @@ class TaskController {
         def taskDocumentations = [:]
         if (!taskInstance.isTemplate) {
             taskInstance.reflectionQuestions?.each { reflectionQuestion ->
-                reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false)
+                reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false, [sort:'lastUpdated', order:'asc'])
             }
             
-            def docs = TaskDocumentation.findAllByTaskAndDeleted(taskInstance, false)
+            def docs = TaskDocumentation.findAllByTaskAndDeleted(taskInstance, false, [sort:'lastUpdated', order:'asc'])
             if (docs) {
                 taskDocumentations[taskInstance.id] = docs
             }
             taskInstance.steps?.each { step ->
-                docs = TaskDocumentation.findAllByStepAndDeleted(step, false)
+                docs = TaskDocumentation.findAllByStepAndDeleted(step, false, [sort:'lastUpdated', order:'asc'])
                 if (docs) {
                     taskDocumentations[step.id] = docs
                 }
@@ -135,7 +135,7 @@ class TaskController {
 
         taskInstance.save flush:true
 
-        flash.message = message(code: 'default.created.message', args: [message(code: 'Task.label', default: 'Task'), taskInstance.id])
+        flash.message = message(code: 'default.created.message', args: [message(code: taskInstance.isTemplate ? 'kola.taskTemplate.noshy' : 'kola.task', default: 'Task'), taskInstance.name])
         redirect action:"edit", id:taskInstance.id
     }
 
@@ -168,7 +168,7 @@ class TaskController {
 
         taskInstance.save flush:true
 
-        flash.message = message(code: 'default.updated.message', args: [message(code: 'Task.label', default: 'Task'), taskInstance.id])
+        flash.message = message(code: 'default.updated.message', args: [message(code: taskInstance.isTemplate ? 'kola.taskTemplate.noshy' : 'kola.task', default: 'Task'), taskInstance.name])
         redirect action:"edit", id:taskInstance.id
     }
 
@@ -186,7 +186,7 @@ class TaskController {
         taskInstance.deleted = true
         taskInstance.save flush:true
 
-        flash.message = message(code: 'default.deleted.message', args: [message(code: 'Task.label', default: 'Task'), taskInstance.id])
+        flash.message = message(code: 'default.deleted.message', args: [message(code: taskInstance.isTemplate ? 'kola.taskTemplate.noshy' : 'kola.task', default: 'Task'), taskInstance.name])
         redirect action:"index", method:"GET"
     }
 
@@ -238,13 +238,125 @@ class TaskController {
         render(template:"export", model:["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations], filename:taskInstance.name + ".pdf")
     }
 
+    @Transactional
+    def saveTaskDocumentation(TaskDocumentation taskDocumentationInstance) {
+        if (taskDocumentationInstance == null || !taskDocumentationInstance.task) {
+            throw new RuntimeException("no task for new documentation")
+        }
+        if (!authService.canAttach(taskDocumentationInstance.task)) {
+            forbidden()
+        }
+        if (taskDocumentationInstance.text) {
+            taskDocumentationInstance.creator = springSecurityService.currentUser
+
+            taskDocumentationInstance.save flush:true
+            if (taskDocumentationInstance.hasErrors()) {
+                respond taskDocumentationInstance.errors, view:'show'
+                return
+            }
+        }
+
+        flash.message = message(code: 'default.created.message', args: [message(code: 'kola.task.documentation'), taskDocumentationInstance.id])
+        redirect action:"show", method:"GET", id:taskDocumentationInstance.task.id
+    }
+
+    @Transactional
+    def updateTaskDocumentation(TaskDocumentation taskDocumentationInstance) {
+        if (taskDocumentationInstance == null || !(taskDocumentationInstance.task || taskDocumentationInstance.step)) {
+            throw new RuntimeException("no task or step for update documentation")
+        }
+        if (!authService.canEdit(taskDocumentationInstance)) {
+            forbidden()
+        }
+
+        taskDocumentationInstance.attachments?.clear()
+        bindData(taskDocumentationInstance, params, [include: ['attachments']])
+        //taskDocumentationInstance.attachments = params.list("attachments")?.unique(false)
+        def msg
+        if (taskDocumentationInstance.text || taskDocumentationInstance.attachments?.size() > 0) {
+            taskDocumentationInstance.save flush:true
+            if (taskDocumentationInstance.hasErrors()) {
+                respond taskDocumentationInstance.errors, view:'show'
+                return
+            }
+            msg = message(code: 'default.updated.message', args: [message(code: 'kola.task.documentation'), taskDocumentationInstance.id])
+        }
+        else {
+            taskDocumentationInstance.text = "DELETED"
+            taskDocumentationInstance.deleted =true
+            taskDocumentationInstance.save flush:true
+            msg = message(code: 'default.deleted.message', args: [message(code: 'kola.task.documentation'), taskDocumentationInstance.id])
+        }
+
+        flash.message = msg
+        def taskId = taskDocumentationInstance.task ? taskDocumentationInstance.task.id : params.parentTask
+        redirect action:"show", method:"GET", id:taskId
+    }
+
+    @Transactional
+    def saveReflectionAnswer(ReflectionAnswer reflectionAnswerInstance) {
+        if (reflectionAnswerInstance == null || !reflectionAnswerInstance.task || !reflectionAnswerInstance.question) {
+            throw new RuntimeException("no task or question for new answer")
+        }
+        if (!authService.canAttach(reflectionAnswerInstance.task)) {
+            forbidden()
+        }
+        if (reflectionAnswerInstance.text) {
+            reflectionAnswerInstance.creator = springSecurityService.currentUser
+
+            reflectionAnswerInstance.save flush:true
+            if (reflectionAnswerInstance.hasErrors()) {
+                respond reflectionAnswerInstance.errors, view:'show'
+                return
+            }
+        }
+
+        flash.message = message(code: 'default.created.message', args: [message(code: 'kola.reflectionAnswer'), reflectionAnswerInstance.id])
+        redirect action:"show", method:"GET", id:reflectionAnswerInstance.task.id
+    }
+
+    @Transactional
+    def updateReflectionAnswer(ReflectionAnswer reflectionAnswerInstance) {
+        if (reflectionAnswerInstance == null || !reflectionAnswerInstance.task || !reflectionAnswerInstance.question) {
+            throw new RuntimeException("no task or question for update answer")
+        }
+        if (!authService.canEdit(reflectionAnswerInstance)) {
+            forbidden()
+        }
+
+        def msg
+        if (reflectionAnswerInstance.text) {
+            reflectionAnswerInstance.save flush:true
+            if (reflectionAnswerInstance.hasErrors()) {
+                reflectionAnswerInstance.errors.each {
+                    println it
+                }
+            }
+            msg = message(code: 'default.updated.message', args: [message(code: 'kola.reflectionAnswer'), reflectionAnswerInstance.id])
+        }
+        else {
+            reflectionAnswerInstance.text = "DELETED"
+            reflectionAnswerInstance.deleted = true
+            reflectionAnswerInstance.save flush:true
+            if (reflectionAnswerInstance.hasErrors()) {
+                reflectionAnswerInstance.errors.each {
+                    println it
+                }
+            }
+            msg = message(code: 'default.deleted.message', args: [message(code: 'kola.reflectionAnswer'), reflectionAnswerInstance.id])
+        }
+
+        flash.message = msg
+        redirect action:"show", method:"GET", id:reflectionAnswerInstance.task.id
+    }
+
     protected void notFound() {
-        flash.message = message(code: 'default.not.found.message', args: [message(code: 'Task.label', default: 'Task'), params.id])
+        flash.message = message(code: 'default.not.found.message', args: [message(code: taskInstance.isTemplate ? 'kola.taskTemplate.noshy' : 'kola.task', default: 'Task'), params.id])
         redirect action: "index", method: "GET"
     }
 
     protected void forbidden() {
-        flash.message = message(code: 'default.forbidden.message', args: [message(code: 'Task.label', default: 'Task'), params.id])
+        flash.message = message(code: 'default.forbidden.message', args: [message(code: taskInstance.isTemplate ? 'kola.taskTemplate.noshy' : 'kola.task', default: 'Task'), params.id])
         redirect action: "index", method: "GET"
     }
 

@@ -64,7 +64,7 @@ var DBSYNC = {
      * @param {Object} password : password for basci authentication support
      * @param {Object} timeout : the timeout in milliseconds for the ajax request making the sync
      */
-    initSync: function(theTablesToSync, dbObject, theSyncInfo, theServerUrl, attachmentUploadUrl, assetsDir, callBack, $cordovaFileTransfer, $q, username, password, timeout) {
+    initSync: function(theTablesToSync, dbObject, theSyncInfo, theServerUrl, attachmentUploadUrl, assetsDir, callBack, $cordovaFileTransfer, $cordovaFile, $q, username, password, timeout) {
         var self = this, i = 0;
         this.db = dbObject;
         this.serverUrl = theServerUrl;
@@ -74,6 +74,7 @@ var DBSYNC = {
         this.password=password;
         this.timeout = timeout;
         this.$cordovaFileTransfer = $cordovaFileTransfer;
+        this.$cordovaFile = $cordovaFile;
         this.attachmentUploadUrl = attachmentUploadUrl;
         this.assetsDir = assetsDir;
         this.$q = $q;
@@ -164,7 +165,6 @@ var DBSYNC = {
                 self._uploadAttachments(data.data.asset).then(function() {
                     callBackProgress('Updating local data', 70, 'updateData');
                     //console.log("--- data", data);
-                    
                     self._downloadAttachments(serverData.data ? serverData.data.asset : []).then(function() {
                         self._updateLocalDb(serverData, function() {
                             self.syncResult.localDataUpdated = self.syncResult.nbUpdated > 0;
@@ -477,25 +477,33 @@ var DBSYNC = {
             angular.forEach(attachments, function(attachment) {
                 var att = attachment.doc;
                 if (att && att.subType == "attachment") {
-                    console.log("--- downloading attachment from " + (att.url) + " to " + (self.assetsDir + att.id));
-                    console.log(attachment);
-                    promises.push(self.$cordovaFileTransfer.download(att.url, self.assetsDir + att.id, options, false)
-                    .then(function(fileEntry) {
-                        // Success!
-                        console.log("--- success");
-                        console.log(fileEntry);
-                        /*
-                        fileEntry.file(function(f) {
-                          attachment.url = f.localURL;
-                          d.resolve();
+                    // only download if not available locally already
+                    promises.push(self.$cordovaFile.checkFile(self.assetsDir, att.id)
+                    .then(function (success) {
+                    // success
+                        console.log("--- found file " + att.id + " -> NOT downloading.");
+                    }, function (error) {
+                        // file not found
+                        console.log("--- downloading attachment from " + (att.url) + " to " + (self.assetsDir + att.id));
+                        console.log(attachment);
+                        return self.$cordovaFileTransfer.download(att.url, self.assetsDir + att.id, options, false)
+                        .then(function(fileEntry) {
+                            // Success!
+                            console.log("--- success");
+                            console.log(fileEntry);
+                            /*
+                            fileEntry.file(function(f) {
+                              attachment.url = f.localURL;
+                              d.resolve();
+                            });
+            */
+                        }, function(err) {
+                            // Error
+                            console.log("--- error");
+                            console.error(err);
+                        }, function (progress) {
+                           // console.log("--- progress: " +((progress.loaded / progress.total) * 100));
                         });
-        */
-                    }, function(err) {
-                        // Error
-                        console.log("--- error");
-                        console.error(err);
-                    }, function (progress) {
-                       // console.log("--- progress: " +((progress.loaded / progress.total) * 100));
                     }));
                 }
             });

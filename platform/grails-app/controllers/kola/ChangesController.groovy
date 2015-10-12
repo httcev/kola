@@ -127,7 +127,12 @@ class ChangesController {
     			println target
     		}
     		if (doc) {
-	    		if (!(doc.lastUpdated.before(start) || doc.lastUpdated.after(end))) {
+    			// TODO: clean this up. we currently deliver ALL assets to handle the following case:
+    			// 1. Create task with attachments, do not assign to user.
+    			// 2. Sync in App
+    			// 3. Assign task to user.
+    			// -> now, if we don't deliver all assets, the App will end up with unknown IDs...
+	    		if (true || !(doc.lastUpdated.before(start) || doc.lastUpdated.after(end))) {
 	    			target.add(doc)
 	    		}
 	    	}
@@ -162,45 +167,5 @@ class ChangesController {
 				}
     		}
 		}
-/*
-    	clientData.data?.each { table, objects ->
-    		println "--- table=" + table
-    		def domainClass
-    		switch(table) {
-    			case "taskDocumentation":
-    				domainClass = TaskDocumentation
-    				break;
-    		}
-    		if (domainClass) {
-	    		objects?.each {
-	    			def doc = JSON.parse(it.doc)
-	    			println doc
-	    			def model = domainClass.get(doc.id)
-	    			if (!model) {
-	    				println "--- creating new " + domainClass + " with id " + doc.id
-	    				model = domainClass.newInstance()
-	    				model.id = doc.id
-	    			}
-	    			else {
-	    				println "--- found existing " + domainClass + " with id " + doc.id
-	    			}
-	    			model.properties = doc
-	    			if (doc.taskId) {
-	    				model.task = Task.get(doc.taskId)
-	    			}
-	    			if (!model.creator) {
-	    				model.creator = user
-	    			}
-	    			if (!model.save(true)) {
-	        			model.errors.allErrors.each { println it }
-	    			}
-	    			else {
-	    				println "------------- SAVED:"
-	    				println model
-	    			}
-	    		}
-	    	}
-    	}
-*/    	
     }
 }

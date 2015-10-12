@@ -1,4 +1,3 @@
-
 <g:set var="authService" bean="authService"/>
 <g:set var="assetService" bean="assetService"/>
 <html>
@@ -67,7 +66,7 @@
 			<div class="col-md-8 col-md-pull-4"><kola:markdown>${taskInstance.description}</kola:markdown></div>
 		</div>
 		<g:if test="${taskInstance?.attachments?.size() > 0}">
-			<g:render bean="${taskInstance?.attachments}" template="attachments" var="attachments" />
+		<g:render model="${[attachments:taskInstance?.attachments]}" template="attachments" />
 		</g:if>
 		<g:if test="${taskInstance?.resources?.size() > 0}">
 		<div class="panel panel-default">
@@ -93,7 +92,7 @@
 						<h4 class="list-group-item-heading">${step.name}</h4>
 						<p class="list-group-item-text"><kola:markdown>${step.description}</kola:markdown></p>
 						<g:if test="${step.attachments?.size() > 0}">
-							<g:render bean="${step.attachments}" template="attachments" var="attachments" />
+							<g:render model="${[attachments:step.attachments]}" template="attachments" />
 						</g:if>
 					</li>
 				</g:each>
@@ -105,55 +104,75 @@
 			<div class="panel-heading"><h3 class="panel-title"><g:message code="kola.reflectionQuestions" /></h3></div>
 			<ul class="list-group">
 				<g:each var="reflectionQuestion" in="${taskInstance?.reflectionQuestions}">
-					<li class="list-group-item"><b class="text-warning">${reflectionQuestion.name}</b></li>
+					<li class="list-group-item clearfix">
+						<b class="text-warning">${reflectionQuestion.name}</b>
+						<g:if test="${authService.canAttach(taskInstance)}">
+							<button type="button" title="${message(code:'kola.reflectionAnswer.create')}" class="btn btn-default pull-right" onclick="$(this).parent().nextAll('.new-answer').first().removeClass('hidden').find('textarea').focus()"><i class="fa fa-comment-o"></i></button>
+						</g:if>
+					</li>
 					<g:each var="reflectionAnswer" in="${reflectionAnswers[reflectionQuestion.id]}">
 						<li class="list-group-item">
 							<div class="list-group-item-text clearfix">
-								<p class="formatted">${reflectionAnswer.text}</p>
+								<p class="formatted reflectionAnswer">${reflectionAnswer.text}</p>
+								<g:if test="${authService.canEdit(reflectionAnswer)}">
+									<g:form class="form hidden" action="updateReflectionAnswer" id="${reflectionAnswer.id}" method="PUT">
+										<textarea name="text" class="form-control" rows="5" placeholder="${message(code:'kola.reflectionAnswer.placeholder')}">${reflectionAnswer.text}</textarea>
+										<div class="text-right form-padding-all"><button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <g:message code="default.save.label" args="[message(code:'kola.reflectionAnswer')]" /></button></div>
+									</g:form>
+								</g:if>
 								<small class="pull-right">
+									<g:if test="${authService.canEdit(reflectionAnswer)}">
+										<button type="button" class="btn btn-default" onclick="$(this).hide().parent().prevAll('.reflectionAnswer').hide().next('.form').removeClass('hidden').find('textarea').focus()"><i class="fa fa-pencil"></i> <g:message code="default.button.edit.label" /></button>
+									</g:if>
 									<g:render bean="${reflectionAnswer.creator.profile}" template="/profile/show" var="profile" />,
 									<g:formatDate date="${reflectionAnswer.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
 								</small>
 							</div>
 						</li>
 					</g:each>
+					<li class="list-group-item new-answer hidden">
+						<g:form class="form" action="saveReflectionAnswer">
+							<input type="hidden" name="task" value="${taskInstance.id}">
+							<input type="hidden" name="question" value="${reflectionQuestion.id}">
+							<textarea name="text" class="form-control" rows="5" placeholder="${message(code:'kola.reflectionAnswer.placeholder')}"></textarea>
+							<div class="text-right form-padding"><button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <g:message code="default.save.label" args="[message(code:'kola.reflectionAnswer')]"/></button></div>
+						</g:form>
+					</li>
 				</g:each>
 			</ul>
 		</div>
 		</g:if>
-		<g:if test="${taskDocumentations?.size() > 0}">
+		<g:if test="${taskDocumentations?.size() > 0 || authService.canAttach(taskInstance)}">
 		<div class="panel panel-success">
-			<div class="panel-heading"><h3 class="panel-title"><g:message code="kola.task.documentations" /></h3></div>
+			<div class="panel-heading clearfix">
+				<h3 class="panel-title clearfix">
+					<g:message code="kola.task.documentations" />
+					<g:if test="${authService.canAttach(taskInstance)}">
+						<button type="button" class="btn btn-default pull-right" onclick="$(this).hide().closest('.panel').find('.new-documentation').removeClass('hidden').find('textarea').focus()"><i class="fa fa-plus"></i> <g:message code="default.add.label" args="[message(code:'kola.task.documentation')]" /></button>
+					</g:if>
+				</h3>
+			</div>
 			<ul class="list-group">
 				<g:each var="taskDocumentation" in="${taskDocumentations[taskInstance.id]}">
-					<li class="list-group-item">
-						<div class="list-group-item-text clearfix">
-							<p class="formatted">${taskDocumentation.text}</p>
-							<g:render bean="${taskDocumentation.attachments}" template="attachments" var="attachments" />
-							<small class="pull-right">
-								<g:render bean="${taskDocumentation.creator.profile}" template="/profile/show" var="profile" />,
-								<g:formatDate date="${taskDocumentation.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
-							</small>
-						</div>
-					</li>
+					<g:render bean="${taskDocumentation}" template="taskDocumentation" var="taskDocumentation" />
 				</g:each>
 				<g:each var="step" in="${taskInstance?.steps}">
 					<g:if test="${taskDocumentations[step.id]?.size() > 0}">
 					<li class="list-group-item"><b><g:message code="kola.task.documentation.forStep"/> "${step.name}":</b></li>
 					<g:each var="taskDocumentation" in="${taskDocumentations[step.id]}">
-						<li class="list-group-item">
-							<div class="list-group-item-text clearfix">
-								<p class="formatted">${taskDocumentation.text}</p>
-								<g:render bean="${taskDocumentation.attachments}" template="attachments" var="attachments" />
-								<small class="pull-right">
-									<g:render bean="${taskDocumentation.creator.profile}" template="/profile/show" var="profile" />,
-									<g:formatDate date="${taskDocumentation.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
-								</small>
-							</div>
-						</li>
+						<g:render bean="${taskDocumentation}" template="taskDocumentation" var="taskDocumentation" />
 					</g:each>
 					</g:if>
 				</g:each>
+				<g:if test="${authService.canAttach(taskInstance)}">
+					<li class="list-group-item new-documentation hidden">
+						<g:form class="form" action="saveTaskDocumentation">
+							<input type="hidden" name="task" value="${taskInstance.id}">
+							<textarea name="text" class="form-control" rows="5" placeholder="${message(code:'kola.task.documentation.placeholder')}"></textarea>
+							<div class="text-right form-padding"><button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <g:message code="default.save.label" args="[message(code:'kola.task.documentation')]"/></button></div>
+						</g:form>
+					</li>
+				</g:if>
 			</ul>
 		</div>
 		</g:if>

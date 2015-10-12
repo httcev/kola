@@ -35,7 +35,7 @@ class ProfileController {
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'User.label', default: 'User'), userInstance.id])
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'kola.user', default: 'User'), userInstance.username])
                 redirect action:"index", method:"GET"
             }
             '*'{ respond userInstance, [status: OK] }
