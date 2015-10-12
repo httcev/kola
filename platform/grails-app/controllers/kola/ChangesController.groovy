@@ -26,6 +26,15 @@ class ChangesController {
 	    	def now = new Date()
 	    	println "handing out changes for $user between $since and $now"
 
+	    	def users = User.withCriteria() {
+				or {
+					between('lastUpdated', since, now)
+					profile {
+						between('lastUpdated', since, now)
+					}
+				}
+			}
+
     		// learning resources may change without having a changed task, so hand out all modified ones.
     		def assets = Asset.findAllByLastUpdatedBetweenAndSubType(since, now, "learning-resource") as Set
 
@@ -61,7 +70,7 @@ class ChangesController {
 	    	def result = [
 	    		"now"  : DATEFORMAT.format(now),
 	    		"data" : [
-		    		"user" : User.findAllByLastUpdatedBetween(since, now),
+		    		"user" : users,
 		    		// reflection questions may change without having a changed task, so hand out all modified ones.
 		    		"reflectionQuestion" : ReflectionQuestion.findAllByLastUpdatedBetween(since, now),
 		    		"reflectionAnswer" : ReflectionAnswer.findAllByLastUpdatedBetweenAndCreator(since, now, user),

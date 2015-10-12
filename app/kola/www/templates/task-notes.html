@@ -9,10 +9,10 @@
     </div>
     <div class="list card" ng-repeat="note in notes | orderBy:'lastUpdated'">
       <div class="item item-text-wrap">
-        <div class="created-date">{{note.lastUpdated | date}} {{note.creator.displayName}}</div>
         <div class="text">{{note.text}}</div>
+        <author-info ng-model="note"></author-info>
       </div>
-      <media-attachments ng-model="note" hide-header="true"></media-attachments>
+      <media-attachments ng-model="note" hide-header="true" edit-mode="true"></media-attachments>
       <div class="item tabs tabs-secondary">
         <button class="button button-clear icon ion-trash-a" ng-click="remove(note)"></button>
       </div>
@@ -44,9 +44,9 @@
       <div class="list card">
         <form name="form" ng-repeat="reflectionQuestion in task.reflectionQuestions" class="item item-text-wrap">
           <div class="positive reflection-question">{{reflectionQuestion.name}}</div>
-          <div class="created-date">{{reflectionAnswers[reflectionQuestion.id].lastUpdated | date}} {{reflectionAnswers[reflectionQuestion.id].creator.displayName}}</div>
           <textarea ng-model="reflectionAnswers[reflectionQuestion.id].text" ng-change="reflectionAnswers[reflectionQuestion.id]._dirty=true" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier Ihre Antwort ein..."></textarea>
           <div class="text-center" ng-show="form.$dirty"><button class="button button-balanced" ng-click="saveReflectionAnswer(reflectionAnswers[reflectionQuestion.id], form)"><i class="icon ion-paper-airplane"></i> Speichern</button></div>
+          <author-info ng-model="reflectionAnswers[reflectionQuestion.id]"></author-info>
         </div>
       </form>
     </div>

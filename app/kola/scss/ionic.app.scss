@@ -65,7 +65,9 @@ media-attachments .center-horizontal { padding:24.5px }
 
 .spinner { width:100%; text-align:center}
 .center-horizontal { text-align:center }
-.created-date { font-size:60% }
+.author-info { font-size:75%; font-weight:bold; color:#999; text-align:right;}
+.author-info img { border-radius:50%; vertical-align:middle }
+.author-info a { text-decoration:none; color:inherit; }
 .reflection-question { padding-bottom:10px }
 .text { white-space:pre-line }
 .animate:focus {

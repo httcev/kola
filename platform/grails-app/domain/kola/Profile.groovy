@@ -17,6 +17,7 @@ class Profile {
     String phone
     String mobile
     byte[] photo
+    Date lastUpdated
 
     static _exported = ["displayName", "company", "phone", "mobile", "photo"]
     static {

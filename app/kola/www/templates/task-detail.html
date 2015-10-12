@@ -1,41 +1,46 @@
-<ion-view ng-show="task">
+<ion-view>
   <ion-nav-title>Auftrag: {{task.name}}</ion-nav-title>
   <ion-content class="padding">
-    <h3>{{task.name}}</h3>
-    <!--
-    <p ng-if="task.due"><b>Wann:</b> {{task.due | date:'fullDate'}}</p>
-    -->
-    <div class="text" marked="task.description"></div>
+    <div ng-if="!task" class="center-horizontal">
+      <ion-spinner></ion-spinner>
+    </div>
+    <div ng-if="task">
+      <h3>{{task.name}}</h3>
+      <!--
+      <p ng-if="task.due"><b>Wann:</b> {{task.due | date:'fullDate'}}</p>
+      -->
+      <div class="text" marked="task.description"></div>
 
-    <media-attachments ng-model="task"></media-attachments>
-    <learning-resources ng-model="task"></learning-resources>
-    <ion-list ng-if="task.steps.length">
-      <h1 class="task-section-header">Teilschritte:</h1>
-      <ion-item ng-repeat="step in task.steps" class="item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}/step/{{step.id}}">
-        {{$index+1}}. {{step.name}}
-        <i class="icon ion-chevron-right icon-accessory"></i>
-      </ion-item>
-    </ion-list>
+      <media-attachments ng-model="task"></media-attachments>
+      <learning-resources ng-model="task"></learning-resources>
+      <ion-list ng-if="task.steps.length">
+        <h1 class="task-section-header">Teilschritte:</h1>
+        <ion-item ng-repeat="step in task.steps" class="item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}/step/{{step.id}}">
+          {{$index+1}}. {{step.name}}
+          <i class="icon ion-chevron-right icon-accessory"></i>
+        </ion-item>
+      </ion-list>
 
-    <h1 class="task-section-header">Dokumentation<!-- und Fragen-->:</h1>
-    <ion-list>
-      <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}/notes">
-        <i class="icon ion-compose"></i>
-        Meine Dokumentation des Auftrags
-        <!--
-        <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 1}}</span>
-        -->
-        <i class="icon ion-chevron-right icon-accessory"></i>
-      </ion-item>
-<!--      
-      <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}/chats">
-        <i class="icon ion-help"></i>
-        Meine Fragen zum Auftrag
-        <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 0}}</span>
-        <i class="icon ion-chevron-right icon-accessory"></i>
-        <ion-option-button class="button-positive" ng-click="addQuestion(task)"><i class="icon ion-plus-round"></i></ion-option-button>
-      </ion-item>
--->      
-    </ion-list>
+      <h1 class="task-section-header">Dokumentation<!-- und Fragen-->:</h1>
+      <ion-list>
+        <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}/notes">
+          <i class="icon ion-compose"></i>
+          Meine Dokumentation des Auftrags
+          <!--
+          <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 1}}</span>
+          -->
+          <i class="icon ion-chevron-right icon-accessory"></i>
+        </ion-item>
+  <!--      
+        <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}/chats">
+          <i class="icon ion-help"></i>
+          Meine Fragen zum Auftrag
+          <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 0}}</span>
+          <i class="icon ion-chevron-right icon-accessory"></i>
+          <ion-option-button class="button-positive" ng-click="addQuestion(task)"><i class="icon ion-plus-round"></i></ion-option-button>
+        </ion-item>
+  -->      
+      </ion-list>
+    </div>
   </ion-content>
 </ion-view>

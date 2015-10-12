@@ -140,5 +140,51 @@ angular.module('kola.directives', [])
     	}
     }
   };
+})
+
+.directive('authorInfo', function($ionicModal, $ionicLoading) {
+  return {
+  	restrict: 'E',
+    //replace: true,
+	require: '^ngModel',
+  	scope: {
+		ngModel: '='
+	},
+    templateUrl: 'templates/directive-author-info.html',
+    link: function($scope) {
+		$scope.showAuthorDetailsModal = function(author) {
+			$scope.author = author;
+			$ionicModal.fromTemplateUrl("templates/author-info-popover.html", {
+				scope: $scope,
+				animation: 'slide-in-up'
+			}).then(function(modal) {
+				$scope.modal = modal;
+				$scope.modal.show();
+			});
+		};
+
+		// Close the modal
+		$scope.closeAuthorDetailsModal = function() {
+			$scope.modal.hide();
+			$scope.modal.remove()
+		};
+
+    	$scope.openUrlNative = function(url) {
+		    if (ionic.Platform.isWebView()) {
+		    	console.log("opening " + url);
+		      navigator.startApp.start([["action", "VIEW"], [url]], function(message) {
+		        console.log(message);
+		      }, 
+		      function(error) {
+		          console.log(error);
+		          $ionicLoading.show({template:error, duration:4000});
+		      });
+		    }
+		    else {
+		      window.open(url);
+		    }
+    	};
+    }
+  };
 });
 

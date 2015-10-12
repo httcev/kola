@@ -83,7 +83,9 @@ class User implements Serializable {
             doc.company = it.profile?.company
             doc.phone = it.profile?.phone
             doc.mobile = it.profile?.mobile
-            doc.photo = it.profile?.photo
+            if (it.profile?.photo?.length > 0) {
+            	doc.photo = it.profile.photo.encodeBase64().toString()
+            }
             return [id:it.id, doc:doc]
         }
     }

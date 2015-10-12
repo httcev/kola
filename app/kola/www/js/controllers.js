@@ -203,8 +203,6 @@ angular.module('kola.controllers', [])
 })
 
 .controller('TaskDetailCtrl', function($scope, $stateParams, dbService) {
-  $scope.task = {};
-  
   dbService.get($stateParams.taskId, "task").then(function(task) {
     $scope.task = task;
   }, function(err) {
