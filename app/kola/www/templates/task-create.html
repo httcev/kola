@@ -1,5 +1,5 @@
 <ion-view>
-  <ion-nav-title>Neuer Auftrag</ion-nav-title>
+  <ion-nav-title>Neuer Arbeitsauftrag</ion-nav-title>
   <ion-nav-buttons side="secondary">
     <button class="button icon ion-paper-airplane" ng-disabled="!task.name" ng-click="save()"></button>
   </ion-nav-buttons>
@@ -7,11 +7,11 @@
     <div class="list">
       <label class="item item-input item-floating-label">
         <span class="input-label positive">Name</span>
-        <input type="text" ng-model="task.name" placeholder="Geben Sie hier den Namen des Auftrags ein..." required autofocus>
+        <input type="text" ng-model="task.name" placeholder="Geben Sie hier den Namen des Arbeitsauftrags ein..." required autofocus>
       </label>
       <label class="item item-input item-floating-label">
         <span class="input-label positive">Beschreibung</span>
-        <textarea ng-model="task.description" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier die Beschreibung des Auftrags ein..."></textarea>
+        <textarea ng-model="task.description" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier die Beschreibung des Arbeitsauftrags ein..."></textarea>
       </label>
       <label class="item item-input">
         <span class="input-label positive">Fällig</span>

@@ -7,6 +7,7 @@ class Profile {
 		company nullable: true
 		phone nullable: true
 		mobile nullable: true
+        lastUpdated nullable: true // needed for downward compatibility
 		// photo max size 500 kb
 		photo maxSize: 1024 * 500, nullable: true
 	}

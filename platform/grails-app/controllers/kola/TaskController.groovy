@@ -1,12 +1,9 @@
 package kola
 
-
-
 import grails.converters.JSON
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 import org.springframework.security.access.annotation.Secured
-import org.springframework.security.access.prepost.PreAuthorize
 
 @Transactional(readOnly = true)
 @Secured(['IS_AUTHENTICATED_FULLY'])

@@ -21,7 +21,7 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
 
-.task-section-header { font-size:1.5em; color:$dark; padding:15px 0 10px 0}
+.task-section-header { font-size:1.5em; color:$positive; padding:15px 0 10px 0}
 
 /* Empty. Add your own CSS if you like */
 .image-list-thumb {
@@ -65,7 +65,7 @@ media-attachments .center-horizontal { padding:24.5px }
 
 .spinner { width:100%; text-align:center}
 .center-horizontal { text-align:center }
-.author-info { font-size:75%; font-weight:bold; color:#999; text-align:right;}
+.author-info { font-size:75%; font-weight:bold; color:#999 }
 .author-info img { border-radius:50%; vertical-align:middle }
 .author-info a { text-decoration:none; color:inherit; }
 .reflection-question { padding-bottom:10px }

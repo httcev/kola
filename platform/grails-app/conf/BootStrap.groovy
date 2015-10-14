@@ -5,6 +5,7 @@ import kola.UserRole
 import kola.Task
 import kola.TaskStep
 import kola.ReflectionQuestion
+import kola.Settings
 
 class BootStrap {
 	def repoDir
@@ -13,6 +14,10 @@ class BootStrap {
     	if (!repoDir.exists()) {
     		repoDir.mkdirs()
     	}
+        if (!Settings.getSettings()) {
+            println "--- creating settings"
+            new Settings().save(true)
+        }
 
         if (Role.count() == 0) {
             def adminRole = new Role(authority: 'ROLE_ADMIN').save(flush: true)

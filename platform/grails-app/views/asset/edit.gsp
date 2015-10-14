@@ -21,7 +21,7 @@
 				</div>
 			</h1>
 			<g:if test="${flash.message}">
-				<div class="message" role="status">${flash.message}</div>
+				<div class="message alert alert-success" role="status">${flash.message}</div>
 			</g:if>
 			<g:hasErrors bean="${assetInstance}">
 				<ul class="errors alert alert-danger" role="alert">

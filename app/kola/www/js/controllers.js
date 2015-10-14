@@ -308,7 +308,7 @@ angular.module('kola.controllers', [])
       dbService.save(objectsToSave).then(function() {
         // TODO: this is a hack to reload tasks
         $rootScope.$broadcast("syncFinished");
-        $ionicLoading.show({template: "Neuer Auftrag gespeichert.", duration:2000});
+        $ionicLoading.show({template: "Neuer Arbeitsauftrag gespeichert.", duration:2000});
         $state.go("tab.tasks");
       }, function(err) {
         console.log(err);

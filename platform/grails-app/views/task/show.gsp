@@ -148,7 +148,7 @@
 				<h3 class="panel-title clearfix">
 					<g:message code="kola.task.documentations" />
 					<g:if test="${authService.canAttach(taskInstance)}">
-						<button type="button" class="btn btn-default pull-right" onclick="$(this).hide().closest('.panel').find('.new-documentation').removeClass('hidden').find('textarea').focus()"><i class="fa fa-plus"></i> <g:message code="default.add.label" args="[message(code:'kola.task.documentation')]" /></button>
+						<button type="button" class="btn btn-default pull-right" onclick="$(this).hide().closest('.panel').find('.new-documentation').removeClass('hidden').find('textarea').focus()"><i class="fa fa-plus"></i> <g:message code="kola.task.documentation.add" /></button>
 					</g:if>
 				</h3>
 			</div>
@@ -168,7 +168,7 @@
 					<li class="list-group-item new-documentation hidden">
 						<g:form class="form" action="saveTaskDocumentation">
 							<input type="hidden" name="task" value="${taskInstance.id}">
-							<textarea name="text" class="form-control" rows="5" placeholder="${message(code:'kola.task.documentation.placeholder')}"></textarea>
+							<textarea name="text" class="form-control" rows="5" placeholder="${message(code:'kola.task.documentation.placeholder')}" required></textarea>
 							<div class="text-right form-padding"><button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <g:message code="default.save.label" args="[message(code:'kola.task.documentation')]"/></button></div>
 						</g:form>
 					</li>

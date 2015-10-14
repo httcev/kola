@@ -1,5 +1,5 @@
 <ion-view>
-  <ion-nav-title>Auftrag: {{task.name}}</ion-nav-title>
+  <ion-nav-title>Arbeitsauftrag: {{task.name}}</ion-nav-title>
   <ion-content class="padding">
     <div ng-if="!task" class="center-horizontal">
       <ion-spinner></ion-spinner>
@@ -25,7 +25,7 @@
       <ion-list>
         <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}/notes">
           <i class="icon ion-compose"></i>
-          Meine Dokumentation des Auftrags
+          Meine Dokumentation des Arbeitsauftrags
           <!--
           <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 1}}</span>
           -->
@@ -34,7 +34,7 @@
   <!--      
         <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}/chats">
           <i class="icon ion-help"></i>
-          Meine Fragen zum Auftrag
+          Meine Fragen zum Arbeitsauftrag
           <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 0}}</span>
           <i class="icon ion-chevron-right icon-accessory"></i>
           <ion-option-button class="button-positive" ng-click="addQuestion(task)"><i class="icon ion-plus-round"></i></ion-option-button>
