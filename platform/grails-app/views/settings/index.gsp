@@ -34,8 +34,8 @@
 				<div class="col-sm-10"><g:textField name="welcomeHeader" value="${settingsInstance?.welcomeHeader}" class="form-control" required="" /></div>
 			</div>
 			<div class="form-group ${hasErrors(bean: settingsInstance, field: 'welcomeBody', 'error')} required">
-				<label for="welcomeBody" class="col-sm-2 control-label"><g:message code="kola.settings.welcome.body" />:</label>
-				<div class="col-sm-10"><g:textArea name="welcomeBody" rows="8" value="${settingsInstance?.welcomeBody}" class="form-control" data-provide="markdown-editable" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdImage cmdCode cmdQuote" /></div>
+				<label for="welcomeBody" class="col-sm-2 control-label"><g:message code="kola.settings.welcome.body" /><span class="required-indicator">*</span>:</label>
+				<div class="col-sm-10"><g:textArea name="welcomeBody" rows="8" value="${settingsInstance?.welcomeBody}" class="form-control" data-provide="markdown-editable" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdImage cmdCode cmdQuote" required="" /></div>
 			</div>
 
 			<div class="buttons pull-right">
