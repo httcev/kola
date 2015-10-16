@@ -13,3 +13,8 @@ Will become a sub heading
 
     Add a indent and this will end up as code
 
+```bash
+$ npm install -g ionic
+```
+
+
