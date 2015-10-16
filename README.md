@@ -35,6 +35,7 @@ Building the App
 ```bash
 $ cd app/kola
 $ npm install
+$ bower install
 $ ionic build [android | ios]
 ```
 
