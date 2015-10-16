@@ -39,7 +39,7 @@ $ bower install
 $ ionic build [android | ios]
 ```
 
-To run the app in dev mode, use
+To run the app in dev mode, edit file app/kola/www/app.js (set the server URL at the bottom to your local machine) and then:
 
 ```bash
 $ ionic serve --lab
