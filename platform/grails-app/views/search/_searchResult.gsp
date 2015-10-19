@@ -6,7 +6,9 @@
 	<g:each var="hit" in="${searchResults}" status="hitIndex">
 		<li class="search-result-hit list-group-item clearfix" id="${hit.id}">
 			<h4 class="list-group-item-heading">
-				<a href="${createLink(resource:hit, action:'show')}" class="search-result-link">${hit.name?.take(100)}</a>
+				<a href="${createLink(resource:hit, action:'show')}" class="search-result-link">
+					${hit.name?.take(100)}
+				</a>
 			</h4>
 			<p class="list-group-item-text">
 			<g:if test="${highlights[hitIndex]['indexText']?.fragments}">

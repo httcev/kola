@@ -29,12 +29,15 @@
 							<label><input name="assigned" type="checkbox" onclick="$(this).closest('form').submit()"${params.assigned ? ' checked' : ''}> <g:message code="kola.filter.assigned" /></label>
 						</span>
 					</g:if>
+					<span class="checkbox">
+						<label><input name="ownCompany" type="checkbox" onclick="$(this).closest('form').submit()"${params.ownCompany ? ' checked' : ''}> <g:message code="kola.filter.ownCompany" /></label>
+					</span>
 				</div>
 			</div>
 		</form>
 		<g:if test="${taskInstanceList?.size() > 0}">
 			<p class="margin text-muted small"><g:message code="kola.search.hits.displaying" args="${[entitiesName, params.offset + 1, Math.min(params.offset + params.max, taskInstanceCount), taskInstanceCount]}" />:</p>
-			<g:set var="filterParams" value="${[own:params.own, assigned:params.assigned, isTemplate:params.isTemplate]}" />
+			<g:set var="filterParams" value="${[own:params.own, ownCompany:params.ownCompany, assigned:params.assigned, isTemplate:params.isTemplate]}" />
 			<div class="table-responsive">
 				<table class="table table-striped">
 					<thead>

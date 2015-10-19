@@ -9,6 +9,9 @@ class Settings {
               }
          }
     }
+    static mapping = {
+        welcomeBody type: "text"
+    }
 
     static Settings getSettings(){
          Settings.first()

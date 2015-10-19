@@ -75,9 +75,9 @@
 			<div class="panel panel-default">
 				<div class="panel-heading"><h3 class="panel-title"><g:message code="kola.task.steps" /></h3></div>
 				<ul class="list-group steps">
-					<g:each var="step" in="${taskInstance?.steps}">
+					<g:each var="step" in="${taskInstance?.steps}" status="i">
 						<li class="list-group-item">
-							<h4 class="list-group-item-heading">${step.name}</h4>
+							<h4 class="list-group-item-heading"><span class="text-muted">${i+1}.</span> ${step.name}</h4>
 							<p class="list-group-item-text"><kola:markdown>${step.description}</kola:markdown></p>
 							<g:if test="${step.attachments?.size() > 0}">
 								<g:render bean="${step.attachments}" template="exportAttachments" var="attachments" />

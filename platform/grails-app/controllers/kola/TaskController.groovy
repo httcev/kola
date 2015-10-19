@@ -17,20 +17,35 @@ class TaskController {
         params.sort = params.sort ?: "lastUpdated"
         params.order = params.order ?: "desc"
         
-        def filtered = params.own || params.assigned
+        def user = springSecurityService.currentUser
+        def userCompany = user.profile?.company
+        def filtered = params.own || params.assigned || params.ownCompany
         def results = Task.createCriteria().list(max:params.max, offset:params.offset) {
+            // left join allows null values in the association
+            createAlias('creator', 'c', org.hibernate.Criteria.LEFT_JOIN)
+            createAlias('c.profile', 'cp', org.hibernate.Criteria.LEFT_JOIN)
+            createAlias('assignee', 'a', org.hibernate.Criteria.LEFT_JOIN)
+            createAlias('a.profile', 'ap', org.hibernate.Criteria.LEFT_JOIN)
+
             eq("deleted", false)
             eq("isTemplate", params.isTemplate?.toBoolean() ? true : false)
             if (filtered) {
                 or {
                     if (params.own) {
-                        eq("creator", springSecurityService.currentUser)
+                        eq("creator", user)
                     }
                     if (params.assigned) {
-                        eq("assignee", springSecurityService.currentUser)
+                        eq("assignee", user)
+                    }
+                    if (params.ownCompany) {
+                        or {
+                            eq("cp.company", userCompany)
+                            eq("ap.company", userCompany)
+                        }
                     }
                 }
             }
+            /*
             if (params.sort?.startsWith("cp.")) {
                 // left join allows null values in the association
                 createAlias('creator', 'c', org.hibernate.Criteria.LEFT_JOIN)
@@ -41,6 +56,7 @@ class TaskController {
                 createAlias('assignee', 'a', org.hibernate.Criteria.LEFT_JOIN)
                 createAlias('a.profile', 'ap', org.hibernate.Criteria.LEFT_JOIN)
             }
+            */
             order(params.sort, params.order)
         }
         respond results, model:[taskInstanceCount:results.totalCount]
@@ -210,29 +226,12 @@ class TaskController {
         if (!filename) {
             fielname = "export"
         }
-        renderPdf(template:"export", model:["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations], filename:"${filename}.pdf")
-    }
-
-    def export2(Task taskInstance) {
-        def reflectionAnswers = [:]
-        def taskDocumentations = [:]
-        if (!taskInstance.isTemplate) {
-            taskInstance.reflectionQuestions?.each { reflectionQuestion ->
-                reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false)
-            }
-            
-            def docs = TaskDocumentation.findAllByTaskAndDeleted(taskInstance, false)
-            if (docs) {
-                taskDocumentations[taskInstance.id] = docs
-            }
-            taskInstance.steps?.each { step ->
-                docs = TaskDocumentation.findAllByStepAndDeleted(step, false)
-                if (docs) {
-                    taskDocumentations[step.id] = docs
-                }
-            }
+        if (params.preview) {
+            render(template:"export", model:["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations])
         }
-        render(template:"export", model:["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations], filename:taskInstance.name + ".pdf")
+        else {
+            renderPdf(template:"export", model:["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations], filename:"${filename}.pdf")
+        }
     }
 
     @Transactional
