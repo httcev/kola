@@ -169,7 +169,7 @@ grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'kola.UserRole'
 grails.plugin.springsecurity.authority.className = 'kola.Role'
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/':                ['permitAll'],
-	'/index':           ['permitAll'],
+    '/index':           ['permitAll'],
 	'/index.gsp':       ['permitAll'],
 	'/assets/**':       ['permitAll'],
 	'/**/js/**':        ['permitAll'],

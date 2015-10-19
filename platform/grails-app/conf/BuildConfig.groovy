@@ -12,13 +12,13 @@ grails.project.fork = [
     //  compile: [maxMemory: 256, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
 
     // configure settings for the test-app JVM, uses the daemon by default
-    test: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, daemon:true],
+    test: [maxMemory: 4096, minMemory: 64, debug: false, maxPerm: 512, daemon:true],
     // configure settings for the run-app JVM
-    run: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
+    run: [maxMemory: 4096, minMemory: 64, debug: false, maxPerm: 512, forkReserve:false],
     // configure settings for the run-war JVM
-    war: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256, forkReserve:false],
+    war: [maxMemory: 4096, minMemory: 64, debug: false, maxPerm: 512, forkReserve:false],
     // configure settings for the Console UI JVM
-    console: [maxMemory: 768, minMemory: 64, debug: false, maxPerm: 256]
+    console: [maxMemory: 4096, minMemory: 64, debug: false, maxPerm: 512]
 ]
 
 grails.project.dependency.resolver = "maven" // or ivy
@@ -62,6 +62,9 @@ grails.project.dependency.resolution = {
         compile('org.pegdown:pegdown:1.5.0')
         // needed for rendering-plugin to work (PDF generation)
         runtime ('org.springframework:spring-test:4.1.5.RELEASE')
+
+        // fixes error messages in DB trace file (log file grows very large)
+        runtime ('com.h2database:h2:1.4.190')
     }
 
     plugins {
