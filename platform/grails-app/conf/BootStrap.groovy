@@ -15,7 +15,6 @@ class BootStrap {
     		repoDir.mkdirs()
     	}
         if (!Settings.getSettings()) {
-            println "--- creating settings"
             new Settings().save(true)
         }
 
@@ -66,7 +65,7 @@ class BootStrap {
                 def testUser = new User(username:"tittel", password:"tittel", email:"stephan.tittel@kom.tu-darmstadt.de", profile:[displayName:"Stephan Tittel", company:"httc e.V.", phone:"+49615116882", mobile:"+4915114474556"]).save(flush: true)
 
                 def numAssets = 5
-                for (i in 1..numAssets) {
+                for (int i=0; i<numAssets; i++) {
                     new Asset(name:"Asset $i", description:"$i Huhu sfsdflkfj lsjkdfl sjdflk sjldkfj slkdfj lskdjf lskjdf lkjlekrjtlwke4l rlwem rlwekrm wlekrmw elkrmwlekmr lwekrmwlekrmwlerm welkrmwlekmr wlekrmwlekr lwkemr lwkemr lwekrmwlkermw lekmr weklrm wermll23mr2l 3km rlk3mr lwekm welrkm  $i", mimeType:"text/plain", content:"Das ist ein Text! $i" as byte[]).save(true)
                 }
                 assert Asset.count() == numAssets

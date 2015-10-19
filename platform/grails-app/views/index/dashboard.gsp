@@ -44,7 +44,7 @@
 					</g:if>
 					<g:else>
 						<div class="panel-body">
-							<p class="text-muted"> <g:message code="kola.tasks.assigned.empty" /></p>
+							<p class="text-muted"><g:message code="kola.tasks.assigned.empty" /></p>
 						</div>
 					</g:else>
 				</div>				
@@ -56,16 +56,23 @@
 							<a href="${createLink(controller:'asset', action:'index')}" class="pull-right"><g:message code="kola.all" /> <i class="fa fa-chevron-right"></i></a>
 						</h3>
 					</div>
-					<ul class="list-group">
-						<g:each var="asset" in="${latestAssets}">
-							<a href="${createLink(resource:asset, action:'show')}" class="list-group-item">
-								<h4 class="list-group-item-heading">${asset.name}</h4>
-								<p class="list-group-item-text">
-									${asset.description?.take(100)}
-								</p>
-							</a>
-						</g:each>
-					</ul>
+					<g:if test="${latestAssets?.size() > 0}">
+						<ul class="list-group">
+							<g:each var="asset" in="${latestAssets}">
+								<a href="${createLink(resource:asset, action:'show')}" class="list-group-item">
+									<h4 class="list-group-item-heading">${asset.name}</h4>
+									<p class="list-group-item-text">
+										${asset.description?.take(100)}
+									</p>
+								</a>
+							</g:each>
+						</ul>
+					</g:if>
+					<g:else>
+						<div class="panel-body">
+							<p class="text-muted"><g:message code="kola.filter.empty" args="${[message(code: 'kola.assets')]}" /></p>
+						</div>
+					</g:else>
 				</div>				
 			</div>
 
