@@ -85,12 +85,14 @@
 		<div id="spinner" class="spinner" style="display:none;"><g:message code="spinner.alt" default="Loading&hellip;"/></div>
 		<div id="push"></div>
 	</div>
-	<div id="footer">
+	<nav class="navbar navbar-default" id="footer">
 		<div class="container-fluid">
-			<p class="text-muted">
-				<a href="http://www.kola-projekt.de/ueber_das_projekt.html" target="_blank" class="pull-right"><g:message code="kola.about" /></a>
-			</p>
+			<p class="navbar-text version">Version <g:meta name="app.version"/></p>
+			<ul class="nav navbar-nav navbar-right">
+	            <li><a href="http://www.kola-projekt.de/ueber_kola.html" target="_blank"><g:message code="kola.about" /></a></li>
+	            <li><a href="http://www.kola-projekt.de/ueber_das_projekt.html" target="_blank"><g:message code="kola.projectLink" /></a></li>
+	          </ul>
 		</div>
-	</div>
+	</nav>
 </body>
 </html>

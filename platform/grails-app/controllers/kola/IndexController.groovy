@@ -13,7 +13,6 @@ class IndexController {
                 a.due ? (b.due ? a.due <=> b.due : -1) : (b.due ? 1 : b.lastUpdated <=> a.lastUpdated)
             }
     		def latestAssets = Asset.where { subType == 'learning-resource' && deleted != true }.list(sort:"lastUpdated", order:"desc", max:4)
-
     		render(view:"dashboard", model:[assignedTasks:assignedTasks, latestAssets:latestAssets])
     	}
     	else {
