@@ -48,6 +48,10 @@ class SearchController {
 			              term(subType: params.subType)
 			          }
 			      }
+			      // exclude attachments from search result
+			      must_not {
+		              term(subType:"attachment")
+			      }
 			  }
 			}
 		}
