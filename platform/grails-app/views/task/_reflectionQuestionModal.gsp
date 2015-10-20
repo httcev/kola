@@ -43,7 +43,7 @@
 
 	function createReflectionQuestionRelation($searchResultNode) {
 		var id = $searchResultNode.attr("id");
-		var $link = $(".search-result-link", $searchResultNode).clone();
+		var $link = $(".search-result-link", $searchResultNode).clone().text();
 		var $li = $("<li class='list-group-item clearfix'>");
 		$li.append($("<input type='hidden' name='reflectionQuestions' value='"+id+"'>"));
 		var $h4 = $("<h4 class='list-group-item-heading'>");
@@ -51,6 +51,7 @@
 		$h4.append($("<div class='btn btn-default drag-handle' title='${message(code:'kola.dnd')}'><i class='fa fa-arrows-v fa-lg'></i></div>"));
 		$h4.append("\n");
 		$h4.append($link);
+		$h4.append("<button type='button' class='btn btn-danger pull-right' onclick=\"$(this).closest('li').remove()\"><i class='fa fa-times' title='${message(code:'default.button.delete.label')}''></i></button>");
 		$("#reflectionQuestion-list").append($li);
 		$("#reflectionQuestionModal").modal("hide");
 	}

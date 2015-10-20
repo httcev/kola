@@ -97,10 +97,10 @@ environments {
     development {
         grails.logging.jul.usebridge = true
         grails.serverURL = "http://130.83.139.161:8080/platform"
-
         kola {
-            repository.directory = "./repository"
+            repository.directory = "./data/repository"
         }
+        elasticSearch.path.data = "./data/index"
     }
     production {
         grails.logging.jul.usebridge = false

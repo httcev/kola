@@ -39,7 +39,7 @@ $(document).ready(function() {
 			//$parent.append($newChooser);
 		}
 	});
-	$(".sortable").each(function() {
+	$(".list-group.sortable").each(function() {
 		var sortable = Sortable.create(this, { handle:".drag-handle" });
 		
 		if ($(this).attr("id") == "step-list") {

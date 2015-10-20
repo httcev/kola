@@ -1,6 +1,6 @@
 <li class="list-group-item clearfix">
 	<g:if test="${!isNew}">
-		<input type="hidden" name="steps[${index}].id" value="${step.id}">
+		<input type="hidden" name="steps[${index}].id" value="${step.id}" class="stepId">
 	</g:if>
 	<input type="hidden" name="steps[${index}].deleted" class="deleteFlag" value="false">
 	<h4 class="list-group-item-heading clearfix">

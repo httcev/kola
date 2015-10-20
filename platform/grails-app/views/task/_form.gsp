@@ -133,8 +133,15 @@
 <script>
 	function deleteStep($button) {
 		var $li = $button.closest("li");
-		$(".deleteFlag", $li).val("true");
-		$li.hide()
+		// if step has not been saved simply remove dom node
+		if ($(".stepId", $li).length == 0) {
+			$li.remove();
+		}
+		else {
+			$(".deleteFlag", $li).val("true");
+			$li.hide();
+		}
+		updateStepIndices();
 	}
 
 	function addStep() {

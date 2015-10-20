@@ -44,7 +44,7 @@
 
 	function createAssetRelation($searchResultNode) {
 		var id = $searchResultNode.attr("id");
-		var $link = $(".search-result-link", $searchResultNode).clone();
+		var $link = $(".search-result-link", $searchResultNode).clone().removeClass();
 		var $li = $("<li class='list-group-item clearfix'>");
 		$li.append($("<input type='hidden' name='resources' value='"+id+"'>"));
 		var $h4 = $("<h4 class='list-group-item-heading'>");
