@@ -2,7 +2,7 @@
 <g:set var="assetService" bean="assetService"/>
 <html>
 	<head>
-		<meta name="layout" content="main">
+		<meta name="layout" content="editor">
 		<g:set var="entityName" value="${message(code: taskInstance.isTemplate?.toBoolean() ? 'kola.taskTemplate' : 'kola.task')}" />
 		<g:set var="entitiesName" value="${message(code: taskInstance.isTemplate?.toBoolean() ? 'kola.taskTemplates' : 'kola.tasks')}" />
 		<title><g:message code="default.show.label" args="[entityName]" /></title>
@@ -166,9 +166,10 @@
 				</g:each>
 				<g:if test="${authService.canAttach(taskInstance)}">
 					<li class="list-group-item new-documentation hidden">
-						<g:form class="form" action="saveTaskDocumentation">
+						<g:form class="form" action="saveTaskDocumentation" enctype="multipart/form-data">
 							<input type="hidden" name="task" value="${taskInstance.id}">
 							<textarea name="text" class="form-control" rows="5" placeholder="${message(code:'kola.task.documentation.placeholder')}" required></textarea>
+							<g:render model="${[attachments:[], mode:'edit']}" template="attachments" />
 							<div class="text-right form-padding"><button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <g:message code="default.save.label" args="[message(code:'kola.task.documentation')]"/></button></div>
 						</g:form>
 					</li>

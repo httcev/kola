@@ -242,9 +242,22 @@ class TaskController {
         if (!authService.canAttach(taskDocumentationInstance.task)) {
             forbidden()
         }
-        if (taskDocumentationInstance.text) {
-            taskDocumentationInstance.creator = springSecurityService.currentUser
+        def attachments = []
+        request.multiFileMap?.each { k,files ->
+            if ("_newAttachment" == k) {
+                files?.each { f ->
+                    if (!f.empty) {
+                        attachments.add(new Asset(name:f.originalFilename, subType:"attachment", mimeType:f.getContentType(), content:f.bytes))
+                    }
+                }
+            }
+        }
 
+        if (taskDocumentationInstance.text || attachments.size() > 0) {
+            taskDocumentationInstance.creator = springSecurityService.currentUser
+            attachments.each {
+                taskDocumentationInstance.addToAttachments(it)
+            }
             taskDocumentationInstance.save flush:true
             if (taskDocumentationInstance.hasErrors()) {
                 respond taskDocumentationInstance.errors, view:'show'
@@ -267,7 +280,24 @@ class TaskController {
 
         taskDocumentationInstance.attachments?.clear()
         bindData(taskDocumentationInstance, params, [include: ['attachments']])
-        //taskDocumentationInstance.attachments = params.list("attachments")?.unique(false)
+        // attach uploaded files
+        request.multiFileMap?.each { k,files ->
+            if ("_newAttachment" == k) {
+                files?.each { f ->
+                    if (!f.empty) {
+                        def asset = new Asset(name:f.originalFilename, subType:"attachment", mimeType:f.getContentType(), content:f.bytes)
+                        if (!asset.save(true)) {
+                            asset.errors.allErrors.each { println it }
+                        }
+                        else {
+                            taskDocumentationInstance.addToAttachments(asset)
+                        }
+                    }
+                }
+            }
+        }
+
+
         def msg
         if (taskDocumentationInstance.text || taskDocumentationInstance.attachments?.size() > 0) {
             taskDocumentationInstance.save flush:true

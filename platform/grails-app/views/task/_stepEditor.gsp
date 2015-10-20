@@ -27,13 +27,7 @@
 				<g:message code="kola.task.attachments" />:
 			</label>
 			<div class="col-sm-10">
-				<g:if test="${step.attachments?.size() > 0}">
-					<g:render model="${[attachments:step.attachments, mode:'edit', prefix:'steps['+index+'].']}" template="attachments" />
-				</g:if>
-				<div class="form-padding">
-					<label class="text-muted"><g:message code="default.add.label" args="${[message(code:'kola.task.attachment')]}" />: </label>
-				</div>
-				<input type="file" name="steps[${index}]._newAttachment" class="new-attachment form-padding">
+				<g:render model="${[attachments:step.attachments, mode:'edit', prefix:'steps['+index+'].']}" template="attachments" />
 			</div>
 		</div>
 	</div>

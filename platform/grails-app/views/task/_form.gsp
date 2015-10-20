@@ -59,13 +59,7 @@
 		<g:message code="kola.task.attachments" />:
 	</label>
 	<div class="col-sm-10">
-		<g:if test="${taskInstance?.attachments?.size() > 0}">
-			<g:render model="${[attachments:taskInstance?.attachments, mode:'edit']}" template="attachments" />
-		</g:if>
-		<div class="form-padding">
-			<label class="text-muted"><g:message code="default.add.label" args="${[message(code:'kola.task.attachment')]}" />: </label>
-		</div>
-		<input type="file" name="_newAttachment" class="new-attachment form-padding">
+		<g:render model="${[attachments:taskInstance?.attachments, mode:'edit']}" template="attachments" />
 	</div>
 </div>
 
@@ -147,44 +141,5 @@
 		$("#step-list").append($("#newStepTemplate").html());
 		updateStepIndices();
 	}
-
-	function updateStepIndices() {
-		$("#step-list>li").each(function(index) {
-			$(".step-index", this).text(index + 1);
-			var prefix = "steps[" + index + "]";
-			$(":input", this).each(function() {
-				var field = $(this);
-				var name = field.attr("name");
-				if (name) {
-					var replaced = name.replace(/steps\[.*?\]/, prefix);
-					field.attr("name", replaced);
-				}
-			})
-		});
-	}
-
-	$(document).ready(function() {
-		$(".sortable").each(function() {
-			var sortable = Sortable.create(this, { handle:".drag-handle" });
-			
-			if ($(this).attr("id") == "step-list") {
-				sortable.option("onUpdate", function() {
-					// update all step indices according to new sort order
-					updateStepIndices();
-				});
-			}
-		});
-
-		$(document).on("change", ".new-attachment", function() {
-			var $parent = $(this).parent();
-			var emptyFileChooserCount = $("input:file", $parent).filter(function() { return $(this).val() == ""; }).length;
-			if (emptyFileChooserCount == 0) {
-				var $newChooser = $(this.cloneNode());
-				$newChooser.val(null);
-				$parent.append($newChooser);
-			}
-		});
-		$("#due").pickadate({format: 'yyyy-mm-dd'});
-	});
 </script>
 

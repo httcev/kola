@@ -6,7 +6,7 @@
 			<g:render model="${[attachments:taskDocumentation.attachments]}" template="attachments" />
 		</div>
 		<g:if test="${authService.canEdit(taskDocumentation)}">
-			<g:form class="form hidden" action="updateTaskDocumentation" id="${taskDocumentation.id}" method="PUT">
+			<g:form class="form hidden" action="updateTaskDocumentation" id="${taskDocumentation.id}" method="PUT" enctype="multipart/form-data">
 				<input type="hidden" name="parentTask" value="${taskInstance.id}">
 				<textarea name="text" class="form-control" rows="5" placeholder="${message(code:'kola.task.documentation.placeholder')}">${taskDocumentation.text}</textarea>
 				<g:render model="${[attachments:taskDocumentation.attachments, mode:'edit']}" template="attachments" />
