@@ -13,7 +13,7 @@
 			${entitiesName}
 			<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REFLECTION_QUESTION_CREATOR">
 				<g:link class="create btn btn-primary pull-right" action="create" title="${message(code: 'default.new.label', args:[entityName])}">
-					<i class="fa fa-plus"> <g:message code="default.button.create.label" /></i>
+					<i class="fa fa-plus"></i> <g:message code="default.button.create.label" />
 				</g:link>
 			</sec:ifAnyGranted>
 		</h1>
