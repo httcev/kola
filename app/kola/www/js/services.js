@@ -104,7 +104,7 @@ angular.module('kola.services', ['uuid'])
     if (window.cordova) {
 //      self._assetsDir = cordova.file.dataDirectory + "assets/";
       self._assetsDir = cordova.file.externalDataDirectory + "assets/";
-      $cordovaFile.createDir(cordova.file.externalDataDirectory, "assets", false).then(function() {alert("created asset dir")},function() {alert("not created asset dir")});
+      $cordovaFile.createDir(cordova.file.externalDataDirectory, "assets", false);//.then(function() {alert("created asset dir")},function() {alert("not created asset dir")});
     }
     self.db = (window.cordova ? window.sqlitePlugin : window).openDatabase(databaseName, '1', 'kola DB', 1024 * 1024 * 100);
     self.db.transaction(function(tx) {
