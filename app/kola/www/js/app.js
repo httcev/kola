@@ -65,30 +65,12 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
       }
     }
   })
-  .state('tab.task-notes', {
-    url: '/tasks/:taskId/notes',
-    views: {
-      'tab-tasks': {
-        templateUrl: 'templates/task-notes.html',
-        controller: 'NotesCtrl'
-      }
-    }
-  })
-  .state('tab.step-notes', {
-    url: '/tasks/:taskId/step/:stepId/notes',
-    views: {
-      'tab-tasks': {
-        templateUrl: 'templates/task-notes.html',
-        controller: 'NotesCtrl'
-      }
-    }
-  })
   .state('tab.task-step', {
     url: '/tasks/:taskId/step/:stepId',
     views: {
       'tab-tasks': {
-        templateUrl: 'templates/task-step.html',
-        controller: 'TaskStepCtrl'
+        templateUrl: 'templates/task-detail.html',
+        controller: 'TaskDetailCtrl'
       }
     }
   })
@@ -139,4 +121,6 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
 
 //.constant("serverUrl", "http://130.83.139.161:8080/platform")
 .constant("serverUrl", "http://plattform.kola-projekt.de")
-.constant("databaseName", "tasks");
+//.constant("serverUrl", "http://demo.kola-projekt.de")
+//.constant("serverUrl", "http://staging.kola-projekt.de")
+.constant("databaseName", "kola.db");

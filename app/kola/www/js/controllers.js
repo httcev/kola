@@ -46,53 +46,66 @@ angular.module('kola.controllers', [])
     reloadTasks();
 })
 
-.controller('NotesCtrl', function($scope, $stateParams, $q, $ionicPopup, $ionicLoading, dbService, rfc4122, mediaAttachment) {
-  var isStep = $stateParams.stepId != null;
-  var targetId = isStep ? $stateParams.stepId : $stateParams.taskId;
-  var taskDocumentationProp = isStep ? "step" : "task";
+.controller('TaskDetailCtrl', function($scope, $stateParams, $q, $ionicPopup, $ionicLoading, dbService, mediaAttachment) {
+  $scope.isStep = $stateParams.stepId != null;
+  var targetId = $scope.isStep ? $stateParams.stepId : $stateParams.taskId;
+  var taskDocumentationProp = $scope.isStep ? "step" : "task";
+  var table = $scope.isStep ? "taskStep" : "task";
 
-  loadNotes();
+  loadTargetAndDocumentation();
 
-  function loadNotes() {
+  function loadTargetAndDocumentation() {
+    // load documentation
     dbService.all("taskDocumentation").then(function(docs) {
-      var filtered = [];
+      var documentation = [];
       var promises = [];
       angular.forEach(docs, function(doc) {
         if (doc[taskDocumentationProp] == targetId && !doc.deleted) {
           promises.push(dbService.resolveIds(doc, "taskDocumentation"));
-          filtered.push(doc);
+          documentation.push(doc);
         }
       });
       $q.all(promises).finally(function() {
-        $scope.notes = filtered;
-      });
-    });
-
-    if (!isStep) {
-      dbService.all("reflectionAnswer").then(function(allReflectionAnswers) {
-        var reflectionAnswers = {};
-        var promises = [];
-        angular.forEach(allReflectionAnswers, function(doc) {
-          if (doc.task == $stateParams.taskId && !doc.deleted) {
-            promises.push(dbService.resolveIds(doc, "reflectionAnswer").then(function() {
-              reflectionAnswers[doc.question] = doc;
-            }));
-          }
-        });
-        $q.all(promises).finally(function() {
-          dbService.get($stateParams.taskId, "task").then(function(task) {
-            angular.forEach(task.reflectionQuestions, function(reflectionQuestion) {
-              if (!reflectionAnswers[reflectionQuestion.id]) {
-                reflectionAnswers[reflectionQuestion.id] = dbService.createReflectionAnswer(task.id, reflectionQuestion.id);
+        if (!$scope.isStep) {
+          // load reflection answers and questions
+          promises = [];
+          dbService.all("reflectionAnswer").then(function(allReflectionAnswers) {
+            var reflectionAnswers = {};
+            angular.forEach(allReflectionAnswers, function(doc) {
+              if (doc.task == $stateParams.taskId && !doc.deleted) {
+                promises.push(dbService.resolveIds(doc, "reflectionAnswer").then(function() {
+                  reflectionAnswers[doc.question] = doc;
+                }));
               }
             });
-
-            $scope.reflectionAnswers = reflectionAnswers;
-            $scope.task = task;
+            $q.all(promises).finally(function() {
+              loadTarget(documentation, reflectionAnswers);
+            });
           });
-        });
+        }
+        else {
+          loadTarget(documentation);
+        }
       });
-    }
+    });
+  }
+
+  function loadTarget(documentation, reflectionAnswers) {
+    dbService.get(targetId, table).then(function(target) {
+      angular.forEach(target.reflectionQuestions, function(reflectionQuestion) {
+        console.log(reflectionQuestion);
+        if (!reflectionAnswers[reflectionQuestion.id]) {
+          reflectionAnswers[reflectionQuestion.id] = dbService.createReflectionAnswer(target.id, reflectionQuestion.id);
+        }
+      });
+      $scope.documentation = documentation;
+      $scope.reflectionAnswers = reflectionAnswers;
+      $scope.newNote = dbService.createTaskDocumentation(targetId, $scope.isStep);
+      $scope.taskOrStep = target;
+    }, function(err) {
+      // TODO: 404 error message and open default/main page
+      console.log(err);
+    });
   }
 
 //  $scope.$on('$ionicView.enter', function(e) {
@@ -109,31 +122,25 @@ angular.module('kola.controllers', [])
     mediaAttachment.attachAudio(note);
   }
 
+  $scope.attachChosenMedia = function(note) {
+    mediaAttachment.attachChosenMedia(note);
+  }
+
   $scope.remove = function(note) {
-    if (note === $scope.newNote && !$scope.newNote.text && !$scope.newNote.attachments) {
-      $scope.newNote = false;
-    }
-    else {
-      $ionicPopup.confirm({
-        title: 'Dokumentation löschen',
-        template: 'Soll diese Dokumentation wirklich gelöscht werden?'
-      }).then(function(result) {
-        if(result) {
-          if (note === $scope.newNote) {
-            $scope.newNote = false;
-          }
-          else {
-            note.deleted = true;
-            dbService.save(note).then(function() {
-              loadNotes();
-            }, function(err) {
-              alert("Speichern fehlgeschlagen");
-              console.log(err);
-            });
-          }
-        }
-     });
-    }
+    $ionicPopup.confirm({
+      title: 'Dokumentation löschen',
+      template: 'Soll diese Dokumentation wirklich gelöscht werden?'
+    }).then(function(result) {
+      if(result) {
+        note.deleted = true;
+        dbService.save(note).then(function() {
+          loadTargetAndDocumentation();
+        }, function(err) {
+          alert("Löschen fehlgeschlagen");
+          console.log(err);
+        });
+      }
+    });
   };
 
   $scope.save = function(note) {
@@ -144,24 +151,21 @@ angular.module('kola.controllers', [])
     objectsToSave.push(note);
     $scope.newNoteSaving = true;
     dbService.save(objectsToSave).then(function() {
-      $scope.newNote = false;
-      loadNotes();
+//      $scope.newNote = false;
+      loadTargetAndDocumentation();
+      $ionicLoading.show({template: "Dokumentation gespeichert", duration:2000});
     }, function(err) {
+      console.log(err);
       $ionicLoading.show({template: "Speichern fehlgeschlagen!", duration:2000});
     }).finally(function() {
       $scope.newNoteSaving = false;
     });
   };
 
- $scope.addNote = function() {
-    if (!$scope.newNote) {
-      $scope.newNote = dbService.createTaskDocumentation(targetId, isStep);
-    }
-  };
-
   $scope.saveReflectionAnswer = function(reflectionAnswer, form) {
     dbService.save(reflectionAnswer).then(function() {
       form.$dirty = false;
+      loadTargetAndDocumentation();
       $ionicLoading.show({template: "Antwort gespeichert", duration:2000});
     });
   };
@@ -200,26 +204,6 @@ angular.module('kola.controllers', [])
       return $state.go("tab.tasks");
     });
   };
-})
-
-.controller('TaskDetailCtrl', function($scope, $stateParams, dbService) {
-  dbService.get($stateParams.taskId, "task").then(function(task) {
-    $scope.task = task;
-  }, function(err) {
-    // TODO: 404 error message and open default/main page
-    console.log(err);
-  });
-})
-
-.controller('TaskStepCtrl', function($scope, $stateParams, dbService) {
-  $scope.step = {};
-
-  dbService.get($stateParams.stepId, "taskStep").then(function(taskStep) {
-    $scope.taskId = $stateParams.taskId;
-    $scope.step = taskStep;
-  }, function() {
-    // TODO: 404 error message and open default/main page
-  });
 })
 
 .controller('TaskChooseTemplateCtrl', function($scope, $state, $q, dbService) {

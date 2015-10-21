@@ -1,46 +1,68 @@
 <ion-view>
-  <ion-nav-title>Arbeitsauftrag: {{task.name}}</ion-nav-title>
+  <ion-nav-title>{{isStep ? 'Teilschritt: ' + taskOrStep.name : 'Arbeitsauftrag: ' + taskOrStep.name}}</ion-nav-title>
   <ion-content class="padding">
-    <div ng-if="!task" class="center-horizontal">
+    <div ng-if="!taskOrStep" class="center-horizontal">
       <ion-spinner></ion-spinner>
     </div>
-    <div ng-if="task">
-      <h3>{{task.name}}</h3>
+    <div ng-if="taskOrStep">
+      <h3>{{taskOrStep.name}}</h3>
       <!--
       <p ng-if="task.due"><b>Wann:</b> {{task.due | date:'fullDate'}}</p>
       -->
-      <div class="text" marked="task.description"></div>
+      <div class="text" marked="taskOrStep.description"></div>
 
-      <media-attachments ng-model="task"></media-attachments>
-      <learning-resources ng-model="task"></learning-resources>
-      <ion-list ng-if="task.steps.length">
+      <media-attachments ng-model="taskOrStep"></media-attachments>
+      <learning-resources ng-model="taskOrStep"></learning-resources>
+      <ion-list ng-if="!isStep && taskOrStep.steps.length">
         <h1 class="task-section-header">Teilschritte:</h1>
-        <ion-item ng-repeat="step in task.steps" class="item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}/step/{{step.id}}">
+        <ion-item ng-repeat="step in taskOrStep.steps" class="item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{taskOrStep.id}}/step/{{step.id}}">
           {{$index+1}}. {{step.name}}
           <i class="icon ion-chevron-right icon-accessory"></i>
         </ion-item>
       </ion-list>
 
-      <h1 class="task-section-header">Dokumentation<!-- und Fragen-->:</h1>
-      <ion-list>
-        <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}/notes">
-          <i class="icon ion-compose"></i>
-          Meine Dokumentation des Arbeitsauftrags
+      <h1 class="task-section-header">Meine Dokumentation<!-- und Fragen-->:</h1>
+      <div class="list card" ng-repeat="note in documentation | orderBy:'lastUpdated'">
+        <div class="item item-text-wrap">
+          <author-info ng-model="note"></author-info>
+          <div class="text">{{note.text}}</div>
+        </div>
+        <media-attachments ng-model="note" hide-header="true"></media-attachments>
+        <div class="item tabs tabs-secondary">
+          <button class="button button-clear icon ion-trash-a" ng-click="remove(note)"></button>
+        </div>
+      </div>
+
+      <div ng-if="newNoteSaving" class="center-horizontal">
+        <ion-spinner></ion-spinner>
+      </div>
+      <div ng-if="!newNoteSaving" class="list card new-note">
+        <div class="item item-text-wrap">
+          <p>Neue Dokumentation anlegen:</p>
+          <textarea ng-model="newNote.text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Welche Arbeiten habe ich erledigt? Wie bin ich vorgegangen?"></textarea>
+        </div>
+        <media-attachments ng-model="newNote" hide-header="true"></media-attachments>
+        <div class="item tabs tabs-secondary">
+          <button class="button button-clear button-positive" ng-click="attachPhoto(newNote)"><i class="icon ion-camera"></i></button>
+          <button class="button button-clear button-positive" ng-click="attachVideo(newNote)"><i class="icon ion-videocamera"></i></button>
           <!--
-          <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 1}}</span>
+          <button class="button button-clear button-positive" ng-click="attachChosenMedia(newNote)"><i class="icon ion-android-folder-open"></i></button>
+          <button class="button button-clear button-positive" ng-click="attachAudio(newNote)"><i class="icon ion-mic-a"></i></button>
           -->
-          <i class="icon ion-chevron-right icon-accessory"></i>
-        </ion-item>
-  <!--      
-        <ion-item class="item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}/chats">
-          <i class="icon ion-help"></i>
-          Meine Fragen zum Arbeitsauftrag
-          <span class="badge" ng-class="(task.notes.lenth > 0) ? 'badge-assertive' : 'badge-stable'">{{task.notes ? task.notes.lenth : 0}}</span>
-          <i class="icon ion-chevron-right icon-accessory"></i>
-          <ion-option-button class="button-positive" ng-click="addQuestion(task)"><i class="icon ion-plus-round"></i></ion-option-button>
-        </ion-item>
-  -->      
-      </ion-list>
+          <button ng-disabled="!(newNote.text || newNote.attachments)" class="button button-balanced" ng-click="save(newNote)"><i class="icon ion-paper-airplane"></i> Speichern</button>
+        </div>
+      </div>
+      <div ng-if="taskOrStep.reflectionQuestions.length">
+        <h1 class="task-section-header padding">Meine Erfahrungen:</h1>
+        <div class="list card">
+          <form name="form" ng-repeat="reflectionQuestion in taskOrStep.reflectionQuestions" class="item item-text-wrap">
+            <div class="royal reflection-question">{{reflectionQuestion.name}}</div>
+            <author-info ng-model="reflectionAnswers[reflectionQuestion.id]"></author-info>
+            <textarea ng-model="reflectionAnswers[reflectionQuestion.id].text" ng-change="reflectionAnswers[reflectionQuestion.id]._dirty=true" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier Ihre Antwort ein..."></textarea>
+            <div class="text-center" ng-show="form.$dirty"><button class="button button-balanced" ng-click="saveReflectionAnswer(reflectionAnswers[reflectionQuestion.id], form)"><i class="icon ion-paper-airplane"></i> Speichern</button></div>
+          </div>
+        </form>
+      </div>
     </div>
   </ion-content>
 </ion-view>
