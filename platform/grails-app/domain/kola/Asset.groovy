@@ -4,6 +4,7 @@ import java.util.UUID
 
 class Asset {
     def transient assetService
+    def transient imageService
 
 	static searchable = {
 		all = [analyzer: 'german']
@@ -51,6 +52,17 @@ class Asset {
     String indexText
 
     Date lastUpdated
+
+    def beforeInsert() {
+        beforeUpdate()
+    }
+
+    def beforeUpdate() {
+        // remove GPS tags from EXIF metadata if this is an image
+        if (content?.length && mimeType?.startsWith("image/jp")) {
+            content = imageService.removeExifGPS(content)
+        }
+    }
 
     def getUrl() {
         assetService.createEncodedLink(this)

@@ -8,7 +8,7 @@ import static org.springframework.http.HttpStatus.*
 @Secured(['IS_AUTHENTICATED_FULLY'])
 class ProfileController {
 	def springSecurityService
-    def thumbnailService
+    def imageService
     def grailsApplication
 
     def index() {
@@ -21,7 +21,7 @@ class ProfileController {
 		def userInstance = springSecurityService.currentUser
 		bindData(userInstance, params, [exclude: ['id', 'authorities', 'enabled', 'accountExpired', 'accountLocked', 'passwordExpired']])
         if (params['_photo']?.bytes?.length > 0) {
-            userInstance.profile.photo = thumbnailService.createThumbnailBytes(params['_photo'].bytes, grailsApplication.config.kola.avatarSize)
+            userInstance.profile.photo = imageService.createThumbnailBytes(params['_photo'].bytes, grailsApplication.config.kola.avatarSize)
         }
         else if (params['_deletePhoto'] == 'true') {
             userInstance.profile.photo = null

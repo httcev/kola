@@ -44,7 +44,10 @@ grails.project.dependency.resolution = {
         //mavenRepo "http://repository.codehaus.org"
         //mavenRepo "http://download.java.net/maven/2/"
         //mavenRepo "http://repository.jboss.com/maven2/"
-	mavenRepo "http://repo.grails.org/grails/core"
+    	mavenRepo "http://repo.grails.org/grails/core"
+
+        // needed for apache imaging (used to remove exif metadata from uploaded images)
+        mavenRepo "https://repository.apache.org/content/repositories/snapshots/"
     }
 
     dependencies {
@@ -60,6 +63,10 @@ grails.project.dependency.resolution = {
         compile('org.apache.tika:tika-parsers:1.9') { excludes "xercesImpl", "xmlParserAPIs", "xml-apis", "log4j", "httpcore" }
         compile('org.hashids:hashids:1.0.1')
         compile('org.pegdown:pegdown:1.5.0')
+
+        // used to remove exif metadata from uploaded images
+        compile('org.apache.commons:commons-imaging:1.0-SNAPSHOT')
+
         // needed for rendering-plugin to work (PDF generation)
         runtime ('org.springframework:spring-test:4.1.5.RELEASE')
 

@@ -7,7 +7,7 @@ import org.springframework.security.access.annotation.Secured
 @Transactional(readOnly = true)
 @Secured(['ROLE_ADMIN'])
 class UserController {
-    def thumbnailService
+    def imageService
     def springSecurityService
     def grailsApplication
 
@@ -32,7 +32,7 @@ class UserController {
         }
 
         if (params['_photo']?.bytes?.length > 0) {
-            userInstance.profile.photo = thumbnailService.createThumbnailBytes(params['_photo'].bytes, grailsApplication.config.kola.avatarSize)
+            userInstance.profile.photo = imageService.createThumbnailBytes(params['_photo'].bytes, grailsApplication.config.kola.avatarSize)
         }
         else if (params['_deletePhoto'] == 'true') {
             userInstance.profile.photo = null
@@ -65,7 +65,7 @@ class UserController {
         }
 
         if (params['_photo']?.bytes?.length > 0) {
-            userInstance.profile.photo = thumbnailService.createThumbnailBytes(params['_photo'].bytes, grailsApplication.config.kola.avatarSize)
+            userInstance.profile.photo = imageService.createThumbnailBytes(params['_photo'].bytes, grailsApplication.config.kola.avatarSize)
         }
         else if (params['_deletePhoto'] == 'true') {
             userInstance.profile.photo = null
