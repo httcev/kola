@@ -106,7 +106,7 @@ angular.module('kola.services', ['uuid'])
       self._assetsDir = cordova.file.externalDataDirectory + "assets/";
       $cordovaFile.createDir(cordova.file.dataDirectory, "assets", false);//.then(function() {alert("created asset dir")},function() {alert("not created asset dir")});
     }
-    self.db = (window.cordova ? window.sqlitePlugin : window).openDatabase("kola.db", '1', 'kola DB', 1024 * 1024 * 100);
+    self.db = (window.cordova ? window.sqlitePlugin : window).openDatabase(databaseName, '1', 'kola DB', 1024 * 1024 * 100);
     self.db.transaction(function(tx) {
       try {
         tx.executeSql('CREATE TABLE IF NOT EXISTS user (id integer primary key, doc text not null)');
@@ -141,6 +141,7 @@ angular.module('kola.services', ['uuid'])
 
   function sync() {
     return initPromise.then(function() {
+      var deferred = $q.defer();
       if (canSync()) {
         $rootScope.onlineState.isSyncing = true;
         DBSYNC.syncNow(onSyncProgress, function(result) {
@@ -158,14 +159,16 @@ angular.module('kola.services', ['uuid'])
             }
             $ionicLoading.show({template:message, duration:2000});
             $state.go("tab.account");
-            return $q.reject("sync failed");
+            deferred.reject("sync failed");
           }
           $rootScope.$broadcast("syncFinished");
+          deferred.resolve();
         });
       }
       else {
-        return $q.reject("cannot sync, because either offline or currently syncing already.");
+        deferred.reject("cannot sync, because either offline or currently syncing already.");
       }
+      return deferred.promise;
     });
   }
 
@@ -280,7 +283,6 @@ angular.module('kola.services', ['uuid'])
         if (canSync()) {
           return sync();
         }
-        return $q.resolve();
       });
     });
   }
@@ -294,7 +296,6 @@ angular.module('kola.services', ['uuid'])
       if (!doc.id) {
         doc.id = rfc4122.v4();
       }
-      console.log("--- saving", doc);
       var copy = angular.copy(doc);
       var localURL = copy._localURL;
 
@@ -302,7 +303,7 @@ angular.module('kola.services', ['uuid'])
       delete copy._localURL;
 
       _replaceIds(copy, CONVERSIONS[doc._table]);
-      console.log("--- replaced", copy);
+      console.log("--- saving", copy);
 
       tx.executeSql("INSERT OR REPLACE INTO " + doc._table + " (id, doc) values (?, ?)", [copy.id, JSON.stringify(copy)], function (tx, results) {
         if (doc._table == "asset" && copy.subType == "attachment" && localURL && localURL.indexOf(self._assetsDir) != 0) {
@@ -370,7 +371,8 @@ angular.module('kola.services', ['uuid'])
             if (tableName == "asset" && doc.subType == "attachment") {
               _setLocalURL(doc).then(function() {
                 d.resolve(doc);
-              }, function() {
+              }, function(err) {
+                console.log(err);
                 d.reject();
               });
             }
@@ -382,9 +384,11 @@ angular.module('kola.services', ['uuid'])
             d.reject("no document with id '" + id + "' in table '" + tableName + "'");
           }
         }, function (err) {
+          console.log(err);
           d.reject(err);
         });
       }, function (err) {
+          console.log(err);
           d.reject(err);
       });
       return d.promise;
@@ -531,6 +535,48 @@ angular.module('kola.services', ['uuid'])
           }
           d.resolve(attachment);
         });
+      });
+      return d.promise;
+    }, function(err) {
+      // An error occurred. Show a message to the user, but only if not a normal "Canceled" event.
+      console.log(err);
+      if (typeof err == "string" && err.indexOf("cancel") < 0) {
+        $ionicLoading.show({template:err, duration:2000});
+      }
+    });
+  };
+
+  this.attachChosenMedia = function(doc) {
+    var options = {
+      destinationType: Camera.DestinationType.FILE_URI,
+      sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM,
+      allowEdit: false,
+      MediaType : Camera.MediaType.ALLMEDIA
+    };
+    console.log("--- choose");
+    return $cordovaCamera.getPicture(options).then(function(imageUrl) {
+      var d = $q.defer();
+      console.log("before -> " + imageUrl);
+      if (imageUrl.substring(0,21)=="content://com.android") {
+        photo_split=imageUrl.split("%3A");
+        imageUrl="content://media/external/images/media/"+photo_split[1];
+      }
+      console.log("after -> " + imageUrl);
+      window.resolveLocalFileSystemURL(imageUrl, function(fileEntry) {
+        fileEntry.file(function(file) {
+          console.log("got file -> " + file);
+          var attachment = dbService.createAttachment(doc);
+          attachment.name = file.name;
+          attachment.mimeType = file.type;
+          attachment._localURL = file.localURL;
+          if (!$rootScope.$$phase) {
+            $rootScope.$apply();
+          }
+          d.resolve(attachment);
+        });
+      }, function(err) {
+        console.log(err);
+        $ionicLoading.show({template:err, duration:2000});
       });
       return d.promise;
     }, function(err) {

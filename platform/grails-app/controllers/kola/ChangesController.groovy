@@ -13,6 +13,7 @@ class ChangesController {
 	static DateFormat DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     static DOMAIN_CLASS_MAPPING = ["asset":Asset, "taskStep":TaskStep, "taskDocumentation":TaskDocumentation, "reflectionAnswer":ReflectionAnswer, "task":Task]
     def springSecurityService
+    def sessionFactory
 
     def index() {
     	try {
@@ -149,6 +150,7 @@ class ChangesController {
     }
 
     def _update(clientData, user) {
+    	def modified = false
     	["asset", "taskStep", "taskDocumentation", "reflectionAnswer", "task"].each { table ->
     		def domainClass = DOMAIN_CLASS_MAPPING[table]
     		clientData.data?."$table"?.each {
@@ -171,10 +173,15 @@ class ChangesController {
 	    			model.errors.allErrors.each { println it }
 				}
 				else {
+					modified = true
 					println "------------- SAVED:"
 					println model
 				}
     		}
+		}
+		if (modified) {
+			// flushing the session lets hibernate set the lastUpdated field on the new objects so that they can directly be returned by the response
+			sessionFactory.getCurrentSession()?.flush()
 		}
     }
 }
