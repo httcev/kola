@@ -64,15 +64,15 @@ class BootStrap {
             development {
                 def testUser = new User(username:"tittel", password:"tittel", email:"stephan.tittel@kom.tu-darmstadt.de", profile:[displayName:"Stephan Tittel", company:"httc e.V.", phone:"+49615116882", mobile:"+4915114474556"]).save(flush: true)
 
-                def numAssets = 5
+                def numAssets = 3
                 for (int i=0; i<numAssets; i++) {
-                    new Asset(name:"Asset $i", description:"$i Huhu sfsdflkfj lsjkdfl sjdflk sjldkfj slkdfj lskdjf lskjdf lkjlekrjtlwke4l rlwem rlwekrm wlekrmw elkrmwlekmr lwekrmwlekrmwlerm welkrmwlekmr wlekrmwlekr lwkemr lwkemr lwekrmwlkermw lekmr weklrm wermll23mr2l 3km rlk3mr lwekm welrkm  $i", mimeType:"text/plain", content:"Das ist ein Text! $i" as byte[]).save(true)
+                    new Asset(name:"Asset $i", description:"$i Huhu", mimeType:"text/plain", content:"Das ist ein Text! $i" as byte[]).save(true)
                 }
                 assert Asset.count() == numAssets
 
-                def numTaskTemplates = 5
+                def numTaskTemplates = 2
                 def description = "### Abschnitt 1\n\n1. Aufzählungstext 1\n1. Aufzählungstext 2\n1. Aufzählungstext 3\n\n### Abschnitt 2\n\n- Aufzählungstext 1\n- Aufzählungstext 2\n- Aufzählungstext 3\n\n**Fett**\n_Kursiv_\n[Link](http://www.example.com)"
-                for (i in 1..numTaskTemplates) {
+                for (int i=0; i<numTaskTemplates; i++) {
                     def task = new Task(name:"Example Task Template $i", description:description, creator:testUser, isTemplate:true)
                     task.addToSteps(new TaskStep(name:"Step 1 example", description:description))
                     task.addToSteps(new TaskStep(name:"Step 2 example", description:description))
@@ -81,7 +81,7 @@ class BootStrap {
                 assert Task.count() == numTaskTemplates
 
                 def numTasks = 2
-                for (i in 1..numTasks) {
+                for (int i=0; i<numTasks; i++) {
                     new Task(name:"Example Task $i", description:description, creator:testUser).save(true)
                 }
                 assert Task.count() == numTaskTemplates + numTasks
