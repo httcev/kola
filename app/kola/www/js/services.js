@@ -51,7 +51,7 @@ angular.module('kola.services', ['uuid'])
 
 .service('dbService', function ($rootScope, $q, $state, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, onlineStateService, databaseName, serverUrl, rfc4122) {
   var self = this;
-  self._assetsDir = null;
+  self._assetsDirName = null;
 
   var CONVERSIONS = {
     "task" : {
@@ -102,9 +102,15 @@ angular.module('kola.services', ['uuid'])
 
   function _init() {
     if (window.cordova) {
-//      self._assetsDir = cordova.file.dataDirectory + "assets/";
-      self._assetsDir = cordova.file.externalDataDirectory + "assets/";
-      $cordovaFile.createDir(cordova.file.externalDataDirectory, "assets", false);//.then(function() {alert("created asset dir")},function() {alert("not created asset dir")});
+//      self._assetsDirName = cordova.file.dataDirectory + "assets/";
+      var baseDir = cordova.file.externalDataDirectory
+      self._assetsDirName = baseDir + "assets/";
+      $cordovaFile.createDir(baseDir, "assets", false).finally(function() {
+        window.resolveLocalFileSystemURL(self._assetsDirName, function(dir) {
+          self._assetsDir = dir;
+          console.log("assets dir", self._assetsDir);
+        });
+      });
     }
     self.db = (window.cordova ? window.sqlitePlugin : window).openDatabase(databaseName, '1', 'kola DB', 1024 * 1024 * 100);
     self.db.transaction(function(tx) {
@@ -175,7 +181,7 @@ angular.module('kola.services', ['uuid'])
   function _initSync() {
     var deferred = $q.defer();
     // theTablesToSync, dbObject, theSyncInfo, theServerUrl, assetUrl, assetDir, callBack, $cordovaFileTransfer, username, password, timeout) 
-    DBSYNC.initSync(TABLES_TO_SYNC, self.db, {foo:"bar"}, serverUrl + "/api/changes", serverUrl + "/api/upload", self._assetsDir, function() {
+    DBSYNC.initSync(TABLES_TO_SYNC, self.db, {foo:"bar"}, serverUrl + "/api/changes", serverUrl + "/api/upload", self._assetsDirName, function() {
       deferred.resolve();
     }, $cordovaFileTransfer, $cordovaFile, $q, localStorage["user"], localStorage["password"]);
     return deferred.promise;
@@ -306,20 +312,29 @@ angular.module('kola.services', ['uuid'])
       console.log("--- saving", copy);
 
       tx.executeSql("INSERT OR REPLACE INTO " + doc._table + " (id, doc) values (?, ?)", [copy.id, JSON.stringify(copy)], function (tx, results) {
-        if (doc._table == "asset" && copy.subType == "attachment" && localURL && localURL.indexOf(self._assetsDir) != 0) {
+        if (doc._table == "asset" && copy.subType == "attachment" && localURL && localURL.indexOf(self._assetsDirName) != 0) {
           // copy attachment data from temp dir to assets dir
           window.resolveLocalFileSystemURL(localURL, function(fileEntry) {
-            console.log(fileEntry);
-            var name = fileEntry.name;
-            var dir = fileEntry.nativeURL.split(name)[0];
-            console.log("--- moving attachment from " + (dir + name) + " to " + (self._assetsDir + copy.id));
-            $cordovaFile.moveFile(dir, name, self._assetsDir, copy.id).then(function (success) {
+            console.log("moving file", fileEntry);
+            fileEntry.moveTo(self._assetsDir, copy.id, function() {
               d.resolve();
             }, function (error) {
               // error
               console.log(error);
               d.reject();
             });
+            /*
+            var name = fileEntry.name;
+            var dir = fileEntry.nativeURL.split(name)[0];
+            console.log("--- moving attachment from " + (dir + name) + " to " + (self._assetsDirName + copy.id));
+            $cordovaFile.moveFile(dir, name, self._assetsDirName, copy.id).then(function (success) {
+              d.resolve();
+            }, function (error) {
+              // error
+              console.log(error);
+              d.reject();
+            });
+*/
           });
         }
         else {
@@ -401,7 +416,7 @@ angular.module('kola.services', ['uuid'])
       if (window.cordova) {
         console.log("--- replacing attachment url with local url -> " + attachment.id);
 
-        $cordovaFile.checkFile(self._assetsDir, attachment.id).then(function (fileEntry) {
+        $cordovaFile.checkFile(self._assetsDirName, attachment.id).then(function (fileEntry) {
           console.log("--- asset file found " + attachment.id)
           // file exists.
           // for images (and TODO: videos) use cdvfile:// url to let the cordova webview load the attachments.
