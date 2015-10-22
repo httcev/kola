@@ -49,9 +49,9 @@ angular.module('kola.services', ['uuid'])
   };
 })
 
-.service('dbService', function ($rootScope, $q, $state, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, onlineStateService, databaseName, serverUrl, rfc4122) {
+.service('dbService', function ($rootScope, $q, $state, $ionicPlatform, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, onlineStateService, databaseName, serverUrl, rfc4122) {
   var self = this;
-  self._assetsDirName = null;
+  self.initDeferred = $q.defer();
 
   var CONVERSIONS = {
     "task" : {
@@ -89,107 +89,215 @@ angular.module('kola.services', ['uuid'])
     {tableName : 'task'}
   ];
 
-  var initDeferred = $q.defer();
-  var initPromise = initDeferred.promise;
-  if (window.cordova) {
-    document.addEventListener('deviceready', function () {
-      _init();
-    });
-  }
-  else {
-    _init();
-  }
-
-  function _init() {
-    if (window.cordova) {
-//      self._assetsDirName = cordova.file.dataDirectory + "assets/";
-      self._cacheDirName = cordova.file.externalCacheDirectory
-      self._dataDirName = cordova.file.externalDataDirectory
-      self._assetsDirName = self._dataDirName + "assets/";
-      $cordovaFile.createDir(self._dataDirName, "assets", false).finally(function() {
-        window.resolveLocalFileSystemURL(self._assetsDirName, function(dir) {
-          self._assetsDir = dir;
-        });
+  self.sync = dependOnInit(function() {
+    var deferred = $q.defer();
+    if (canSync()) {
+      $rootScope.onlineState.isSyncing = true;
+      DBSYNC.syncNow(onSyncProgress, function(result) {
+        $rootScope.onlineState.isSyncing = false;
+        if (result && result.syncOK === true) {
+          // synchronized successfully
+        }
+        if (result && result.status == 401) {
+          openAccountTab("Login fehlgeschlagen. Bitte überprüfen Sie Nutzernamen und Passwort.");
+          deferred.reject("sync failed");
+        }
+        else {
+          $rootScope.$broadcast("syncFinished");
+          deferred.resolve();
+        }
       });
     }
-    self.db = (window.cordova ? window.sqlitePlugin : window).openDatabase(databaseName, '1', 'kola DB', 1024 * 1024 * 100);
-    self.db.transaction(function(tx) {
-      try {
-        tx.executeSql('CREATE TABLE IF NOT EXISTS user (id integer primary key, doc text not null)');
-        tx.executeSql('CREATE TABLE IF NOT EXISTS asset (id varchar(255) not null primary key, doc text not null)');
-        tx.executeSql('CREATE TABLE IF NOT EXISTS reflectionQuestion (id integer primary key, doc text not null)');
-        tx.executeSql('CREATE TABLE IF NOT EXISTS reflectionAnswer (id varchar(255) not null primary key, doc text not null)');
-        tx.executeSql('CREATE TABLE IF NOT EXISTS task (id varchar(255) not null primary key, doc text not null)');
-        tx.executeSql('CREATE TABLE IF NOT EXISTS taskStep (id varchar(255) not null primary key, doc text not null)');
-        tx.executeSql('CREATE TABLE IF NOT EXISTS taskDocumentation (id varchar(255) not null primary key, doc text not null)');
+    else {
+      deferred.reject("cannot sync, because either offline or currently syncing already.");
+    }
+    return deferred.promise;
+  });
+
+  self.all = dependOnInit(function(tableName) {
+    var d = $q.defer();
+    self.db.transaction(function (t) {
+      t.executeSql("select doc from " + tableName, [], function (tx, results) {
+        var docs = []
+        for (var i=0; i<results.rows.length; i++) {
+          var doc = JSON.parse(results.rows.item(i).doc);
+          doc._table = tableName;
+          docs.push(doc);
+        }
+        d.resolve(docs);
+      }, function (err) {
+        d.reject(err);
+      });
+    }, function (err) {
+        d.reject(err);
+    });
+    return d.promise;
+  });
+
+  self.save = dependOnInit(function(doc) {
+    var d = $q.defer();
+    self.db.transaction(function (tx) {
+      var promises = [];
+      if (angular.isArray(doc)) {
+        angular.forEach(doc, function(o) {
+          promises.push(_save(o, tx));
+        });
       }
-      catch(e) {
-        console.log(e);
+      else {
+        promises.push(_save(doc, tx));
+      }
+      $q.all(promises).then(function() {
+        d.resolve();
+      }, function(err) {
+        d.reject(err);
+      })
+    }, function (err) {
+        throw err;
+    });
+
+    return d.promise.then(function() {
+      // saving should succeed in offline mode. since sync() rejects when offline, check canSync() first.
+      if (canSync()) {
+        return self.sync();
       }
     });
-    _initSync().then(function() {
+  });
+
+  self._get = dependOnInit(function(id, tableName) {
+    var d = $q.defer();
+    self.db.transaction(function (tx) {
+      tx.executeSql("select doc from " + tableName + " where id=?", [id], function (tx, results) {
+        if (results.rows.length == 1) {
+          var doc = JSON.parse(results.rows.item(0).doc);
+          doc._table = tableName;
+          if (tableName == "asset" && doc.subType == "attachment") {
+            self._setLocalURL(doc).then(function() {
+              d.resolve(doc);
+            }, function(err) {
+              console.log(err);
+              d.reject();
+            });
+          }
+          else {
+            d.resolve(doc);
+          }
+        }
+        else {
+          d.reject("no document with id '" + id + "' in table '" + tableName + "'");
+        }
+      }, function (err) {
+        console.log(err);
+        d.reject(err);
+      });
+    }, function (err) {
+        console.log(err);
+        d.reject(err);
+    });
+    return d.promise;
+  });
+
+  self._setLocalURL = dependOnInit(function(attachment) {
+    var d = $q.defer();
+    if (window.cordova) {
+      $cordovaFile.checkFile(self._assetsDirName, attachment.id).then(function (fileEntry) {
+        // file exists.
+        // for images (and TODO: videos) use cdvfile:// url to let the cordova webview load the attachments.
+        // for other file types (e.g. PDFs), use fileEntry's nativeURL, so that Android can open it natively.
+        if (attachment.mimeType.indexOf("image/") == 0) {
+          fileEntry.file(function(f) {
+            attachment._localURL = f.localURL;
+            d.resolve();
+          });
+        }
+        else {
+            attachment._localURL = fileEntry.nativeURL;
+            d.resolve();
+        }
+      }, function() {
+        // file not found
+        d.reject("asset file NOT found " + attachment.id);        
+      });
+    }
+    else {
+      d.resolve();
+    }
+    return d.promise;
+  });
+
+  function _init() {
+    var user = localStorage["user"];
+    if (user) {
       $rootScope.$watch("onlineState.isOnline", onOnlineStateChanged);
-      initDeferred.resolve();
-    });
+      var password = localStorage["password"];
+      if (window.cordova) {
+  //      self._assetsDirName = cordova.file.dataDirectory + "assets/";
+        self._cacheDirName = cordova.file.externalCacheDirectory;
+        self._dataDirName = cordova.file.externalDataDirectory;
+        self._assetsDirName = self._dataDirName + "assets/";
+        $cordovaFile.createDir(self._dataDirName, "assets", false).finally(function() {
+          window.resolveLocalFileSystemURL(self._assetsDirName, function(dir) {
+            self._assetsDir = dir;
+          });
+        });
+      }
+      console.log("--- using DB " + user);
+      self.db = (window.cordova ? window.sqlitePlugin : window).openDatabase(user, '1', 'kola DB', 1024 * 1024 * 100);
+      self.db.transaction(function(tx) {
+        try {
+          tx.executeSql('CREATE TABLE IF NOT EXISTS user (id integer primary key, doc text not null)');
+          tx.executeSql('CREATE TABLE IF NOT EXISTS asset (id varchar(255) not null primary key, doc text not null)');
+          tx.executeSql('CREATE TABLE IF NOT EXISTS reflectionQuestion (id integer primary key, doc text not null)');
+          tx.executeSql('CREATE TABLE IF NOT EXISTS reflectionAnswer (id varchar(255) not null primary key, doc text not null)');
+          tx.executeSql('CREATE TABLE IF NOT EXISTS task (id varchar(255) not null primary key, doc text not null)');
+          tx.executeSql('CREATE TABLE IF NOT EXISTS taskStep (id varchar(255) not null primary key, doc text not null)');
+          tx.executeSql('CREATE TABLE IF NOT EXISTS taskDocumentation (id varchar(255) not null primary key, doc text not null)');
+        }
+        catch(err) {
+          console.log(err);
+        }
+      });
+      DBSYNC.initSync(TABLES_TO_SYNC, self.db, {foo:"bar"}, serverUrl + "/api/changes", serverUrl + "/api/upload", self._assetsDirName, function() {
+        self.initDeferred.resolve();
+      }, $cordovaFileTransfer, $cordovaFile, $q, user, password);
+    }
+    else {
+      self.initDeferred.reject("no_user");
+    }
   }
 
+  function dependOnInit(fn) {
+    return function() {
+      var args = arguments;
+      return self.initDeferred.promise.then(function() {
+        return fn.apply(this, args);
+      }, function(err) {
+        if ("no_user" == err) {
+          openAccountTab("Willommen bei KOLA! Bitte geben Sie Ihren Nutzernamen und Passwort ein.");
+        }
+        else {
+          console.log(err);
+        }
+        return $q.reject("init failed");
+      });
+    }
+  }
+
+  function updateLogin() {
+    _init();
+    return self.initDeferred.promise;
+  };
+
   function onOnlineStateChanged() {
-    sync();
+    console.log("--- online state changed");
+    self.sync();
   }
 
   function onSyncProgress(msg) {
+    //console.log(msg);
   }
 
   function canSync() {
     return $rootScope.onlineState.isOnline && !$rootScope.onlineState.isSyncing;
-  }
-
-  function sync() {
-    return initPromise.then(function() {
-      var deferred = $q.defer();
-      if (canSync()) {
-        $rootScope.onlineState.isSyncing = true;
-        DBSYNC.syncNow(onSyncProgress, function(result) {
-          $rootScope.onlineState.isSyncing = false;
-          if (result && result.syncOK === true) {
-            // synchronized successfully
-          }
-          if (result && result.status == 401) {
-            var message;
-            if (localStorage["user"]) {
-              message = "Login fehlgeschlagen. Bitte überprüfen Sie Nutzernamen und Passwort.";
-            }
-            else {
-              message = "Willommen bei KOLA! Bitte geben Sie Ihren Nutzernamen und Passwort ein.";
-            }
-            $ionicLoading.show({template:message, duration:2000});
-            $state.go("tab.account");
-            deferred.reject("sync failed");
-          }
-          $rootScope.$broadcast("syncFinished");
-          deferred.resolve();
-        });
-      }
-      else {
-        deferred.reject("cannot sync, because either offline or currently syncing already.");
-      }
-      return deferred.promise;
-    });
-  }
-
-  function _initSync() {
-    var deferred = $q.defer();
-    // theTablesToSync, dbObject, theSyncInfo, theServerUrl, assetUrl, assetDir, callBack, $cordovaFileTransfer, username, password, timeout) 
-    DBSYNC.initSync(TABLES_TO_SYNC, self.db, {foo:"bar"}, serverUrl + "/api/changes", serverUrl + "/api/upload", self._assetsDirName, function() {
-      deferred.resolve();
-    }, $cordovaFileTransfer, $cordovaFile, $q, localStorage["user"], localStorage["password"]);
-    return deferred.promise;
-  }
-
-  function updateLogin() {
-    return initPromise.then(function() {
-      return _initSync();
-    });
   }
 
   function _create(tableName, props) {
@@ -231,63 +339,10 @@ angular.module('kola.services', ['uuid'])
     return _create("reflectionAnswer", { task:taskId, question:questionId });
   }
 
-  function all(tableName) {
-    return initPromise.then(function() {
-      var d = $q.defer();
-      self.db.transaction(function (t) {
-        t.executeSql("select doc from " + tableName, [], function (tx, results) {
-          var docs = []
-          for (var i=0; i<results.rows.length; i++) {
-            var doc = JSON.parse(results.rows.item(i).doc);
-            doc._table = tableName;
-            docs.push(doc);
-          }
-          d.resolve(docs);
-        }, function (err) {
-          d.reject(err);
-        });
-      }, function (err) {
-          d.reject(err);
-      });
-      return d.promise;
-    });
-  }
-
   function get(id, tableName) {
-    return _get(id, tableName).then(function(doc) {
+    return self._get(id, tableName).then(function(doc) {
       return _resolveIds(doc, CONVERSIONS[tableName]).then(function() {
         return doc;
-      });
-    });
-  }
-
-  function save(doc) {
-    return initPromise.then(function() {
-      var d = $q.defer();
-      self.db.transaction(function (tx) {
-        var promises = [];
-        if (angular.isArray(doc)) {
-          angular.forEach(doc, function(o) {
-            promises.push(_save(o, tx));
-          });
-        }
-        else {
-          promises.push(_save(doc, tx));
-        }
-        $q.all(promises).then(function() {
-          d.resolve();
-        }, function(err) {
-          d.reject(err);
-        })
-      }, function (err) {
-          throw err;
-      });
-
-      return d.promise.then(function() {
-        // saving should succeed in offline mode. since sync() rejects when offline, check canSync() first.
-        if (canSync()) {
-          return sync();
-        }
       });
     });
   }
@@ -376,14 +431,14 @@ angular.module('kola.services', ['uuid'])
       if (ids != null) {
         if (angular.isArray(ids)) {
           angular.forEach(ids, function(id, index) {
-            promises.push(_get(id, conversionDef.refTable).then(function(doc) {
+            promises.push(self._get(id, conversionDef.refTable).then(function(doc) {
               target[key][index] = doc;
               return _resolveIds(doc, CONVERSIONS[conversionDef.refTable]);
             }));
           });
         }
         else {
-          promises.push(_get(ids, conversionDef.refTable).then(function(doc) {
+          promises.push(self._get(ids, conversionDef.refTable).then(function(doc) {
             target[key] = doc;
             return _resolveIds(doc, CONVERSIONS[conversionDef.refTable]);
           }));
@@ -391,71 +446,6 @@ angular.module('kola.services', ['uuid'])
       }
     });
     return $q.all(promises);
-  }
-
-  function _get(id, tableName) {
-    return initPromise.then(function() {
-      var d = $q.defer();
-      self.db.transaction(function (tx) {
-        tx.executeSql("select doc from " + tableName + " where id=?", [id], function (tx, results) {
-          if (results.rows.length == 1) {
-            var doc = JSON.parse(results.rows.item(0).doc);
-            doc._table = tableName;
-            if (tableName == "asset" && doc.subType == "attachment") {
-              _setLocalURL(doc).then(function() {
-                d.resolve(doc);
-              }, function(err) {
-                console.log(err);
-                d.reject();
-              });
-            }
-            else {
-              d.resolve(doc);
-            }
-          }
-          else {
-            d.reject("no document with id '" + id + "' in table '" + tableName + "'");
-          }
-        }, function (err) {
-          console.log(err);
-          d.reject(err);
-        });
-      }, function (err) {
-          console.log(err);
-          d.reject(err);
-      });
-      return d.promise;
-    });
-  }
-
-  function _setLocalURL(attachment) {
-    return initPromise.then(function() {
-      var d = $q.defer();
-      if (window.cordova) {
-        $cordovaFile.checkFile(self._assetsDirName, attachment.id).then(function (fileEntry) {
-          // file exists.
-          // for images (and TODO: videos) use cdvfile:// url to let the cordova webview load the attachments.
-          // for other file types (e.g. PDFs), use fileEntry's nativeURL, so that Android can open it natively.
-          if (attachment.mimeType.indexOf("image/") == 0) {
-            fileEntry.file(function(f) {
-              attachment._localURL = f.localURL;
-              d.resolve();
-            });
-          }
-          else {
-              attachment._localURL = fileEntry.nativeURL;
-              d.resolve();
-          }
-        }, function() {
-          // file not found
-          d.reject("asset file NOT found " + attachment.id);        
-        });
-      }
-      else {
-        d.resolve();
-      }
-      return d.promise;
-    });
   }
 
   function _replaceIds(target, tableConversions) {
@@ -478,12 +468,20 @@ angular.module('kola.services', ['uuid'])
     });
   }
 
+  function openAccountTab(message) {
+    $ionicLoading.show({template:message, duration:2000});
+    $state.go("tab.account");
+  }
+
+  $ionicPlatform.ready(_init);
+
+
   return {
+    sync:self.sync,
+    all:self.all,
+    save:self.save,
     updateLogin:updateLogin,
-    sync:sync,
-    all:all,
     get:get,
-    save:save,
     resolveIds:resolveIds,
     createTask:createTask,
     createAttachment:createAttachment,
