@@ -6,34 +6,35 @@
     <button class="button icon ion-plus-round" ng-click="create()"></button>
   </ion-nav-buttons>
   <ion-content>
-    <ion-list>
+    <div ng-if="!tasks" class="center-horizontal">
+      <ion-spinner></ion-spinner>
+    </div>
+    <ion-list ng-if="tasks">
       <div class="item item-divider item-stable item-icon-left item-button-right">
         <i class="icon ion-alert"></i><b>Anstehend:</b>
       </div>
-      <ion-item ng-repeat="task in pendingTasks = (tasks | filter:{done:!true, deleted:!true} | orderBy:[sortByDue, '-lastUpdated']) track by task.id" class="item-remove-animate item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}">
+      <ion-item ng-repeat="task in pendingTasks = (tasks | filter:{done:'!true', deleted:'!true'} | orderBy:[sortByDue, '-lastUpdated']) track by task.id" class="item-remove-animate item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}">
         <i ng-if="task.type!='homework'" class="icon ion-clipboard"></i>
         <i ng-if="task.type=='homework'" class="icon ion-university"></i>
         <h2>{{task.name}}</h2>
         <p ng-if="task.due"><b>Fällig</b>: {{task.due | date:'fullDate'}}</p>
         <i class="icon ion-chevron-right icon-accessory"></i>
 
-        <ion-option-button class="button-balanced" ng-click="markDone(task)">
+        <ion-option-button class="button-balanced" ng-click="toggleDone(task)">
           <i class="icon ion-checkmark-round"></i>
         </ion-option-button>
       </ion-item>
       <div ng-hide="pendingTasks.length" class="padding">Keine anstehenden Arbeitsaufträge</div>
 
       <div class="item item-divider item-stable item-icon-left"><i class="icon ion-checkmark-round balanced"></i><b>Erledigt:</b></div>
-      <ion-item ng-repeat="task in completedTasks = (tasks | filter:{done:true, deleted:!true} | orderBy:'-due') track by task.id" class="item-remove-animate item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}">
+      <ion-item ng-repeat="task in completedTasks = (tasks | filter:{done:true, deleted:'!true'} | orderBy:'-due') track by task.id" class="item-remove-animate item-icon-left item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{task.id}}">
         <i class="icon ion-clipboard"></i>
         <h2>{{task.name}}</h2>
         <p ng-if="task.due"><b>Fällig</b>: {{task.due | date:'fullDate'}}</p>
         <i class="icon ion-chevron-right icon-accessory"></i>
-<!--
-        <ion-option-button class="button-assertive" ng-click="remove(task)">
-          <i class="icon ion-trash-a"></i>
+        <ion-option-button class="button-assertive" ng-click="toggleDone(task)">
+          <i class="icon ion-checkmark-round"></i>
         </ion-option-button>
--->        
       </ion-item>
       <div ng-hide="completedTasks.length" class="padding">Keine erledigten Arbeitsaufträge</div>
     </ion-list>
