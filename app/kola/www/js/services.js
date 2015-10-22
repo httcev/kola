@@ -49,8 +49,9 @@ angular.module('kola.services', ['uuid'])
   };
 })
 
-.service('dbService', function ($rootScope, $q, $state, $ionicPlatform, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, onlineStateService, databaseName, serverUrl, rfc4122) {
+.service('dbService', function ($rootScope, $q, $state, $ionicPlatform, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, onlineStateService, serverUrl, rfc4122) {
   var self = this;
+  var firstRun = true;
   self.initDeferred = $q.defer();
 
   var CONVERSIONS = {
@@ -227,7 +228,10 @@ angular.module('kola.services', ['uuid'])
   function _init() {
     var user = localStorage["user"];
     if (user) {
-      $rootScope.$watch("onlineState.isOnline", onOnlineStateChanged);
+      if (firstRun) {
+        $rootScope.$watch("onlineState.isOnline", onOnlineStateChanged);
+        firstRun = false;
+      }
       var password = localStorage["password"];
       if (window.cordova) {
   //      self._assetsDirName = cordova.file.dataDirectory + "assets/";
@@ -240,7 +244,6 @@ angular.module('kola.services', ['uuid'])
           });
         });
       }
-      console.log("--- using DB " + user);
       self.db = (window.cordova ? window.sqlitePlugin : window).openDatabase(user, '1', 'kola DB', 1024 * 1024 * 100);
       self.db.transaction(function(tx) {
         try {
@@ -283,6 +286,7 @@ angular.module('kola.services', ['uuid'])
   }
 
   function updateLogin() {
+    self.initDeferred = $q.defer();
     _init();
     return self.initDeferred.promise;
   };
