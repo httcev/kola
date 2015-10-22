@@ -1,9 +1,6 @@
 angular.module('kola.controllers', [])
 
-.controller('TasksCtrl', function($scope, $filter, $state, $rootScope, dbService) {
-    //$scope.tasks = pouchCollection("all/by_type", { keys:["task", "homework"] }, "all/filterByTypes", { types:["task", "homework"] });
-    $scope.tasks = [];
-
+.controller('TasksCtrl', function($scope, $state, $rootScope, dbService) {
     function reloadTasks() {
       dbService.all("task").then(function(docs) {
         var filtered = [];
@@ -16,33 +13,26 @@ angular.module('kola.controllers', [])
       });
     }
 
-    $scope.markDone = function(task) {
-      task.done = true;
+    $scope.toggleDone = function(task) {
+      task.done = !task.done;
       dbService.save(task);
     }
-    /*
-    pouchCollection("all/by_type", { keys:["task", "homework"] }, "all/filterByTypes", { types:["task", "homework"] }).then(function(result) {
-      $scope.tasks = result;
-      console.log($scope.tasks);  
-    });
-*/
-
+/*
     $scope.remove = function(task) {
       task.deleted = true;
       dbService.save(task);
     };
-
+*/
     $scope.create = function() {
       $state.go("tab.task-choose-template");
     };
 
     $scope.sortByDue = function(task) {
-        return task.due ? task.due : (task.lastUpdated ? 'zzzzzzz' : '0'); 
+        return task.due ? task.due : (task.lastUpdated ? 'zzzzzzz' : 0); 
     };
     $rootScope.$on("syncFinished", function () {
       reloadTasks();
     });
-
     reloadTasks();
 })
 
@@ -52,17 +42,17 @@ angular.module('kola.controllers', [])
   var taskDocumentationProp = $scope.isStep ? "step" : "task";
   var table = $scope.isStep ? "taskStep" : "task";
 
-  loadTargetAndDocumentation();
+  loadTargetAndDocumentations();
 
-  function loadTargetAndDocumentation() {
+  function loadTargetAndDocumentations() {
     // load documentation
     dbService.all("taskDocumentation").then(function(docs) {
-      var documentation = [];
+      var documentations = [];
       var promises = [];
       angular.forEach(docs, function(doc) {
         if (doc[taskDocumentationProp] == targetId && !doc.deleted) {
           promises.push(dbService.resolveIds(doc, "taskDocumentation"));
-          documentation.push(doc);
+          documentations.push(doc);
         }
       });
       $q.all(promises).finally(function() {
@@ -79,28 +69,27 @@ angular.module('kola.controllers', [])
               }
             });
             $q.all(promises).finally(function() {
-              loadTarget(documentation, reflectionAnswers);
+              loadTarget(documentations, reflectionAnswers);
             });
           });
         }
         else {
-          loadTarget(documentation);
+          loadTarget(documentations);
         }
       });
     });
   }
 
-  function loadTarget(documentation, reflectionAnswers) {
+  function loadTarget(documentations, reflectionAnswers) {
     dbService.get(targetId, table).then(function(target) {
       angular.forEach(target.reflectionQuestions, function(reflectionQuestion) {
-        console.log(reflectionQuestion);
         if (!reflectionAnswers[reflectionQuestion.id]) {
           reflectionAnswers[reflectionQuestion.id] = dbService.createReflectionAnswer(target.id, reflectionQuestion.id);
         }
       });
-      $scope.documentation = documentation;
+      $scope.newDocumentation = false;
+      $scope.documentations = documentations;
       $scope.reflectionAnswers = reflectionAnswers;
-      $scope.newNote = dbService.createTaskDocumentation(targetId, $scope.isStep);
       $scope.taskOrStep = target;
     }, function(err) {
       // TODO: 404 error message and open default/main page
@@ -110,31 +99,31 @@ angular.module('kola.controllers', [])
 
 //  $scope.$on('$ionicView.enter', function(e) {
 
-  $scope.attachPhoto = function(note) {
-    mediaAttachment.attachPhoto(note);
+  $scope.attachPhoto = function(documentation) {
+    mediaAttachment.attachPhoto(documentation);
   }
 
-  $scope.attachVideo = function(note) {
-    mediaAttachment.attachVideo(note);
+  $scope.attachVideo = function(documentation) {
+    mediaAttachment.attachVideo(documentation);
   }
 
-  $scope.attachAudio = function(note) {
-    mediaAttachment.attachAudio(note);
+  $scope.attachAudio = function(documentation) {
+    mediaAttachment.attachAudio(documentation);
   }
 
-  $scope.attachChosenMedia = function(note) {
-    mediaAttachment.attachChosenMedia(note);
+  $scope.attachChosenMedia = function(documentation) {
+    mediaAttachment.attachChosenMedia(documentation);
   }
 
-  $scope.remove = function(note) {
+  $scope.removeDocumentation = function(documentation) {
     $ionicPopup.confirm({
       title: 'Dokumentation löschen',
       template: 'Soll diese Dokumentation wirklich gelöscht werden?'
     }).then(function(result) {
       if(result) {
-        note.deleted = true;
-        dbService.save(note).then(function() {
-          loadTargetAndDocumentation();
+        documentation.deleted = true;
+        dbService.save(documentation).then(function() {
+          loadTargetAndDocumentations();
         }, function(err) {
           alert("Löschen fehlgeschlagen");
           console.log(err);
@@ -143,29 +132,32 @@ angular.module('kola.controllers', [])
     });
   };
 
-  $scope.save = function(note) {
+  $scope.addDocumentation = function() {
+    $scope.newDocumentation = dbService.createTaskDocumentation(targetId, $scope.isStep);
+  }
+
+  $scope.saveDocumentation = function(documentation) {
     var objectsToSave = [];
-    angular.forEach(note.attachments, function(attachment) {
+    angular.forEach(documentation.attachments, function(attachment) {
       objectsToSave.push(attachment);
     });
-    objectsToSave.push(note);
-    $scope.newNoteSaving = true;
+    objectsToSave.push(documentation);
+    documentation._saving = true;
     dbService.save(objectsToSave).then(function() {
-//      $scope.newNote = false;
-      loadTargetAndDocumentation();
+      loadTargetAndDocumentations();
       $ionicLoading.show({template: "Dokumentation gespeichert", duration:2000});
     }, function(err) {
       console.log(err);
       $ionicLoading.show({template: "Speichern fehlgeschlagen!", duration:2000});
     }).finally(function() {
-      $scope.newNoteSaving = false;
+      documentation._saving = false;
     });
   };
 
   $scope.saveReflectionAnswer = function(reflectionAnswer, form) {
     dbService.save(reflectionAnswer).then(function() {
       form.$dirty = false;
-      loadTargetAndDocumentation();
+      loadTargetAndDocumentations();
       $ionicLoading.show({template: "Antwort gespeichert", duration:2000});
     });
   };

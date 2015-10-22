@@ -103,12 +103,12 @@ angular.module('kola.services', ['uuid'])
   function _init() {
     if (window.cordova) {
 //      self._assetsDirName = cordova.file.dataDirectory + "assets/";
-      var baseDir = cordova.file.externalDataDirectory
-      self._assetsDirName = baseDir + "assets/";
-      $cordovaFile.createDir(baseDir, "assets", false).finally(function() {
+      self._cacheDirName = cordova.file.externalCacheDirectory
+      self._dataDirName = cordova.file.externalDataDirectory
+      self._assetsDirName = self._dataDirName + "assets/";
+      $cordovaFile.createDir(self._dataDirName, "assets", false).finally(function() {
         window.resolveLocalFileSystemURL(self._assetsDirName, function(dir) {
           self._assetsDir = dir;
-          console.log("assets dir", self._assetsDir);
         });
       });
     }
@@ -134,7 +134,6 @@ angular.module('kola.services', ['uuid'])
   }
 
   function onOnlineStateChanged() {
-    console.log("--- online state changed:", $rootScope.onlineState);
     sync();
   }
 
@@ -305,24 +304,43 @@ angular.module('kola.services', ['uuid'])
       var copy = angular.copy(doc);
       var localURL = copy._localURL;
 
-      delete copy._table;
-      delete copy._localURL;
+      // delete local properties (all properties beginning with an underscore)
+      for (var property in copy) {
+        if (property.indexOf("_") == 0) {
+          delete copy[property];
+        }
+      }
 
       _replaceIds(copy, CONVERSIONS[doc._table]);
       console.log("--- saving", copy);
 
       tx.executeSql("INSERT OR REPLACE INTO " + doc._table + " (id, doc) values (?, ?)", [copy.id, JSON.stringify(copy)], function (tx, results) {
-        if (doc._table == "asset" && copy.subType == "attachment" && localURL && localURL.indexOf(self._assetsDirName) != 0) {
-          // copy attachment data from temp dir to assets dir
+        if (doc._table == "asset" && copy.subType == "attachment" && localURL) {
           window.resolveLocalFileSystemURL(localURL, function(fileEntry) {
-            console.log("moving file", fileEntry);
-            fileEntry.moveTo(self._assetsDir, copy.id, function() {
+            // move attachment data to assets dir if it is not already there
+            if (fileEntry.nativeURL != (self._assetsDirName + copy.id)) {
+              // check if the asset is in the app's cache folder. if yes, move the asset, if not copy it (to avoid removing files selected from the photo library).
+              if (fileEntry.nativeURL.indexOf(self._cacheDirName) == 0) {
+                fileEntry.moveTo(self._assetsDir, copy.id, function() {
+                  d.resolve();
+                }, function (err) {
+                  // error
+                  d.reject(err);
+                });
+              }
+              else {
+                fileEntry.copyTo(self._assetsDir, copy.id, function() {
+                  d.resolve();
+                }, function (err) {
+                  // error
+                  d.reject(err);
+                });
+              }
+            }
+            else {
+              // file is already in assets dir
               d.resolve();
-            }, function (error) {
-              // error
-              console.log(error);
-              d.reject();
-            });
+            }
             /*
             var name = fileEntry.name;
             var dir = fileEntry.nativeURL.split(name)[0];
@@ -414,10 +432,7 @@ angular.module('kola.services', ['uuid'])
     return initPromise.then(function() {
       var d = $q.defer();
       if (window.cordova) {
-        console.log("--- replacing attachment url with local url -> " + attachment.id);
-
         $cordovaFile.checkFile(self._assetsDirName, attachment.id).then(function (fileEntry) {
-          console.log("--- asset file found " + attachment.id)
           // file exists.
           // for images (and TODO: videos) use cdvfile:// url to let the cordova webview load the attachments.
           // for other file types (e.g. PDFs), use fileEntry's nativeURL, so that Android can open it natively.
@@ -568,18 +583,14 @@ angular.module('kola.services', ['uuid'])
       allowEdit: false,
       MediaType : Camera.MediaType.ALLMEDIA
     };
-    console.log("--- choose");
     return $cordovaCamera.getPicture(options).then(function(imageUrl) {
       var d = $q.defer();
-      console.log("before -> " + imageUrl);
       if (imageUrl.substring(0,21)=="content://com.android") {
         photo_split=imageUrl.split("%3A");
         imageUrl="content://media/external/images/media/"+photo_split[1];
       }
-      console.log("after -> " + imageUrl);
       window.resolveLocalFileSystemURL(imageUrl, function(fileEntry) {
         fileEntry.file(function(file) {
-          console.log("got file -> " + file);
           var attachment = dbService.createAttachment(doc);
           attachment.name = file.name;
           attachment.mimeType = file.type;

@@ -22,44 +22,63 @@
       </ion-list>
 
       <h1 class="task-section-header">Meine Dokumentation<!-- und Fragen-->:</h1>
-      <div class="list card" ng-repeat="note in documentation | orderBy:'lastUpdated'">
-        <div class="item item-text-wrap">
-          <author-info ng-model="note"></author-info>
-          <div class="text">{{note.text}}</div>
+      <div class="list card documentation" ng-repeat="documentation in documentations | orderBy:'lastUpdated'">
+        <div ng-if="documentation._saving" class="center-horizontal">
+          <ion-spinner></ion-spinner>
         </div>
-        <media-attachments ng-model="note" hide-header="true"></media-attachments>
-        <div class="item tabs tabs-secondary">
-          <button class="button button-clear icon ion-trash-a" ng-click="remove(note)"></button>
+        <div ng-if="!documentation._saving">
+          <div class="item item-text-wrap">
+            <author-info ng-model="documentation"></author-info>
+            <div ng-if="!documentation._editMode" class="text">{{documentation.text}}</div>
+            <textarea ng-if="documentation._editMode" ng-model="documentation.text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Welche Arbeiten habe ich erledigt? Wie bin ich vorgegangen?" autofocus></textarea>
+          </div>
+          <media-attachments ng-model="documentation" hide-header="true" edit-mode="{{documentation._editMode}}"></media-attachments>
+          <div class="item tabs tabs-secondary">
+            <button ng-if="!documentation._editMode" class="button button-clear icon ion-edit" ng-click="documentation._editMode = true"></button>
+            <div ng-if="documentation._editMode">
+              <button class="button button-clear button-positive" ng-click="attachPhoto(documentation)"><i class="icon ion-camera"></i></button>
+              <button class="button button-clear button-positive" ng-click="attachVideo(documentation)"><i class="icon ion-videocamera"></i></button>
+              <button class="button button-clear button-positive" ng-click="attachChosenMedia(documentation)"><i class="icon ion-android-folder-open"></i></button>
+              <button class="button button-clear icon ion-trash-a" ng-click="removeDocumentation(documentation)"></button>
+              <button class="button button-balanced" ng-click="saveDocumentation(documentation)">Speichern</button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div ng-if="newNoteSaving" class="center-horizontal">
-        <ion-spinner></ion-spinner>
+      <div ng-if="!newDocumentation" class="center-horizontal">
+        <button class="button button-balanced new-documentation-button" ng-click="addDocumentation()"><i class="icon ion-plus-round"></i> Neue Dokumentation anlegen</button>
       </div>
-      <div ng-if="!newNoteSaving" class="list card new-note">
-        <div class="item item-text-wrap">
-          <p>Neue Dokumentation anlegen:</p>
-          <textarea ng-model="newNote.text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Welche Arbeiten habe ich erledigt? Wie bin ich vorgegangen?"></textarea>
+
+      <div ng-if="newDocumentation">
+        <div ng-if="newDocumentation._saving" class="center-horizontal">
+          <ion-spinner></ion-spinner>
         </div>
-        <media-attachments ng-model="newNote" hide-header="true"></media-attachments>
-        <div class="item tabs tabs-secondary">
-          <button class="button button-clear button-positive" ng-click="attachPhoto(newNote)"><i class="icon ion-camera"></i></button>
-          <button class="button button-clear button-positive" ng-click="attachVideo(newNote)"><i class="icon ion-videocamera"></i></button>
-          <button class="button button-clear button-positive" ng-click="attachChosenMedia(newNote)"><i class="icon ion-android-folder-open"></i></button>
-          <!--
-          <button class="button button-clear button-positive" ng-click="attachAudio(newNote)"><i class="icon ion-mic-a"></i></button>
-          -->
-          <button ng-disabled="!(newNote.text || newNote.attachments)" class="button button-balanced" ng-click="save(newNote)"><i class="icon ion-paper-airplane"></i> Speichern</button>
+        <div ng-if="!newDocumentation._saving" class="list card documentation">
+          <div class="item item-text-wrap">
+            <textarea ng-model="newDocumentation.text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Welche Arbeiten habe ich erledigt? Wie bin ich vorgegangen?" autofocus></textarea>
+          </div>
+          <media-attachments ng-model="newDocumentation" hide-header="true"></media-attachments>
+          <div class="item tabs tabs-secondary">
+            <button class="button button-clear button-positive" ng-click="attachPhoto(newDocumentation)"><i class="icon ion-camera"></i></button>
+            <button class="button button-clear button-positive" ng-click="attachVideo(newDocumentation)"><i class="icon ion-videocamera"></i></button>
+            <button class="button button-clear button-positive" ng-click="attachChosenMedia(newDocumentation)"><i class="icon ion-android-folder-open"></i></button>
+            <!--
+            <button class="button button-clear button-positive" ng-click="attachAudio(newDocumentation)"><i class="icon ion-mic-a"></i></button>
+            -->
+            <button ng-disabled="!(newDocumentation.text || newDocumentation.attachments)" class="button button-balanced" ng-click="saveDocumentation(newDocumentation)">Speichern</button>
+          </div>
         </div>
       </div>
+
       <div ng-if="taskOrStep.reflectionQuestions.length">
         <h1 class="task-section-header padding">Meine Erfahrungen:</h1>
         <div class="list card">
           <form name="form" ng-repeat="reflectionQuestion in taskOrStep.reflectionQuestions" class="item item-text-wrap">
             <div class="royal reflection-question">{{reflectionQuestion.name}}</div>
             <author-info ng-model="reflectionAnswers[reflectionQuestion.id]"></author-info>
-            <textarea ng-model="reflectionAnswers[reflectionQuestion.id].text" ng-change="reflectionAnswers[reflectionQuestion.id]._dirty=true" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier Ihre Antwort ein..."></textarea>
-            <div class="text-center" ng-show="form.$dirty"><button class="button button-balanced" ng-click="saveReflectionAnswer(reflectionAnswers[reflectionQuestion.id], form)"><i class="icon ion-paper-airplane"></i> Speichern</button></div>
+            <textarea ng-model="reflectionAnswers[reflectionQuestion.id].text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier Ihre Antwort ein..."></textarea>
+            <div class="text-center" ng-show="form.$dirty"><button class="button button-balanced" ng-click="saveReflectionAnswer(reflectionAnswers[reflectionQuestion.id], form)">Speichern</button></div>
           </div>
         </form>
       </div>
