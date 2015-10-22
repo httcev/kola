@@ -89,6 +89,7 @@
 		<div class="container-fluid">
 			<p class="navbar-text version">Version <g:meta name="app.version"/></p>
 			<ul class="nav navbar-nav navbar-right">
+	            <sec:ifLoggedIn><li><g:link uri="/assets/kola.apk"><g:message code="kola.download.app" /></g:link></li></sec:ifLoggedIn>
 	            <li><a href="http://www.kola-projekt.de/ueber_kola.html" target="_blank"><g:message code="kola.about" /></a></li>
 	            <li><a href="http://www.kola-projekt.de/ueber_das_projekt.html" target="_blank"><g:message code="kola.projectLink" /></a></li>
 	          </ul>
