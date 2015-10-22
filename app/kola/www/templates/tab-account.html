@@ -11,7 +11,7 @@
 	  </label>
 	</div>
 	<div class="center-horizontal">
-		<button class="button button-balanced icon-left ion-checkmark-round" ng-click="updateProfile()">Speichern</button>
+		<button ng-disabled="profile.name.length==0 || profile.password.length==0" class="button button-balanced icon-left ion-checkmark-round" ng-click="updateProfile()">Speichern</button>
 	</div>
   </ion-content>
 </ion-view>

@@ -110,7 +110,7 @@ angular.module('kola.services', ['uuid'])
       });
     }
     else {
-      deferred.reject("cannot sync, because either offline or currently syncing already.");
+      deferred.reject("sync denied");
     }
     return deferred.promise;
   });
@@ -228,10 +228,6 @@ angular.module('kola.services', ['uuid'])
   function _init() {
     var user = localStorage["user"];
     if (user) {
-      if (firstRun) {
-        $rootScope.$watch("onlineState.isOnline", onOnlineStateChanged);
-        firstRun = false;
-      }
       var password = localStorage["password"];
       if (window.cordova) {
   //      self._assetsDirName = cordova.file.dataDirectory + "assets/";
@@ -261,6 +257,10 @@ angular.module('kola.services', ['uuid'])
       });
       DBSYNC.initSync(TABLES_TO_SYNC, self.db, {foo:"bar"}, serverUrl + "/api/changes", serverUrl + "/api/upload", self._assetsDirName, function() {
         self.initDeferred.resolve();
+        if (firstRun) {
+          $rootScope.$watch("onlineState.isOnline", onOnlineStateChanged);
+          firstRun = false;
+        }
       }, $cordovaFileTransfer, $cordovaFile, $q, user, password);
     }
     else {
@@ -292,7 +292,7 @@ angular.module('kola.services', ['uuid'])
   };
 
   function onOnlineStateChanged() {
-    console.log("--- online state changed");
+    //console.log("--- online state changed", $rootScope.onlineState);
     self.sync();
   }
 

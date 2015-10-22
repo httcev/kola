@@ -3,6 +3,7 @@ angular.module('kola.controllers', [])
 .controller('TasksCtrl', function($scope, $state, $rootScope, dbService) {
     function reloadTasks() {
       dbService.all("task").then(function(docs) {
+        console.log("GOT ALL TASKS", docs);
         var filtered = [];
         angular.forEach(docs, function(doc) {
           if (!doc["isTemplate"] && !doc.deleted) {
@@ -10,6 +11,9 @@ angular.module('kola.controllers', [])
           }
         });
         $scope.tasks = filtered;
+      }, function() {
+        // this error handling is needed on the first start of the app. dbService initialization is rejected in this case.
+        $scope.tasks = [];
       });
     }
 
@@ -183,16 +187,23 @@ angular.module('kola.controllers', [])
 })
 
 .controller('AccountCtrl', function($scope, $state, dbService) {
-  $scope.profile = { name:localStorage["user"], password:localStorage["password"] };
+  $scope.profile = { name:(localStorage["user"] || ""), password:(localStorage["password"] || "") };
 
   $scope.updateProfile = function() {
-    localStorage["user"] = $scope.profile.name;
-    localStorage["password"] = $scope.profile.password;
-    dbService.updateLogin().then(function() {
-      return dbService.sync();
-    }).then(function() {
-      return $state.go("tab.tasks");
-    });
+    if ($scope.profile.name && $scope.profile.password) {
+      localStorage["user"] = $scope.profile.name;
+      localStorage["password"] = $scope.profile.password;
+      dbService.updateLogin().then(function() {
+        return dbService.sync();
+      }).then(function() {
+        return $state.go("tab.tasks");
+      }, function(err) {
+        // in case we're offline, we'll get "sync denied" here. in that case, switch to tasks tab anyway
+        if ("sync denied" == err) {
+          return $state.go("tab.tasks");
+        }
+      });
+    }
   };
 })
 
