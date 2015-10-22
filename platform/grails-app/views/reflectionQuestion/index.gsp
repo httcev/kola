@@ -24,7 +24,7 @@
 			<table class="table table-striped">
 				<thead>
 					<tr>
-						<g:sortableColumn property="name" title="${message(code: 'kola.reflectionQuestion.question')}"/>
+						<g:sortableColumn property="name" title="${message(code: 'kola.reflectionQuestion')}"/>
 						<g:sortableColumn property="autoLink" title="${message(code: 'kola.reflectionQuestion.autoLink.short')}" />
 					</tr>
 				</thead>

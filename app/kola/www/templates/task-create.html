@@ -32,7 +32,7 @@
         <div><media-attachments ng-model="step" edit-mode="true" hide-header="true"></media-attachments></div>
         <button class="button button-clear icon ion-trash-a" ng-click="task.steps.splice($index, 1)"></button>
       </div>
-      <div ng-if="task.reflectionQuestions.length" class="item item-divider item-stable">Reflexionsfragen</div>
+      <div ng-if="task.reflectionQuestions.length" class="item item-divider item-stable">Fragen zu den Erfahrungen</div>
       <div ng-if="task.reflectionQuestions.length" ng-repeat="reflectionQuestion in task.reflectionQuestions" class="item item-button-right">
         {{reflectionQuestion.name}}
         <button class="button button-clear icon ion-trash-a" ng-click="task.reflectionQuestions.splice($index, 1)"></button>

@@ -47,7 +47,7 @@ class ReflectionQuestionController {
             return
         }
 
-        flash.message = message(code: 'default.created.message', args: [message(code: 'kola.reflectionQuestion', default: 'Reflexionsaufforderung'), reflectionQuestionInstance.id])
+        flash.message = message(code: 'default.created.message', args: [message(code: 'kola.reflectionQuestion'), reflectionQuestionInstance.id])
         redirect action:"index", method:"GET"
     }
 
@@ -68,7 +68,7 @@ class ReflectionQuestionController {
             return
         }
 
-        flash.message = message(code: 'default.updated.message', args: [message(code: 'kola.reflectionQuestion', default: 'Reflexionsaufforderung'), reflectionQuestionInstance.id])
+        flash.message = message(code: 'default.updated.message', args: [message(code: 'kola.reflectionQuestion'), reflectionQuestionInstance.id])
         redirect action:"index", method:"GET"
     }
 
@@ -82,12 +82,12 @@ class ReflectionQuestionController {
         reflectionQuestionInstance.deleted = true
         reflectionQuestionInstance.save flush:true
 
-        flash.message = message(code: 'default.deleted.message', args: [message(code: 'kola.reflectionQuestion', default: 'Reflexionsaufforderung'), reflectionQuestionInstance.id])
+        flash.message = message(code: 'default.deleted.message', args: [message(code: 'kola.reflectionQuestion'), reflectionQuestionInstance.id])
         redirect action:"index", method:"GET"
     }
 
     protected void notFound() {
-        flash.message = message(code: 'default.not.found.message', args: [message(code: 'kola.reflectionQuestion', default: 'Reflexionsaufforderung'), params.id])
+        flash.message = message(code: 'default.not.found.message', args: [message(code: 'kola.reflectionQuestion'), params.id])
         redirect action: "index", method: "GET"
     }
 }

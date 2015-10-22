@@ -101,7 +101,7 @@
 		</g:if>
 		<g:if test="${taskInstance?.reflectionQuestions?.size() > 0}">
 		<div class="panel panel-default">
-			<div class="panel-heading"><h3 class="panel-title"><g:message code="kola.reflectionQuestions.personal" /></h3></div>
+			<div class="panel-heading"><h3 class="panel-title"><g:message code="kola.reflectionQuestions" /></h3></div>
 			<ul class="list-group">
 				<g:each var="reflectionQuestion" in="${taskInstance?.reflectionQuestions}">
 					<li class="list-group-item clearfix">
