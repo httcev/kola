@@ -24,8 +24,8 @@
 				<g:if test="${authService.canDelete(taskInstance)}">
 					<g:link class="delete btn btn-danger" action="delete" id="${taskInstance.id}" title="${message(code: 'default.button.delete.label', args:[entityName])}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><i class="fa fa-times"></i></g:link>
 				</g:if>
+				<g:link class="export btn btn-primary" action="export" id="${taskInstance.id}" title="${message(code: 'default.export.label', args:[entityName])}"><i class="fa fa-cloud-download"></i></g:link>
 				<g:if test="${authService.canEdit(taskInstance)}">
-					<g:link class="export btn btn-primary" action="export" id="${taskInstance.id}" title="${message(code: 'default.export.label', args:[entityName])}"><i class="fa fa-cloud-download"></i></g:link>
 					<g:link class="edit btn btn-primary" action="edit" id="${taskInstance.id}" title="${message(code: 'default.edit.label', args:[entityName])}"><i class="fa fa-pencil"></i></g:link>
 				</g:if>
 			</div>
