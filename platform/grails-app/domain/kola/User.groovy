@@ -1,7 +1,6 @@
 package kola
 
 class User implements Serializable {
-
 	private static final long serialVersionUID = 1
 
 	transient springSecurityService
@@ -14,6 +13,7 @@ class User implements Serializable {
 	boolean accountExpired
 	boolean accountLocked
 	boolean passwordExpired
+	boolean termsOfUseAccepted
     Date lastUpdated
 
 	User(String username, String password) {

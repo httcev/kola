@@ -12,6 +12,11 @@
 			<label><g:checkBox name="passwordExpired" value="${userInstance?.passwordExpired}"/> <g:message code="kola.user.passwordExpired" /></label>
 		</div>
 	</div>
+	<div class="col-sm-offset-2 col-sm-10">
+		<div class="checkbox">
+			<label><g:checkBox name="termsOfUseAccepted" value="${userInstance?.termsOfUseAccepted}"/> <g:message code="kola.user.termsOfUseAccepted" /></label>
+		</div>
+	</div>
 </div>
 <%--
 <div class="form-group ${hasErrors(bean: userInstance, field: 'accountExpired', 'error')}">

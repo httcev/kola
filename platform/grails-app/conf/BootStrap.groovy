@@ -15,7 +15,12 @@ class BootStrap {
     		repoDir.mkdirs()
     	}
         if (!Settings.getSettings()) {
-            new Settings().save(true)
+            def settings = new Settings()
+            if (!settings.save(true)) {
+                settings.errors.allErrors.each {
+                    println it
+                }
+            }
         }
 
         if (Role.count() == 0) {
