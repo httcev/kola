@@ -25,6 +25,7 @@
 						<g:sortableColumn property="username" title="${message(code: 'kola.user.loginName')}" />
 						<g:sortableColumn property="profile.displayName" title="${message(code: 'kola.user.displayName')}" />
 						<g:sortableColumn property="profile.company" title="${message(code: 'kola.user.company')}" />
+						<g:sortableColumn property="enabled" title="${message(code: 'kola.user.enabled')}" />
 					</tr>
 				</thead>
 				<tbody>
@@ -33,6 +34,7 @@
 						<td><g:link action="edit" id="${userInstance.id}">${fieldValue(bean: userInstance, field: "username")}</g:link></td>
 						<td>${fieldValue(bean: userInstance.profile, field: "displayName")}</td>
 						<td>${fieldValue(bean: userInstance.profile, field: "company")}</td>
+						<td><i class="fa fa-lg fa-${userInstance.enabled ? 'check text-success' : 'minus text-warning'}"></i></td>
 					</tr>
 				</g:each>
 				</tbody>
