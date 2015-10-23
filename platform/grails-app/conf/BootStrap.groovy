@@ -25,7 +25,6 @@ class BootStrap {
         }
         // cache if terms of use is set
         grailsApplication.config.kola.termsOfUseExisting = Settings.getSettings().termsOfUse?.length() > 0
-        println "--- TERMS OF USE EXISTIN -> " + grailsApplication.config.kola.termsOfUseExisting
 
         if (Role.count() == 0) {
             def adminRole = new Role(authority: 'ROLE_ADMIN').save(flush: true)
