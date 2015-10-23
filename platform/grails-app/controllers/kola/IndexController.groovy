@@ -16,7 +16,7 @@ class IndexController {
     		render(view:"dashboard", model:[assignedTasks:assignedTasks, latestAssets:latestAssets])
     	}
     	else {
-    		render(view:"index")
+    		render(view:"index", model:[welcomeHeader:Settings.settings.welcomeHeader, welcomeBody:Settings.settings.welcomeBody])
     	}
     }
 }
