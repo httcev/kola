@@ -6,12 +6,13 @@ var sass = require('gulp-sass');
 var minifyCss = require('gulp-minify-css');
 var rename = require('gulp-rename');
 var sh = require('shelljs');
+var preprocess = require('gulp-preprocess');
 
 var paths = {
   sass: ['./scss/**/*.scss']
 };
 
-gulp.task('default', ['sass']);
+gulp.task('default', ['sass', 'set-env']);
 
 gulp.task('sass', function(done) {
   gulp.src('./scss/ionic.app.scss')
@@ -36,6 +37,21 @@ gulp.task('install', ['git-check'], function() {
     .on('log', function(data) {
       gutil.log('bower', gutil.colors.cyan(data.id), data.message);
     });
+});
+
+gulp.task('set-env', function() {
+  if (!process.env.ENV) {
+    process.env.ENV = "dev";
+  }
+  gulp.src('./conf/app.js')
+    .pipe(preprocess({context: {  }}))
+    .pipe(gulp.dest('./www/js/'));
+
+  var appPackage = "de.httc.kola" + (process.env.ENV != "prod" ? ("." + process.env.ENV) : "");
+  var appName = "KOLA" + (process.env.ENV != "prod" ? (" [" + process.env.ENV + "]") : "");
+  return gulp.src('./conf/config.xml')
+    .pipe(preprocess({context: { APP_PACKAGE: appPackage, APP_NAME: appName }}))
+    .pipe(gulp.dest('.'));
 });
 
 gulp.task('git-check', function(done) {

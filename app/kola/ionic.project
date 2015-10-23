@@ -2,6 +2,7 @@
   "name": "KOLA",
   "app_id": "",
   "gulpStartupTasks": [
+    "set-env",
     "sass",
     "watch"
   ],

@@ -119,7 +119,15 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
   });
 }])
 
-//.constant("serverUrl", "http://130.83.139.161:8080/platform");
+// @if ENV == 'dev'
+.constant("serverUrl", "http://130.83.139.161:8080/platform");
+// @endif
+// @if ENV == 'prod'
 .constant("serverUrl", "http://plattform.kola-projekt.de");
-//.constant("serverUrl", "http://demo.kola-projekt.de");
-//.constant("serverUrl", "http://staging.kola-projekt.de");
+// @endif
+// @if ENV == 'demo'
+.constant("serverUrl", "http://demo.kola-projekt.de");
+// @endif
+// @if ENV == 'staging'
+.constant("serverUrl", "http://staging.kola-projekt.de");
+// @endif
