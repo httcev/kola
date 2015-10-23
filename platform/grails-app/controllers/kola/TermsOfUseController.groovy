@@ -19,7 +19,6 @@ class TermsOfUseController {
     @Transactional
     @Secured(['IS_AUTHENTICATED_FULLY'])
     def accept() {
-        println "---accepted='${params.accepted}'"
         if (params.accepted == null) {
             flash.message = message(code:"kola.termsOfUse.agree.check")
             redirect action:"index"

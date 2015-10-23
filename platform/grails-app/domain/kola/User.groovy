@@ -13,7 +13,7 @@ class User implements Serializable {
 	boolean accountExpired
 	boolean accountLocked
 	boolean passwordExpired
-	boolean termsOfUseAccepted
+	Boolean termsOfUseAccepted
     Date lastUpdated
 
 	User(String username, String password) {
@@ -67,6 +67,7 @@ class User implements Serializable {
 		username blank: false, unique: true
 		password blank: false
 		email email: true, blank: false
+		termsOfUseAccepted nullable:true
 	}
 
 	static mapping = {
