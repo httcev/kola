@@ -36,7 +36,7 @@ class AuthService {
     }
 
     def getAssignableUserProfiles() {
-        if (SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')) {
+        if (SpringSecurityUtils.ifAnyGranted('ROLE_ADMIN, ROLE_TEACHER')) {
             return Profile.list(sort:"displayName")
         }
         else {
