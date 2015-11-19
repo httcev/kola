@@ -3,6 +3,7 @@ package kola
 import grails.converters.XML
 import org.springframework.security.access.annotation.Secured
 import grails.transaction.Transactional
+import groovy.xml.*
 import java.text.SimpleDateFormat
 import java.text.DateFormat
 
@@ -31,32 +32,56 @@ class BackupController {
         def file = request.getFile("file")
         if (file && !file.empty) {
             def text = new String(file.bytes)
-            def map = paramsCreated(text)
-            println map
-/*            
+            //def map = paramsCreated(text)
+//            println map
+            
             def xml = XML.parse(text)
             xml.entry?.each { domain ->
                 def domainClassName = domain.attributes().key
+                println "----------------------------"
+                println grailsApplication.getDomainClass(domainClassName).properties.findAll {
+                    it.association == true
+                }
                 def domainClass = grailsApplication.getDomainClass(domainClassName)?.clazz
+                //println "--- class -> " + domainClass
                 if (domainClass) {
                     domain.children()?.each { row ->
                         def id = row.@id.toString()
-                        println "---- " + id
+//                        println "--- id -> " + id
                         def o = domainClass.newInstance()
-                        //o.id = id
-                        o.properties = row.children()
-
-                        if (!o.validate()) {
-                            o.errors.allErrors.each { println it }
+                        def map = paramsCreated(XmlUtil.serialize(row))
+/*
+                        row.children().each { child ->
+                            println "--- child " + XmlUtil.serialize(child)
+                            println "--- name=" + child.name
                         }
+                        //o.id = id
+*/                      
+                        if (map.content) {
+                            map.content = map.content?.decodeBase64()
+                        }
+//                        println map
+
+                        o.properties = map
+
+//                        println "----------------------------"
+//                        println o.properties
+/*
+                        if (!o.save()) {
+                            o.errors.allErrors.each { println it }
+                            throw new RuntimeException("backup failed")
+                        }
+                        else {
+                            println "--- SAVED -> " + o
+                        }
+  */
                     }
                 }
                 else {
                     log.error "Couldn't load domain class '${domainClassName}'. Ignoring all objects from backup with this class."
                 }
-                // new Player(p.attributes()).save()
             }
-*/
+
         }
     }
 
@@ -70,7 +95,7 @@ class BackupController {
                 if (id) {
                     map['id'] = id
                 }
-                params[name] = map
+                //params[name] = map
                 populateParamsFromXML(xml, map)
                 /*
                 def target = [:]
@@ -85,7 +110,7 @@ class BackupController {
             }
         }
         catch (Exception e) {
-            LOG.error "Error parsing incoming XML request: ${e.message}", e
+            LOG.error "Error parsing XML: ${e.message}", e
         }
     }
 

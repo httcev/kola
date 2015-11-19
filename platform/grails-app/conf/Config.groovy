@@ -1,3 +1,6 @@
+import org.apache.log4j.rolling.RollingFileAppender
+import org.apache.log4j.rolling.TimeBasedRollingPolicy
+
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
@@ -134,14 +137,46 @@ kola {
 }
 
 // log4j configuration
-log4j.main = {
+log4j = {
+    /*
+    log4j.appender.file=org.apache.log4j.RollingFileAppender
+log4j.appender.file.File=C:\\wsimport\\log.txt
+log4j.appender.file.MaxFileSize=1MB
+log4j.appender.file.MaxBackupIndex=1
+log4j.appender.file.layout=org.apache.log4j.PatternLayout
+log4j.appender.file.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
+*/
+/*
+    appenders {
+        console name: 'stdout', layout: pattern(conversionPattern: '[%d{yyyy-MM-dd HH:mm:ss}] %X{sessionId},%X{user},%m%n')
+    }
+*/
+
+    def rollingFile = new RollingFileAppender(name:'rollingFileAppender', layout: pattern(conversionPattern:'[%d{yyyy-MM-dd HH:mm:ss}] %X{sessionId},%X{user},%X{method},%m%n'))
+    // Rolling policy where log filename is logs/app.log.
+    // Rollover each day, compress and save in logs/backup directory.
+    def rollingPolicy = new TimeBasedRollingPolicy(fileNamePattern: 'logs/backup/app.%d{yyyy-MM-dd}.gz', activeFileName: 'logs/usage.log')
+    rollingPolicy.activateOptions()
+    rollingFile.setRollingPolicy rollingPolicy
+
+    appenders {
+        console name: 'stdout'
+        appender rollingFile
+    }
+
     // Example of changing the log pattern for the default console appender:
     //
     //appenders {
     //    console name:'stdout', layout:pattern(conversionPattern: '%c{2} %m%n')
     //}
 
-    debug 'kola'
+    root {
+        error 'stdout'
+    }
+
+    debug 'grails.app'
+//    debug rollingFileAppender: 'usagetracking'
+    debug rollingFileAppender: 'usagetracking', additivity:false
 
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
            'org.codehaus.groovy.grails.web.pages',          // GSP

@@ -59,6 +59,9 @@ grails.project.dependency.resolution = {
         // fixes a bug in grails
         compile('com.google.guava:guava:18.0')
 
+        // for rolling log files
+        compile('log4j:apache-log4j-extras:1.0')
+
         compile('org.apache.tika:tika-core:1.9')
         compile('org.apache.tika:tika-parsers:1.9') { excludes "xercesImpl", "xmlParserAPIs", "xml-apis", "log4j", "httpcore" }
         compile('org.hashids:hashids:1.0.1')

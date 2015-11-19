@@ -311,7 +311,7 @@ angular.module('kola.services', ['uuid'])
   function createTask() {
     var task = _create("task", { isTemplate:false, reflectionQuestions:[] });
     // auto link standard reflection questions
-    return all("reflectionQuestion").then(function(reflectionQuestions) {
+    return self.all("reflectionQuestion").then(function(reflectionQuestions) {
       angular.forEach(reflectionQuestions, function(reflectionQuestion) {
         if (reflectionQuestion.autoLink) {
           task.reflectionQuestions.push(reflectionQuestion);
