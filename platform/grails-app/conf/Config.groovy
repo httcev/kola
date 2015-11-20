@@ -152,7 +152,7 @@ log4j.appender.file.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
     }
 */
 
-    def rollingFile = new RollingFileAppender(name:'rollingFileAppender', layout: pattern(conversionPattern:'[%d{yyyy-MM-dd HH:mm:ss}] %X{sessionId},%X{user},%X{method},%m%n'))
+    def rollingFile = new RollingFileAppender(name:'rollingFileAppender', layout: pattern(conversionPattern:'[%d{yyyy-MM-dd HH:mm:ss}] %X{userAgent},%X{sessionId},%X{user},%X{method},%m%n'))
     // Rolling policy where log filename is logs/app.log.
     // Rollover each day, compress and save in logs/backup directory.
     def rollingPolicy = new TimeBasedRollingPolicy(fileNamePattern: 'logs/backup/app.%d{yyyy-MM-dd}.gz', activeFileName: 'logs/usage.log')

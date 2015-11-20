@@ -5,10 +5,14 @@ import org.springframework.security.access.annotation.Secured
 import grails.transaction.Transactional
 import java.text.SimpleDateFormat
 import java.text.DateFormat
+import org.apache.commons.logging.Log
+import org.apache.commons.logging.LogFactory
 
 @Secured(['IS_AUTHENTICATED_FULLY'])
 @Transactional
 class ChangesController {
+    private static final Log LOG = LogFactory.getLog('usagetracking')
+
 	static allowedMethods = [index: ["GET", "POST"], upload:"POST"]
 	static DateFormat DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     static DOMAIN_CLASS_MAPPING = ["asset":Asset, "taskStep":TaskStep, "taskDocumentation":TaskDocumentation, "reflectionAnswer":ReflectionAnswer, "task":Task]
@@ -103,6 +107,7 @@ class ChangesController {
     	}
     	try {
 	    	def user = springSecurityService.currentUser
+			LOG.info("changes/uploadAttachment/$id")
 
     		// TODO: check write access
     		Asset asset = Asset.get(id)
@@ -159,10 +164,12 @@ class ChangesController {
 				def model = domainClass.get(doc.id)
 				if (!model) {
 					println "--- creating new " + domainClass + " with id " + doc.id + ", user=" + user
+					LOG.info("changes/create_${table}/${doc.id}")
 					model = domainClass.newInstance()
 					model.id = doc.id
 				}
 				else {
+					LOG.info("changes/update_${table}/${doc.id}")
 					println "--- found existing " + domainClass + " with id " + doc.id
 				}
 				model.properties = doc

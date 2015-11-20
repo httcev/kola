@@ -12,11 +12,12 @@ class UsageTrackingFilters {
             before = {
                 MDC.put('user', springSecurityService.principal?.username)
                 MDC.put('method', request.method)
+                MDC.put('userAgent', request.getHeader("User-Agent")?.replaceAll(",", ";"))
                 String sessionId = RequestContextHolder.getRequestAttributes()?.getSessionId()
                 if(sessionId){
                     MDC.put('sessionId', sessionId)
                 }
-                LOG.info("$params.controller/$params.action/$params.id")
+                LOG.info(params.controller + (params.action ? ("/" + params.action + (params.id ? ("/" + params.id) : "")) : ""))
             }
             after = {
             }
@@ -24,6 +25,7 @@ class UsageTrackingFilters {
                 MDC.remove('sessionId')
                 MDC.remove('user')
                 MDC.remove('method')
+                MDC.remove('userAgent')
             }
         }
     }
