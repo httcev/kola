@@ -552,7 +552,7 @@ angular.module('kola.services', ['uuid'])
       saveToPhotoAlbum: false
     };
     
-    if (localStorage["scaleImages"] === "true") {
+    if ((localStorage["scaleImages"]  || "true") === "true") {
       options.targetWidth = 1024;
       options.targetHeight = 1024;
     }
@@ -588,7 +588,7 @@ angular.module('kola.services', ['uuid'])
       allowEdit: false,
       MediaType : Camera.MediaType.ALLMEDIA
     };
-    if (localStorage["scaleImages"] === "true") {
+    if ((localStorage["scaleImages"]  || "true") === "true") {
       options.targetWidth = 1024;
       options.targetHeight = 1024;
     }
