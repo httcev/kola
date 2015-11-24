@@ -548,12 +548,15 @@ angular.module('kola.services', ['uuid'])
       sourceType: Camera.PictureSourceType.CAMERA,
       allowEdit: false,
       //encodingType: Camera.EncodingType.JPEG,
-//      targetWidth: 100,
-//      targetHeight: 100,
       popoverOptions: CameraPopoverOptions,
       saveToPhotoAlbum: false
     };
     
+    if (localStorage["scaleImages"] === "true") {
+      options.targetWidth = 1024;
+      options.targetHeight = 1024;
+    }
+
     return $cordovaCamera.getPicture(options).then(function(imageUrl) {
       var d = $q.defer();
       window.resolveLocalFileSystemURL(imageUrl, function(fileEntry) {
@@ -585,6 +588,10 @@ angular.module('kola.services', ['uuid'])
       allowEdit: false,
       MediaType : Camera.MediaType.ALLMEDIA
     };
+    if (localStorage["scaleImages"] === "true") {
+      options.targetWidth = 1024;
+      options.targetHeight = 1024;
+    }
     return $cordovaCamera.getPicture(options).then(function(imageUrl) {
       var d = $q.defer();
       if (imageUrl.substring(0,21)=="content://com.android") {

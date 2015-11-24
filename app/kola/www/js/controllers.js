@@ -187,7 +187,7 @@ angular.module('kola.controllers', [])
 })
 
 .controller('AccountCtrl', function($scope, $state, dbService) {
-  $scope.profile = { name:(localStorage["user"] || ""), password:(localStorage["password"] || "") };
+  $scope.profile = { name:(localStorage["user"] || ""), password:(localStorage["password"] || ""), scaleImages:((localStorage["scaleImages"]  || "true") === "true")};
 
   $scope.updateProfile = function() {
     if ($scope.profile.name && $scope.profile.password) {
@@ -204,6 +204,7 @@ angular.module('kola.controllers', [])
         }
       });
     }
+    localStorage["scaleImages"] = $scope.profile.scaleImages.toString();
   };
 })
 

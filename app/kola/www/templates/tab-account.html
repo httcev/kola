@@ -9,6 +9,18 @@
 	    <span class="input-label">Passwort</span>
 	    <input type="password" ng-model="profile.password">
 	  </label>
+	  <div class="item item-divider">
+	  	Weitere Einstellungen
+	  </div>
+	  <li class="item item-toggle item-text-wrap">
+	     Fotos vor dem Hochladen kleiner skalieren (empfohlen)
+	     <label class="toggle toggle-balanced">
+	       <input type="checkbox" ng-model="profile.scaleImages">
+	       <div class="track">
+	         <div class="handle"></div>
+	       </div>
+	     </label>
+	  </li>
 	</div>
 	<div class="center-horizontal">
 		<button ng-disabled="profile.name.length==0 || profile.password.length==0" class="button button-balanced icon-left ion-checkmark-round" ng-click="updateProfile()">Speichern</button>
