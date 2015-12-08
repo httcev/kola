@@ -5,6 +5,9 @@ import org.apache.commons.collections.list.LazyList
 import org.apache.commons.collections.FactoryUtils
 
 class Task {
+    def springSecurityService
+    def pushNotificationService
+
     static searchable = {
         all = [analyzer: 'german']
         only = ['name', 'description', 'deleted']
@@ -46,6 +49,19 @@ class Task {
     List<Asset> attachments                         // defined as list to keep order in which elements got added
     List<TaskStep> steps                            // defined as list to keep order in which elements got added
     List<ReflectionQuestion> reflectionQuestions    // defined as list to keep order in which elements got added
+
+    def beforeInsert() {
+        if (assignee && assignee != springSecurityService.currentUser) {
+            pushNotificationService.sendAssignedNotification(this)
+        }
+    }
+
+    def beforeUpdate() {
+        if (assignee && isDirty("assignee") && assignee != springSecurityService.currentUser) {
+            pushNotificationService.sendAssignedNotification(this)
+        }
+    }
+
 
     static _embedded = ["name", "description", "done", "deleted", "due", "isTemplate", "lastUpdated"]
     static _referenced = ["steps", "resources", "attachments", "reflectionQuestions", "template", "creator", "assignee"]

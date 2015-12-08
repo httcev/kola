@@ -97,6 +97,7 @@ grails.project.dependency.resolution = {
 
         runtime ":elasticsearch:0.0.4.6"
         runtime ":quartz:1.0.2"
+
         compile ":webflow:2.1.0"
         compile ":rendering:1.0.0"
         compile (":spring-security-ui:1.0-RC2") { excludes "jquery-ui", "famfamfam" }

@@ -102,6 +102,7 @@ environments {
         grails.serverURL = "http://130.83.139.161:8080/platform"
         kola {
             repository.directory = "./data/repository"
+            pushNotification.gcmApiKey = "AIzaSyAJQJjAOE53yqqTbgi3Nj3rfeMjREc-fOo"
         }
         elasticSearch.path.data = "./data/index"
     }
@@ -110,6 +111,7 @@ environments {
         grails.serverURL = "http://plattform.kola-projekt.de"
         kola {
             repository.directory = "/srv/kola/prod/repository"
+            pushNotification.gcmApiKey = "AIzaSyCEXmn4Ta8wvX8Nb9lIW8GEBGavBknequ8"
         }
         elasticSearch.path.data = "/srv/kola/prod/index"
     }
@@ -118,14 +120,16 @@ environments {
         grails.serverURL = "http://demo.kola-projekt.de"
         kola {
             repository.directory = "/srv/kola/demo/repository"
+            pushNotification.gcmApiKey = "AIzaSyAr2gXuBbLcDek4-zGcwvJPA-v9EHpuhOo"
         }
         elasticSearch.path.data = "/srv/kola/demo/index"
     }
     staging {
         grails.logging.jul.usebridge = false
-        grails.serverURL = "http://staging.kola-projekt.de"
+        grails.serverURL = "https://staging.kola-projekt.de"
         kola {
             repository.directory = "/srv/kola/staging/repository"
+            pushNotification.gcmApiKey = "AIzaSyAJQJjAOE53yqqTbgi3Nj3rfeMjREc-fOo"
         }
         elasticSearch.path.data = "/srv/kola/staging/index"
     }
@@ -134,6 +138,7 @@ environments {
 kola {
     thumbnailSize = 80
     avatarSize = 40
+    pushNotification.gcmUrl = "https://gcm-http.googleapis.com/gcm/send"
 }
 
 // log4j configuration
@@ -175,7 +180,6 @@ log4j.appender.file.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
     }
 
     debug 'grails.app'
-//    debug rollingFileAppender: 'usagetracking'
     debug rollingFileAppender: 'usagetracking', additivity:false
 
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
@@ -203,6 +207,7 @@ grails.plugin.springsecurity.userLookup.userDomainClassName = 'kola.User'
 grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'kola.UserRole'
 grails.plugin.springsecurity.authority.className = 'kola.Role'
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
+//    '/dbconsole/**':     ['permitAll'],
 	'/':                ['permitAll'],
     '/index':           ['permitAll'],
 	'/index.gsp':       ['permitAll'],

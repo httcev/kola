@@ -48,8 +48,7 @@ var DBSYNC = {
     clientData: null,
     serverData: null,
     
-    username: null, // basic authentication support
-    password: null, // basic authentication support
+    authenticationService: null, // basic authentication support
 
     /*************** PUBLIC FUNCTIONS ********************/
     /**
@@ -60,18 +59,16 @@ var DBSYNC = {
      * @param {Object} theSyncInfo : will be sent to the server (useful to store any ID or device info).
      * @param {Object} theServerUrl
      * @param {Object} callBack(firstInit) : called when init finished.
-     * @param {Object} username : username for basci authentication support
-     * @param {Object} password : password for basci authentication support
+     * @param {Object} authenticationService : credentials provider for basic authentication support
      * @param {Object} timeout : the timeout in milliseconds for the ajax request making the sync
      */
-    initSync: function(theTablesToSync, dbObject, theSyncInfo, theServerUrl, attachmentUploadUrl, assetsDir, callBack, $cordovaFileTransfer, $cordovaFile, $q, username, password, timeout) {
+    initSync: function(theTablesToSync, dbObject, theSyncInfo, theServerUrl, attachmentUploadUrl, assetsDir, callBack, $cordovaFileTransfer, $cordovaFile, $q, authenticationService, timeout) {
         var self = this, i = 0;
         this.db = dbObject;
         this.serverUrl = theServerUrl;
         this.tablesToSync = theTablesToSync;
         this.syncInfo = theSyncInfo;
-        this.username=username;
-        this.password=password;
+        this.authenticationService = authenticationService;
         this.timeout = timeout;
         this.$cordovaFileTransfer = $cordovaFileTransfer;
         this.$cordovaFile = $cordovaFile;
@@ -252,14 +249,15 @@ var DBSYNC = {
     _sendDataToServer: function(dataToSync, callBack, timeoutCallBack) {
         var self = this;
         var xhrBusy = true;
+        var credentials = self.authenticationService.getCredentials();
 
         var XHR = new window.XMLHttpRequest(),
                 data = JSON.stringify(dataToSync);
         XHR.overrideMimeType = 'application/json;charset=UTF-8';
-        
-        if (self.username!=null && self.password!=null && self.username!=undefined && self.password!=undefined ){
+
+        if (credentials.user != null && credentials.password != null && credentials.user != undefined && credentials.password != undefined) {
             XHR.open("POST", self.serverUrl, true);
-            XHR.setRequestHeader("Authorization", "Basic " + self._encodeBase64(self.username + ':' + self.password));    
+            XHR.setRequestHeader("Authorization", "Basic " + self._encodeBase64(credentials.user + ':' + credentials.password));    
         } else {
             XHR.open("POST", self.serverUrl, true);
         }
@@ -444,10 +442,11 @@ var DBSYNC = {
     },
     _uploadAttachments: function(attachments) {
         var self = this;
+        var crendentials = self.authenticationService.getCredentials();
         var promises = [];
         if (ionic.Platform.isWebView()) {
             console.log("--- upload assets", attachments);
-            var options = { headers: { "Authorization": "Basic " + this._encodeBase64(self.username + ':' + self.password) }};
+            var options = { headers: { "Authorization": "Basic " + this._encodeBase64(crendentials.user + ':' + crendentials.password) }};
             console.log("--- options", options);
             angular.forEach(attachments, function(attachment) {
                 var doc = JSON.parse(attachment.doc);
@@ -471,9 +470,10 @@ var DBSYNC = {
     },
     _downloadAttachments: function(attachments) {
         var self = this;
+        var crendentials = self.authenticationService.getCredentials();
         var promises = [];
         if (ionic.Platform.isWebView()) {
-            var options = { headers: { "Authorization": "Basic " + this._encodeBase64(self.username + ':' + self.password) }};
+            var options = { headers: { "Authorization": "Basic " + this._encodeBase64(crendentials.user + ':' + crendentials.password) }};
             angular.forEach(attachments, function(attachment) {
                 var att = attachment.doc;
                 if (att && att.subType == "attachment") {

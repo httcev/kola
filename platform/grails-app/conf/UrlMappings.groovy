@@ -9,6 +9,10 @@ class UrlMappings {
             controller = "changes"
             action = [POST:"uploadAttachment"]
         }
+        "/api/pushToken"{
+            controller = "pushToken"
+            action = [POST:"update"]
+        }
 
         name viewAsset: "/v/$id"{
             controller = "asset"

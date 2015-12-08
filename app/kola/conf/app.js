@@ -1,4 +1,4 @@
-angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked', 'kola.controllers', 'kola.services', 'kola.directives'])
+angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked', 'kola.controllers', 'kola.services', 'kola.directives', 'kola.notification'])
 
 .run(function($ionicPlatform) {
   // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -120,14 +120,18 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
 }])
 
 // @if ENV == 'dev'
+.constant("gcmSenderID", "686594383179")
 .constant("serverUrl", "http://130.83.139.161:8080/platform");
 // @endif
 // @if ENV == 'prod'
+.constant("gcmSenderID", "502614463037")
 .constant("serverUrl", "http://plattform.kola-projekt.de");
 // @endif
 // @if ENV == 'demo'
-.constant("serverUrl", "http://demo.kola-projekt.de");
+.constant("gcmSenderID", "406168835925")
+.constant("serverUrl", "https://demo.kola-projekt.de");
 // @endif
 // @if ENV == 'staging'
-.constant("serverUrl", "http://staging.kola-projekt.de");
+.constant("gcmSenderID", "686594383179")
+.constant("serverUrl", "https://staging.kola-projekt.de");
 // @endif

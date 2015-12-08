@@ -377,12 +377,12 @@ class TaskController {
     }
 
     protected void notFound() {
-        flash.message = message(code: 'default.not.found.message', args: [message(code: taskInstance.isTemplate ? 'kola.taskTemplate.noshy' : 'kola.task', default: 'Task'), params.id])
+        flash.message = message(code: 'default.not.found.message', args: [message(code:'kola.task', default: 'Task'), params.id])
         redirect action: "index", method: "GET"
     }
 
     protected void forbidden() {
-        flash.message = message(code: 'default.forbidden.message', args: [message(code: taskInstance.isTemplate ? 'kola.taskTemplate.noshy' : 'kola.task', default: 'Task'), params.id])
+        flash.message = message(code: 'default.forbidden.message', args: [message(code:'kola.task', default: 'Task'), params.id])
         redirect action: "index", method: "GET"
     }
 

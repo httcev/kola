@@ -49,7 +49,7 @@ angular.module('kola.services', ['uuid'])
   };
 })
 
-.service('dbService', function ($rootScope, $q, $state, $ionicPlatform, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, onlineStateService, serverUrl, rfc4122) {
+.service('dbService', function ($rootScope, $q, $state, $ionicPlatform, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, serverUrl, authenticationService, rfc4122) {
   var self = this;
   var firstRun = true;
   self.initDeferred = $q.defer();
@@ -226,9 +226,8 @@ angular.module('kola.services', ['uuid'])
   });
 
   function _init() {
-    var user = localStorage["user"];
+    var user = authenticationService.getCredentials().user;
     if (user) {
-      var password = localStorage["password"];
       if (window.cordova) {
   //      self._assetsDirName = cordova.file.dataDirectory + "assets/";
         self._cacheDirName = cordova.file.externalCacheDirectory;
@@ -261,7 +260,7 @@ angular.module('kola.services', ['uuid'])
           $rootScope.$watch("onlineState.isOnline", onOnlineStateChanged);
           firstRun = false;
         }
-      }, $cordovaFileTransfer, $cordovaFile, $q, user, password);
+      }, $cordovaFileTransfer, $cordovaFile, $q, authenticationService);
     }
     else {
       self.initDeferred.reject("no_user");
@@ -275,7 +274,7 @@ angular.module('kola.services', ['uuid'])
         return fn.apply(this, args);
       }, function(err) {
         if ("no_user" == err) {
-          openAccountTab("Willommen bei KOLA! Bitte geben Sie Ihren Nutzernamen und Passwort ein.");
+          openAccountTab("Willkommen bei KOLA! Bitte geben Sie Ihren Nutzernamen und Passwort ein.");
         }
         else {
           console.log(err);
@@ -285,11 +284,11 @@ angular.module('kola.services', ['uuid'])
     }
   }
 
-  function updateLogin() {
+  function onCredentialsChanged() {
     self.initDeferred = $q.defer();
     _init();
     return self.initDeferred.promise;
-  };
+  }
 
   function onOnlineStateChanged() {
     //console.log("--- online state changed", $rootScope.onlineState);
@@ -477,6 +476,7 @@ angular.module('kola.services', ['uuid'])
     $state.go("tab.account");
   }
 
+  $rootScope.$on("credentialsChanged", onCredentialsChanged);
   $ionicPlatform.ready(_init);
 
 
@@ -484,7 +484,6 @@ angular.module('kola.services', ['uuid'])
     sync:self.sync,
     all:self.all,
     save:self.save,
-    updateLogin:updateLogin,
     get:get,
     resolveIds:resolveIds,
     createTask:createTask,
@@ -494,26 +493,75 @@ angular.module('kola.services', ['uuid'])
   }
 })
 
-.service('onlineStateService', function ($ionicPlatform, $rootScope, $cordovaNetwork) {
+.service('authenticationService', function ($ionicPlatform, $rootScope, $q, $cordovaNetwork, serverUrl) {
+  var credentials = loadCredentials();
   $rootScope.onlineState = {"isOnline":false, "isWifi":false, "isSyncing":false};
+
   function onOnlineStateChange(event, networkState) {
     $rootScope.onlineState.isOnline = networkState !== "none";
     $rootScope.onlineState.isWifi = networkState === "wifi";
+/*
+    if ($rootScope.onlineState.isOnline) {
+      // try to authenticate
+      authenticate();
+    }
+    */
   }
 
-  $rootScope.$on('$cordovaNetwork:online', onOnlineStateChange);
-  // listen for Offline event
-  $rootScope.$on('$cordovaNetwork:offline', onOnlineStateChange);
+  function loadCredentials() {
+    return {"user":localStorage["user"], "password":localStorage["password"]};
+  }
 
+  function getCredentials() {
+    return credentials;
+  }
+
+  function updateCredentials(user, password) {
+    localStorage["user"] = user;
+    localStorage["password"] = password;
+    credentials = loadCredentials();
+    $rootScope.$broadcast("credentialsChanged", credentials);
+  }
+/*
+  function authenticate() {
+    var d = $q.defer();
+    var user = localStorage["user"];
+    if (user) {
+      var password = localStorage["password"];
+      if ($rootScope.onlineState.isOnline) {
+        // TODO: make test request...
+        $rootScope.$broadcast("authenticated", { "username":user, "password":password, "validated":true });
+        d.resolve();
+      }
+      else {
+        d.resolve();
+        $rootScope.$broadcast("authenticated", { "username":user, "password":password, "validated":false });
+      }
+    }
+    else {
+      d.reject("no_user");
+    }
+    return d.promise;
+  }
+*/
   $ionicPlatform.ready(function() {
     // only use ngCordova on native devices
     if (ionic.Platform.isWebView()) {
+      // listen for network connection events
+      $rootScope.$on('$cordovaNetwork:online', onOnlineStateChange);
+      $rootScope.$on('$cordovaNetwork:offline', onOnlineStateChange);
       onOnlineStateChange(null, $cordovaNetwork.getNetwork());
     }
     else {
+      // on non-native devices, we assume to be online all the time
       onOnlineStateChange(null, "wifi");
     }
   });
+
+  return {
+    updateCredentials:updateCredentials,
+    getCredentials:getCredentials
+  }
 })
 
 .service('modalDialog', function ($ionicModal) {
@@ -553,8 +601,8 @@ angular.module('kola.services', ['uuid'])
     };
     
     if ((localStorage["scaleImages"]  || "true") === "true") {
-      options.targetWidth = 1024;
-      options.targetHeight = 1024;
+      options.targetWidth = 1280;
+      options.targetHeight = 1280;
     }
 
     return $cordovaCamera.getPicture(options).then(function(imageUrl) {
@@ -589,8 +637,8 @@ angular.module('kola.services', ['uuid'])
       MediaType : Camera.MediaType.ALLMEDIA
     };
     if ((localStorage["scaleImages"]  || "true") === "true") {
-      options.targetWidth = 1024;
-      options.targetHeight = 1024;
+      options.targetWidth = 1280;
+      options.targetHeight = 1280;
     }
     return $cordovaCamera.getPicture(options).then(function(imageUrl) {
       var d = $q.defer();
