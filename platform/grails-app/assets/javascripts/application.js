@@ -17,6 +17,9 @@ if (typeof jQuery !== 'undefined') {
 			}).ajaxStop(function() {
 				$(this).fadeOut();
 			});
+			$("#footer-links").on("show.bs.collapse", function () {
+				$("html, body").animate({ scrollTop: $(document).height() }, "slow");
+			});
 		});
 	})(jQuery);
 }

@@ -12,18 +12,25 @@
 *= require_self
 */
 
-html, body { height:100% }
+html { position: relative; min-height: 100%; }
+body { margin-bottom:55px; }
 h1 { font-size:32px; }
 h2 { font-size:28px; }
 #wrapper { min-height:100%; height:auto; margin:0 auto -50px }
 #main-container { padding-bottom:15px }
 #avatar-container { margin-bottom:15px }
-#footer, #push { height:50px; margin-bottom:0; }
 #loginWrapper { max-width:350px; margin:50px auto }
+#google-play-link { padding-top:6px; padding-bottom:0; padding-right:0;}
+#google-play-link img { height:40px; }
 .error input { border-color:red; }
-.version { font-family:monospace; color:#CCC !important; }
+.version { font-family:monospace; color:#CCC !important; font-size:14px }
 header h1, .navbar-default .navbar-brand { color:#a11d21 }
 header #logo, .navbar-header #logo { width:32px; margin-top:-6px;}
+footer.footer { position:absolute; bottom:0; width:100%; height:52px;}
+footer.footer .navbar { margin-bottom:0 }
+footer.footer .navbar-toggle .toggle-icon { display:block; width:24px; font-family:"FontAwesome"}
+footer.footer .navbar-toggle .toggle-icon:before { content:"\f077";}
+footer.footer .navbar-toggle.collapsed .toggle-icon:before { content:"\f078";}
 
 th { white-space:nowrap; }
 th.sortable.sorted { position:relative; }

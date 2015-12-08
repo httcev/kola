@@ -111,6 +111,7 @@ environments {
         grails.serverURL = "http://plattform.kola-projekt.de"
         kola {
             repository.directory = "/srv/kola/prod/repository"
+            appDownloadUrl = "https://play.google.com/apps/testing/de.httc.kola"
             pushNotification.gcmApiKey = "AIzaSyCEXmn4Ta8wvX8Nb9lIW8GEBGavBknequ8"
         }
         elasticSearch.path.data = "/srv/kola/prod/index"
@@ -120,6 +121,7 @@ environments {
         grails.serverURL = "http://demo.kola-projekt.de"
         kola {
             repository.directory = "/srv/kola/demo/repository"
+            appDownloadUrl = "https://play.google.com/apps/testing/de.httc.kola.demo"
             pushNotification.gcmApiKey = "AIzaSyAr2gXuBbLcDek4-zGcwvJPA-v9EHpuhOo"
         }
         elasticSearch.path.data = "/srv/kola/demo/index"
@@ -129,6 +131,7 @@ environments {
         grails.serverURL = "https://staging.kola-projekt.de"
         kola {
             repository.directory = "/srv/kola/staging/repository"
+            appDownloadUrl = "https://play.google.com/apps/testing/de.httc.kola.staging"
             pushNotification.gcmApiKey = "AIzaSyAJQJjAOE53yqqTbgi3Nj3rfeMjREc-fOo"
         }
         elasticSearch.path.data = "/srv/kola/staging/index"
