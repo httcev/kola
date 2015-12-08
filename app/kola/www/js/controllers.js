@@ -186,16 +186,23 @@ angular.module('kola.controllers', [])
   $scope.chat = Chats.get($stateParams.chatId);
 })
 
-.controller('AccountCtrl', function($scope, $state, dbService) {
-  $scope.profile = { name:(localStorage["user"] || ""), password:(localStorage["password"] || ""), scaleImages:((localStorage["scaleImages"]  || "true") === "true")};
+.controller('AccountCtrl', function($scope, $state, $cordovaAppVersion, dbService, authenticationService) {
+  $scope.profile = authenticationService.getCredentials();
+  $scope.scaleImages = ((localStorage["scaleImages"]  || "true") === "true");
+  if (ionic.Platform.isWebView()) {
+    document.addEventListener("deviceready", function () {
+      $cordovaAppVersion.getVersionNumber().then(function (version) {
+          $scope.version = version;
+        });
+    }, false);
+  }
 
   $scope.updateProfile = function() {
-    if ($scope.profile.name && $scope.profile.password) {
-      localStorage["user"] = $scope.profile.name;
-      localStorage["password"] = $scope.profile.password;
-      dbService.updateLogin().then(function() {
-        return dbService.sync();
-      }).then(function() {
+    localStorage["scaleImages"] = $scope.scaleImages.toString();
+    if ($scope.profile.user && $scope.profile.password) {
+      authenticationService.updateCredentials($scope.profile.user, $scope.profile.password);
+
+      dbService.sync().then(function() {
         return $state.go("tab.tasks");
       }, function(err) {
         // in case we're offline, we'll get "sync denied" here. in that case, switch to tasks tab anyway
@@ -204,7 +211,6 @@ angular.module('kola.controllers', [])
         }
       });
     }
-    localStorage["scaleImages"] = $scope.profile.scaleImages.toString();
   };
 })
 
