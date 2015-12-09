@@ -119,6 +119,8 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
   });
 }])
 
+.constant("appName", "/* @echo APP_NAME */")
+.constant("appVersion", "/* @echo APP_VERSION */")
 // @if ENV == 'dev'
 .constant("gcmSenderID", "686594383179")
 .constant("serverUrl", "http://130.83.139.161:8080/platform");

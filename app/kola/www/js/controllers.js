@@ -186,16 +186,11 @@ angular.module('kola.controllers', [])
   $scope.chat = Chats.get($stateParams.chatId);
 })
 
-.controller('AccountCtrl', function($scope, $state, $cordovaAppVersion, dbService, authenticationService) {
+.controller('AccountCtrl', function($scope, $state, appName, appVersion, dbService, authenticationService) {
   $scope.profile = authenticationService.getCredentials();
   $scope.scaleImages = ((localStorage["scaleImages"]  || "true") === "true");
-  if (ionic.Platform.isWebView()) {
-    document.addEventListener("deviceready", function () {
-      $cordovaAppVersion.getVersionNumber().then(function (version) {
-          $scope.version = version;
-        });
-    }, false);
-  }
+  $scope.appName = appName;
+  $scope.appVersion = appVersion;
 
   $scope.updateProfile = function() {
     localStorage["scaleImages"] = $scope.scaleImages.toString();
