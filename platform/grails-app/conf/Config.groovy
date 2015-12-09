@@ -102,6 +102,7 @@ environments {
         grails.serverURL = "http://130.83.139.161:8080/platform"
         kola {
             repository.directory = "./data/repository"
+            appDownloadUrl = "http://www.example.com"
             pushNotification.gcmApiKey = "AIzaSyAJQJjAOE53yqqTbgi3Nj3rfeMjREc-fOo"
         }
         elasticSearch.path.data = "./data/index"

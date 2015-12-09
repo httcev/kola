@@ -5,7 +5,6 @@ import org.apache.commons.collections.list.LazyList
 import org.apache.commons.collections.FactoryUtils
 
 class Task {
-    def springSecurityService
     def pushNotificationService
 
     static searchable = {
@@ -51,13 +50,13 @@ class Task {
     List<ReflectionQuestion> reflectionQuestions    // defined as list to keep order in which elements got added
 
     def beforeInsert() {
-        if (assignee && assignee != springSecurityService.currentUser) {
+        if (assignee) {
             pushNotificationService.sendAssignedNotification(this)
         }
     }
 
     def beforeUpdate() {
-        if (assignee && isDirty("assignee") && assignee != springSecurityService.currentUser) {
+        if (assignee && isDirty("assignee")) {
             pushNotificationService.sendAssignedNotification(this)
         }
     }

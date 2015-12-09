@@ -16,6 +16,9 @@ class PushNotificationService {
 					return
 				}
 				log.info "Sending push notification to user ${target.username}: " + message
+				pushToken.properties?.each {
+					log.info it
+				}
 				URL url = new URL(grailsApplication.config.kola.pushNotification.gcmUrl);
 			    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			    conn.setRequestMethod("POST")
