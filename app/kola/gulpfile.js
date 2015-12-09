@@ -46,7 +46,7 @@ gulp.task('set-env', function() {
   }
   var appPackage = "de.httc.kola" + (process.env.ENV != "prod" ? ("." + process.env.ENV) : "");
   var appName = "KOLA" + (process.env.ENV != "prod" ? (" [" + process.env.ENV + "]") : "");
-  var appVersion = "1.0.2";
+  var appVersion = "1.0.4";
 
   gulp.src('./conf/app.js')
     .pipe(preprocess({context: { APP_NAME: appName, APP_VERSION: appVersion }}))
