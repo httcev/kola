@@ -34,6 +34,14 @@ angular.module('kola.controllers', [])
     $scope.sortByDue = function(task) {
         return task.due ? task.due : (task.lastUpdated ? 'zzzzzzz' : 0); 
     };
+
+    $scope.doRefresh = function() {
+      dbService.sync().finally(function() {
+         // Stop the ion-refresher from spinning
+         $scope.$broadcast('scroll.refreshComplete');
+      });
+    };
+
     $rootScope.$on("syncFinished", function () {
       reloadTasks();
     });
