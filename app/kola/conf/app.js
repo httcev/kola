@@ -54,7 +54,8 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
         templateUrl: 'templates/task-create.html',
         controller: 'TaskCreateCtrl'
       }
-    }
+    },
+    cache: false
   })
   .state('tab.task-detail', {
     url: '/tasks/:taskId',
