@@ -156,7 +156,7 @@ class ChangesController {
 
     def _update(clientData, user) {
     	def modified = false
-    	["asset", "taskStep", "taskDocumentation", "reflectionAnswer", "task"].each { table ->
+    	["asset", "taskStep", "reflectionAnswer", "task", "taskDocumentation"].each { table ->
     		def domainClass = DOMAIN_CLASS_MAPPING[table]
     		clientData.data?."$table"?.each {
 				def doc = JSON.parse(it.doc)
