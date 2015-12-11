@@ -1,5 +1,5 @@
 angular.module('kola.notification', ['kola.services'])
-.run(function($rootScope, $http, gcmSenderID, serverUrl, authenticationService) {
+.run(function($rootScope, $http, $ionicLoading, gcmSenderID, serverUrl, authenticationService, dbService) {
 	var registrationId;
 	var credentials = authenticationService.getCredentials();
 
@@ -13,6 +13,7 @@ angular.module('kola.notification', ['kola.services'])
 			var push = PushNotification.init({
 			    android: {
 			        senderID: gcmSenderID,
+			        //forceShow: true,
 			        icon: "notification",
 		        	iconColor: "#a11d21"
 			    },
@@ -37,6 +38,8 @@ angular.module('kola.notification', ['kola.services'])
 			    // data.image,
 			    // data.additionalData
 			    console.log("on notification: " + data.message);
+			    $ionicLoading.show({template:"<h3>" + data.title + "</h3>" + data.message, duration:4000});
+			    dbService.sync();
 			});
 
 			push.on('error', function(e) {
