@@ -1,5 +1,5 @@
 angular.module('kola.notification', ['kola.services'])
-.run(function($rootScope, $http, $ionicLoading, gcmSenderID, serverUrl, authenticationService, dbService) {
+.run(function($rootScope, $http, $ionicLoading, $sanitize, gcmSenderID, serverUrl, authenticationService, dbService) {
 	var registrationId;
 	var credentials = authenticationService.getCredentials();
 
@@ -38,7 +38,10 @@ angular.module('kola.notification', ['kola.services'])
 			    // data.image,
 			    // data.additionalData
 			    console.log("on notification: " + data.message);
-			    $ionicLoading.show({template:"<h3>" + data.title + "</h3>" + data.message, duration:4000});
+			    // only display toast if app is currently in foreground
+			    if (data.additionalData && data.additionalData.foreground) {
+				    $ionicLoading.show({template:"<h3>" + $sanitize(data.title) + "</h3>" + $sanitize(data.message), duration:4000});
+				}
 			    dbService.sync();
 			});
 
