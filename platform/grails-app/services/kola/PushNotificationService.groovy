@@ -52,6 +52,7 @@ class PushNotificationService {
         	"title":messageSource.getMessage("kola.push.assigned.title", null, Locale.GERMAN),
         	"message":task.name,
         	"style":"inbox",
+        	"collapse_key":"assigned_tasks",
         	"summaryText":messageSource.getMessage("kola.push.assigned.summaryText", null, Locale.GERMAN)
     	]
         sendPushNotification(task.assignee, message)

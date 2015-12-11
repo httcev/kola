@@ -3,8 +3,8 @@ angular.module('kola.notification', ['kola.services'])
 	var registrationId;
 	var credentials = authenticationService.getCredentials();
 
-	function onCredentialsChanged(creds) {
-		credentials = creds;
+	function onCredentialsChanged(event, args) {
+		credentials = args;
 		transmitRegistrationId();
 	}
 
