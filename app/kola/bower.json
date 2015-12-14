@@ -1,14 +1,14 @@
 {
-  "name": "HelloIonic",
+  "name": "KOLA",
   "private": "true",
   "devDependencies": {
-    "ionic": "driftyco/ionic-bower#1.0.0"
+    "ionic": "driftyco/ionic-bower#1.2.0"
   },
   "dependencies": {
-    "angular-elastic": "~2.5.0",
+    "angular-elastic": "~2.5.1",
     "angular-i18n": "~1.4.1",
-    "angular-marked": "~0.0.21",
+    "angular-marked": "~1.0.1",
     "angular-uuid-service": "~0.1.0",
-    "ngCordova": "~0.1.20-alpha"
+    "ngCordova": "~0.1.23-alpha"
   }
 }
