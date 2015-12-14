@@ -241,7 +241,7 @@ angular.module('kola.controllers', [])
   }
 })
 
-.controller('TaskCreateCtrl', function($scope, $state, $stateParams, $ionicLoading, $rootScope, dbService, rfc4122) {
+.controller('TaskCreateCtrl', function($scope, $state, $stateParams, $ionicLoading, $rootScope, $ionicHistory, dbService, rfc4122) {
   if ($stateParams.templateId) {
     dbService.get($stateParams.templateId, "task").then(function(template) {
       var task = angular.copy(template);
@@ -304,6 +304,8 @@ angular.module('kola.controllers', [])
         // TODO: this is a hack to reload tasks
         $rootScope.$broadcast("syncFinished");
         $ionicLoading.show({template: "Neuer Arbeitsauftrag gespeichert.", duration:2000});
+        // prevent going back to editor
+        $ionicHistory.nextViewOptions({ disableBack:true });
         $state.go("tab.tasks");
       }, function(err) {
         console.log(err);
