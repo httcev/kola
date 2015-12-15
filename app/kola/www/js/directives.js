@@ -1,32 +1,32 @@
 angular.module('kola.directives', [])
 
 .directive('learningResources', function() {
-  return {
-  	restrict: 'E',
-    //replace: true,
-	require: '^ngModel',
-  	scope: {
-		ngModel: '=',
-		hideHeader: '@',
-		editMode: '@'
-	},
-    templateUrl: 'templates/directive-learning-resources.html',
-    link: function($scope) {
-    	$scope.openUrlNative = function(url) {
-		    if (ionic.Platform.isWebView()) {
-		      navigator.startApp.start([["action", "VIEW"], [url]], function(message) {
-		        console.log(message);
-		      }, 
-		      function(error) {
-		          console.log(error);
-		      });
-		    }
-		    else {
-		      window.open(url);
-		    }
-    	}
-    }
-  };
+	return {
+		restrict: 'E',
+		//replace: true,
+		require: '^ngModel',
+		scope: {
+			ngModel: '=',
+			hideHeader: '@',
+			editMode: '@'
+		},
+		templateUrl: 'templates/directive-learning-resources.html',
+		link: function($scope) {
+			$scope.openUrlNative = function(url) {
+				if (ionic.Platform.isWebView()) {
+					navigator.startApp.start([["action", "VIEW"], [url]], function(message) {
+					console.log(message);
+				}, 
+				function(error) {
+					console.log(error);
+				});
+				}
+				else {
+					window.open(url);
+				}
+			}
+		}
+	};
 })
 
 .directive('mediaAttachments', function($q, $ionicModal, $ionicLoading, $timeout) {
@@ -123,68 +123,72 @@ angular.module('kola.directives', [])
   };
 })
 
-.directive('syncControl', function($state, dbService) {
-  return {
-  	restrict: 'E',
-    //replace: true,
-    /*
-	require: '^ngModel',
-  	scope: {
-		ngModel: '='
-	},
-	*/
-    templateUrl: 'templates/directive-sync-control.html',
-    link: function($scope) {
-    	$scope.sync = function() {
-		    dbService.sync();
-    	}
-    }
-  };
+.directive('syncControl', function($state, $ionicLoading, dbService) {
+	return {
+		restrict: 'E',
+		//replace: true,
+		/*
+		require: '^ngModel',
+		scope: {
+			ngModel: '='
+		},
+		*/
+		templateUrl: 'templates/directive-sync-control.html',
+		link: function($scope) {
+			$scope.sync = function() {
+				dbService.sync();
+			};
+
+			$scope.showOfflineInfo = function() {
+				$ionicLoading.show({template:"<h3>Kein Netzzugang</h3><p>Das Gerät hat momentan keinen Netzzugang. Alle Änderungen werden zunächst nur lokal auf dem Gerät gespeichert und synchronisiert, sobald eine Internetverbindung besteht.</p>", duration:6000});
+			};
+		}
+	};
 })
 
 .directive('authorInfo', function($ionicModal, $ionicLoading) {
-  return {
-  	restrict: 'E',
-    //replace: true,
-	require: '^ngModel',
-  	scope: {
-		ngModel: '='
-	},
-    templateUrl: 'templates/directive-author-info.html',
-    link: function($scope) {
-		$scope.showAuthorDetailsModal = function(author) {
-			$scope.author = author;
-			$ionicModal.fromTemplateUrl("templates/author-info-popover.html", {
-				scope: $scope,
-				animation: 'slide-in-up'
-			}).then(function(modal) {
-				$scope.modal = modal;
-				$scope.modal.show();
-			});
-		};
+	return {
+		restrict: 'E',
+		//replace: true,
+		require: '^ngModel',
+		scope: {
+			ngModel: '='
+		},
+		templateUrl: 'templates/directive-author-info.html',
+		link: function($scope) {
+			$scope.showAuthorDetailsModal = function(author) {
+				$scope.author = author;
+				$ionicModal.fromTemplateUrl("templates/author-info-popover.html", {
+					scope: $scope,
+					animation: 'slide-in-up'
+				}).then(function(modal) {
+					$scope.modal = modal;
+					$scope.modal.show();
+				});
+			};
 
-		// Close the modal
-		$scope.closeAuthorDetailsModal = function() {
-			$scope.modal.hide();
-			$scope.modal.remove()
-		};
+			// Close the modal
+			$scope.closeAuthorDetailsModal = function() {
+				$scope.modal.hide();
+				$scope.modal.remove()
+			};
 
-    	$scope.openUrlNative = function(url) {
-		    if (ionic.Platform.isWebView()) {
-		    	console.log("opening " + url);
-		      navigator.startApp.start([["action", "VIEW"], [url]], function(message) {
-		        console.log(message);
-		      }, 
-		      function(error) {
-		          console.log(error);
-		          $ionicLoading.show({template:error, duration:4000});
-		      });
-		    }
-		    else {
-		      window.open(url);
-		    }
-    	};
-    }
-  };
+			$scope.openUrlNative = function(url) {
+				if (ionic.Platform.isWebView()) {
+					console.log("opening " + url);
+					navigator.startApp.start([["action", "VIEW"], [url]], function(message) {
+						console.log(message);
+					}, 
+					function(error) {
+						console.log(error);
+						$ionicLoading.show({template:error, duration:4000});
+					});
+				}
+				else {
+					window.open(url);
+				}
+			};
+		}
+	};
 });
 
