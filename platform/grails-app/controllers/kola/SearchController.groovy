@@ -4,7 +4,7 @@ import org.apache.lucene.queryparser.classic.QueryParser
 import static org.elasticsearch.index.query.QueryBuilders.*;
 import static org.elasticsearch.index.query.FilterBuilders.*;
 
-@Secured(['IS_AUTHENTICATED_FULLY'])
+@Secured(['IS_AUTHENTICATED_REMEMBERED'])
 class SearchController {
 	def elasticSearchService
 

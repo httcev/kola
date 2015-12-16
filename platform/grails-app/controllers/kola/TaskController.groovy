@@ -6,7 +6,7 @@ import grails.transaction.Transactional
 import org.springframework.security.access.annotation.Secured
 
 @Transactional(readOnly = true)
-@Secured(['IS_AUTHENTICATED_FULLY'])
+@Secured(['IS_AUTHENTICATED_REMEMBERED'])
 class TaskController {
     def springSecurityService
     def authService

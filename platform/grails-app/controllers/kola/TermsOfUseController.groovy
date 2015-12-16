@@ -5,7 +5,7 @@ import grails.transaction.Transactional
 import org.springframework.security.access.annotation.Secured
 
 @Transactional(readOnly = true)
-@Secured(['IS_AUTHENTICATED_FULLY'])
+@Secured(['IS_AUTHENTICATED_REMEMBERED'])
 class TermsOfUseController {
     static allowedMethods = [index:"GET", accept:"POST"]
     def springSecurityService
@@ -17,7 +17,7 @@ class TermsOfUseController {
     }
 
     @Transactional
-    @Secured(['IS_AUTHENTICATED_FULLY'])
+    @Secured(['IS_AUTHENTICATED_REMEMBERED'])
     def accept() {
         if (params.accepted == null) {
             flash.message = message(code:"kola.termsOfUse.agree.check")

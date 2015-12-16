@@ -4,7 +4,7 @@ import grails.converters.JSON
 import org.springframework.security.access.annotation.Secured
 import grails.transaction.Transactional
 
-@Secured(['IS_AUTHENTICATED_FULLY'])
+@Secured(['IS_AUTHENTICATED_REMEMBERED'])
 @Transactional
 class PushTokenController {
 	static allowedMethods = [update:"POST"]

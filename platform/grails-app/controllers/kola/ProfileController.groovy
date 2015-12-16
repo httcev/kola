@@ -5,7 +5,7 @@ import org.springframework.security.access.annotation.Secured
 import static org.springframework.http.HttpStatus.*
 
 @Transactional(readOnly = true)
-@Secured(['IS_AUTHENTICATED_FULLY'])
+@Secured(['IS_AUTHENTICATED_REMEMBERED'])
 class ProfileController {
 	def springSecurityService
     def imageService

@@ -11,7 +11,7 @@ import grails.transaction.Transactional
 class ReflectionQuestionController {
     //static allowedMethods = [save: "POST", update: "PUT", delete: "DELETE"]
 
-    @Secured(['IS_AUTHENTICATED_FULLY'])
+    @Secured(['IS_AUTHENTICATED_REMEMBERED'])
     def index(Integer max) {
         params.offset = params.offset ? (params.offset as int) : 0
         params.max = Math.min(max ?: 10, 100)
@@ -21,7 +21,7 @@ class ReflectionQuestionController {
         respond query.list(params), model:[reflectionQuestionInstanceCount: query.count()]
     }
 
-    @Secured(['IS_AUTHENTICATED_FULLY'])
+    @Secured(['IS_AUTHENTICATED_REMEMBERED'])
     def show(ReflectionQuestion reflectionQuestionInstance) {
         if (reflectionQuestionInstance == null) {
             notFound()

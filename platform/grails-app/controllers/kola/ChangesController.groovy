@@ -8,7 +8,7 @@ import java.text.DateFormat
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 
-@Secured(['IS_AUTHENTICATED_FULLY'])
+@Secured(['IS_AUTHENTICATED_REMEMBERED'])
 @Transactional
 class ChangesController {
     private static final Log LOG = LogFactory.getLog('usagetracking')
