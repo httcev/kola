@@ -39,7 +39,7 @@
       <div ng-if="taskOrStep.reflectionQuestions.length">
         <h1 class="task-section-header padding">Meine Erfahrungen:</h1>
         <div class="list card">
-          <form name="form" ng-repeat="reflectionQuestion in taskOrStep.reflectionQuestions" class="item item-text-wrap">
+          <form name="form" ng-repeat="reflectionQuestion in taskOrStep.reflectionQuestions track by reflectionQuestion.id" class="item item-text-wrap">
             <div class="energized reflection-question">{{reflectionQuestion.name}} id={{reflectionQuestion.id}}</div>
             <author-info ng-model="reflectionAnswers[reflectionQuestion.id]"></author-info>
             <textarea ng-model="reflectionAnswers[reflectionQuestion.id].text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier Ihre Antwort ein..."></textarea>
