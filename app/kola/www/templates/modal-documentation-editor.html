@@ -1,0 +1,30 @@
+<div class="modal documentation-editor">
+	<ion-header-bar class="bar-stable">
+		<div class="buttons">
+			<button class="button button-clear" ng-click="checkCloseEditDocumentationModal()"><i class="icon ion-close"></i></button>
+		</div>
+  		<h1 class="title"></h1>
+		<div class="buttons">
+			<button ng-if="!editedDocumentation._isNew" class="button button-assertive icon ion-trash-a margin-horizontal" ng-click="removeDocumentation()"></button>
+			<button class="button button-balanced icon-left" ng-disabled="!(editedDocumentation.text || editedDocumentation.attachments)" ng-click="saveDocumentation()"><i class="icon ion-checkmark"></i> Speichern</button>
+		</div>
+	</ion-header-bar>
+	<ion-content>
+		<div class="card card-positive">
+			<textarea ng-model="editedDocumentation.text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Welche Arbeiten habe ich erledigt? Wie bin ich vorgegangen?" ng-change="setEditedDocumentationDirty()"></textarea>
+		</div>
+		<media-attachments ng-model="editedDocumentation" edit-mode="true"></media-attachments>
+	</ion-content>
+	<ion-footer-bar class="bar-stable">
+		<div class="title">
+			Hinzufügen:
+        </div>
+        <div class="buttons">
+            <button class="button button-clear button-positive" ng-click="attachPhoto()"><i class="icon ion-camera"></i></button>
+            <span class="padding-horizontal"></span>
+            <button class="button button-clear button-positive" ng-click="attachVideo()"><i class="icon ion-videocamera"></i></button>
+            <span class="padding-horizontal"></span>
+            <button class="button button-clear button-positive" ng-click="attachChosenMedia()"><i class="icon ion-android-folder-open"></i></button>
+        </div>
+	</ion-footer-bar>
+</div>

@@ -4,17 +4,15 @@
     <div ng-if="!attachmentUrls" class="center-horizontal">
 		<ion-spinner></ion-spinner>
     </div>
-	<a ng-if="attachmentUrls && editMode != 'true'" class="item item-list-detail">
-		<ion-scroll direction="x">
-			<span ng-repeat="attachment in ngModel.attachments">
-				<img ng-if="attachment.mimeType.indexOf('image/') == 0" class="image-list-thumb" ng-src="{{attachmentUrls[$index]}}" ng-click="showImage($index, attachmentUrls)"/>
-				<span ng-if="attachment.mimeType.indexOf('image/') != 0" class="image-list-thumb external-attachment" ng-click="openUrlNative(attachmentUrls[$index], attachment.mimeType)"><span class="ion-android-open"></span> {{attachment.name}}</span>
+    <div ng-if="attachmentUrls" class="media-container">
+		<div ng-repeat="attachment in ngModel.attachments" class="media-item">
+			<img ng-if="attachment.mimeType.indexOf('image/') == 0" ng-src="{{attachmentUrls[$index]}}" ng-click="showImage($index, attachmentUrls)"/>
+			<span ng-if="attachment.mimeType.indexOf('image/') != 0" class="external-attachment" ng-click="openUrlNative(attachmentUrls[$index], attachment.mimeType)">
+				<i class="symbol icon {{attachment.mimeType.indexOf('video/') == 0 ? 'ion-android-film' : 'ion-android-open'}}"></i> {{attachment.name}}
 			</span>
-		</ion-scroll>
-	</a>
-	<div ng-if="attachmentUrls && editMode == 'true'" ng-repeat="attachment in ngModel.attachments" class="item item-button-right">
-		<img ng-if="attachment.mimeType.indexOf('image/') == 0" class="image-list-thumb" ng-src="{{attachmentUrls[$index]}}" ng-click="showImage($index, attachmentUrls)"/>
-		<span ng-if="attachment.mimeType.indexOf('image/') != 0" class="image-list-thumb external-attachment" ng-click="openUrlNative(attachmentUrls[$index], attachment.mimeType)"><span class="ion-android-open"></span> {{attachment.name}}</span>
-		<button class="button button-clear icon ion-trash-a" ng-click="ngModel.attachments.splice($index, 1)"></button>
+			<div class="button-overlay" ng-if="editMode == 'true'">
+				<button class="button button-clear button-assertive button-small icon ion-close delete-button" ng-click="removeAttachment($index)"></button>
+			</div>
+		</div>
 	</div>
 </div>

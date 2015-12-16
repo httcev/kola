@@ -24,10 +24,12 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 .task-section-header { font-size:1.5em; color:$positive; padding:15px 0 10px 0}
 
 /* Empty. Add your own CSS if you like */
+/*
 .image-list-thumb {
     height: 100px;
     margin:0 5px;
 }
+*/
 media-attachments .center-horizontal { padding:24.5px }
 sync-control span { padding-top:10px; }
 .spinner svg {
@@ -39,6 +41,13 @@ sync-control span { padding-top:10px; }
     height: 100%;
     top: 0 !important;
     left: 0 !important;
+}
+.modal {
+  top: 0 ;
+  bottom: 0 ; 
+  left: 0 ;
+  right: 0 ;
+  width: 100% ;
 }
 .transparent {
     /*background: transparent !important;*/
@@ -63,16 +72,19 @@ sync-control span { padding-top:10px; }
 }
 
 .fullwidth { width:100% }
+.margin-horizontal { margin-left:10px; margin-right:10px;}
 
 .spinner { width:100%; text-align:center}
 .center-horizontal { text-align:center }
-.author-info { font-size:75%; font-weight:bold; color:#999 }
+.author-info { display:inline-block; font-size:75%; font-weight:bold; color:#999 }
 .author-info img { border-radius:50%; vertical-align:middle }
 .author-info a { text-decoration:none; color:inherit; }
 .reflection-question { padding-bottom:10px }
 .text { white-space:pre-line }
 .text ul { list-style: disc; padding-left:20px; white-space:initial }
 .text ol { list-style-type:decimal; padding-left:20px; white-space:initial }
+.small { font-size:85% }
+.version { font-family:monospace; color:#888; font-size:12px; font-weight: normal;}
 .animate:focus {
     -webkit-transition: height 50ms ease-in-out;
     -moz-transition: height 50ms ease-in-out;
@@ -80,7 +92,14 @@ sync-control span { padding-top:10px; }
     transition: height 50ms ease-in-out;
 }
 .external-attachment { display:inline-block; vertical-align:top; width:100px; white-space:normal }
-.documentation .tabs-secondary { padding:4px 0; height:auto }
 .new-documentation-button { margin-bottom:30px; }
-.small { font-size:85% }
-.version { font-family:monospace; color:#888; font-size:12px; font-weight: normal;}
+.edit-documentation-button { float:right; }
+.documentation-editor .card { margin-left:5px; margin-right:5px; }
+.documentation-editor textarea { min-height:100px; font-size:16px;}
+/*.media-edit { display:inline-block; position:relative; min-width:100px; min-height:100px; text-align:right; vertical-align:top; }*/
+.media-container { display:flex; flex-wrap:wrap; justify-content:space-between }
+.media-container .media-item { height:100px; position:relative; margin:5px; cursor:pointer; font-size:11px; line-height:11px}
+.media-container .media-item img { height:100%; }
+.media-container .media-item .external-attachment { text-align:center; }
+.media-container .media-item .external-attachment .symbol { font-size:72px; }
+.media-container .button-overlay { position:absolute; z-index:1; top:0; left:0; right:0; background-color:#888; opacity:0.7; text-align:right; cursor:default;}

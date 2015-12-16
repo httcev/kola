@@ -29,7 +29,7 @@ angular.module('kola.directives', [])
 	};
 })
 
-.directive('mediaAttachments', function($q, $ionicModal, $ionicLoading, $timeout) {
+.directive('mediaAttachments', function($q, $ionicModal, $ionicLoading, $ionicPopup, $timeout) {
   return {
   	restrict: 'E',
     //replace: true,
@@ -80,6 +80,18 @@ angular.module('kola.directives', [])
 				});
             }
 			$scope.attachmentUrls = attachmentUrls;
+        }
+
+        $scope.removeAttachment = function(index) {
+			var confirmPopup = $ionicPopup.confirm({
+				title: "<b>Anhang entfernen</b>",
+				template: "Soll der Anhang wirklich entfernt werden?"
+			});
+			confirmPopup.then(function(res) {
+				if(res) {
+		           	ngModel.$modelValue.attachments.splice(index, 1);
+				}
+			});
         }
 
 		$scope.showImage = function(index, imageUrls) {

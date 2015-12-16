@@ -304,7 +304,7 @@ angular.module('kola.services', ['uuid'])
   }
 
   function _create(tableName, props) {
-    return angular.extend({ id:rfc4122.v4(), _table:tableName }, props);
+    return angular.extend({ id:rfc4122.v4(), _table:tableName, _isNew:true }, props);
   }
 
   function createTask() {
@@ -565,24 +565,34 @@ angular.module('kola.services', ['uuid'])
 })
 
 .service('modalDialog', function ($ionicModal) {
-  this.createModalDialog = function(scope, templateUrl) {
-    $ionicModal.fromTemplateUrl(templateUrl, {
-      scope: scope,
-      animation: 'slide-in-up'
-    }).then(function(modal) {
-      scope.modal = modal
-    })  
+  this.createModalDialog = function(scope, templateUrl, focusFirstInput, openFunctionName, closeFunctionName) {
+    openFunctionName = typeof openFunctionName !== "undefined" ? openFunctionName : "openModal";
+    closeFunctionName = typeof closeFunctionName !== "undefined" ? closeFunctionName : "closeModal";
+    focusFirstInput = typeof focusFirstInput !== "undefined" ? focusFirstInput : true;
+    console.log("--- focusFirstInput=" + focusFirstInput);
+    var modalId = Math.random().toString(36).slice(2);
+    console.log("--- creating modal with id '"+modalId+"'");
 
-    scope.openModal = function() {
-      scope.modal.show()
+    scope[openFunctionName] = function() {
+      scope[modalId].show();
     }
 
-    scope.closeModal = function() {
-      scope.modal.hide();
+    scope[closeFunctionName] = function() {
+      scope[modalId].hide();
     };
 
-    scope.$on('$destroy', function() {
-      scope.modal.remove();
+    scope.$on("$destroy", function() {
+      scope[modalId].remove();
+      console.log("--- destroyed modal " + modalId);
+    });
+
+    return $ionicModal.fromTemplateUrl(templateUrl, {
+      scope: scope,
+      animation: "slide-in-up",
+      focusFirstInput: focusFirstInput
+    }).then(function(modal) {
+      scope[modalId] = modal;
+      return modal;
     });
   }
 })

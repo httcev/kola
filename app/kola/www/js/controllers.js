@@ -48,7 +48,7 @@ angular.module('kola.controllers', [])
     reloadTasks();
 })
 
-.controller('TaskDetailCtrl', function($scope, $stateParams, $q, $ionicPopup, $ionicLoading, dbService, mediaAttachment) {
+.controller('TaskDetailCtrl', function($scope, $stateParams, $q, $ionicPopup, $ionicModal, $ionicLoading, dbService, mediaAttachment) {
   $scope.isStep = $stateParams.stepId != null;
   var targetId = $scope.isStep ? $stateParams.stepId : $stateParams.taskId;
   var taskDocumentationProp = $scope.isStep ? "step" : "task";
@@ -109,60 +109,109 @@ angular.module('kola.controllers', [])
     });
   }
 
-//  $scope.$on('$ionicView.enter', function(e) {
-
-  $scope.attachPhoto = function(documentation) {
-    mediaAttachment.attachPhoto(documentation);
+  $scope.attachPhoto = function() {
+    mediaAttachment.attachPhoto($scope.editedDocumentation);
   }
 
-  $scope.attachVideo = function(documentation) {
-    mediaAttachment.attachVideo(documentation);
+  $scope.attachVideo = function() {
+    mediaAttachment.attachVideo($scope.editedDocumentation);
   }
 
-  $scope.attachAudio = function(documentation) {
-    mediaAttachment.attachAudio(documentation);
+  $scope.attachAudio = function() {
+    mediaAttachment.attachAudio($scope.editedDocumentation);
   }
 
-  $scope.attachChosenMedia = function(documentation) {
-    mediaAttachment.attachChosenMedia(documentation);
+  $scope.attachChosenMedia = function() {
+    mediaAttachment.attachChosenMedia($scope.editedDocumentation);
   }
 
-  $scope.removeDocumentation = function(documentation) {
+  $scope.removeDocumentation = function() {
     $ionicPopup.confirm({
-      title: 'Dokumentation löschen',
+      title: '<b>Dokumentation löschen</b>',
       template: 'Soll diese Dokumentation wirklich gelöscht werden?'
     }).then(function(result) {
       if(result) {
-        documentation.deleted = true;
-        dbService.save(documentation).then(function() {
+        $ionicLoading.show({template: "<ion-spinner></ion-spinner><p>Dokumentation wird gelöscht</p>" });
+        $scope.editedDocumentation.deleted = true;
+        dbService.save($scope.editedDocumentation).then(function() {
           loadTargetAndDocumentations();
+          $ionicLoading.show({template: "Dokumentation wurde gelöscht", duration:1500});
+          $scope.closeEditDocumentationModal();
         }, function(err) {
-          alert("Löschen fehlgeschlagen");
+          $ionicLoading.show({template: "Löschen fehlgeschlagen", duration:2000});
           console.log(err);
         });
       }
     });
   };
 
-  $scope.addDocumentation = function() {
-    $scope.newDocumentation = dbService.createTaskDocumentation(targetId, $scope.isStep);
+  $scope.editDocumentation = function(documentation) {
+    if (!documentation) {
+      documentation = dbService.createTaskDocumentation(targetId, $scope.isStep);
+    }
+    var autoFocus = !documentation.text || documentation.text.length <= 0;
+    $ionicModal.fromTemplateUrl("templates/modal-documentation-editor.html", {
+      scope: $scope,
+      animation: "slide-in-up",
+      focusFirstInput: autoFocus
+    }).then(function(modal) {
+      $scope.editDocumentationModal = modal;
+      $scope.editedDocumentation = documentation;
+      $scope.editedDocumentationDirty = false;
+      $scope.unbindWatch = $scope.$watchCollection("editedDocumentation.attachments", function(newValue, oldValue) {
+        if (newValue !== oldValue) {
+          $scope.setEditedDocumentationDirty();
+        }
+      });
+      $scope.openEditDocumentationModal();
+    });
+  };
+
+  $scope.openEditDocumentationModal = function() {
+    $scope.editDocumentationModal.show();
+  };
+
+  $scope.checkCloseEditDocumentationModal = function() {
+    if ($scope.editedDocumentationDirty) {
+      $ionicPopup.confirm({
+        title: "<b>Änderungen verwerfen</b>",
+        template: "Sollen alle Änderungen an der Dokumentation verworfen werden?"
+      }).then(function(result) {
+        if(result) {
+          loadTargetAndDocumentations();
+          $scope.closeEditDocumentationModal();
+        }
+      });
+    }
+    else {
+      $scope.closeEditDocumentationModal();
+    }
+  };
+
+  $scope.closeEditDocumentationModal = function() {
+    $scope.unbindWatch();
+    $scope.editDocumentationModal.hide();
+    $scope.editDocumentationModal.remove();
   }
 
-  $scope.saveDocumentation = function(documentation) {
+  $scope.setEditedDocumentationDirty = function() {
+    $scope.editedDocumentationDirty = true;
+  }
+
+  $scope.saveDocumentation = function() {
     var objectsToSave = [];
-    angular.forEach(documentation.attachments, function(attachment) {
+    $ionicLoading.show({template: "<ion-spinner></ion-spinner><p>Dokumentation wird gespeichert</p>" });
+    angular.forEach($scope.editedDocumentation.attachments, function(attachment) {
       objectsToSave.push(attachment);
     });
-    objectsToSave.push(documentation);
-    documentation._saving = true;
+    objectsToSave.push($scope.editedDocumentation);
     dbService.save(objectsToSave).then(function() {
       loadTargetAndDocumentations();
-      $ionicLoading.show({template: "Dokumentation gespeichert", duration:2000});
+      $ionicLoading.show({template: "Dokumentation erfolgreich gespeichert", duration:1500});
+      $scope.closeEditDocumentationModal();
     }, function(err) {
       console.log(err);
       $ionicLoading.show({template: "Speichern fehlgeschlagen!", duration:2000});
-    }).finally(function() {
-      documentation._saving = false;
     });
   };
 
