@@ -93,7 +93,7 @@
 							<g:link class="btn btn-default btn-block" controller="reflectionQuestion" action="create"><i class="fa fa-plus"></i> <g:message code="kola.reflectionQuestion" /></g:link>
 						</sec:ifAnyGranted>
 						<sec:ifAnyGranted roles="ROLE_ADMIN">
-							<g:link class="btn btn-default btn-block" controller="user" action="create"><i class="fa fa-plus"></i> <g:message code="kola.user" /></g:link>
+							<g:link class="btn btn-default btn-block" controller="user" action="create"><i class="fa fa-plus"></i> <g:message code="de.httc.plugin.user.user" /></g:link>
 						</sec:ifAnyGranted>
 					</div>
 				</div>

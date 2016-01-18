@@ -4,12 +4,14 @@ import grails.converters.JSON
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 import org.springframework.security.access.annotation.Secured
+import de.httc.plugins.user.User
 
 @Transactional(readOnly = true)
 @Secured(['IS_AUTHENTICATED_REMEMBERED'])
 class TaskController {
     def springSecurityService
     def authService
+    def taskService
 
     def index(Integer max) {
         params.offset = params.offset ? (params.offset as int) : 0
@@ -146,7 +148,7 @@ class TaskController {
             return
         }
 
-        taskInstance.save flush:true
+        taskService.save taskInstance
 
         flash.message = message(code: 'default.created.message', args: [message(code: taskInstance.isTemplate ? 'kola.taskTemplate.noshy' : 'kola.task', default: 'Task'), taskInstance.name])
         redirect action:"edit", id:taskInstance.id
@@ -179,7 +181,7 @@ class TaskController {
             return
         }
 
-        taskInstance.save flush:true
+        taskService.save taskInstance
 
         flash.message = message(code: 'default.updated.message', args: [message(code: taskInstance.isTemplate ? 'kola.taskTemplate.noshy' : 'kola.task', default: 'Task'), taskInstance.name])
         redirect action:"edit", id:taskInstance.id
@@ -197,7 +199,7 @@ class TaskController {
         }
 
         taskInstance.deleted = true
-        taskInstance.save flush:true
+        taskService.save taskInstance
 
         flash.message = message(code: 'default.deleted.message', args: [message(code: taskInstance.isTemplate ? 'kola.taskTemplate.noshy' : 'kola.task', default: 'Task'), taskInstance.name])
         redirect action:"index", method:"GET"

@@ -1,0 +1,31 @@
+package kola
+
+import grails.transaction.Transactional
+
+@Transactional(readOnly = true)
+class TaskService {
+    def pushNotificationService
+    def springSecurityService
+    def messageSource
+
+    def save(Task task) {
+        def assigneeDirty = task.assignee && (!task.attached || task.isDirty("assignee"))
+        println "--- ASSIGNEE=${task.assignee}"
+        println "--- ASSIGNEE DIRTY=${assigneeDirty}"
+        if (assigneeDirty && springSecurityService.currentUser != task.assignee) {
+            sendAssignedNotification(task)
+        }
+        return task.save()
+    }
+
+    private void sendAssignedNotification(task) {
+        def msg = [
+                "title":messageSource.getMessage("kola.push.assigned.title", null, Locale.GERMAN),
+                "message":task.name,
+                "style":"inbox",
+                "collapse_key":"assigned_tasks",
+                "summaryText":messageSource.getMessage("kola.push.assigned.summaryText", null, Locale.GERMAN)
+        ]
+        pushNotificationService.sendPushNotification(task.assignee, msg)
+    }
+}

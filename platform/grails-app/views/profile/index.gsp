@@ -15,23 +15,23 @@
 			<g:if test="${flash.message}">
 				<div class="message alert alert-success" role="status">${flash.message}</div>
 			</g:if>
-			<g:hasErrors bean="${userInstance}">
+			<g:hasErrors bean="${user}">
 				<ul class="errors alert alert-danger" role="alert">
 					<g:eachError bean="${userInstance}" var="error">
 					<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
 					</g:eachError>
 				</ul>
 			</g:hasErrors>
-			<g:hasErrors bean="${userInstance.profile}">
+			<g:hasErrors bean="${user?.profile}">
 				<ul class="errors alert alert-danger" role="alert">
-					<g:eachError bean="${userInstance.profile}" var="error">
+					<g:eachError bean="${user.profile}" var="error">
 					<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
 					</g:eachError>
 				</ul>
 			</g:hasErrors>
-			<g:hiddenField name="version" value="${userInstance?.version}" />
-			<g:render template="/user/form"/>
-			<g:render template="/user/profile"/>
+			<g:hiddenField name="version" value="${user?.version}" />
+			<g:render template="/user/form" plugin="user"/>
+			<g:render template="/user/profile" plugin="user"/>
 			<div class="buttons pull-right">
 				<button class="save btn btn-success"><i class="fa fa-save"></i> <g:message code="default.button.update.label" default="Update" /></button>
 			</div>

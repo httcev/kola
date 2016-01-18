@@ -7,6 +7,7 @@ import java.text.SimpleDateFormat
 import java.text.DateFormat
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
+import de.httc.plugins.user.User
 
 @Secured(['IS_AUTHENTICATED_REMEMBERED'])
 @Transactional
@@ -17,6 +18,7 @@ class ChangesController {
 	static DateFormat DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
     static DOMAIN_CLASS_MAPPING = ["asset":Asset, "taskStep":TaskStep, "taskDocumentation":TaskDocumentation, "reflectionAnswer":ReflectionAnswer, "task":Task]
     def springSecurityService
+    def taskService
     def sessionFactory
 
     def index() {
@@ -176,13 +178,15 @@ class ChangesController {
 				if (!model.creator) {
 					model.creator = user
 				}
-				if (!model.save()) {
-	    			model.errors.allErrors.each { println it }
-				}
-				else {
+				// in case of a "task", delegate saving to taskService ti handle push notifications
+				def success = "task" == table ? taskService.save(model) : model.save()
+				if (success) {
 					modified = true
 					println "------------- SAVED:"
 					println model
+				}
+				else {
+	    			model.errors.allErrors.each { println it }
 				}
     		}
 		}

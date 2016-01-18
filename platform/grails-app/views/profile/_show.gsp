@@ -24,13 +24,13 @@
 			<form class="form-horizontal">
 				<g:if test="${profile.company}">
 					<div class="form-group">
-						<label class=" col-sm-3 control-label"><g:message code="kola.user.company" />:</label>
+						<label class=" col-sm-3 control-label"><g:message code="de.httc.plugin.user.company" />:</label>
 						<div class="col-sm-9 form-padding">${profile.company}</div>
 					</div>
 				</g:if>
 				<g:if test="${profile.phone}">
 					<div class="form-group">
-						<label class=" col-sm-3 control-label"><g:message code="kola.user.phone" default="Phone" />:</label>
+						<label class=" col-sm-3 control-label"><g:message code="de.httc.plugin.user.phone" />:</label>
 						<div class="col-sm-9">
 							<a href="tel:${profile.phone}" class="btn btn-success"><i class="fa fa-phone fa-lg fa-fw"></i></a> ${profile.phone}
 						</div>
@@ -38,7 +38,7 @@
 				</g:if>
 				<g:if test="${profile.mobile}">
 					<div class="form-group">
-						<label class=" col-sm-3 control-label"><g:message code="kola.user.mobile" default="Mobile" />:</label>
+						<label class=" col-sm-3 control-label"><g:message code="de.httc.plugin.user.mobile" />:</label>
 						<div class="col-sm-9">
 							<a href="tel:${profile.mobile}" class="btn btn-success"><i class="fa fa-phone fa-lg fa-fw"></i></a> ${profile.mobile}
 						</div>
@@ -46,7 +46,7 @@
 				</g:if>
 				<g:if test="${profile.user.email}">
 					<div class="form-group">
-						<label class=" col-sm-3 control-label"><g:message code="kola.user.email" default="Email" />:</label>
+						<label class=" col-sm-3 control-label"><g:message code="de.httc.plugin.user.email" />:</label>
 						<div class="col-sm-9">
 							<a href="mailto:${profile.user.email}" class="btn btn-success"><i class="fa fa-envelope fa-lg fa-fw"></i></a> ${profile.user.email}
 						</div>

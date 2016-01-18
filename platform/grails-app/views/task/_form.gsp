@@ -27,7 +27,7 @@
 			<select name="assignee.id" class="form-control" value="${taskInstance?.assignee?.id}">
 				<option value=""></option>
 				<g:each var="profile" in="${authService.assignableUserProfiles}">
-					<option value="${profile.user.id}"${taskInstance?.assignee?.id == profile.user.id ? ' selected' : ''}>${profile.displayName}</option>
+					<option value="${profile.user.id}"${taskInstance?.assignee?.id == profile.user.id ? ' selected' : ''}>${profile.displayNameFormal}</option>
 				</g:each>
 			</select>
 		</div>

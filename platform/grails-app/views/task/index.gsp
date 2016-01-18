@@ -46,10 +46,10 @@
 							<g:if test="${!params.isTemplate?.toBoolean()}">
 								<g:sortableColumn property="due" title="${message(code: 'kola.task.due')}" params="${filterParams}" />
 								<g:sortableColumn property="done" class="text-center" title="${message(code: 'kola.task.done')}" params="${filterParams}" />
-								<g:sortableColumn property="ap.displayName" title="${message(code: 'kola.task.assignee')}" params="${filterParams}" />
+								<g:sortableColumn property="ap.lastName" title="${message(code: 'kola.task.assignee')}" params="${filterParams}" />
 							</g:if>
-							<g:sortableColumn property="cp.displayName" title="${message(code: 'kola.meta.creator')}" params="${filterParams}" />
-							<g:sortableColumn property="cp.company" title="${message(code: 'kola.user.company')}" params="${filterParams}" />
+							<g:sortableColumn property="cp.lastName" title="${message(code: 'kola.meta.creator')}" params="${filterParams}" />
+							<g:sortableColumn property="cp.company" title="${message(code: 'de.httc.plugin.user.company')}" params="${filterParams}" />
 							<g:sortableColumn property="lastUpdated" title="${message(code: 'kola.meta.lastUpdated')}" params="${filterParams}" />
 						</tr>
 					</thead>
@@ -60,9 +60,9 @@
 							<g:if test="${!params.isTemplate?.toBoolean()}">
 								<td><g:formatDate date="${taskInstance.due}" type="date"/></td>
 								<td class="text-center"><i class="fa fa-fw ${taskInstance.done ? 'fa-check text-success' : 'fa-minus text-warning'}"></i></td>
-								<td>${fieldValue(bean: taskInstance.assignee?.profile, field: "displayName")}</td>
+								<td>${fieldValue(bean: taskInstance.assignee?.profile, field: "displayNameFormal")}</td>
 							</g:if>
-							<td>${fieldValue(bean: taskInstance.creator?.profile, field: "displayName")}</td>
+							<td>${fieldValue(bean: taskInstance.creator?.profile, field: "displayNameFormal")}</td>
 							<td>${fieldValue(bean: taskInstance.creator?.profile, field: "company")}</td>
 							<td><g:formatDate date="${taskInstance.lastUpdated}" type="date"/></td>
 						</tr>

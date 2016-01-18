@@ -2,6 +2,7 @@ package kola
 
 import grails.transaction.Transactional
 import grails.plugin.springsecurity.SpringSecurityUtils
+import de.httc.plugins.user.Profile
 
 @Transactional(readOnly = true)
 class AuthService {
@@ -37,7 +38,7 @@ class AuthService {
 
     def getAssignableUserProfiles() {
         if (SpringSecurityUtils.ifAnyGranted('ROLE_ADMIN, ROLE_TEACHER')) {
-            return Profile.list(sort:"displayName")
+            return Profile.list(sort:"lastName")
         }
         else {
             def currentCompany = springSecurityService.currentUser?.profile?.company
@@ -45,7 +46,7 @@ class AuthService {
             def query = User.where { profile?.company == company }.order("profile?.displayName")
             return query.list()
             */
-            return Profile.findAll(sort:"displayName") {
+            return Profile.findAll(sort:"lastName") {
                 company == currentCompany
             }
         }

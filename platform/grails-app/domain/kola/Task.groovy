@@ -3,11 +3,9 @@ package kola
 import java.util.UUID
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.collections.FactoryUtils
+import de.httc.plugins.user.User
 
 class Task {
-    def pushNotificationService
-    def springSecurityService
-
     static searchable = {
         all = [analyzer: 'german']
         only = ['name', 'description', 'deleted']
@@ -49,19 +47,6 @@ class Task {
     List<Asset> attachments                         // defined as list to keep order in which elements got added
     List<TaskStep> steps                            // defined as list to keep order in which elements got added
     List<ReflectionQuestion> reflectionQuestions    // defined as list to keep order in which elements got added
-
-    def beforeInsert() {
-        if (assignee && springSecurityService.currentUser != assignee) {
-            pushNotificationService.sendAssignedNotification(this)
-        }
-    }
-
-    def beforeUpdate() {
-        if (assignee && isDirty("assignee") && springSecurityService.currentUser != assignee) {
-            pushNotificationService.sendAssignedNotification(this)
-        }
-    }
-
 
     static _embedded = ["name", "description", "done", "deleted", "due", "isTemplate", "lastUpdated"]
     static _referenced = ["steps", "resources", "attachments", "reflectionQuestions", "template", "creator", "assignee"]

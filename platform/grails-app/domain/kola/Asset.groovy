@@ -1,6 +1,7 @@
 package kola
 
 import java.util.UUID
+import de.httc.plugins.user.User
 
 class Asset {
     def transient assetService

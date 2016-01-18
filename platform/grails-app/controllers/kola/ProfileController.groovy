@@ -12,8 +12,7 @@ class ProfileController {
     def grailsApplication
 
     def index() {
-		def userInstance = springSecurityService.currentUser
-		respond userInstance
+		[user:springSecurityService.currentUser]
     }
 
     @Transactional
@@ -35,7 +34,7 @@ class ProfileController {
 
         request.withFormat {
             form multipartForm {
-                flash.message = message(code: 'default.updated.message', args: [message(code: 'kola.user', default: 'User'), userInstance.username])
+                flash.message = message(code: 'default.updated.message', args: [message(code: 'de.httc.plugin.user.user', default: 'User'), userInstance.username])
                 redirect action:"index", method:"GET"
             }
             '*'{ respond userInstance, [status: OK] }

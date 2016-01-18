@@ -1,7 +1,7 @@
 import kola.Asset
-import kola.User
-import kola.Role
-import kola.UserRole
+import de.httc.plugins.user.User
+import de.httc.plugins.user.Role
+import de.httc.plugins.user.UserRole
 import kola.Task
 import kola.TaskStep
 import kola.ReflectionQuestion
@@ -34,7 +34,7 @@ class BootStrap {
             def teacherRole = new Role(authority: 'ROLE_TEACHER').save(flush: true)
             assert Role.count() == 5
 
-            def adminUser = new User(username:"admin", password:"admin", email:"stephan.tittel@httc.de", profile:[displayName:"Admin User", company:"KOLA"]).save(flush: true)
+            def adminUser = new User(username:"admin", password:"admin", email:"stephan.tittel@httc.de", profile:[firstName:"User", lastName:"Admin", company:"KOLA"]).save(flush: true)
             assert User.count() == 1
 
             UserRole.create(adminUser, adminRole, true)
@@ -71,30 +71,47 @@ class BootStrap {
 
         environments {
             development {
-                def testUser = new User(username:"tittel", password:"tittel", email:"stephan.tittel@kom.tu-darmstadt.de", profile:[displayName:"Stephan Tittel", company:"httc e.V.", phone:"+49615116882", mobile:"+4915114474556"]).save(flush: true)
+                if (Task.count() == 0) {
+                    def testUser = new User(username:"tittel", password:"tittel", email:"stephan.tittel@kom.tu-darmstadt.de", profile:[firstName:"Stephan", lastName:"Tittel", company:"httc e.V.", phone:"+49615116882", mobile:"+4915114474556"]).save(flush: true)
 
-                def numAssets = 3
-                for (int i=0; i<numAssets; i++) {
-                    new Asset(name:"Asset $i", description:"$i Huhu", mimeType:"text/plain", content:"Das ist ein Text! $i" as byte[]).save(true)
-                }
-                assert Asset.count() == numAssets
+                    def numAssets = 3
+                    for (int i=0; i<numAssets; i++) {
+                        new Asset(name:"Asset $i", description:"$i Huhu", mimeType:"text/plain", content:"Das ist ein Text! $i" as byte[]).save(true)
+                    }
+                    assert Asset.count() == numAssets
 
-                def numTaskTemplates = 2
-                def description = "### Abschnitt 1\n\n1. Aufzählungstext 1\n1. Aufzählungstext 2\n1. Aufzählungstext 3\n\n### Abschnitt 2\n\n- Aufzählungstext 1\n- Aufzählungstext 2\n- Aufzählungstext 3\n\n**Fett**\n_Kursiv_\n[Link](http://www.example.com)"
-                for (int i=0; i<numTaskTemplates; i++) {
-                    def task = new Task(name:"Example Task Template $i", description:description, creator:testUser, isTemplate:true)
-                    task.addToSteps(new TaskStep(name:"Step 1 example", description:description))
-                    task.addToSteps(new TaskStep(name:"Step 2 example", description:description))
-                    task.save(true)
-                }
-                assert Task.count() == numTaskTemplates
+                    def numTaskTemplates = 2
+                    def description = "### Abschnitt 1\n\n1. Aufzählungstext 1\n1. Aufzählungstext 2\n1. Aufzählungstext 3\n\n### Abschnitt 2\n\n- Aufzählungstext 1\n- Aufzählungstext 2\n- Aufzählungstext 3\n\n**Fett**\n_Kursiv_\n[Link](http://www.example.com)"
+                    for (int i=0; i<numTaskTemplates; i++) {
+                        def task = new Task(name:"Example Task Template $i", description:description, creator:testUser, isTemplate:true)
+                        task.addToSteps(new TaskStep(name:"Step 1 example", description:description))
+                        task.addToSteps(new TaskStep(name:"Step 2 example", description:description))
+                        task.save(true)
+                    }
+                    assert Task.count() == numTaskTemplates
 
-                def numTasks = 2
-                for (int i=0; i<numTasks; i++) {
-                    new Task(name:"Example Task $i", description:description, creator:testUser).save(true)
+                    def numTasks = 2
+                    for (int i=0; i<numTasks; i++) {
+                        new Task(name:"Example Task $i", description:description, creator:testUser).save(true)
+                    }
+                    assert Task.count() == numTaskTemplates + numTasks
                 }
-                assert Task.count() == numTaskTemplates + numTasks
             }
+        }
+
+        grails.converters.JSON.registerObjectMarshaller(User) {
+            def doc = [:]
+            doc.id = it.id
+            doc.username = it.username
+            doc.email = it.email
+            doc.displayName = it.profile?.displayName
+            doc.company = it.profile?.company
+            doc.phone = it.profile?.phone
+            doc.mobile = it.profile?.mobile
+            if (it.profile?.photo?.length > 0) {
+                doc.photo = it.profile.photo.encodeBase64().toString()
+            }
+            return [id:it.id, doc:doc]
         }
     }
     def destroy = {

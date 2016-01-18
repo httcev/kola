@@ -1,7 +1,6 @@
 package kola
 
 class ReflectionQuestion {
-
     static constraints = {
     	name blank:false
     }

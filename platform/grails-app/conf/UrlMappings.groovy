@@ -28,11 +28,9 @@ class UrlMappings {
                 // apply constraints here
             }
         }
-/*
-        "/tasks"(resources:"task") {
-            "/steps"(resources:"taskStep")
-        }
-*/
+        "/user/$action?/$id?(.$format)?" { controller = "user"; namespace = "admin"; plugin = "user" }
+        "/register/$action?" { controller = "register"; plugin = "user" }
+
         "/$controller/$action?/$id?(.$format)?"{
             constraints {
                 // apply constraints here
