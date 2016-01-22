@@ -1,5 +1,6 @@
 import org.apache.log4j.rolling.RollingFileAppender
 import org.apache.log4j.rolling.TimeBasedRollingPolicy
+import grails.util.Environment
 
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
@@ -96,92 +97,43 @@ grails.databinding.dateFormats = [
     'yyyy-MM-dd', 'yyyy-MM-dd HH:mm:ss.S', "yyyy-MM-dd'T'hh:mm:ss.SSS'Z'"
 ]
 
+
+grails.logging.jul.usebridge = false
+grails.serverURL = "https://${Environment.current == Environment.PRODUCTION ? 'plattform' : Environment.current.name}.kola-projekt.de"
+kola {
+    thumbnailSize = 80
+    avatarSize = 40
+    repository.directory = "/srv/kola/${Environment.current.name}/repository"
+    appDownloadUrl = "https://play.google.com/apps/testing/de.httc.kola${Environment.current == Environment.PRODUCTION ? '' : '.' + Environment.current.name}"
+}
+de.httc.plugin.user.selfRegistrationEnabled = false
+
+elasticSearch {
+    index.name = "kola-${Environment.current.name}"
+    datastoreImpl = "hibernateDatastore"
+    includeTransients = false
+    client.mode = "node"
+}
+
 environments {
     development {
         grails.logging.jul.usebridge = true
         grails.serverURL = "http://130.83.139.161:8080/platform"
-        kola {
-            repository.directory = "./data/repository"
-            appDownloadUrl = "http://www.example.com"
-        }
-        elasticSearch.path.data = "./data/index"
-        de {
-            httc {
-                plugin {
-                    pushNotification{
-                        gcmApiKey = "AIzaSyAJQJjAOE53yqqTbgi3Nj3rfeMjREc-fOo"
-                        gcmUrl = "https://gcm-http.googleapis.com/gcm/send"
-                    }
-                    user.selfRegistrationEnabled = false           
-                }
-            }
-        }
+        elasticSearch.client.mode = "local"
+        elasticSearch.index.store.type = "memory"
+
+        kola.repository.directory = "./data/repository"
+        de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyAJQJjAOE53yqqTbgi3Nj3rfeMjREc-fOo"
     }
     production {
-        grails.logging.jul.usebridge = false
-        grails.serverURL = "http://plattform.kola-projekt.de"
-        kola {
-            repository.directory = "/srv/kola/prod/repository"
-            appDownloadUrl = "https://play.google.com/apps/testing/de.httc.kola"
-        }
-        elasticSearch.path.data = "/srv/kola/prod/index"
-        de {
-            httc {
-                plugin {
-                    pushNotification{
-                        gcmApiKey = "AIzaSyCEXmn4Ta8wvX8Nb9lIW8GEBGavBknequ8"
-                        gcmUrl = "https://gcm-http.googleapis.com/gcm/send"
-                    }
-                    user.selfRegistrationEnabled = false           
-                }
-            }
-        }
+        de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyCEXmn4Ta8wvX8Nb9lIW8GEBGavBknequ8"
     }
     demo {
-        grails.logging.jul.usebridge = false
-        grails.serverURL = "http://demo.kola-projekt.de"
-        kola {
-            repository.directory = "/srv/kola/demo/repository"
-            appDownloadUrl = "https://play.google.com/apps/testing/de.httc.kola.demo"
-        }
-        elasticSearch.path.data = "/srv/kola/demo/index"
-        de {
-            httc {
-                plugin {
-                    pushNotification{
-                        gcmApiKey = "AIzaSyAr2gXuBbLcDek4-zGcwvJPA-v9EHpuhOo"
-                        gcmUrl = "https://gcm-http.googleapis.com/gcm/send"
-                    }
-                    user.selfRegistrationEnabled = false           
-                }
-            }
-        }
+        de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyAr2gXuBbLcDek4-zGcwvJPA-v9EHpuhOo"
     }
     staging {
-        grails.logging.jul.usebridge = false
-        grails.serverURL = "https://staging.kola-projekt.de"
-        kola {
-            repository.directory = "/srv/kola/staging/repository"
-            appDownloadUrl = "https://play.google.com/apps/testing/de.httc.kola.staging"
-        }
-        elasticSearch.path.data = "/srv/kola/staging/index"
-        de {
-            httc {
-                plugin {
-                    pushNotification{
-                        gcmApiKey = "AIzaSyAJQJjAOE53yqqTbgi3Nj3rfeMjREc-fOo"
-                        gcmUrl = "https://gcm-http.googleapis.com/gcm/send"
-                    }
-                    user.selfRegistrationEnabled = false           
-                }
-            }
-        }
+        de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyAJQJjAOE53yqqTbgi3Nj3rfeMjREc-fOo"
     }
-}
-
-kola {
-    thumbnailSize = 80
-    avatarSize = 40
 }
 
 // log4j configuration
@@ -236,13 +188,8 @@ log4j.appender.file.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
            'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
            'org.springframework',
            'org.hibernate',
-           'net.sf.ehcache.hibernate'
-}
-
-elasticSearch {
-    datastoreImpl = "hibernateDatastore"
-    includeTransients = false
-    client.mode = 'local'
+           'net.sf.ehcache.hibernate',
+           'org.grails.plugins'
 }
 
 // Added by the Spring Security Core plugin:
@@ -252,11 +199,11 @@ grails.plugin.springsecurity.userLookup.authorityJoinClassName = 'de.httc.plugin
 grails.plugin.springsecurity.authority.className = 'de.httc.plugins.user.Role'
 grails.plugin.springsecurity.securityConfigType = "Annotation"
 grails.plugin.springsecurity.apf.storeLastUsername = true
+grails.plugin.springsecurity.printStatusMessages = false
 grails.plugin.springsecurity.failureHandler.exceptionMappings = [
    'org.springframework.security.authentication.CredentialsExpiredException': '/user/passwordExpired'
 ]
 grails.plugin.springsecurity.controllerAnnotations.staticRules = [
-//    '/dbconsole/**':     ['permitAll'],
 	'/':                ['permitAll'],
     '/index':           ['permitAll'],
 	'/index.gsp':       ['permitAll'],
@@ -268,7 +215,8 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
     '/**/fonts/**':     ['permitAll'],
 	'/**/favicon.ico':  ['permitAll'],
     '/register/**':     ['permitAll'],
-    '/user/**':         ['ROLE_ADMIN']
+    '/user/**':         ['ROLE_ADMIN'],
+    '/dbconsole/**':     ['ROLE_ADMIN']
 ]
 
 // enable basic authentication for api access for app
@@ -294,8 +242,10 @@ grails {
 grails.plugin.springsecurity.ui.forgotPassword.emailSubject = "KOLA Benutzerkonto, neues Passwort"
 grails.plugin.springsecurity.ui.forgotPassword.emailFrom = "info@kola-projekt.de"
 grails.plugin.springsecurity.ui.forgotPassword.emailBody = 'Guten Tag $user.profile.firstName $user.profile.lastName,<br/><br/>bitte klicken Sie&nbsp;<a href="$url">hier</a>, um Ihr KOLA-Passwort neu zu setzen.<br/><br/>Wenn Sie diese Mail nicht angefordert haben, ignorieren Sie sie bitte einfach, es wurden keine Änderungen vorgenommen.<br/><br/>Ihr KOLA-Team'
-
 grails.plugin.springsecurity.ui.register.emailSubject = "KOLA Benutzerkonto"
 grails.plugin.springsecurity.ui.register.defaultRoleNames =["ROLE_USER"]
 grails.plugin.springsecurity.ui.register.emailFrom = "info@kola-projekt.de"
 grails.plugin.springsecurity.ui.register.emailBody = 'Guten Tag $user.profile.firstName $user.profile.lastName,<br/><br/>um das Anlegen des neuen KOLA Benutzerkontos abzuschließen, klicken Sie bitte&nbsp;<a href="$url">hier</a>.<br/><br/>Wenn Sie kein KOLA Benutzerkonto angefordert haben, ignorieren Sie diese Mail bitte einfach.<br/><br/>Ihr KOLA-Team'
+
+grails.plugin.databasemigration.updateOnStart = true
+grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.groovy']

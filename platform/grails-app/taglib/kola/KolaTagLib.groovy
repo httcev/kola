@@ -16,16 +16,16 @@ class KolaTagLib {
     //static encodeAsForTags = [tagName: [taglib:'html'], otherTagName: [taglib:'none']]
 
     def displayName = { attrs ->
-        // TODO: storing the user in the session is bad. this is a workaround for the problem that springSecurityService.currentUser is null in case of a webflow. loading it from DB is not possible due to "org.hibernate.HibernateException: No Session found for current thread"
-        if (!session.blubber) {
-            def profile = springSecurityService.currentUser?.profile
-            if (profile) {
-                session.blubber = "${profile.firstName} ${profile.lastName}"
+        try {
+            // TODO: storing the user in the session is bad. this is a workaround for the problem that springSecurityService.currentUser is null in case of a webflow. loading it from DB is not possible due to "org.hibernate.HibernateException: No Session found for current thread"
+            if (!session.blubber) {
+                def profile = springSecurityService.currentUser?.profile
+                if (profile) {
+                    session.blubber = "${profile.displayName}"
+                }
             }
-        }
-        try{
             out << session.blubber
-        }catch(Throwable e) {
+        } catch(Throwable e) {
             log.error e
         }
     }

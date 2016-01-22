@@ -18,21 +18,19 @@ hibernate {
 environments {
     development {
         dataSource {
-//            dbCreate = "create-drop" // one of 'create', 'create-drop', 'update', 'validate', ''
-//            url = "jdbc:h2:mem:devDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
-            dbCreate = "update"
-            url = "jdbc:h2:/home/tittel/kola-db/prod;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+//            dbCreate = "update"
+            url = "jdbc:h2:./data/db/prod;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
     }
     test {
         dataSource {
-            dbCreate = "update"
+//            dbCreate = "update"
             url = "jdbc:h2:mem:testDb;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
         }
     }
     production {
         dataSource {
-            dbCreate = "update"
+//            dbCreate = "update"
             url = "jdbc:h2:/srv/kola/prod/db/prod;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
             properties {
                // See http://grails.org/doc/latest/guide/conf.html#dataSource for documentation
@@ -58,7 +56,7 @@ environments {
     }
     demo {
         dataSource {
-            dbCreate = "update"
+//            dbCreate = "update"
             url = "jdbc:h2:/srv/kola/demo/db/prod;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
             properties {
                // See http://grails.org/doc/latest/guide/conf.html#dataSource for documentation
@@ -84,7 +82,7 @@ environments {
     }
     staging {
         dataSource {
-            dbCreate = "update"
+//            dbCreate = "update"
             url = "jdbc:h2:/srv/kola/staging/db/prod;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
             properties {
                // See http://grails.org/doc/latest/guide/conf.html#dataSource for documentation

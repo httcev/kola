@@ -27,6 +27,7 @@ class AssetController {
     //static allowedMethods = [save: "POST", update: ["PUT", "POST"], delete: "DELETE"]
 
     @Secured(['IS_AUTHENTICATED_REMEMBERED'])
+    @Transactional(readOnly = true)
     def index(Integer max) {
         params.offset = params.offset ? (params.offset as int) : 0
         params.max = Math.min(max ?: 10, 100)

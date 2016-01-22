@@ -1,8 +1,10 @@
 package kola
 
 import org.springframework.security.access.annotation.Secured
+import grails.transaction.Transactional
 
 @Secured(['permitAll'])
+@Transactional(readOnly = true)
 class IndexController {
 	def springSecurityService
 

@@ -28,7 +28,7 @@ class Asset {
         id generator: "assigned"
         description type: "text"
 		content lazy: true
-        indexText lazy: true, type:"text"
+        indexText lazy: true, type: "text"
     }
 
     //static transients = ['indexText']
