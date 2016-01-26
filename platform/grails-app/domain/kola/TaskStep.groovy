@@ -4,8 +4,8 @@ import java.util.UUID
 import de.httc.plugins.user.User
 
 class TaskStep {
-	static hasMany = [resources:Asset, attachments:Asset]
-	//static belongsTo = [ task:Task ]
+	static hasMany = [documentations:TaskDocumentation, resources:Asset, attachments:Asset]
+	static belongsTo = [ task:Task ]
     static constraints = {
     	name blank:false
     	description nullable:true

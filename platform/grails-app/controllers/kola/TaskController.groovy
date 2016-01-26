@@ -14,7 +14,7 @@ class TaskController {
     def taskService
 
     def index(Integer max) {
-        params.offset = params.offset ? (params.offset as int) : 0
+        params.offset = params.offset && !params.resetOffset ? (params.offset as int) : 0
         params.max = Math.min(max ?: 10, 100)
         params.sort = params.sort ?: "lastUpdated"
         params.order = params.order ?: "desc"
@@ -22,6 +22,7 @@ class TaskController {
         def user = springSecurityService.currentUser
         def userCompany = user.profile?.company
         def filtered = params.own || params.assigned || params.ownCompany
+
         def results = Task.createCriteria().list(max:params.max, offset:params.offset) {
             // left join allows null values in the association
             createAlias('creator', 'c', org.hibernate.Criteria.LEFT_JOIN)
@@ -47,18 +48,6 @@ class TaskController {
                     }
                 }
             }
-            /*
-            if (params.sort?.startsWith("cp.")) {
-                // left join allows null values in the association
-                createAlias('creator', 'c', org.hibernate.Criteria.LEFT_JOIN)
-                createAlias('c.profile', 'cp', org.hibernate.Criteria.LEFT_JOIN)
-            }
-            else if (params.sort?.startsWith("ap.")) {
-                // left join allows null values in the association
-                createAlias('assignee', 'a', org.hibernate.Criteria.LEFT_JOIN)
-                createAlias('a.profile', 'ap', org.hibernate.Criteria.LEFT_JOIN)
-            }
-            */
             order(params.sort, params.order)
         }
         respond results, model:[taskInstanceCount:results.totalCount]

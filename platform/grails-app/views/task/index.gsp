@@ -38,19 +38,23 @@
 		<g:if test="${taskInstanceList?.size() > 0}">
 			<p class="margin text-muted small"><g:message code="kola.search.hits.displaying" args="${[entitiesName, params.offset + 1, Math.min(params.offset + params.max, taskInstanceCount), taskInstanceCount]}" />:</p>
 			<g:set var="filterParams" value="${[own:params.own, ownCompany:params.ownCompany, assigned:params.assigned, isTemplate:params.isTemplate]}" />
+			<g:set var="sortParams" value="${[resetOffset:true] << filterParams}" />
 			<div class="table-responsive">
 				<table class="table table-striped">
 					<thead>
 						<tr>
-							<g:sortableColumn property="name" title="${message(code: 'kola.meta.name')}" params="${filterParams}" />
+							<g:sortableColumn property="name" title="${message(code: 'kola.meta.name')}" params="${sortParams}" />
 							<g:if test="${!params.isTemplate?.toBoolean()}">
-								<g:sortableColumn property="due" title="${message(code: 'kola.task.due')}" params="${filterParams}" />
-								<g:sortableColumn property="done" class="text-center" title="${message(code: 'kola.task.done')}" params="${filterParams}" />
-								<g:sortableColumn property="ap.lastName" title="${message(code: 'kola.task.assignee')}" params="${filterParams}" />
+								<g:sortableColumn property="due" title="${message(code: 'kola.task.due')}" params="${sortParams}" />
+								<g:sortableColumn property="done" class="text-center" title="${message(code: 'kola.task.done')}" params="${sortParams}" />
+								<g:sortableColumn property="ap.lastName" title="${message(code: 'kola.task.assignee')}" params="${sortParams}" />
 							</g:if>
-							<g:sortableColumn property="cp.lastName" title="${message(code: 'kola.meta.creator')}" params="${filterParams}" />
-							<g:sortableColumn property="cp.company" title="${message(code: 'de.httc.plugin.user.company')}" params="${filterParams}" />
-							<g:sortableColumn property="lastUpdated" title="${message(code: 'kola.meta.lastUpdated')}" params="${filterParams}" />
+							<g:sortableColumn property="cp.lastName" title="${message(code: 'kola.meta.creator')}" params="${sortParams}" />
+							<g:sortableColumn property="cp.company" title="${message(code: 'de.httc.plugin.user.company')}" params="${sortParams}" />
+							<g:sortableColumn property="lastUpdated" title="${message(code: 'kola.meta.lastUpdated')}" params="${sortParams}" />
+							<g:if test="${!params.isTemplate?.toBoolean()}">
+								<g:sortableColumn property="lastDocumented" title="${message(code: 'kola.task.lastDocumented')}" params="${sortParams}" />
+							</g:if>
 						</tr>
 					</thead>
 					<tbody>
@@ -65,6 +69,9 @@
 							<td>${fieldValue(bean: taskInstance.creator?.profile, field: "displayNameFormal")}</td>
 							<td>${fieldValue(bean: taskInstance.creator?.profile, field: "company")}</td>
 							<td><g:formatDate date="${taskInstance.lastUpdated}" type="date"/></td>
+							<g:if test="${!params.isTemplate?.toBoolean()}">
+								<td><g:formatDate date="${taskInstance.lastDocumented}" type="date"/></td>
+							</g:if>
 						</tr>
 					</g:each>
 					</tbody>

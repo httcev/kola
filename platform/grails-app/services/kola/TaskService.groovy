@@ -10,8 +10,6 @@ class TaskService {
 
     def save(Task task) {
         def assigneeDirty = task.assignee && (!task.attached || task.isDirty("assignee"))
-        println "--- ASSIGNEE=${task.assignee}"
-        println "--- ASSIGNEE DIRTY=${assigneeDirty}"
         if (assigneeDirty && springSecurityService.currentUser != task.assignee) {
             sendAssignedNotification(task)
         }

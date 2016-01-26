@@ -12,7 +12,7 @@ class Task {
         name boost:3.0
         description boost:2.0
     }
-    static hasMany = [steps:TaskStep, reflectionQuestions:ReflectionQuestion, resources:Asset, attachments:Asset]
+    static hasMany = [steps:TaskStep, documentations:TaskDocumentation, reflectionQuestions:ReflectionQuestion, resources:Asset, attachments:Asset]
     static constraints = {
         name blank:false
         description nullable:true
@@ -25,6 +25,7 @@ class Task {
         steps cascade: "all-delete-orphan"
         name type: "text"
         description type: "text"
+        lastDocumented formula:"(select d.LAST_UPDATED from TASK_DOCUMENTATION d where d.DELETED='false' and (d.TASK_ID=ID or d.STEP_ID in (select s.ID from TASK_STEP s where s.TASK_ID=ID)) order by d.LAST_UPDATED desc limit 1)"
     }
  
     String id = UUID.randomUUID().toString()
@@ -42,6 +43,7 @@ class Task {
     // task and task template
     Date dateCreated
     Date lastUpdated
+    Date lastDocumented
     User creator
     List<Asset> resources                           // defined as list to keep order in which elements got added
     List<Asset> attachments                         // defined as list to keep order in which elements got added
