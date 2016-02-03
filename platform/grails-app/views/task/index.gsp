@@ -64,9 +64,9 @@
 							<g:if test="${!params.isTemplate?.toBoolean()}">
 								<td><g:formatDate date="${taskInstance.due}" type="date"/></td>
 								<td class="text-center"><i class="fa fa-fw ${taskInstance.done ? 'fa-check text-success' : 'fa-minus text-warning'}"></i></td>
-								<td>${fieldValue(bean: taskInstance.assignee?.profile, field: "displayNameFormal")}</td>
+								<td>${fieldValue(bean: taskInstance.assignee?.profile, field: "displayNameReverse")}</td>
 							</g:if>
-							<td>${fieldValue(bean: taskInstance.creator?.profile, field: "displayNameFormal")}</td>
+							<td>${fieldValue(bean: taskInstance.creator?.profile, field: "displayNameReverse")}</td>
 							<td>${fieldValue(bean: taskInstance.creator?.profile, field: "company")}</td>
 							<td><g:formatDate date="${taskInstance.lastUpdated}" type="date"/></td>
 							<g:if test="${!params.isTemplate?.toBoolean()}">
