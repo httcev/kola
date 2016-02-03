@@ -7,7 +7,7 @@
 		</div>
 		<g:if test="${authService.canEdit(taskDocumentation)}">
 			<g:form class="form hidden" action="updateTaskDocumentation" id="${taskDocumentation.id}" method="PUT" enctype="multipart/form-data">
-				<input type="hidden" name="parentTask" value="${taskInstance.id}">
+				<input type="hidden" name="parentTask" value="${task.id}">
 				<textarea name="text" class="form-control" rows="5" placeholder="${message(code:'kola.task.documentation.placeholder')}">${taskDocumentation.text}</textarea>
 				<g:render model="${[attachments:taskDocumentation.attachments, mode:'edit']}" template="attachments" />
 				<div class="text-right form-padding-all"><button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <g:message code="default.save.label" args="[message(code:'kola.task.documentation')]" /></button></div>

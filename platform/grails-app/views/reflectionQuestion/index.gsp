@@ -29,19 +29,19 @@
 					</tr>
 				</thead>
 				<tbody>
-				<g:each in="${reflectionQuestionInstanceList}" var="reflectionQuestionInstance">
+				<g:each in="${reflectionQuestionList}" var="reflectionQuestion">
 					<tr>
-						<td><g:link action="show" id="${reflectionQuestionInstance.id}">${fieldValue(bean: reflectionQuestionInstance, field: "name")}</g:link></td>
-						<td class="text-center"><i class="fa fa-fw ${reflectionQuestionInstance.autoLink ? 'fa-check text-success' : 'fa-minus text-muted'}"></i></td>
+						<td><g:link action="show" id="${reflectionQuestion.id}">${fieldValue(bean: reflectionQuestion, field: "name")}</g:link></td>
+						<td class="text-center"><i class="fa fa-fw ${reflectionQuestion.autoLink ? 'fa-check text-success' : 'fa-minus text-muted'}"></i></td>
 					</tr>
 				</g:each>
 				</tbody>
 			</table>
 		</div>
 
-		<g:if test="${params.max < reflectionQuestionInstanceCount}">
+		<g:if test="${params.max < reflectionQuestionCount}">
 			<div class="pagination pull-right">
-				<g:paginate total="${reflectionQuestionInstanceCount ?: 0}" />
+				<g:paginate total="${reflectionQuestionCount ?: 0}" />
 			</div>
 		</g:if>
 	</body>

@@ -50,7 +50,7 @@ class TaskController {
             }
             order(params.sort, params.order)
         }
-        respond results, model:[taskInstanceCount:results.totalCount]
+        respond results, model:[taskCount:results.totalCount]
     }
 
     def show(Task taskInstance) {
@@ -77,7 +77,7 @@ class TaskController {
             }
         }
 
-        ["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations]
+        respond taskInstance, model:["reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations]
     }
 
     def create() {
@@ -108,7 +108,7 @@ class TaskController {
         params.sort = params.sort ?: "lastUpdated"
         params.order = params.order ?: "desc"
         def query = Task.where { isTemplate == true && deleted == false }
-        respond query.list(params), model:[taskInstanceCount: query.count()]
+        respond query.list(params), model:[taskCount: query.count()]
     }
 
     @Secured(['ROLE_ADMIN', 'ROLE_TASK_TEMPLATE_CREATOR'])
@@ -215,13 +215,13 @@ class TaskController {
         }
         def filename = taskInstance.name?.replaceAll("\\W+", "_");
         if (!filename) {
-            fielname = "export"
+            filename = "export"
         }
         if (params.preview) {
-            render(template:"export", model:["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations])
+            render(template:"export", model:["task":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations])
         }
         else {
-            renderPdf(template:"export", model:["taskInstance":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations], filename:"${filename}.pdf")
+            renderPdf(template:"export", model:["task":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations], filename:"${filename}.pdf")
         }
     }
 

@@ -22,22 +22,22 @@
 				<button class="choose btn btn-primary pull-right" name="template.id" value=""><i class="fa fa-check-square-o"></i> <g:message code="kola.choose" /></button>
 			</div>
 			<ul class="list-group">
-				<g:each var="taskInstance" in="${taskInstanceList}">
+				<g:each var="task" in="${taskList}">
 					<li class="list-group-item clearfix">
 						<h4 class="list-group-item-heading">
-							<a href="${createLink(resource:taskInstance, action:"show")}" target="_blank">${taskInstance.name}</a>
-							<button class="choose btn btn-primary pull-right" name="template.id" value="${taskInstance.id}"><i class="fa fa-check-square-o"></i> <g:message code="kola.choose" /></button>
+							<a href="${createLink(resource:task, action:"show")}" target="_blank">${task.name}</a>
+							<button class="choose btn btn-primary pull-right" name="template.id" value="${task.id}"><i class="fa fa-check-square-o"></i> <g:message code="kola.choose" /></button>
 						</h4>
 						<p class="list-group-item-text">
-							<kola:markdown>${taskInstance.description?.take(400)}</kola:markdown>
+							<kola:markdown>${task.description?.take(400)}</kola:markdown>
 						</p>
 					</li>
 				</g:each>
 			</ul>
 		</g:form>
-		<g:if test="${params.max < taskInstanceCount}">
+		<g:if test="${params.max < taskCount}">
 			<div class="pagination pull-right">
-				<g:paginate total="${taskInstanceCount ?: 0}" />
+				<g:paginate total="${taskCount ?: 0}" />
 			</div>
 		</g:if>
 	</body>

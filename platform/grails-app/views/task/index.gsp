@@ -35,8 +35,8 @@
 				</div>
 			</div>
 		</form>
-		<g:if test="${taskInstanceList?.size() > 0}">
-			<p class="margin text-muted small"><g:message code="kola.search.hits.displaying" args="${[entitiesName, params.offset + 1, Math.min(params.offset + params.max, taskInstanceCount), taskInstanceCount]}" />:</p>
+		<g:if test="${taskList?.size() > 0}">
+			<p class="margin text-muted small"><g:message code="kola.search.hits.displaying" args="${[entitiesName, params.offset + 1, Math.min(params.offset + params.max, taskCount), taskCount]}" />:</p>
 			<g:set var="filterParams" value="${[own:params.own, ownCompany:params.ownCompany, assigned:params.assigned, isTemplate:params.isTemplate]}" />
 			<g:set var="sortParams" value="${[resetOffset:true] << filterParams}" />
 			<div class="table-responsive">
@@ -58,28 +58,28 @@
 						</tr>
 					</thead>
 					<tbody>
-					<g:each in="${taskInstanceList}" status="i" var="taskInstance">
+					<g:each in="${taskList}" status="i" var="task">
 						<tr>
-							<td><g:link action="show" id="${taskInstance.id}" params="${[isTemplate:params.isTemplate]}">${fieldValue(bean: taskInstance, field: "name")}</g:link></td>
+							<td><g:link action="show" id="${task.id}" params="${[isTemplate:params.isTemplate]}">${fieldValue(bean: task, field: "name")}</g:link></td>
 							<g:if test="${!params.isTemplate?.toBoolean()}">
-								<td><g:formatDate date="${taskInstance.due}" type="date"/></td>
-								<td class="text-center"><i class="fa fa-fw ${taskInstance.done ? 'fa-check text-success' : 'fa-minus text-warning'}"></i></td>
-								<td>${fieldValue(bean: taskInstance.assignee?.profile, field: "displayNameReverse")}</td>
+								<td><g:formatDate date="${task.due}" type="date"/></td>
+								<td class="text-center"><i class="fa fa-fw ${task.done ? 'fa-check text-success' : 'fa-minus text-warning'}"></i></td>
+								<td>${fieldValue(bean: task.assignee?.profile, field: "displayNameReverse")}</td>
 							</g:if>
-							<td>${fieldValue(bean: taskInstance.creator?.profile, field: "displayNameReverse")}</td>
-							<td>${fieldValue(bean: taskInstance.creator?.profile, field: "company")}</td>
-							<td><g:formatDate date="${taskInstance.lastUpdated}" type="date"/></td>
+							<td>${fieldValue(bean: task.creator?.profile, field: "displayNameReverse")}</td>
+							<td>${fieldValue(bean: task.creator?.profile, field: "company")}</td>
+							<td><g:formatDate date="${task.lastUpdated}" type="date"/></td>
 							<g:if test="${!params.isTemplate?.toBoolean()}">
-								<td><g:formatDate date="${taskInstance.lastDocumented}" type="date"/></td>
+								<td><g:formatDate date="${task.lastDocumented}" type="date"/></td>
 							</g:if>
 						</tr>
 					</g:each>
 					</tbody>
 				</table>
 			</div>
-			<g:if test="${params.max < taskInstanceCount}">
+			<g:if test="${params.max < taskCount}">
 				<div class="pagination pull-right">
-					<g:paginate total="${taskInstanceCount ?: 0}" params="${filterParams}" />
+					<g:paginate total="${taskCount ?: 0}" params="${filterParams}" />
 				</div>
 			</g:if>
 		</g:if>

@@ -17,7 +17,7 @@
 			</g:if>
 			<g:hasErrors bean="${user}">
 				<ul class="errors alert alert-danger" role="alert">
-					<g:eachError bean="${userInstance}" var="error">
+					<g:eachError bean="${user}" var="error">
 					<li <g:if test="${error in org.springframework.validation.FieldError}">data-field-id="${error.field}"</g:if>><g:message error="${error}"/></li>
 					</g:eachError>
 				</ul>

@@ -4,7 +4,7 @@
 	</head>
 	<body>
 		<p class="text-danger"><b><g:message code="kola.asset.anchor.choose" />:</b></p>
-		<g:radioGroup name="anchor" values="${possibleAnchors}" labels="${possibleAnchors}" value="${assetInstance?.anchor}" >
+		<g:radioGroup name="anchor" values="${possibleAnchors}" labels="${possibleAnchors}" value="" >
 			<div class="radio"><label>${it.radio}${it.label}</label></div>
 		</g:radioGroup>
 		<div class="buttons pull-right">

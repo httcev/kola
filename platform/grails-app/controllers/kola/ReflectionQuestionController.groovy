@@ -18,7 +18,7 @@ class ReflectionQuestionController {
         params.sort = params.sort ?: "autoLink"
         params.order = params.order ?: "desc"
         def query = ReflectionQuestion.where { deleted == false }
-        respond query.list(params), model:[reflectionQuestionInstanceCount: query.count()]
+        respond query.list(params), model:[reflectionQuestionCount: query.count()]
     }
 
     @Secured(['IS_AUTHENTICATED_REMEMBERED'])

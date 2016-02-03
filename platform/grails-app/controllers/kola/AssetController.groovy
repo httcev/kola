@@ -34,7 +34,7 @@ class AssetController {
         params.sort = params.sort ?: "lastUpdated"
         params.order = params.order ?: "desc"
         def query = Asset.where { subType == "learning-resource" && deleted == false }
-        respond query.list(params), model:[assetInstanceCount: query.count()]
+        respond query.list(params), model:[assetCount: query.count()]
     }
 
     @Secured(['IS_AUTHENTICATED_REMEMBERED'])
