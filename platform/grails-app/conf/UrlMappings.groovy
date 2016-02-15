@@ -14,20 +14,6 @@ class UrlMappings {
             action = [POST:"update"]
         }
 
-        name viewAsset: "/v/$id"{
-            controller = "asset"
-            action = "viewAsset"
-            constraints {
-                // apply constraints here
-            }
-        }
-        name viewAssetFile: "/v/$id/$file**"{
-            controller = "asset"
-            action = "viewAsset"
-            constraints {
-                // apply constraints here
-            }
-        }
         "/user/$action?/$id?(.$format)?" { controller = "user"; namespace = "admin"; plugin = "user" }
         "/register/$action?" { controller = "register"; plugin = "user" }
 

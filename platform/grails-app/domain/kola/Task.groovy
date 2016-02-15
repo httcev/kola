@@ -4,6 +4,7 @@ import java.util.UUID
 import org.apache.commons.collections.list.LazyList
 import org.apache.commons.collections.FactoryUtils
 import de.httc.plugins.user.User
+import de.httc.plugins.repository.Asset
 
 class Task {
     static searchable = {

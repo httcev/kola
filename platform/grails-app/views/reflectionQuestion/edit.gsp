@@ -9,7 +9,7 @@
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><a class="home" href="${createLink(uri: '/')}"><g:message code="kola.home"/></a></li>
+			<li><g:link uri="/"><g:message code="app.home" /></li>
 			<li><g:link class="index" action="index">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.edit.label" args="[entityName]" /></li>
 		</ol>

@@ -1,7 +1,7 @@
 <%@ page import="java.util.UUID" %>
 
 <g:set var="galleryId" value="id-${UUID.randomUUID().toString()}"/>
-<g:set var="assetService" bean="assetService"/>
+<g:set var="repositoryService" bean="repositoryService"/>
 
 <g:if test="${mode == 'edit'}">
 	<g:if test="${attachments?.size() > 0}">
@@ -13,7 +13,7 @@
 						<g:if test="${attachments.size() > 1}">
 							<div class="btn btn-default drag-handle" title="${message(code:'kola.dnd')}"><i class="fa fa-arrows-v fa-lg"></i></div>
 						</g:if>
-						<a href="${assetService.createEncodedLink(asset)}" target="_blank">${asset.name}</a>
+						<a href="${repositoryService.createEncodedLink(asset)}" target="_blank">${asset.name}</a>
 						<button type="button" class="btn btn-danger pull-right" title="${message(code:'default.delete.label', args:[message(code:'kola.task.attachment')])}" onclick="$(this).closest('li').remove()"><i class="fa fa-times"></i></button>
 					</h4>
 					<p class="list-group-item-text">
@@ -32,7 +32,7 @@
 <g:else>
 	<div class="attachments clearfix form-padding">
 		<g:each var="asset" in="${attachments}">
-			<g:set var="url" value="${assetService.createEncodedLink(asset)}" />
+			<g:set var="url" value="${repositoryService.createEncodedLink(asset)}" />
 			<a href="${url}"
 				<g:if test="${asset.mimeType?.startsWith("image") || asset.mimeType?.startsWith("video")}">
 					data-gallery="#${galleryId}" type="${asset.mimeType}"

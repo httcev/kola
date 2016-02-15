@@ -84,6 +84,10 @@ grails.project.dependency.resolution = {
         // plugins for the compile step
         compile "de.httc.plugins:user:2.0.0-SNAPSHOT"
         compile "de.httc.plugins:push-notification:2.0.0-SNAPSHOT"
+        compile ("de.httc.plugins:repository:2.0.0-SNAPSHOT") {
+            excludes "lucene-snowball" // confleicts with elastic search
+        }
+//        compile ("de.httc.plugins:qaa:2.0.0-SNAPSHOT")
 
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"
@@ -93,7 +97,7 @@ grails.project.dependency.resolution = {
 
         // plugins needed at runtime but not for compilation
         runtime ":hibernate4:4.3.8.1" // or ":hibernate:3.6.10.18"
-        runtime ":database-migration:1.4.0"
+        runtime ":database-migration:1.4.1"
         runtime ":jquery:1.11.1"
         runtime ":twitter-bootstrap:3.3.4"
         runtime ":font-awesome-resources:4.3.0.1"

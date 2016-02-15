@@ -3,6 +3,7 @@ import org.springframework.security.access.annotation.Secured
 import org.apache.lucene.queryparser.classic.QueryParser
 import static org.elasticsearch.index.query.QueryBuilders.*;
 import static org.elasticsearch.index.query.FilterBuilders.*;
+import de.httc.plugins.repository.Asset
 
 @Secured(['IS_AUTHENTICATED_REMEMBERED'])
 class SearchController {
@@ -43,14 +44,14 @@ class SearchController {
 			      must {
 			          term(deleted:false)
 			      }
-			      if (params.subType) {
+			      if (params.typeLabel) {
 			          must {
-			              term(subType: params.subType)
+			              term(typeLabel: params.typeLabel)
 			          }
 			      }
 			      // exclude attachments from search result
 			      must_not {
-		              term(subType:"attachment")
+		              term(typeLabel:"attachment")
 			      }
 			  }
 			}
@@ -59,10 +60,10 @@ class SearchController {
     }
 
     protected String escapeQuery(String query) {
-    	/*
-		def escapedCharacters = Regexp.escape('\\+-&|!(){}[]^~*?:')
-		return query?.gsub(/([#{escaped_characters}])/, '\\\\\1')
-		*/
+    	
+		//def escapedCharacters = Regexp.escape('\\+-&|!(){}[]^~*?:')
+		//return query?.gsub(/([#{escaped_characters}])/, '\\\\\1')
+		
 		if ("*".equals(query)) {
 			return query;
 		}

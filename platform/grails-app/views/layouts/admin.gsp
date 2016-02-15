@@ -42,7 +42,7 @@
 					<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REFLECTION_QUESTION_CREATOR">
 						<li class="${controllerName == 'reflectionQuestion' ? 'active' : ''}"><g:link controller="reflectionQuestion" action="index"><g:message code="kola.reflectionQuestions" /></g:link></li>
 					</sec:ifAnyGranted>
-					<li class="${controllerName == 'asset' ? 'active' : ''}"><g:link controller="asset" action="index"><g:message code="kola.assets" /></g:link></li>
+					<li class="${controllerName == 'asset' ? 'active' : ''}"><g:link controller="asset" action="index" plugins="repository"><g:message code="kola.assets" /></g:link></li>
 				</ul>
 				</sec:ifLoggedIn>
 				<ul class="nav navbar-nav navbar-right">

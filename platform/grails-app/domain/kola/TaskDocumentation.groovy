@@ -2,6 +2,7 @@ package kola
 
 import java.util.UUID
 import de.httc.plugins.user.User
+import de.httc.plugins.repository.Asset
 
 class TaskDocumentation {
 	static hasMany = [ attachments:Asset ]

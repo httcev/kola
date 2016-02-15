@@ -2,6 +2,7 @@ package kola
 
 import org.springframework.security.access.annotation.Secured
 import grails.transaction.Transactional
+import de.httc.plugins.repository.Asset
 
 @Secured(['permitAll'])
 @Transactional(readOnly = true)
@@ -14,7 +15,7 @@ class IndexController {
                 // sort order: first tasks having a due date (sorted ascending), then tasks having no due date (sorted by lastUpdated descending)
                 a.due ? (b.due ? a.due <=> b.due : -1) : (b.due ? 1 : b.lastUpdated <=> a.lastUpdated)
             }
-    		def latestAssets = Asset.where { subType == 'learning-resource' && deleted != true }.list(sort:"lastUpdated", order:"desc", max:4)
+    		def latestAssets = Asset.where { typeLabel == 'learning-resource' && deleted == false }.list(sort:"lastUpdated", order:"desc", max:4)
     		render(view:"dashboard", model:[assignedTasks:assignedTasks, latestAssets:latestAssets])
     	}
     	else {

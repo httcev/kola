@@ -1,6 +1,5 @@
 
 <g:set var="authService" bean="authService"/>
-<g:set var="assetService" bean="assetService"/>
 <html>
 	<head>
 		<meta name="layout" content="main">
@@ -10,7 +9,7 @@
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><g:link uri="/"><g:message code="kola.home" /></g:link></li>
+			<li><g:link uri="/"><g:message code="app.home" /></g:link></li>
 			<li><g:link action="index">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.show.label" args="[entityName]" /></li>
 		</ol>

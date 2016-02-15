@@ -43,6 +43,8 @@ environments {
         dataSource {
 //            dbCreate = "update"
             url = "jdbc:h2:./data/db/prod;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+            // clear production properties: this prevents timeouts in database migration
+            properties = null
         }
     }
     test {

@@ -84,7 +84,7 @@
 			</g:if>
 		</g:if>
 		<g:else>
-			<div class="alert alert-danger margin"><g:message code="kola.filter.empty" args="${[entitiesName]}" /></div>
+			<div class="alert alert-danger margin"><g:message code="app.filter.empty" args="${[entitiesName]}" /></div>
 		</g:else>
 	</body>
 </html>

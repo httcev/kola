@@ -1,6 +1,6 @@
 <%@ page import="kola.TaskStep" %>
 
-<g:set var="assetService" bean="assetService"/>
+<g:set var="repositoryService" bean="repositoryService"/>
 <g:set var="authService" bean="authService"/>
 
 <div class="form-group ${hasErrors(bean: task, field: 'name', 'error')} required">
@@ -76,7 +76,7 @@
 						<g:if test="${task?.resources?.size() > 1}">
 							<div class="btn btn-default drag-handle" title="${message(code:'kola.dnd')}"><i class="fa fa-arrows-v fa-lg"></i></div>
 						</g:if>
-						<a href="${assetService.createEncodedLink(asset)}" target="_blank">${asset.name}</a>
+						<a href="${repositoryService.createEncodedLink(asset)}" target="_blank">${asset.name}</a>
 						<button type="button" class="btn btn-danger pull-right" onclick="$(this).closest('li').remove()" title="${message(code:'default.button.delete.label')}"><i class="fa fa-times"></i></button>
 					</h4>
 					<p class="list-group-item-text">

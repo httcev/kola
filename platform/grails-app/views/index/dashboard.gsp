@@ -62,7 +62,7 @@
 								<a href="${createLink(resource:asset, action:'show')}" class="list-group-item">
 									<h4 class="list-group-item-heading">${asset.name}</h4>
 									<p class="list-group-item-text">
-										${asset.description?.take(100)}
+										${asset.props['_description']?.take(100)}
 									</p>
 								</a>
 							</g:each>
@@ -70,7 +70,7 @@
 					</g:if>
 					<g:else>
 						<div class="panel-body">
-							<p class="text-muted"><g:message code="kola.filter.empty" args="${[message(code: 'kola.assets')]}" /></p>
+							<p class="text-muted"><g:message code="app.filter.empty" args="${[message(code: 'kola.assets')]}" /></p>
 						</div>
 					</g:else>
 				</div>				
@@ -87,7 +87,7 @@
 							<g:link class="btn btn-default btn-block" controller="task" action="createTemplate"><i class="fa fa-plus"></i> <g:message code="kola.taskTemplate" /></g:link>
 						</sec:ifAnyGranted>
 						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REPOSITORY_ADMIN">
-							<g:link class="btn btn-default btn-block" controller="asset" action="create"><i class="fa fa-plus"></i> <g:message code="kola.asset" /></g:link>
+							<g:link class="btn btn-default btn-block" controller="asset" namespace="admin" action="create"><i class="fa fa-plus"></i> <g:message code="kola.asset" /></g:link>
 						</sec:ifAnyGranted>
 						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REFLECTION_QUESTION_CREATOR">
 							<g:link class="btn btn-default btn-block" controller="reflectionQuestion" action="create"><i class="fa fa-plus"></i> <g:message code="kola.reflectionQuestion" /></g:link>

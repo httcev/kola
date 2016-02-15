@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><g:link uri="/"><g:message code="kola.home" default="Home" /></g:link></li>
+			<li><g:link uri="/"><g:message code="app.home" default="Home" /></g:link></li>
 			<li><g:link action="index">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.create.label" args="[entityName]" /></li>
 		</ol>

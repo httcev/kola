@@ -1,7 +1,8 @@
-import kola.Asset
 import de.httc.plugins.user.User
 import de.httc.plugins.user.Role
 import de.httc.plugins.user.UserRole
+import de.httc.plugins.repository.Asset
+import de.httc.plugins.repository.AssetContent
 import kola.Task
 import kola.TaskStep
 import kola.ReflectionQuestion
@@ -76,7 +77,7 @@ class BootStrap {
 
                     def numAssets = 3
                     for (int i=0; i<numAssets; i++) {
-                        new Asset(name:"Asset $i", description:"$i Huhu", mimeType:"text/plain", content:"Das ist ein Text! $i" as byte[]).save(true)
+                        new Asset(name:"Asset $i", typeLabel:"learning-resource", mimeType:"text/plain", content:new AssetContent(data:"Das ist ein Text! $i" as byte[]), props:[_description:"$i Huhu".toString()]).save(true)
                     }
                     assert Asset.count() == numAssets
 
@@ -86,7 +87,9 @@ class BootStrap {
                         def task = new Task(name:"Example Task Template $i", description:description, creator:testUser, isTemplate:true)
                         task.addToSteps(new TaskStep(name:"Step 1 example", description:description))
                         task.addToSteps(new TaskStep(name:"Step 2 example", description:description))
-                        task.save(true)
+                        if (!task.save(true)) {
+                            task.errors.allErrors.each { println it }
+                        }
                     }
                     assert Task.count() == numTaskTemplates
 
@@ -112,6 +115,26 @@ class BootStrap {
                 doc.photo = it.profile.photo.encodeBase64().toString()
             }
             return [id:it.id, doc:doc]
+        }
+        
+        def _exported = ["name", "props", "mimeType", "type", "deleted"]
+        def _referenced = ["creator"]
+        grails.converters.JSON.registerObjectMarshaller(Asset) {
+            def doc = asset.properties.findAll { k, v ->
+                k in _exported
+            }
+            _referenced.each {
+                if (asset."$it" instanceof List) {
+                    doc."$it" = asset."$it"?.collect {
+                        it?.id
+                    }
+                }
+                else {
+                    doc."$it" = asset."$it"?.id
+                }
+            }
+            doc.id = asset.id
+            return [id:asset.id, doc:doc]
         }
     }
     def destroy = {

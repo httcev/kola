@@ -1,10 +1,6 @@
-<%@ page import="java.util.UUID" %>
-
-<g:set var="assetService" bean="assetService"/>
-
 <div class="attachments clearfix form-padding-all">
 	<g:each var="asset" in="${attachments}">
-		<g:set var="url" value="${assetService.createEncodedLink(asset)}" />
+		<g:set var="url" value="${repositoryService.createEncodedLink(asset)}" />
 		<div class="text-center pull-left">
 			<g:if test="${asset.mimeType?.startsWith("image")}">
 				<img src="${url}" />

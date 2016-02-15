@@ -103,16 +103,17 @@ grails.serverURL = "https://${Environment.current == Environment.PRODUCTION ? 'p
 kola {
     thumbnailSize = 80
     avatarSize = 40
-    repository.directory = "/srv/kola/${Environment.current.name}/repository"
     appDownloadUrl = "https://play.google.com/apps/testing/de.httc.kola${Environment.current == Environment.PRODUCTION ? '' : '.' + Environment.current.name}"
 }
 de.httc.plugin.user.selfRegistrationEnabled = false
+de.httc.plugin.repository.directory = "/srv/kola/${Environment.current.name}/repository"
 
 elasticSearch {
     index.name = "kola-${Environment.current.name}"
     datastoreImpl = "hibernateDatastore"
     includeTransients = false
     client.mode = "node"
+    bulkIndexOnStartup = true
 }
 
 environments {
@@ -121,8 +122,9 @@ environments {
         grails.serverURL = "http://130.83.139.161:8080/platform"
         elasticSearch.client.mode = "local"
         elasticSearch.index.store.type = "memory"
+        //elasticSearch.bulkIndexOnStartup = false
 
-        kola.repository.directory = "./data/repository"
+        de.httc.plugin.repository.directory = "./data/repository"
         de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyAJQJjAOE53yqqTbgi3Nj3rfeMjREc-fOo"
     }
     production {
@@ -186,8 +188,8 @@ log4j.appender.file.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
            'org.codehaus.groovy.grails.commons',            // core / classloading
            'org.codehaus.groovy.grails.plugins',            // plugins
            'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
-           'org.springframework',
            'org.hibernate',
+           'org.springframework',
            'net.sf.ehcache.hibernate',
            'org.grails.plugins'
 }
@@ -216,7 +218,7 @@ grails.plugin.springsecurity.controllerAnnotations.staticRules = [
 	'/**/favicon.ico':  ['permitAll'],
     '/register/**':     ['permitAll'],
     '/user/**':         ['ROLE_ADMIN'],
-    '/dbconsole/**':     ['ROLE_ADMIN']
+    '/dbconsole/**':     ['permitAll']
 ]
 
 // enable basic authentication for api access for app
@@ -247,5 +249,5 @@ grails.plugin.springsecurity.ui.register.defaultRoleNames =["ROLE_USER"]
 grails.plugin.springsecurity.ui.register.emailFrom = "info@kola-projekt.de"
 grails.plugin.springsecurity.ui.register.emailBody = 'Guten Tag $user.profile.firstName $user.profile.lastName,<br/><br/>um das Anlegen des neuen KOLA Benutzerkontos abzuschließen, klicken Sie bitte&nbsp;<a href="$url">hier</a>.<br/><br/>Wenn Sie kein KOLA Benutzerkonto angefordert haben, ignorieren Sie diese Mail bitte einfach.<br/><br/>Ihr KOLA-Team'
 
-grails.plugin.databasemigration.updateOnStart = true
-grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.groovy']
+//grails.plugin.databasemigration.updateOnStart = true
+//grails.plugin.databasemigration.updateOnStartFileNames = ['changelog.groovy']

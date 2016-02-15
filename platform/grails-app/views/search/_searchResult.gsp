@@ -6,7 +6,7 @@
 	<g:each var="hit" in="${searchResults}" status="hitIndex">
 		<li class="search-result-hit list-group-item clearfix" id="${hit.id}">
 			<h4 class="list-group-item-heading">
-				<a href="${createLink(resource:hit, action:'show')}" class="search-result-link ${(hit.class.name-'kola.').toLowerCase()}">
+				<a href="${createLink(resource:hit, action:'show')}" class="search-result-link ${(hit.class.simpleName).toLowerCase()}">
 					${hit.name?.take(100)}
 				</a>
 			</h4>

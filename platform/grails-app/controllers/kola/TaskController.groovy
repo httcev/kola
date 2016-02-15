@@ -5,6 +5,8 @@ import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 import org.springframework.security.access.annotation.Secured
 import de.httc.plugins.user.User
+import de.httc.plugins.repository.Asset
+import de.httc.plugins.repository.AssetContent
 
 @Transactional(readOnly = true)
 @Secured(['IS_AUTHENTICATED_REMEMBERED'])
@@ -238,7 +240,7 @@ class TaskController {
             if ("_newAttachment" == k) {
                 files?.each { f ->
                     if (!f.empty) {
-                        attachments.add(new Asset(name:f.originalFilename, subType:"attachment", mimeType:f.getContentType(), content:f.bytes))
+                        attachments.add(new Asset(name:f.originalFilename, typeLabel:"attachment", mimeType:f.getContentType(), content:new AssetContent(data:f.bytes)))
                     }
                 }
             }
@@ -276,7 +278,7 @@ class TaskController {
             if ("_newAttachment" == k) {
                 files?.each { f ->
                     if (!f.empty) {
-                        def asset = new Asset(name:f.originalFilename, subType:"attachment", mimeType:f.getContentType(), content:f.bytes)
+                        def asset = new Asset(name:f.originalFilename, typeLabel:"attachment", mimeType:f.getContentType(), content:new AssetContent(data:f.bytes))
                         if (!asset.save(true)) {
                             asset.errors.allErrors.each { println it }
                         }
@@ -459,7 +461,7 @@ class TaskController {
             
             files?.each { f ->
                 if (!f.empty) {
-                    def asset = new Asset(name:f.originalFilename, subType:"attachment", mimeType:f.getContentType(), content:f.bytes)
+                    def asset = new Asset(name:f.originalFilename, typeLabel:"attachment", mimeType:f.getContentType(), content:new AssetContent(data:f.bytes))
                     if (!asset.save(true)) {
                         asset.errors.allErrors.each { println it }
                     }

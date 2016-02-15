@@ -7,7 +7,7 @@
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><g:link uri="/"><g:message code="kola.home" /></g:link></li>
+			<li><g:link uri="/"><g:message code="app.home" /></g:link></li>
 			<li><g:link action="index" params="[isTemplate:task.isTemplate]">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.edit.label" args="[entityName]" /></li>
 		</ol>

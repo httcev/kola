@@ -6,6 +6,7 @@ import grails.transaction.Transactional
 import groovy.xml.*
 import java.text.SimpleDateFormat
 import java.text.DateFormat
+import de.httc.plugins.repository.Asset
 
 @Secured(['ROLE_ADMIN'])
 @Transactional

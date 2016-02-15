@@ -8,6 +8,7 @@ import java.text.DateFormat
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import de.httc.plugins.user.User
+import de.httc.plugins.repository.Asset
 
 @Secured(['IS_AUTHENTICATED_REMEMBERED'])
 @Transactional
@@ -43,7 +44,7 @@ class ChangesController {
 			}
 
     		// learning resources may change without having a changed task, so hand out all modified ones.
-    		def assets = Asset.findAllByLastUpdatedBetweenAndSubType(since, now, "learning-resource") as Set
+    		def assets = Asset.findAllByLastUpdatedBetweenAndTypeLabel(since, now, "learning-resource") as Set
 
 			def c = Task.createCriteria()
 	    	def tasks = c {

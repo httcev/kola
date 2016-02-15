@@ -1,5 +1,5 @@
 <g:set var="authService" bean="authService"/>
-<g:set var="assetService" bean="assetService"/>
+<g:set var="repositoryService" bean="repositoryService"/>
 <html>
 	<head>
 		<meta name="layout" content="editor">
@@ -11,7 +11,7 @@
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><g:link uri="/"><g:message code="kola.home" /></g:link></li>
+			<li><g:link uri="/"><g:message code="app.home" /></g:link></li>
 			<li><g:link action="index" params="[isTemplate:task.isTemplate]">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.show.label" args="[entityName]" /></li>
 		</ol>
@@ -73,7 +73,7 @@
 			<div class="panel-heading"><h3 class="panel-title"><g:message code="kola.assets" /></h3></div>
 			<div class="list-group">
 				<g:each var="asset" in="${task?.resources}">
-					<a href="${assetService.createEncodedLink(asset)}" class="list-group-item" target="_blank">
+					<a href="${repositoryService.createEncodedLink(asset)}" class="list-group-item" target="_blank">
 						<h4 class="list-group-item-heading">
 							<i class="fa fa-external-link"></i> ${asset.name}
 						</h4>

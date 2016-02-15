@@ -1,21 +1,20 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<g:set var="assetService" bean="assetService"/>
+<g:set var="repositoryService" bean="repositoryService"/>
 <html>
 	<head>
 		<title>${task?.name}</title>
 		<link rel="stylesheet" href="${resource(dir:'assets', file:'application.css')}" type="text/css" media="all" />
-
 		<style  type="text/css">
 		  @page { size:210mm 297mm; @bottom-left { content: element(header); }}
 		  *::after, *::before { display:block !important; }
-		  #print-footer { position:running(header); font-size:10px; line-height:11px; vertical-align: middle; text-align: right }
+		  .print-footer { position:running(header); font-size:10px; line-height:11px; vertical-align: middle; text-align: right }
 		  img { width: 200px }
 		  .panel { page-break-inside: avoid; }
 		</style>
 	</head>
 	<body>
-		<div id="print-footer">
+		<div class="print-footer">
 			<img src="${assetPath(src: 'Kola-h-100.png', absolute:true)}" width="44"/>
 			Kompetenzorientiertes Lernen im Arbeitsprozess mit digitalen Medien
 		</div>
@@ -61,7 +60,7 @@
 				<div class="panel-heading"><h3 class="panel-title"><g:message code="kola.assets" /></h3></div>
 				<div class="list-group">
 					<g:each var="asset" in="${task?.resources}">
-						<a href="${assetService.createEncodedLink(asset)}" class="list-group-item" target="_blank">
+						<a href="${repositoryService.createEncodedLink(asset)}" class="list-group-item" target="_blank">
 							<h4 class="list-group-item-heading">
 								<i class="fa fa-external-link"></i> ${asset.name}
 							</h4>
