@@ -173,6 +173,12 @@ var DBSYNC = {
                             self.cbEndSync(self.syncResult);
                         });
                     });
+                }, function() {
+                    // uploading failed
+                    self.syncResult.syncOK = false;
+                    self.syncResult.codeStr = 'uploadFailed';
+                    self.syncResult.message = 'Uploading new assets failed';
+                    self.cbEndSync(self.syncResult);
                 });
             }, function() {
                 // Called when a timeout occurred
@@ -459,6 +465,7 @@ var DBSYNC = {
                     }, function(err) {
                         // Error
                         console.error("--- upload error", err);
+                        return self.$q.reject();
                     }, function (progress) {
                         // constant progress updates
                         //console.log("--- upload progress", progress);

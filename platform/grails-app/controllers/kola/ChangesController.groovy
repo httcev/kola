@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import de.httc.plugins.user.User
 import de.httc.plugins.repository.Asset
+import de.httc.plugins.repository.AssetContent
 
 @Secured(['IS_AUTHENTICATED_REMEMBERED'])
 @Transactional
@@ -92,7 +93,7 @@ class ChangesController {
 	    	render result as JSON
 	    }
 	    catch(e) {
-	    	e.printStackTrace()
+	    	log.error e
 	    	render status:400, contentType:"text/plain", text:e.message
 	    }
     }
@@ -111,7 +112,6 @@ class ChangesController {
     	try {
 	    	def user = springSecurityService.currentUser
 			LOG.info("changes/uploadAttachment/$id")
-
     		// TODO: check write access
     		Asset asset = Asset.get(id)
     		if (!asset) {
@@ -120,8 +120,12 @@ class ChangesController {
 		    	return
     		}
 
-    		asset.content = request.getFile("file").bytes
-    		if (asset.save(true)) {
+    		// remove possible extsting asset content
+    		if (!asset.content) {
+    			asset.content = new AssetContent()
+    		}
+    		asset.content.data = request.getFile("file").bytes
+    		if (asset.save()) {
     			println "--- SUCCESS"
 		    	render status:200, contentType:"text/plain", text:"success"
 		    	return
@@ -132,7 +136,7 @@ class ChangesController {
 		    }
 	    }
 	    catch(e) {
-	    	e.printStackTrace()
+	    	log.error e
 	    	render status:400, contentType:"text/plain", text:e.message
 	    }
     }
