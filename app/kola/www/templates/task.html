@@ -1,0 +1,15 @@
+<!--
+Each tab's child <ion-nav-view> directive will have its own
+navigation history that also transitions its views in and out.
+-->
+<ion-tabs class="tabs-icon-top tabs-color-active-positive">
+  <ion-tab title="Arbeitsauftrag" icon="ion-clipboard" ui-sref="task.detail">
+    <ion-nav-view name="task-detail"></ion-nav-view>
+  </ion-tab>
+  <ion-tab title="Dokumentation" icon="ion-compose" ui-sref="task.documentation">
+    <ion-nav-view name="task-documentation"></ion-nav-view>
+  </ion-tab>
+  <ion-tab title="Fragen" icon="ion-chatboxes" ui-sref="task.questions">
+    <ion-nav-view name="task-questions"></ion-nav-view>
+  </ion-tab>
+</ion-tabs>

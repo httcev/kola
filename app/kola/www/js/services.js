@@ -171,7 +171,7 @@ angular.module('kola.services', ['uuid'])
         if (results.rows.length == 1) {
           var doc = JSON.parse(results.rows.item(0).doc);
           doc._table = tableName;
-          if (tableName == "asset" && doc.subType == "attachment") {
+          if (tableName == "asset" && doc.typeLabel == "attachment") {
             self._setLocalURL(doc).then(function() {
               d.resolve(doc);
             }, function(err) {
@@ -321,7 +321,7 @@ angular.module('kola.services', ['uuid'])
   }
 
   function createAttachment(parent) {
-    var attachment = _create("asset", { subType:"attachment" });
+    var attachment = _create("asset", { typeLabel:"attachment" });
     parent.attachments = parent.attachments || [];
     parent.attachments.push(attachment);
     return attachment;
@@ -373,7 +373,7 @@ angular.module('kola.services', ['uuid'])
       console.log("--- saving", copy);
 
       tx.executeSql("INSERT OR REPLACE INTO " + doc._table + " (id, doc) values (?, ?)", [copy.id, JSON.stringify(copy)], function (tx, results) {
-        if (doc._table == "asset" && copy.subType == "attachment" && localURL) {
+        if (doc._table == "asset" && copy.typeLabel == "attachment" && localURL) {
           window.resolveLocalFileSystemURL(localURL, function(fileEntry) {
             // move attachment data to assets dir if it is not already there
             if (fileEntry.nativeURL != (self._assetsDirName + copy.id)) {
@@ -473,7 +473,7 @@ angular.module('kola.services', ['uuid'])
 
   function openAccountTab(message) {
     $ionicLoading.show({template:message, duration:2000});
-    $state.go("tab.account");
+    $state.go("settings");
   }
 
   $rootScope.$on("credentialsChanged", onCredentialsChanged);

@@ -1,0 +1,35 @@
+<ion-view view-title="Einstellungen" hide-back-button="true">
+	<ion-nav-buttons side="secondary">
+		<button type="submit" form="settings-form" ng-disabled="profile.user.length==0 || profile.password.length==0" class="button button-balanced icon-left" ng-disabled="!profile.user || !profile.password"><i class="icon ion-checkmark"></i> Speichern</button>
+		<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
+	</ion-nav-buttons>
+	<ion-content>
+		<form id="settings-form" ng-submit="update()">
+		  	<div class="list">
+			  <label class="item item-input item-stacked-label">
+			    <span class="input-label">Benutzer</span>
+			    <input type="text" ng-model="profile.user" autocapitalize="off">
+			  </label>
+			  <label class="item item-input item-stacked-label">
+			    <span class="input-label">Passwort</span>
+			    <input type="password" ng-model="profile.password">
+			  </label>
+			  <div class="item item-divider">
+			  	Weitere Einstellungen
+			  </div>
+			  <li class="item item-toggle item-text-wrap">
+			     Fotos vor dem Hochladen kleiner skalieren (empfohlen)
+			     <label class="toggle toggle-balanced">
+			       <input type="checkbox" ng-model="scaleImages">
+			       <div class="track">
+			         <div class="handle"></div>
+			       </div>
+			     </label>
+			  </li>
+			</div>
+		</form>
+	</ion-content>
+	<ion-footer-bar align-title="center">
+	  <h1 class="title"><span class="version">{{appName}} Version {{appVersion}}</span></h1>
+	</ion-footer-bar>  
+</ion-view>

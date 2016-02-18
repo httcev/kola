@@ -28,7 +28,7 @@ angular.module('kola.controllers', [])
     };
 */
     $scope.create = function() {
-      $state.go("tab.task-choose-template");
+      $state.go("task-choose-template");
     };
 
     $scope.sortByDue = function(task) {
@@ -243,23 +243,23 @@ angular.module('kola.controllers', [])
   $scope.chat = Chats.get($stateParams.chatId);
 })
 
-.controller('AccountCtrl', function($scope, $state, appName, appVersion, dbService, authenticationService) {
+.controller('SettingsCtrl', function($scope, $state, appName, appVersion, dbService, authenticationService) {
   $scope.profile = authenticationService.getCredentials();
   $scope.scaleImages = ((localStorage["scaleImages"]  || "true") === "true");
   $scope.appName = appName;
   $scope.appVersion = appVersion;
 
-  $scope.updateProfile = function() {
+  $scope.update = function() {
     localStorage["scaleImages"] = $scope.scaleImages.toString();
     if ($scope.profile.user && $scope.profile.password) {
       authenticationService.updateCredentials($scope.profile.user, $scope.profile.password);
 
       dbService.sync().then(function() {
-        return $state.go("tab.tasks");
+        return $state.go("home");
       }, function(err) {
         // in case we're offline, we'll get "sync denied" here. in that case, switch to tasks tab anyway
         if ("sync denied" == err) {
-          return $state.go("tab.tasks");
+          return $state.go("home");
         }
       });
     }
@@ -286,7 +286,7 @@ angular.module('kola.controllers', [])
     if (template) {
       params.templateId = template.id;
     }
-    $state.go("tab.task-create", params);
+    $state.go("task-create", params);
   }
 })
 
@@ -355,7 +355,7 @@ angular.module('kola.controllers', [])
         $ionicLoading.show({template: "Neuer Arbeitsauftrag gespeichert.", duration:2000});
         // prevent going back to editor
         $ionicHistory.nextViewOptions({ disableBack:true });
-        $state.go("tab.tasks");
+        $state.go("home");
       }, function(err) {
         console.log(err);
         $ionicLoading.show({template: "Speichern fehlgeschlagen!", duration:2000});

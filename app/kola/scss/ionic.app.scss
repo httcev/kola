@@ -21,6 +21,7 @@ $ionicons-font-path: "../lib/ionic/fonts" !default;
 // Include all of Ionic
 @import "www/lib/ionic/scss/ionic";
 
+*[ui-sref] { cursor:pointer }
 .task-section-header { font-size:1.5em; color:$positive; padding:15px 0 10px 0}
 
 /* Empty. Add your own CSS if you like */
@@ -98,7 +99,7 @@ sync-control span { padding-top:10px; }
 .documentation-editor textarea { min-height:100px; font-size:16px;}
 /*.media-edit { display:inline-block; position:relative; min-width:100px; min-height:100px; text-align:right; vertical-align:top; }*/
 .media-container { display:flex; flex-wrap:wrap; justify-content:space-between }
-.media-container .media-item { height:100px; position:relative; margin:5px; cursor:pointer; font-size:11px; line-height:11px}
+.media-container .media-item { height:100px; position:relative; margin:5px; cursor:pointer; font-size:11px; line-height:11px; border:1px solid #EEE; padding:1px;}
 .media-container .media-item img { height:100%; }
 .media-container .media-item .external-attachment { text-align:center; }
 .media-container .media-item .external-attachment .symbol { font-size:72px; }

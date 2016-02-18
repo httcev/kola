@@ -20,87 +20,69 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
   // Each state's controller can be found in controllers.js
   $stateProvider
 
-  // setup an abstract state for the tabs directive
-  .state('tab', {
-    url: "/tab",
-    abstract: true,
-    templateUrl: "templates/tabs.html"
+  .state('home', {
+    url: "/home",
+    controller: 'TasksCtrl',
+    templateUrl: "templates/home.html"
   })
 
-  // Each tab has its own nav history stack:
-
-  .state('tab.tasks', {
-    url: '/tasks',
-    views: {
-      'tab-tasks': {
-        templateUrl: 'templates/tab-tasks.html',
-        controller: 'TasksCtrl'
-      }
-    }
+  .state('task-choose-template', {
+    url: '/new-task/chooseTemplate',
+    templateUrl: 'templates/task-choose-template.html',
+    controller: 'TaskChooseTemplateCtrl'
   })
-  .state('tab.task-choose-template', {
-    url: '/tasks/chooseTemplate',
-    views: {
-      'tab-tasks': {
-        templateUrl: 'templates/task-choose-template.html',
-        controller: 'TaskChooseTemplateCtrl'
-      }
-    }
-  })
-  .state('tab.task-create', {
-    url: '/tasks/create/:templateId',
-    views: {
-      'tab-tasks': {
-        templateUrl: 'templates/task-create.html',
-        controller: 'TaskCreateCtrl'
-      }
-    },
+  .state('task-create', {
+    url: '/new-task/create/:templateId',
+    templateUrl: 'templates/task-create.html',
+    controller: 'TaskCreateCtrl',
     cache: false
   })
-  .state('tab.task-detail', {
-    url: '/tasks/:taskId',
+
+  .state('task', {
+    url: "/task/:taskId",
+    abstract: true,
+    templateUrl: "templates/task.html"
+  })
+  .state('task.detail', {
+    url: '/detail',
     views: {
-      'tab-tasks': {
+      'task-detail': {
         templateUrl: 'templates/task-detail.html',
         controller: 'TaskDetailCtrl'
       }
     }
   })
-  .state('tab.task-step', {
-    url: '/tasks/:taskId/step/:stepId',
+  .state('task.documentation', {
+    url: '/documentation',
     views: {
-      'tab-tasks': {
+      'task-documentation': {
+        templateUrl: 'templates/task-documentation.html',
+        controller: 'TaskDetailCtrl'
+      }
+    }
+  })
+  .state('task.questions', {
+    url: '/questions',
+    views: {
+      'task-questions': {
+        templateUrl: 'templates/task-questions.html',
+        controller: 'TaskDetailCtrl'
+      }
+    }
+  })
+  .state('task.step', {
+    url: '/step/:stepId',
+    views: {
+      'task-step': {
         templateUrl: 'templates/task-detail.html',
         controller: 'TaskDetailCtrl'
       }
     }
   })
-  .state('tab.chats', {
-    url: '/chats',
-    views: {
-      'tab-chats': {
-        templateUrl: 'templates/tab-chats.html',
-        controller: 'ChatsCtrl'
-      }
-    }
-  })
-  .state('tab.chat-detail', {
-    url: '/chats/:chatId',
-    views: {
-      'tab-chats': {
-        templateUrl: 'templates/chat-detail.html',
-        controller: 'ChatDetailCtrl'
-      }
-    }
-  })
-  .state('tab.account', {
-    url: '/account',
-    views: {
-      'tab-account': {
-        templateUrl: 'templates/tab-account.html',
-        controller: 'AccountCtrl'
-      }
-    }
+  .state('settings', {
+    url: '/settings',
+    templateUrl: 'templates/settings.html',
+    controller: 'SettingsCtrl'
   });
 
   // if none of the above states are matched, use this as the fallback
@@ -119,6 +101,10 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
     }
   });
 }])
+
+.config(function($ionicConfigProvider) {
+  $ionicConfigProvider.backButton.text("Zurück");
+})
 
 .constant("appName", "/* @echo APP_NAME */")
 .constant("appVersion", "/* @echo APP_VERSION */")

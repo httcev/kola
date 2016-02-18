@@ -450,7 +450,7 @@ var DBSYNC = {
             console.log("--- options", options);
             angular.forEach(attachments, function(attachment) {
                 var doc = JSON.parse(attachment.doc);
-                if (doc.subType == "attachment") {
+                if (doc.typeLabel == "attachment") {
                     console.log("--- uploading "+(self.assetsDir + doc.id)+" to " +(self.attachmentUploadUrl + "/" + doc.id));
                     promises.push(self.$cordovaFileTransfer.upload(self.attachmentUploadUrl + "/" + doc.id, self.assetsDir + doc.id, options)
                     .then(function(result) {
@@ -476,7 +476,7 @@ var DBSYNC = {
             var options = { headers: { "Authorization": "Basic " + this._encodeBase64(crendentials.user + ':' + crendentials.password) }};
             angular.forEach(attachments, function(attachment) {
                 var att = attachment.doc;
-                if (att && att.subType == "attachment") {
+                if (att && att.typeLabel == "attachment") {
                     // only download if not available locally already
                     promises.push(self.$cordovaFile.checkFile(self.assetsDir, att.id)
                     .then(function (success) {
