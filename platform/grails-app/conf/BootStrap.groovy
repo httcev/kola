@@ -3,6 +3,9 @@ import de.httc.plugins.user.Role
 import de.httc.plugins.user.UserRole
 import de.httc.plugins.repository.Asset
 import de.httc.plugins.repository.AssetContent
+import de.httc.plugins.qaa.Question
+import de.httc.plugins.qaa.Answer
+import de.httc.plugins.qaa.Comment
 import kola.Task
 import kola.TaskStep
 import kola.ReflectionQuestion
@@ -13,9 +16,9 @@ class BootStrap {
     def grailsApplication
 
     def init = { servletContext ->
-    	if (!repoDir.exists()) {
-    		repoDir.mkdirs()
-    	}
+		if (!repoDir.exists()) {
+			repoDir.mkdirs()
+		}
         if (!Settings.getSettings()) {
             def settings = new Settings()
             if (!settings.save(true)) {
@@ -42,29 +45,16 @@ class BootStrap {
             assert UserRole.count() == 1
         }
         if (ReflectionQuestion.count() == 0) {
-/*            
-            new ReflectionQuestion(name:"Kam es bei der Durchführung der Arbeitshandlung zu Schwierigkeiten (technisch/fachlich)?").save(true)
-            new ReflectionQuestion(name:"Wodurch kann die Funktionstüchtigkeit grundsätzlich beeinträchtigt werden?").save(true)
-            new ReflectionQuestion(name:"Was kann bei einer erneuten Durchführung der verschiedenen Arbeitsschritte besser/anders durchgeführt werden?").save(true)
-            new ReflectionQuestion(name:"Ist der Arbeitsschritt in der dafür vorgesehen Zeit durchgeführt worden?").save(true)
-            new ReflectionQuestion(name:"Welcher Arbeitsschritt war am zeitintensivsten? Begründen Sie ihre Aussage.").save(true)
-            new ReflectionQuestion(name:"Welches Funktionswissen/Vorwissen war für die Durchführung der Arbeiten notwendig?").save(true)
-            new ReflectionQuestion(name:"Ist die Planung und Durchführung der Arbeitshandlung selbstständig erfolgt oder gab es Hilfestellungen von Meistern bzw. Gesellen?").save(true)
-            new ReflectionQuestion(name:"Haben Sie die Arbeit alleine durchgeführt oder im Team?").save(true)
-            new ReflectionQuestion(name:"Welche Rückmeldungen haben Sie vom Team vor Ort erhalten?").save(true)
-            new ReflectionQuestion(name:"Welche Teilschritte des gesamten Kundenauftrags ging den durchgeführten Arbeiten voraus? Welche schließen sich an?").save(true)
-            new ReflectionQuestion(name:"War die durchgeführte Arbeit eher über- oder unterfordernd? Begründen Sie Ihre Meinung.").save(true)
-*/
-            new ReflectionQuestion(name:"Was ist mir gut gelungen?", autoLink:true).save(true)
-            new ReflectionQuestion(name:"Was ist mir schwer gefallen (z.B. technisch oder fachlich)?", autoLink:true).save(true)
-            new ReflectionQuestion(name:"Was würde ich beim nächsten Mal besser oder anders machen?", autoLink:true).save(true)
-            new ReflectionQuestion(name:"Welche Fragen sind mir noch offen geblieben?", autoLink:true).save(true)
-            new ReflectionQuestion(name:"Welche Fragen habe ich bereits zu den anstehenden Aufträgen?", autoLink:true).save(true)
+            new ReflectionQuestion(name:"Was ist mir gut gelungen?", autoLink:true).save()
+            new ReflectionQuestion(name:"Was ist mir schwer gefallen (z.B. technisch oder fachlich)?", autoLink:true).save()
+            new ReflectionQuestion(name:"Was würde ich beim nächsten Mal besser oder anders machen?", autoLink:true).save()
+            new ReflectionQuestion(name:"Welche Fragen sind mir noch offen geblieben?", autoLink:true).save()
+            new ReflectionQuestion(name:"Welche Fragen habe ich bereits zu den anstehenden Aufträgen?", autoLink:true).save()
 
-            new ReflectionQuestion(name:"Zu welchem Thema wünsche ich mir noch Erklärungen?").save(true)
-            new ReflectionQuestion(name:"Welche neuen Tätigkeiten würde ich gerne noch kennenlernen?").save(true)
-            new ReflectionQuestion(name:"Welche Probleme/Störungen sind bei der Arbeit entstanden? Wie bin ich vorgegangen um die Probleme zu lösen?").save(true)
-            new ReflectionQuestion(name:"Was habe ich bei diesem Auftrag neu gelernt? Was kann ich jetzt besser?").save(true)
+            new ReflectionQuestion(name:"Zu welchem Thema wünsche ich mir noch Erklärungen?").save()
+            new ReflectionQuestion(name:"Welche neuen Tätigkeiten würde ich gerne noch kennenlernen?").save()
+            new ReflectionQuestion(name:"Welche Probleme/Störungen sind bei der Arbeit entstanden? Wie bin ich vorgegangen um die Probleme zu lösen?").save()
+            new ReflectionQuestion(name:"Was habe ich bei diesem Auftrag neu gelernt? Was kann ich jetzt besser?").save()
             new ReflectionQuestion(name:"Welche Aufgaben waren interessant und würde ich gerne vertiefen?").save(true)
 
             assert ReflectionQuestion.count() == 10
@@ -87,6 +77,9 @@ class BootStrap {
                         def task = new Task(name:"Example Task Template $i", description:description, creator:testUser, isTemplate:true)
                         task.addToSteps(new TaskStep(name:"Step 1 example", description:description))
                         task.addToSteps(new TaskStep(name:"Step 2 example", description:description))
+                        ReflectionQuestion.getAll().each {
+                            task.addToReflectionQuestions(it)
+                        }
                         if (!task.save(true)) {
                             task.errors.allErrors.each { println it }
                         }
@@ -95,13 +88,18 @@ class BootStrap {
 
                     def numTasks = 2
                     for (int i=0; i<numTasks; i++) {
-                        new Task(name:"Example Task $i", description:description, creator:testUser).save(true)
+                        def task = new Task(name:"Example Task $i", description:description, creator:User.findByUsername("admin"), assignee:testUser).save(true)
+                        task.addToSteps(new TaskStep(name:"Step 1 example", description:description))
+                        task.addToSteps(new TaskStep(name:"Step 2 example", description:description))
+                        new Question(title:"Ich habe eine Frage $i", text:"Was ist grün und hüpft von Baum zu Baum?", creator:testUser, reference:task).save(true)
                     }
                     assert Task.count() == numTaskTemplates + numTasks
+                    assert Question.count() == numTasks
                 }
             }
         }
 
+        // USERS
         grails.converters.JSON.registerObjectMarshaller(User) {
             def doc = [:]
             doc.id = it.id
@@ -116,14 +114,13 @@ class BootStrap {
             }
             return [id:it.id, doc:doc]
         }
-        
-        def _exported = ["name", "props", "mimeType", "type", "deleted"]
-        def _referenced = ["creator"]
-        grails.converters.JSON.registerObjectMarshaller(Asset) {
+
+        // ASSETS
+        grails.converters.JSON.registerObjectMarshaller(Asset) { asset ->
             def doc = asset.properties.findAll { k, v ->
-                k in _exported
+                k in ["name", "props", "mimeType", "url", "typeLabel", "deleted"]
             }
-            _referenced.each {
+            ["creator"].each {
                 if (asset."$it" instanceof List) {
                     doc."$it" = asset."$it"?.collect {
                         it?.id
@@ -135,6 +132,61 @@ class BootStrap {
             }
             doc.id = asset.id
             return [id:asset.id, doc:doc]
+        }
+
+        // QUESTIONS
+        grails.converters.JSON.registerObjectMarshaller(Question) { question ->
+            def doc = question.properties.findAll { k, v ->
+                k in ["title", "text", "deleted", "lastUpdated", "metadata", "rated", "rating"]
+            }
+            ["attachments", "answers", "comments", "creator", "acceptedAnswer", "reference"].each {
+                if (question."$it" instanceof List) {
+                    doc."$it" = question."$it"?.collect {
+                        it?.id
+                    }
+                }
+                else {
+                    doc."$it" = question."$it"?.id
+                }
+            }
+            doc.id = question.id
+            return [id:question.id, doc:doc]
+        }
+        // ANSWERS
+        grails.converters.JSON.registerObjectMarshaller(Answer) { answer ->
+            def doc = answer.properties.findAll { k, v ->
+                k in ["text", "deleted", "lastUpdated", "rated", "rating"]
+            }
+            ["attachments", "comments", "creator", "question"].each {
+                if (answer."$it" instanceof List) {
+                    doc."$it" = answer."$it"?.collect {
+                        it?.id
+                    }
+                }
+                else {
+                    doc."$it" = answer."$it"?.id
+                }
+            }
+            doc.id = answer.id
+            return [id:answer.id, doc:doc]
+        }
+        // COMMENTS
+        grails.converters.JSON.registerObjectMarshaller(Comment) { comment ->
+            def doc = comment.properties.findAll { k, v ->
+                k in ["text", "deleted", "lastUpdated"]
+            }
+            ["creator"].each {
+                if (comment."$it" instanceof List) {
+                    doc."$it" = comment."$it"?.collect {
+                        it?.id
+                    }
+                }
+                else {
+                    doc."$it" = comment."$it"?.id
+                }
+            }
+            doc.id = comment.id
+            return [id:comment.id, doc:doc]
         }
     }
     def destroy = {

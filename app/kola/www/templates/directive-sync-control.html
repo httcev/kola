@@ -1,3 +1,2 @@
-<ion-spinner ng-show="$root.onlineState.isSyncing" icon="dots"></ion-spinner>
 <span class="assertive" ng-hide="$root.onlineState.isOnline" ng-click="showOfflineInfo()"><i class="icon ion-alert-circled"></i> Offline</span>
-<button ng-show="$root.onlineState.isOnline && !$root.onlineState.isSyncing" class="button icon ion-loop" ng-click="sync()"></button>
+<button ng-show="$root.onlineState.isOnline" ng-class="['button','button-icon','icon',{'ion-looping':syncing, 'ion-loop':!syncing}]" ng-click="sync()"></button>

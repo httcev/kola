@@ -87,7 +87,7 @@ grails.project.dependency.resolution = {
         compile ("de.httc.plugins:repository:2.0.0-SNAPSHOT") {
             excludes "lucene-snowball" // confleicts with elastic search
         }
-//        compile ("de.httc.plugins:qaa:2.0.0-SNAPSHOT")
+        compile ("de.httc.plugins:qaa:2.0.0-SNAPSHOT")
 
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"

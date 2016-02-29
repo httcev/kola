@@ -1,0 +1,91 @@
+@charset "UTF-8";
+
+@font-face {
+  font-family: "qa";
+  src:url("../fonts/qa.eot");
+  src:url("../fonts/qa.eot?#iefix") format("embedded-opentype"),
+    url("../fonts/qa.woff") format("woff"),
+    url("../fonts/qa.ttf") format("truetype"),
+    url("../fonts/qa.svg#qa") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+[data-icon]:before {
+  font-family: "qa" !important;
+  content: attr(data-icon);
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  speak: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+[class^="qaa-"]:before,
+[class*=" qaa-"]:before {
+  font-family: "qa" !important;
+  font-style: normal !important;
+  font-weight: normal !important;
+  font-variant: normal !important;
+  text-transform: none !important;
+  speak: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.qaa-comment-o:before {
+  content: "\61";
+}
+.qaa-commenting-o:before {
+  content: "\63";
+}
+.qaa-comment:before {
+  content: "\64";
+}
+.qaa-commenting:before {
+  content: "\65";
+}
+.qaa-comments:before {
+  content: "\66";
+}
+.qaa-leanpub:before {
+  content: "\67";
+}
+.qaa-refresh:before {
+  content: "\68";
+}
+.qaa-tag:before {
+  content: "\69";
+}
+.qaa-tags:before {
+  content: "\6a";
+}
+.qaa-thumbs-down:before {
+  content: "\6b";
+}
+.qaa-thumbs-o-down:before {
+  content: "\6c";
+}
+.qaa-thumbs-o-up:before {
+  content: "\6d";
+}
+.qaa-thumbs-up:before {
+  content: "\6e";
+}
+.qaa-thumb-tack:before {
+  content: "\6f";
+}
+.qaa-whatsapp:before {
+  content: "\70";
+}icon
+}
+.qaa-answer:before {
+  content: "\71";
+}
+.qaa-question:before {
+  content: "\72";
+}

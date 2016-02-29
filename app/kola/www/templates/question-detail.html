@@ -1,0 +1,27 @@
+<ion-view>
+    <ion-nav-title>Frage</ion-nav-title>
+    <ion-nav-buttons side="secondary">
+        <button class="button button-icon icon ion-edit edit-question-button" ng-click="editQuestion(question)"></button>
+        <button class="button button-icon icon qaa-answer add-answer-button" ng-click="editDocument()"></button>
+        <button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
+    </ion-nav-buttons>
+    <ion-content class="padding">
+        <div class="question">
+            <h3 class="positive">{{question.title}}</h3>
+            <p class="text">{{question.text}}</p>
+            <media-attachments ng-model="question" hide-header="true"></media-attachments>
+            <author-info ng-model="question"></author-info>
+        </div>
+
+        <h1 ng-if="question.answers.length" class="task-section-header">Antworten:</h1>
+        <div class="list card answers" ng-repeat="answer in question.answers | orderBy:'lastUpdated'">
+            <div class="item item-divider">
+                <author-info ng-model="answer"></author-info>
+            </div>
+            <div class="item item-text-wrap">
+                <div class="text">{{answer.text}}</div>
+            </div>
+            <media-attachments ng-model="answer" hide-header="true"></media-attachments>
+        </div>
+    </ion-content>
+</ion-view>

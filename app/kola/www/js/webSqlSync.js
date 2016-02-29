@@ -159,10 +159,10 @@ var DBSYNC = {
             callBackProgress('Sending ' + self.syncResult.nbSent + ' elements to the server', 20, 'sendData');
 
             self._sendDataToServer(data, function(serverData) {
-                self._uploadAttachments(data.data.asset).then(function() {
+                self._uploadAttachments(data.data.asset).finally(function() {
                     callBackProgress('Updating local data', 70, 'updateData');
                     //console.log("--- data", data);
-                    self._downloadAttachments(serverData.data ? serverData.data.asset : []).then(function() {
+                    self._downloadAttachments(serverData.data ? serverData.data.asset : []).finally(function() {
                         self._updateLocalDb(serverData, function() {
                             self.syncResult.localDataUpdated = self.syncResult.nbUpdated > 0;
                             self.syncResult.syncOK = true;
@@ -173,13 +173,13 @@ var DBSYNC = {
                             self.cbEndSync(self.syncResult);
                         });
                     });
-                }, function() {
+                }/*, function() {
                     // uploading failed
                     self.syncResult.syncOK = false;
                     self.syncResult.codeStr = 'uploadFailed';
                     self.syncResult.message = 'Uploading new assets failed';
                     self.cbEndSync(self.syncResult);
-                });
+                }*/);
             }, function() {
                 // Called when a timeout occurred
                 self.syncResult.syncOK = false;
@@ -411,6 +411,7 @@ var DBSYNC = {
     },
     _finishSync: function(syncDate, tx, callBack) {
         var self = this, tableName, idsToDelete, idName, i, idValue, idsString;
+        var serverUpdatedAcks = self.serverData.updated || [];
         this.firstSync = false;
         this.syncInfo.lastSyncDate = syncDate;
         this._executeSql('UPDATE sync_info SET last_sync = "' + syncDate + '"', [], tx);
@@ -422,7 +423,13 @@ var DBSYNC = {
             idName =  self.idNameFromTableName[tableName];
             for (i=0; i < self.clientData.data[tableName].length; i++) {
                 idValue = self.clientData.data[tableName][i][idName];
-                idsToDelete.push('"'+idValue+'"');
+                // server now sends acks in "updated" id array. so only remove ids if they have successfully been updated by the server.
+                if (serverUpdatedAcks.indexOf(idValue) > -1) {
+                    idsToDelete.push('"'+idValue+'"');
+                }
+                else {
+                    console.log("RETAINING " + idValue + ", because server didn't send ack.");
+                }
             }
             if (idsToDelete.length > 0) {
                 idsString = self._arrayToString(idsToDelete, ',');
@@ -451,9 +458,7 @@ var DBSYNC = {
         var crendentials = self.authenticationService.getCredentials();
         var promises = [];
         if (ionic.Platform.isWebView()) {
-            console.log("--- upload assets", attachments);
             var options = { headers: { "Authorization": "Basic " + this._encodeBase64(crendentials.user + ':' + crendentials.password) }};
-            console.log("--- options", options);
             angular.forEach(attachments, function(attachment) {
                 var doc = JSON.parse(attachment.doc);
                 if (doc.typeLabel == "attachment") {
@@ -461,7 +466,6 @@ var DBSYNC = {
                     promises.push(self.$cordovaFileTransfer.upload(self.attachmentUploadUrl + "/" + doc.id, self.assetsDir + doc.id, options)
                     .then(function(result) {
                         // Success!
-                        console.log("--- upload success", result);
                     }, function(err) {
                         // Error
                         console.error("--- upload error", err);

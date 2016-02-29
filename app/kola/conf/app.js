@@ -41,7 +41,8 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
   .state('task', {
     url: "/task/:taskId",
     abstract: true,
-    templateUrl: "templates/task.html"
+    templateUrl: "templates/task.html",
+    cache: false
   })
   .state('task.detail', {
     url: '/detail',
@@ -57,7 +58,7 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
     views: {
       'task-documentation': {
         templateUrl: 'templates/task-documentation.html',
-        controller: 'TaskDetailCtrl'
+        controller: 'TaskDocumentationCtrl'
       }
     }
   })
@@ -65,15 +66,24 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
     url: '/questions',
     views: {
       'task-questions': {
-        templateUrl: 'templates/task-questions.html',
-        controller: 'TaskDetailCtrl'
+        templateUrl: 'templates/questions.html',
+        controller: 'QuestionsCtrl'
+      }
+    }
+  })
+  .state('task.question', {
+    url: '/questions/:questionId',
+    views: {
+      'task-questions': {
+        templateUrl: 'templates/question-detail.html',
+        controller: 'QuestionDetailCtrl'
       }
     }
   })
   .state('task.step', {
     url: '/step/:stepId',
     views: {
-      'task-step': {
+      'task-detail': {
         templateUrl: 'templates/task-detail.html',
         controller: 'TaskDetailCtrl'
       }
@@ -86,7 +96,7 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
   });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/tasks');
+  $urlRouterProvider.otherwise('/home');
 })
 
 .config(function($compileProvider) {

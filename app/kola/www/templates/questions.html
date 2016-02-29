@@ -1,0 +1,28 @@
+<ion-view>
+  <ion-nav-title>
+  	Fragen<span ng-if="task"> zum Arbeitsauftrag</span>
+  </ion-nav-title>
+  <ion-nav-buttons side="secondary">
+    <button class="button button-icon icon qaa-question" ng-click="editDocument()"></button>
+    <button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
+  </ion-nav-buttons>
+  <ion-content>
+    <div ng-if="!questions" class="center-horizontal">
+		<ion-spinner></ion-spinner>
+    </div>
+    <div ng-if="questions">
+	    <ion-list ng-if="questions">
+	      <ion-item ng-repeat="question in questions | orderBy:'lastUpdated' track by question.id" class="item-remove-animate item-icon-left item-icon-right" type="item-text-wrap" ui-sref="task.question({questionId:question.id})">
+	      	<i class="icon qaa-question"></i>
+	        <h2>{{question.title}}</h2>
+	        <p><b>Anworten</b>: {{question.answers.length}}</p>
+	        <i class="icon ion-chevron-right icon-accessory"></i>
+	      </ion-item>
+	    </ion-list>
+		<div ng-hide="questions.length" class="center-horizontal padding assertive">Es sind keine Fragen zu diesem Arbeitsauftrag gestellt worden.</div>
+	    <div class="center-horizontal padding">
+	      <button class="button button-balanced icon-left icon ion-plus new-question-button" ng-click="editDocument()">Neue Frage stellen</button>
+	    </div>
+	</div>
+  </ion-content>
+</ion-view>
