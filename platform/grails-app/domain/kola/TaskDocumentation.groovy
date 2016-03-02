@@ -3,14 +3,17 @@ package kola
 import java.util.UUID
 import de.httc.plugins.user.User
 import de.httc.plugins.repository.Asset
+import de.httc.plugins.qaa.QuestionReference
 
 class TaskDocumentation {
 	static hasMany = [ attachments:Asset ]
-	static belongsTo = [ task:Task, step:TaskStep ]
+	static belongsTo = [ reference:QuestionReference ]
     static constraints = {
         // ensure that either task or step is set
+        /*
         task(nullable: true, validator: {field, inst -> inst.step || field})
         step(nullable: true)
+        */
     	text nullable:true
 //        deleted bindable:true
     }
@@ -29,7 +32,7 @@ class TaskDocumentation {
     List<Asset> attachments     // defined as list to keep order in which elements got added
 
     static _exported = ["text", "lastUpdated", "deleted"]
-    static _referenced = ["attachments", "creator", "task", "step"]
+    static _referenced = ["attachments", "creator", "reference"]
     static {
         grails.converters.JSON.registerObjectMarshaller(TaskDocumentation) { taskDocumentation ->
             def doc = taskDocumentation.properties.findAll { k, v ->

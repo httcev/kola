@@ -3,10 +3,12 @@ package kola
 import java.util.UUID
 import de.httc.plugins.user.User
 import de.httc.plugins.repository.Asset
+import de.httc.plugins.qaa.QuestionReference
 
-class TaskStep {
+class TaskStep extends QuestionReference {
+    static mappedBy = [documentations:"reference"]
 	static hasMany = [documentations:TaskDocumentation, resources:Asset, attachments:Asset]
-	static belongsTo = [ task:Task ]
+	static belongsTo = Task
     static constraints = {
     	name blank:false
     	description nullable:true
@@ -15,12 +17,10 @@ class TaskStep {
     }
     static transients = ["deleted"]
     static mapping = {
-        id generator: "assigned"
         name type: "text"
         description type: "text"
     }
 
-    String id = UUID.randomUUID().toString()
     String name
     String description
     boolean deleted

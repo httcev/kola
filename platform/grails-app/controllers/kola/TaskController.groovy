@@ -67,12 +67,12 @@ class TaskController {
                 reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false, [sort:'lastUpdated', order:'asc'])
             }
             
-            def docs = TaskDocumentation.findAllByTaskAndDeleted(taskInstance, false, [sort:'lastUpdated', order:'asc'])
+            def docs = TaskDocumentation.findAllByReferenceAndDeleted(taskInstance, false, [sort:'lastUpdated', order:'asc'])
             if (docs) {
                 taskDocumentations[taskInstance.id] = docs
             }
             taskInstance.steps?.each { step ->
-                docs = TaskDocumentation.findAllByStepAndDeleted(step, false, [sort:'lastUpdated', order:'asc'])
+                docs = TaskDocumentation.findAllByReferenceAndDeleted(step, false, [sort:'lastUpdated', order:'asc'])
                 if (docs) {
                     taskDocumentations[step.id] = docs
                 }
@@ -204,12 +204,12 @@ class TaskController {
                 reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false)
             }
             
-            def docs = TaskDocumentation.findAllByTaskAndDeleted(taskInstance, false)
+            def docs = TaskDocumentation.findAllByReferenceAndDeleted(taskInstance, false)
             if (docs) {
                 taskDocumentations[taskInstance.id] = docs
             }
             taskInstance.steps?.each { step ->
-                docs = TaskDocumentation.findAllByStepAndDeleted(step, false)
+                docs = TaskDocumentation.findAllByReferenceAndDeleted(step, false)
                 if (docs) {
                     taskDocumentations[step.id] = docs
                 }
@@ -229,10 +229,10 @@ class TaskController {
 
     @Transactional
     def saveTaskDocumentation(TaskDocumentation taskDocumentationInstance) {
-        if (taskDocumentationInstance == null || !taskDocumentationInstance.task) {
+        if (taskDocumentationInstance == null || !taskDocumentationInstance.reference) {
             throw new RuntimeException("no task for new documentation")
         }
-        if (!authService.canAttach(taskDocumentationInstance.task)) {
+        if (!authService.canAttach(taskDocumentationInstance.reference)) {
             forbidden()
         }
         def attachments = []
@@ -259,12 +259,12 @@ class TaskController {
         }
 
         flash.message = message(code: 'default.created.message', args: [message(code: 'kola.task.documentation'), taskDocumentationInstance.id])
-        redirect action:"show", method:"GET", id:taskDocumentationInstance.task.id
+        redirect action:"show", method:"GET", id:taskDocumentationInstance.reference.id
     }
 
     @Transactional
     def updateTaskDocumentation(TaskDocumentation taskDocumentationInstance) {
-        if (taskDocumentationInstance == null || !(taskDocumentationInstance.task || taskDocumentationInstance.step)) {
+        if (taskDocumentationInstance == null || !taskDocumentationInstance.reference) {
             throw new RuntimeException("no task or step for update documentation")
         }
         if (!authService.canEdit(taskDocumentationInstance)) {
@@ -308,7 +308,7 @@ class TaskController {
         }
 
         flash.message = msg
-        def taskId = taskDocumentationInstance.task ? taskDocumentationInstance.task.id : params.parentTask
+        def taskId = taskDocumentationInstance.reference ? taskDocumentationInstance.reference.id : params.parentTask
         redirect action:"show", method:"GET", id:taskId
     }
 

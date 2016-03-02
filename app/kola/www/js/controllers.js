@@ -114,7 +114,7 @@ angular.module('kola.controllers', [])
         }).then(function(result) {
             if (result) {
                 $ionicLoading.show({
-                    template: "<ion-spinner></ion-spinner><p>" + $scope.docName + " wird gelöscht</p>"
+                    template: "<ion-spinner class='spinner-large'></ion-spinner><p>" + $scope.docName + " wird gelöscht</p>"
                 });
                 $scope.editedDocument.deleted = true;
                 dbService.save($scope.editedDocument).then(function() {
@@ -172,7 +172,7 @@ angular.module('kola.controllers', [])
 
         var objectsToSave = [];
         $ionicLoading.show({
-            template: "<ion-spinner></ion-spinner><p>" + $scope.docName + " wird gespeichert</p>"
+            template: "<div class='saving'><ion-spinner></ion-spinner> " + $scope.docName + " wird gespeichert...</div>"
         });
         angular.forEach($scope.editedDocument.attachments, function(attachment) {
             console.log("--- att", attachment);
@@ -182,7 +182,7 @@ angular.module('kola.controllers', [])
         dbService.save(objectsToSave).then(function() {
             $scope.reload().then(function() {
                 $ionicLoading.show({
-                    template: $scope.docName + " erfolgreich gespeichert",
+                    template: "<div class='saving'><i class='icon ion-checkmark balanced'></i> " + $scope.docName + " erfolgreich gespeichert.</div>",
                     duration: 1500
                 });
                 $scope.closeEditDocumentModal();
@@ -190,14 +190,14 @@ angular.module('kola.controllers', [])
         }, function(err) {
             console.log(err);
             $ionicLoading.show({
-                template: "Speichern fehlgeschlagen!",
+                template: "<div class='saving'><i class='icon ion-alert-circled assertive'></i> Speichern fehlgeschlagen!</div>",
                 duration: 2000
             });
         });
     };
 })
 
-.controller('TaskDocumentationCtrl', function($scope, $rootScope, $stateParams, $q, $ionicModal, $ionicLoading, $controller, dbService) {
+.controller('TaskDocumentationCtrl', function($scope, $rootScope, $stateParams, $q, $ionicModal, $ionicLoading, $controller, dbService, authenticationService) {
     $scope.docName = "Dokumentation";
     $scope.firstProp = "text";
     $scope.templateName = "templates/modal-documentation-editor.html";
@@ -258,6 +258,10 @@ angular.module('kola.controllers', [])
         });
     };
 
+    $scope.canEdit = function(doc) {
+        return authenticationService.canEdit(doc);
+    }
+
     function loadDocumentations(referenceIds, documentationsArray) {
         return dbService.all("taskDocumentation").then(function(allTaskDocumentations) {
             var promises = [];
@@ -309,6 +313,8 @@ angular.module('kola.controllers', [])
                 });
             });
         } else {
+            // clear last selected task/step since we're not in task context here
+            $rootScope.lastOpenedTaskOrStepId = null;
             return loadQuestions().then(function(questions) {
                 $scope.questions = questions;
             });
@@ -317,13 +323,13 @@ angular.module('kola.controllers', [])
 
     $scope.createNewDocument = function() {
         var question = dbService.createQuestion();
-        console.log("setting default selected step to " + $rootScope.lastOpenedTaskOrStepId);
+        console.log("setting default selected task/step to " + $rootScope.lastOpenedTaskOrStepId);
         question.reference = $rootScope.lastOpenedTaskOrStepId;
         return question;
     }
 
     $scope.prepareSave = function(document) {
-        if (!document.reference) {
+        if (!document.reference && $scope.task) {
             document.reference = $scope.task.id;
         }
     }
@@ -347,7 +353,7 @@ angular.module('kola.controllers', [])
     $scope.reload();
 })
 
-.controller('QuestionDetailCtrl', function($scope, $stateParams, $q, $controller, $ionicPopup, $ionicModal, $ionicLoading, dbService, mediaAttachment) {
+.controller('QuestionDetailCtrl', function($scope, $stateParams, $q, $controller, $ionicPopup, $ionicModal, $ionicLoading, dbService, authenticationService, mediaAttachment) {
     $scope.docName = "Antwort";
     $scope.firstProp = "text";
     $scope.templateName = "templates/modal-answer-editor.html";
@@ -374,6 +380,10 @@ angular.module('kola.controllers', [])
 
     $scope.createNewDocument = function() {
         return dbService.createAnswer($scope.question);
+    }
+
+    $scope.canEdit = function(doc) {
+        return authenticationService.canEdit(doc);
     }
 /*
     function loadAnswers(question, answers) {

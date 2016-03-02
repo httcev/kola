@@ -10,12 +10,12 @@
 		</div>
 	</ion-header-bar>
 	<ion-content>
-		<label ng-if="task.steps.length" class="item item-input item-select">
+		<label ng-if="task.steps.length" class="item item-input item-select padding-vertical">
 			Dokumentation zu:
 			<select ng-model="editedDocument.reference" ng-options="step.id as step.name for step in task.steps">
 				<option value="">Gesamter Auftrag</option>
 			</select>
-		</label>		
+		</label>
 		<div class="card card-positive">
 			<textarea ng-model="editedDocument.text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Welche Arbeiten habe ich erledigt? Wie bin ich vorgegangen?" ng-change="setEditedDocumentDirty()"></textarea>
 		</div>

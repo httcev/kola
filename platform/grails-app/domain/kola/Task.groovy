@@ -5,14 +5,16 @@ import org.apache.commons.collections.list.LazyList
 import org.apache.commons.collections.FactoryUtils
 import de.httc.plugins.user.User
 import de.httc.plugins.repository.Asset
+import de.httc.plugins.qaa.QuestionReference
 
-class Task {
+class Task extends QuestionReference {
     static searchable = {
         all = [analyzer: 'german']
         only = ['name', 'description', 'deleted']
         name boost:3.0
         description boost:2.0
     }
+    static mappedBy = [documentations:"reference"]
     static hasMany = [steps:TaskStep, documentations:TaskDocumentation, reflectionQuestions:ReflectionQuestion, resources:Asset, attachments:Asset]
     static constraints = {
         name blank:false
@@ -22,14 +24,12 @@ class Task {
         assignee nullable:true
     }
     static mapping = {
-        id generator: "assigned"
         steps cascade: "all-delete-orphan"
         name type: "text"
         description type: "text"
-        lastDocumented formula:"(select d.LAST_UPDATED from TASK_DOCUMENTATION d where d.DELETED='false' and (d.TASK_ID=ID or d.STEP_ID in (select s.ID from TASK_STEP s where s.TASK_ID=ID)) order by d.LAST_UPDATED desc limit 1)"
+        lastDocumented formula:"(select d.LAST_UPDATED from TASK_DOCUMENTATION d where d.DELETED='false' and (d.REFERENCE_ID=ID or d.REFERENCE_ID in (select s.TASK_STEPS_ID from TASK_TASK_STEP s where s.TASK_STEP_ID=ID)) order by d.LAST_UPDATED desc limit 1)"
     }
  
-    String id = UUID.randomUUID().toString()
     String name
     String description
 

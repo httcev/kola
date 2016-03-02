@@ -154,21 +154,23 @@ angular.module('kola.directives', [])
         */
         templateUrl: 'templates/directive-sync-control.html',
         link: function($scope) {
-            $scope.sync = function() {
-                dbService.sync();
+            $scope.click = function() {
+                if ($scope.online) {
+                    dbService.sync();
+                }
+                else {
+                    $ionicPopup.alert({
+                        title: "Kein Netzzugang",
+                        template: "Das Gerät hat momentan keinen Netzzugang. Alle Änderungen werden zunächst nur lokal auf dem Gerät gespeichert und synchronisiert, sobald eine Internetverbindung besteht"
+                    });
+                }
             };
-
-            $scope.showOfflineInfo = function() {
-                $ionicPopup.alert({
-                    title: "Kein Netzzugang",
-                    template: "Das Gerät hat momentan keinen Netzzugang. Alle Änderungen werden zunächst nur lokal auf dem Gerät gespeichert und synchronisiert, sobald eine Internetverbindung besteht"
-                });
-            };
-
             $rootScope.$watch("onlineState.isSyncing", function(state) {
-                console.log("--- sync state changed", state);
                 $scope.syncing = state;
-            })
+            });
+            $rootScope.$watch("onlineState.isOnline", function(state) {
+                $scope.online = state;
+            });
         }
     };
 })
@@ -220,6 +222,49 @@ angular.module('kola.directives', [])
                     window.open(url);
                 }
             };
+        }
+    };
+})
+
+.directive('commentsList', function() {
+    return {
+        restrict: 'E',
+        //replace: true,
+        require: '^ngModel',
+        scope: {
+            ngModel: '='
+        },
+        templateUrl: 'templates/directive-comments-list.html',
+        link: function($scope) {
+            $scope.createComment = function() {
+                alert("create comment");
+            }
+        }
+    };
+})
+
+.directive('ratingControl', function() {
+    return {
+        restrict: 'E',
+        //replace: true,
+        require: '^ngModel',
+        scope: {
+            ngModel: '='
+        },
+        templateUrl: 'templates/directive-rating-control.html',
+        link: function($scope) {
+            $scope.click = function() {
+                console.log($scope);
+                if ($scope.ngModel.rated) {
+                    $scope.ngModel.rated = false;
+                    $scope.ngModel.rating--;
+                }
+                else {
+                    $scope.ngModel.rated = true;
+                    $scope.ngModel.rating++;
+                }
+                console.log("rated", $scope.ngModel.rated);
+            }
         }
     };
 });

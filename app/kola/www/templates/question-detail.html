@@ -1,27 +1,43 @@
 <ion-view>
     <ion-nav-title>Frage</ion-nav-title>
     <ion-nav-buttons side="secondary">
-        <button class="button button-icon icon ion-edit edit-question-button" ng-click="editQuestion(question)"></button>
-        <button class="button button-icon icon qaa-answer add-answer-button" ng-click="editDocument()"></button>
+        <button class="button button-icon icon httc-answer-add add-answer-button" ng-click="editDocument()"></button>
         <button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
     </ion-nav-buttons>
     <ion-content class="padding">
-        <div class="question">
-            <h3 class="positive">{{question.title}}</h3>
-            <p class="text">{{question.text}}</p>
-            <media-attachments ng-model="question" hide-header="true"></media-attachments>
-            <author-info ng-model="question"></author-info>
+        <div ng-if="!question" class="center-horizontal">
+    		<ion-spinner class="spinner-large"></ion-spinner>
         </div>
+        <div ng-if="question">
+            <div class="question clearfix">
+                <h4 class="positive">
+                    {{question.title}}
+                    {{question.lastUpdated}}
+                    <button ng-if="canEdit(question)" class="button button-positive button-clear button-small icon ion-edit float-right" ng-click="editQuestion(question)"></button>
+                </h4>
+                <rating-control ng-model="question"></rating-control>
+                <p class="text">{{question.text}}</p>
+                <media-attachments ng-model="question" hide-header="true"></media-attachments>
+                <author-info ng-model="question"></author-info>
+                <comments-list ng-model="question"></comments-list>
+            </div>
 
-        <h1 ng-if="question.answers.length" class="task-section-header">Antworten:</h1>
-        <div class="list card answers" ng-repeat="answer in question.answers | orderBy:'lastUpdated'">
-            <div class="item item-divider">
-                <author-info ng-model="answer"></author-info>
+            <h1 ng-if="question.answers.length" class="task-section-header">Antworten:</h1>
+            <div class="list card calm answers" ng-repeat="answer in question.answers">
+                <div class="item item-text-wrap clearfix">
+                    <rating-control ng-model="answer"></rating-control>
+                    <div class="text">{{answer.text}}</div>
+                </div>
+                <media-attachments ng-model="answer" hide-header="true"></media-attachments>
+                <div class="item item-divider text-right">
+                    <author-info ng-model="answer"></author-info>
+                    <button ng-if="canEdit(answer)" class="button button-positive button-clear button-small icon ion-edit" ng-click="editDocument(answer)"></button>
+                </div>
+                <div class="item" ng-if="answer.comments.length"><comments-list ng-model="answer"></comments-list></div>
             </div>
-            <div class="item item-text-wrap">
-                <div class="text">{{answer.text}}</div>
+            <div class="center-horizontal padding">
+                <button class="button button-balanced icon-left icon httc-answer-add add-answer-button" ng-click="editDocument()">Neue Antwort geben</button>
             </div>
-            <media-attachments ng-model="answer" hide-header="true"></media-attachments>
         </div>
     </ion-content>
 </ion-view>

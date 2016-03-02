@@ -2,7 +2,7 @@
 	<h1 ng-if="hideHeader != 'true' && editMode != 'true'" class="task-section-header">Anhänge:</h1>
 	<div ng-if="hideHeader != 'true' && editMode == 'true'" class="item item-divider item-stable">Anhänge</div>
 	<div ng-if="!attachmentUrls" class="center-horizontal">
-		<ion-spinner></ion-spinner>
+		<ion-spinner class="spinner-large"></ion-spinner>
 	</div>
 	<div ng-if="attachmentUrls" class="media-container">
 		<div ng-repeat="attachment in ngModel.attachments" class="media-item">

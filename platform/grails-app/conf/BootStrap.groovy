@@ -88,13 +88,24 @@ class BootStrap {
 
                     def numTasks = 2
                     for (int i=0; i<numTasks; i++) {
-                        def task = new Task(name:"Example Task $i", description:description, creator:User.findByUsername("admin"), assignee:testUser).save(true)
+                        def task = new Task(name:"Example Task $i", description:description, creator:User.findByUsername("admin"), assignee:testUser)
                         task.addToSteps(new TaskStep(name:"Step 1 example", description:description))
                         task.addToSteps(new TaskStep(name:"Step 2 example", description:description))
-                        new Question(title:"Ich habe eine Frage $i", text:"Was ist grün und hüpft von Baum zu Baum?", creator:testUser, reference:task).save(true)
+						task.save(true)
+                        def question = new Question(title:"Ich habe eine Frage $i", text:"Was ist grün und hüpft von Baum zu Baum?", creator:testUser, reference:task)
+						def answer = new Answer(text:"Weiss nicht! Ein Frosch?", creator:testUser)
+						answer.addToComments(new Comment(text:"Antwortkommentar...", creator:testUser))
+						question.addToAnswers(answer)
+						question.addToComments(new Comment(text:"Fragenkommentar 1...", creator:testUser))
+						question.addToComments(new Comment(text:"Fragenkommentar 2...", creator:testUser))
+						if (!question.save(true)) {
+                            question.errors.allErrors.each { println it }
+                        }
                     }
                     assert Task.count() == numTaskTemplates + numTasks
                     assert Question.count() == numTasks
+					assert Answer.count() == numTasks
+					assert Comment.count() == numTasks * 3
                 }
             }
         }
@@ -121,7 +132,7 @@ class BootStrap {
                 k in ["name", "props", "mimeType", "url", "typeLabel", "deleted"]
             }
             ["creator"].each {
-                if (asset."$it" instanceof List) {
+                if (asset."$it" instanceof Collection) {
                     doc."$it" = asset."$it"?.collect {
                         it?.id
                     }
@@ -140,7 +151,7 @@ class BootStrap {
                 k in ["title", "text", "deleted", "lastUpdated", "metadata", "rated", "rating"]
             }
             ["attachments", "answers", "comments", "creator", "acceptedAnswer", "reference"].each {
-                if (question."$it" instanceof List) {
+                if (question."$it" instanceof Collection) {
                     doc."$it" = question."$it"?.collect {
                         it?.id
                     }
@@ -158,7 +169,7 @@ class BootStrap {
                 k in ["text", "deleted", "lastUpdated", "rated", "rating"]
             }
             ["attachments", "comments", "creator", "question"].each {
-                if (answer."$it" instanceof List) {
+                if (answer."$it" instanceof Collection) {
                     doc."$it" = answer."$it"?.collect {
                         it?.id
                     }
@@ -176,7 +187,7 @@ class BootStrap {
                 k in ["text", "deleted", "lastUpdated"]
             }
             ["creator"].each {
-                if (comment."$it" instanceof List) {
+                if (comment."$it" instanceof Collection) {
                     doc."$it" = comment."$it"?.collect {
                         it?.id
                     }

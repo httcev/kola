@@ -89,6 +89,17 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
       }
     }
   })
+  .state('questions', {
+    url: '/questions',
+    templateUrl: 'templates/questions.html',
+    controller: 'QuestionsCtrl',
+    cache: false
+  })
+  .state('question', {
+    url: '/questions/:questionId',
+    templateUrl: 'templates/question-detail.html',
+    controller: 'QuestionDetailCtrl'
+  })
   .state('settings', {
     url: '/settings',
     templateUrl: 'templates/settings.html',

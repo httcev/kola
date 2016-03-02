@@ -63,15 +63,18 @@ self.sync = dependOnInit(function() {
         $rootScope.onlineState.isSyncing = true;
         DBSYNC.syncNow(onSyncProgress, function(result) {
             $rootScope.onlineState.isSyncing = false;
-            if (result && result.syncOK === true) {
-                // synchronized successfully
-            }
             if (result && result.status == 401) {
                 openAccountTab("Login fehlgeschlagen. Bitte überprüfen Sie Nutzernamen und Passwort.");
                 deferred.reject("sync failed");
             } else {
                 $rootScope.$broadcast("syncFinished");
-                deferred.resolve();
+                if (result && result.syncOK === true) {
+                    // synchronized successfully
+                    deferred.resolve();
+                }
+                else {
+                    deferred.reject("sync failed");
+                }
             }
         });
     } else {
@@ -497,7 +500,7 @@ return {
 }
 })
 
-.service('authenticationService', function($ionicPlatform, $rootScope, $q, $cordovaNetwork, serverUrl) {
+.service('authenticationService', function($ionicPlatform, $rootScope, $cordovaNetwork) {
     var credentials = loadCredentials();
     $rootScope.onlineState = {
         "isOnline": false,
@@ -508,12 +511,6 @@ return {
     function onOnlineStateChange(event, networkState) {
         $rootScope.onlineState.isOnline = networkState !== "none";
         $rootScope.onlineState.isWifi = networkState === "wifi";
-        /*
-            if ($rootScope.onlineState.isOnline) {
-              // try to authenticate
-              authenticate();
-            }
-            */
     }
 
     function loadCredentials() {
@@ -533,28 +530,11 @@ return {
         credentials = loadCredentials();
         $rootScope.$broadcast("credentialsChanged", credentials);
     }
-    /*
-      function authenticate() {
-        var d = $q.defer();
-        var user = localStorage["user"];
-        if (user) {
-          var password = localStorage["password"];
-          if ($rootScope.onlineState.isOnline) {
-            // TODO: make test request...
-            $rootScope.$broadcast("authenticated", { "username":user, "password":password, "validated":true });
-            d.resolve();
-          }
-          else {
-            d.resolve();
-            $rootScope.$broadcast("authenticated", { "username":user, "password":password, "validated":false });
-          }
-        }
-        else {
-          d.reject("no_user");
-        }
-        return d.promise;
-      }
-    */
+
+    function canEdit(doc) {
+        return doc && (!doc.creator || doc.creator.username === credentials.user);
+    }
+
     $ionicPlatform.ready(function() {
         // only use ngCordova on native devices
         if (ionic.Platform.isWebView()) {
@@ -570,7 +550,8 @@ return {
 
     return {
         updateCredentials: updateCredentials,
-        getCredentials: getCredentials
+        getCredentials: getCredentials,
+        canEdit: canEdit
     }
 })
 

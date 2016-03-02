@@ -1,6 +1,6 @@
 <ion-view view-title="Einstellungen" hide-back-button="true">
 	<ion-nav-buttons side="secondary">
-		<button type="submit" form="settings-form" ng-disabled="profile.user.length==0 || profile.password.length==0" class="button button-balanced icon-left" ng-disabled="!profile.user || !profile.password"><i class="icon ion-checkmark"></i> Speichern</button>
+		<button type="submit" form="settings-form" ng-disabled="profile.user.length==0 || profile.password.length==0" class="button button-light icon-left" ng-disabled="!profile.user || !profile.password"><i class="icon ion-checkmark"></i> Speichern</button>
 		<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
 	</ion-nav-buttons>
 	<ion-content>
@@ -31,5 +31,5 @@
 	</ion-content>
 	<ion-footer-bar align-title="center">
 	  <h1 class="title"><span class="version">{{appName}} Version {{appVersion}}</span></h1>
-	</ion-footer-bar>  
+	</ion-footer-bar>
 </ion-view>

@@ -1,12 +1,12 @@
 <ion-view>
   <ion-nav-title>Dokumentation des Arbeitsauftrags</ion-nav-title>
   <ion-nav-buttons side="secondary">
-    <button class="button button-icon icon ion-plus-round" ng-click="editDocument()"></button>
+    <button class="button button-icon icon httc-compose-add" ng-click="editDocument()"></button>
     <button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
   </ion-nav-buttons>
   <ion-content class="padding">
     <div ng-if="!documentations" class="center-horizontal">
-      <ion-spinner></ion-spinner>
+      <ion-spinner class="spinner-large"></ion-spinner>
     </div>
     <div ng-if="documentations">
       <div ng-hide="documentations.length" class="center-horizontal padding assertive">Es ist noch keine Dokumentation zu diesem Arbeitsauftrag angelegt worden.</div>
@@ -14,7 +14,7 @@
       <div class="list card documentation" ng-repeat="documentation in documentations | orderBy:'lastUpdated'">
         <div class="item item-divider">
           <author-info ng-model="documentation"></author-info>
-          <button class="button button-positive button-clear button-small icon ion-edit edit-documentation-button" ng-click="editDocument(documentation)"></button>
+          <button ng-if="canEdit(documentation)" class="button button-positive button-clear button-small icon ion-edit float-right" ng-click="editDocument(documentation)"></button>
         </div>
         <div class="item item-text-wrap">
           <div class="text">{{documentation.text}}</div>
@@ -22,14 +22,14 @@
         <media-attachments ng-model="documentation" hide-header="true"></media-attachments>
       </div>
       <div class="center-horizontal">
-        <button class="button button-balanced icon-left icon ion-plus new-documentation-button" ng-click="editDocument()">Neue Dokumentation anlegen</button>
+        <button class="button button-balanced icon-left icon httc-compose-add new-documentation-button" ng-click="editDocument()">Neue Dokumentation anlegen</button>
       </div>
 
       <div ng-if="reflectionQuestions.length">
         <h1 class="task-section-header padding">Meine Erfahrungen:</h1>
         <div class="list card">
           <form name="form" ng-repeat="reflectionQuestion in task.reflectionQuestions track by reflectionQuestion.id" class="item item-text-wrap">
-            <div class="energized reflection-question">{{reflectionQuestion.name}}</div>
+            <div class="energized padding-bottom">{{reflectionQuestion.name}}</div>
             <author-info ng-model="reflectionAnswers[reflectionQuestion.id]"></author-info>
             <textarea ng-model="reflectionAnswers[reflectionQuestion.id].text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier Ihre Antwort ein..."></textarea>
             <div class="text-center" ng-show="form.$dirty">

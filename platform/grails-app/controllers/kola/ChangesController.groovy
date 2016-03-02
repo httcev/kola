@@ -89,7 +89,6 @@ class ChangesController {
                 _addModifiedQuestionTree(question, questions, answers, comments, assets, since, now)
             }
 
-
 	    	def taskDocumentations = TaskDocumentation.findAllByLastUpdatedBetweenAndCreator(since, now, user);
 	    	taskDocumentations?.each { taskDocumentation ->
 	    		// add modified attachments
@@ -118,7 +117,7 @@ class ChangesController {
 	    }
 	    catch(e) {
 	    	log.error e
-	    	render status:400, contentType:"text/plain", text:e.message
+	    	render status:400, contentType:"text/plain", text:e?.message?:"unknown error"
 	    }
     }
 
@@ -190,6 +189,7 @@ class ChangesController {
 	    	if (_isMofifiedBetween(comment, start, end)) {
                 println "--- 2 question comment is modified"
 	    		comments.add(comment)
+                questions.add(question)
 	    	}
     	}
     	question.attachments.each { attachment ->
@@ -202,10 +202,12 @@ class ChangesController {
 	    	if (_isMofifiedBetween(answer, start, end)) {
                 println "--- 4 answer is modified"
 	    		answers.add(answer)
+                questions.add(question)
 	    	}
 	    	answer.comments.each { comment ->
 		    	if (_isMofifiedBetween(comment, start, end)) {
                     println "--- 5 answer comment is modified"
+                    answers.add(answer)
 		    		comments.add(comment)
 		    	}
 	    	}
