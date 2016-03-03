@@ -18,7 +18,7 @@ class TaskController {
         params.max = Math.min(max ?: 10, 100)
         params.sort = params.sort ?: "lastUpdated"
         params.order = params.order ?: "desc"
-        
+
         def user = springSecurityService.currentUser
         def userCompany = user.profile?.company
         def filtered = params.own || params.assigned || params.ownCompany
@@ -48,7 +48,11 @@ class TaskController {
                     }
                 }
             }
-            order(params.sort, params.order)
+            and {
+                order(params.sort, params.order)
+                // add secondary sort key to keep sorting consistent on reload
+                order("id", "asc")
+            }
         }
         respond results, model:[taskCount:results.totalCount]
     }
@@ -64,7 +68,7 @@ class TaskController {
             taskInstance.reflectionQuestions?.each { reflectionQuestion ->
                 reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false, [sort:'lastUpdated', order:'asc'])
             }
-            
+
             def docs = TaskDocumentation.findAllByTaskAndDeleted(taskInstance, false, [sort:'lastUpdated', order:'asc'])
             if (docs) {
                 taskDocumentations[taskInstance.id] = docs
@@ -201,7 +205,7 @@ class TaskController {
             taskInstance.reflectionQuestions?.each { reflectionQuestion ->
                 reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false)
             }
-            
+
             def docs = TaskDocumentation.findAllByTaskAndDeleted(taskInstance, false)
             if (docs) {
                 taskDocumentations[taskInstance.id] = docs
@@ -426,7 +430,7 @@ class TaskController {
                     log.error "Couldn't add attachment: Asset not found: ${it}"
                 }
             }
-        }  
+        }
 
         // update reflection questions
         taskInstance.reflectionQuestions?.clear()
@@ -439,12 +443,12 @@ class TaskController {
                 log.error "Couldn't add reflection question: ReflectionQuestion not found: ${it}"
             }
         }
-        
+
         // create new attachments
         request.multiFileMap?.each { k,files ->
             def domainName = k - "._newAttachment" - "_newAttachment"
             def domain = taskInstance
-            
+
             if (domainName.length() > 0) {
                 def matcher = domainName =~ /(.*)\[(.*)\]/
                 if (matcher.matches()) {
@@ -456,7 +460,7 @@ class TaskController {
                     }
                 }
             }
-            
+
             files?.each { f ->
                 if (!f.empty) {
                     def asset = new Asset(name:f.originalFilename, subType:"attachment", mimeType:f.getContentType(), content:f.bytes)
