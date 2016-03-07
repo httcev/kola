@@ -150,7 +150,7 @@ class BootStrap {
             def doc = question.properties.findAll { k, v ->
                 k in ["title", "text", "deleted", "lastUpdated", "metadata", "rated", "rating"]
             }
-            ["attachments", "answers", "comments", "creator", "acceptedAnswer", "reference"].each {
+            ["attachments", "creator", "acceptedAnswer", "reference"].each {
                 if (question."$it" instanceof Collection) {
                     doc."$it" = question."$it"?.collect {
                         it?.id
@@ -168,7 +168,7 @@ class BootStrap {
             def doc = answer.properties.findAll { k, v ->
                 k in ["text", "deleted", "lastUpdated", "rated", "rating"]
             }
-            ["attachments", "comments", "creator", "question"].each {
+            ["attachments", "creator", "question"].each {
                 if (answer."$it" instanceof Collection) {
                     doc."$it" = answer."$it"?.collect {
                         it?.id

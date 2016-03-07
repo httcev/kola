@@ -2,7 +2,7 @@ package kola
 
 import grails.transaction.Transactional
 
-@Transactional(readOnly = true)
+@Transactional
 class TaskService {
     def pushNotificationService
     def springSecurityService

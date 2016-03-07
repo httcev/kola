@@ -244,9 +244,9 @@ self._attachOneToMany = function(doc, tx) {
         doc[join.field] = [];
         var sql = "select id from " + join.targetTable + " where " + join.targetField + "=?";
         tx.executeSql(sql, [doc.id], function(tx, results) {
-            angular.forEach(results.rows, function(row) {
-                doc[join.field].push(row.id);
-            });
+            for(var i = 0; i < results.rows.length; i++) {
+                doc[join.field].push(results.rows.item(i).id);
+            }
             joinPromise.resolve();
         });
     });

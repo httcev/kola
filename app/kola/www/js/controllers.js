@@ -346,7 +346,11 @@ angular.module('kola.controllers', [])
             });
             return $q.all(promises).then(function() {
                 return questions;
+            }, function(err) {
+                console.log(err);
             });
+        }, function(err) {
+            console.log(err);
         });
     }
 

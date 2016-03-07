@@ -24,6 +24,7 @@ class ChangesController {
     static DOMAIN_CLASS_MAPPING = ["asset":Asset, "taskStep":TaskStep, "task":Task, "taskDocumentation":TaskDocumentation, "reflectionAnswer":ReflectionAnswer, "comment":Comment, "answer":Answer, "question":Question]
     def springSecurityService
     def taskService
+    def questionService
     def sessionFactory
 
     def index() {
@@ -271,8 +272,11 @@ class ChangesController {
 
     def _saveModel(model) {
 		// in case of a "task", delegate saving to taskService to handle push notifications
-    	if (model instanceof Task) {
+        if (model instanceof Task) {
     		return taskService.save(model)
+    	}
+        else if (model instanceof Question) {
+    		return questionService.saveQuestion(model)
     	}
     	else {
     		return model.save()
