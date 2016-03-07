@@ -200,7 +200,7 @@ var DBSYNC = {
 
     /* You can override the following methods to use your own log */
     log: function(message) {
-        console.log(message);
+        //console.log(message);
     },
     error: function(message) {
         console.error(message);

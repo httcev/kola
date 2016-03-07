@@ -21,7 +21,7 @@ class ChangesController {
 
 	static allowedMethods = [index: ["GET", "POST"], upload:"POST"]
 	static DateFormat DATEFORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-    static DOMAIN_CLASS_MAPPING = ["asset":Asset, "taskStep":TaskStep, "task":Task, "taskDocumentation":TaskDocumentation, "reflectionAnswer":ReflectionAnswer, "comment":Comment, "answer":Answer, "question":Question]
+    static DOMAIN_CLASS_MAPPING = ["asset":Asset, "taskStep":TaskStep, "task":Task, "taskDocumentation":TaskDocumentation, "reflectionAnswer":ReflectionAnswer, "question":Question, "answer":Answer, "comment":Comment ]
     def springSecurityService
     def taskService
     def questionService

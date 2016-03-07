@@ -206,15 +206,22 @@ angular.module('kola.controllers', [])
     });
 
     $scope.reload = function() {
-        var documentations = [];
-        var reflectionAnswers = {};
-
         // load task
         return dbService.get($stateParams.taskId, "task").then(function(task) {
             $scope.task = task;
 
-            // load reflections answes for current task
-            return loadReflectionAnswers(task, reflectionAnswers).then(function() {
+            var referenceIds = "('" + $stateParams.taskId + "'";
+            angular.forEach(task.steps, function(step) {
+                referenceIds += ",'" + step.id + "'";
+            });
+            referenceIds += ")";
+
+            // load reflection answers for current task
+            return dbService.all("reflectionAnswer", true, "task='" + $stateParams.taskId + "'").then(function(docs) {
+                var reflectionAnswers = {};
+                angular.forEach(docs, function(doc) {
+                    reflectionAnswers[doc.question] = doc;
+                });
                 // create empty reflection answers when not existing
                 angular.forEach(task.reflectionQuestions, function(reflectionQuestion) {
                     if (!reflectionAnswers[reflectionQuestion.id]) {
@@ -222,12 +229,8 @@ angular.module('kola.controllers', [])
                     }
                 });
 
-                var referenceIds = [$stateParams.taskId];
-                angular.forEach(task.steps, function(step) {
-                    referenceIds.push(step.id);
-                });
                 // load documentations for current task and its steps
-                return loadDocumentations(referenceIds, documentations).then(function() {
+                return  dbService.all("taskDocumentation", true, "reference in " + referenceIds).then(function(documentations) {
                     $scope.documentations = documentations;
                     $scope.reflectionAnswers = reflectionAnswers;
                 });
@@ -248,11 +251,14 @@ angular.module('kola.controllers', [])
     }
 
     $scope.saveReflectionAnswer = function(reflectionAnswer, form) {
+        if (reflectionAnswer.text.length == 0) {
+            reflectionAnswer.deleted = true;
+        }
         dbService.save(reflectionAnswer).then(function() {
             form.$dirty = false;
-            reload();
+            $scope.reload();
             $ionicLoading.show({
-                template: "Antwort gespeichert",
+                template: "Antwort " + (reflectionAnswer.deleted ? "gelöscht" : "gespeichert"),
                 duration: 2000
             });
         });
@@ -260,33 +266,6 @@ angular.module('kola.controllers', [])
 
     $scope.canEdit = function(doc) {
         return authenticationService.canEdit(doc);
-    }
-
-    function loadDocumentations(referenceIds, documentationsArray) {
-        return dbService.all("taskDocumentation").then(function(allTaskDocumentations) {
-            var promises = [];
-            angular.forEach(allTaskDocumentations, function(doc) {
-                if (!doc.deleted && referenceIds.indexOf(doc.reference) > -1) {
-                    promises.push(dbService.resolveIds(doc, "taskDocumentation"));
-                    documentationsArray.push(doc);
-                }
-            });
-            return $q.all(promises);
-        });
-    }
-
-    function loadReflectionAnswers(task, reflectionAnswersMap) {
-        return dbService.all("reflectionAnswer").then(function(allReflectionAnswers) {
-            var promises = [];
-            angular.forEach(allReflectionAnswers, function(doc) {
-                if (doc.task == task.id && !doc.deleted) {
-                    promises.push(dbService.resolveIds(doc, "reflectionAnswer").then(function() {
-                        reflectionAnswersMap[doc.question] = doc;
-                    }));
-                }
-            });
-            return $q.all(promises);
-        });
     }
 
     $scope.reload();

@@ -25,7 +25,7 @@
         <button class="button button-balanced icon-left icon httc-compose-add new-documentation-button" ng-click="editDocument()">Neue Dokumentation anlegen</button>
       </div>
 
-      <div ng-if="reflectionQuestions.length">
+      <div ng-if="task.reflectionQuestions.length">
         <h1 class="task-section-header padding">Meine Erfahrungen:</h1>
         <div class="list card">
           <form name="form" ng-repeat="reflectionQuestion in task.reflectionQuestions track by reflectionQuestion.id" class="item item-text-wrap">

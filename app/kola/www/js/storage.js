@@ -58,7 +58,6 @@ angular.module('kola.storage', ['uuid'])
              "sync": true,
              "extract": {
                  "deleted": "BOOL",
-                 "question": "TEXT",
                  "task": "TEXT"
              }
          },
@@ -120,6 +119,7 @@ angular.module('kola.storage', ['uuid'])
 .service('dbService', function ($rootScope, $q, $state, $ionicPlatform, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, serverUrl, schemaService, authenticationService, rfc4122) {
   var self = this;
   var firstRun = true;
+  var debug = true;
   self.initDeferred = $q.defer();
 
   self.sync = dependOnInit(function() {
@@ -148,26 +148,41 @@ angular.module('kola.storage', ['uuid'])
     return deferred.promise;
 });
 
-self.all = dependOnInit(function(tableName) {
+self.all = dependOnInit(function(tableName, resolve, whereClause) {
     var d = $q.defer();
+    var promises = [d.promise];
+    var docs = [];
+
     self.db.transaction(function(t) {
-        t.executeSql("select doc from " + tableName + " where deleted <> 'true'", [], function(tx, results) {
-            var docs = []
-            for (var i = 0; i < results.rows.length; i++) {
-                var doc = JSON.parse(results.rows.item(i).doc);
-                doc._table = tableName;
-                docs.push(doc);
-            }
-            d.resolve(docs);
-        }, function(tx, err) {
-            console.log(err);
-            d.reject(err);
-        });
+      var sql = "select doc from " + tableName + " where ";
+      if (whereClause) {
+        sql += whereClause + " and ";
+      }
+      sql += "deleted <> 'true'";
+      if (debug) {
+        console.log(sql);
+      }
+      t.executeSql(sql, [], function(tx, results) {
+          for (var i = 0; i < results.rows.length; i++) {
+              var doc = JSON.parse(results.rows.item(i).doc);
+              doc._table = tableName;
+              docs.push(doc);
+              if (resolve) {
+                  promises.push(resolveIds(doc));
+              }
+          }
+          d.resolve();
+      }, function(tx, err) {
+          console.log(err);
+          d.reject(err);
+      });
     }, function(err) {
         console.log(err);
         d.reject(err);
     });
-    return d.promise;
+    return $q.all(promises).then(function() {
+      return docs;
+    });
 });
 
 self.save = dependOnInit(function(doc) {
@@ -202,7 +217,9 @@ self._get = dependOnInit(function(id, tableName) {
     var d = $q.defer();
     self.db.transaction(function(tx) {
         var sql = "select doc from " + tableName + " where id=?";
-        console.log(sql, [id]);
+        if (debug) {
+          console.log(sql, [id]);
+        }
         tx.executeSql(sql, [id], function(tx, results) {
             if (results.rows.length == 1) {
                 var result = results.rows.item(0);
@@ -210,7 +227,6 @@ self._get = dependOnInit(function(id, tableName) {
                 doc._table = tableName;
                 // attach oneToMany relations
                 self._attachOneToMany(doc, tx).then(function() {
-                    console.log("loaded and attached", doc);
                     if (tableName == "asset" && doc.typeLabel == "attachment") {
                         self._setLocalURL(doc).then(function() {
                             d.resolve(doc);
@@ -243,6 +259,9 @@ self._attachOneToMany = function(doc, tx) {
         joinPromises.push(joinPromise.promise);
         doc[join.field] = [];
         var sql = "select id from " + join.targetTable + " where " + join.targetField + "=?";
+        if (debug) {
+          console.log(sql, [doc.id]);
+        }
         tx.executeSql(sql, [doc.id], function(tx, results) {
             for(var i = 0; i < results.rows.length; i++) {
                 doc[join.field].push(results.rows.item(i).id);
@@ -290,7 +309,9 @@ function _createTables() {
                 sql += field + " " + type + ", ";
             });
             sql += "doc TEXT NOT NULL)";
-            console.log(sql);
+            if (debug) {
+              console.log(sql);
+            }
             var d = $q.defer();
             promises.push(d);
             tx.executeSql(sql, null, function() {
@@ -479,7 +500,6 @@ function _save(doc, tx) {
         var tableSchema = schemaService[doc._table];
         _replaceIds(copy, tableSchema);
 
-
         console.log("--- saving", copy);
         var sql = "INSERT OR REPLACE INTO " + doc._table + " (id, doc";
         var sqlValues = "?, ?";
@@ -490,7 +510,9 @@ function _save(doc, tx) {
             values.push(copy[field] || false);
         });
         sql += ") values (" + sqlValues + ")";
-        console.log(sql, values);
+        if (debug) {
+          console.log(sql, values);
+        }
 
         tx.executeSql(sql, values, function(tx, results) {
             if (doc._table == "asset" && copy.typeLabel == "attachment" && localURL) {
