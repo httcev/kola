@@ -23,7 +23,7 @@
             </div>
 
             <h1 ng-if="question.answers.length" class="task-section-header">Antworten:</h1>
-            <div class="list card calm answers" ng-repeat="answer in question.answers">
+            <div class="list card answers" ng-repeat="answer in question.answers">
                 <div class="item item-text-wrap clearfix">
                     <rating-control ng-model="answer"></rating-control>
                     <div class="text">{{answer.text}}</div>
@@ -33,7 +33,7 @@
                     <author-info ng-model="answer"></author-info>
                     <button ng-if="canEdit(answer)" class="button button-positive button-clear button-small icon ion-edit" ng-click="editDocument(answer)"></button>
                 </div>
-                <div class="item" ng-if="answer.comments.length"><comments-list ng-model="answer"></comments-list></div>
+                <comments-list class="item" ng-model="answer"></comments-list>
             </div>
             <div class="center-horizontal padding">
                 <button class="button button-balanced icon-left icon httc-answer-add add-answer-button" ng-click="editDocument()">Neue Antwort geben</button>

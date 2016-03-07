@@ -426,7 +426,9 @@ angular.module('kola.controllers', [])
         localStorage["scaleImages"] = $scope.scaleImages.toString();
         if ($scope.profile.user && $scope.profile.password) {
             authenticationService.updateCredentials($scope.profile.user, $scope.profile.password);
-
+            dbService.sync();
+            return $state.go("home");
+/*
             dbService.sync().then(function() {
                 return $state.go("home");
             }, function(err) {
@@ -435,6 +437,7 @@ angular.module('kola.controllers', [])
                     return $state.go("home");
                 }
             });
+*/
         }
     };
 })

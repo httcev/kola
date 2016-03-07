@@ -160,8 +160,8 @@ angular.module('kola.directives', [])
                 }
                 else {
                     $ionicPopup.alert({
-                        title: "Kein Netzzugang",
-                        template: "Das Gerät hat momentan keinen Netzzugang. Alle Änderungen werden zunächst nur lokal auf dem Gerät gespeichert und synchronisiert, sobald eine Internetverbindung besteht"
+                        title: "<b>Kein Netzzugang</b>",
+                        template: "Das Gerät hat momentan keinen Netzzugang. <span class='assertive bold'>Alle Änderungen werden zunächst nur lokal auf dem Gerät gespeichert</span> und synchronisiert, sobald eine Internetverbindung besteht"
                     });
                 }
             };
@@ -226,18 +226,31 @@ angular.module('kola.directives', [])
     };
 })
 
-.directive('commentsList', function() {
+.directive('commentsList', function(dbService) {
     return {
         restrict: 'E',
-        //replace: true,
-        require: '^ngModel',
+        require: 'ngModel',
         scope: {
             ngModel: '='
         },
         templateUrl: 'templates/directive-comments-list.html',
         link: function($scope) {
             $scope.createComment = function() {
-                alert("create comment");
+                $scope.newComment = { text:"" };
+            }
+
+            $scope.saveComment = function() {
+                console.log($scope);
+                console.log("--- saving", $scope.newComment);
+                if ($scope.newComment && $scope.newComment.text.length > 0) {
+                    var comment = dbService.createComment($scope.ngModel);
+                    comment.text = $scope.newComment.text;
+                    $scope.saving = true;
+                    dbService.save(comment).then(function() {
+                        $scope.newComment = null;
+                        $scope.saving = false;
+                    });
+                }
             }
         }
     };
@@ -261,7 +274,7 @@ angular.module('kola.directives', [])
                 }
                 else {
                     $scope.ngModel.rated = true;
-                    $scope.ngModel.rating++;
+                    $scope.ngModel.rating = ($scope.ngModel.rating || 0) + 1;
                 }
                 console.log("rated", $scope.ngModel.rated);
             }

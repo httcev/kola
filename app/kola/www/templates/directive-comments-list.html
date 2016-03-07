@@ -1,4 +1,4 @@
-<div ng-if="ngModel.comments.length" class="comments-list">
+<div ng-if="ngModel.comments.length" class="comments-list clearfix padding-top">
 	<h2>Kommentare:</h2>
 	<ul class="comments">
 		<li class="comment" ng-repeat="comment in ngModel.comments">
@@ -8,5 +8,18 @@
 	</ul>
 </div>
 <div class="text-right padding">
-	<button class="button button-outline button-small add-comment-button" ng-click="createComment()">Kommentieren</button>
+	<div ng-if="!saving">
+		<div ng-if="newComment">
+			<input type="text" class="fullwidth" ng-model="newComment.text" placeholder="Geben Sie hier Ihr Kommentar ein..." autofocus>
+		</div>
+		<button
+			class="button button-small add-comment-button"
+			ng-disabled="saving"
+			ng-class="{'button-outline':!newComment, 'button-balanced':newComment}"
+			ng-click="newComment ? saveComment() : createComment()">
+				<span ng-if="newComment">Speichern</span>
+				<span ng-if="!newComment">Kommentieren</span>
+		</button>
+	</div>
+	<ion-spinner ng-if="saving" icon="spiral"></ion-spinner>
 </div>

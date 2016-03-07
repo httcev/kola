@@ -47,7 +47,7 @@ var DBSYNC = {
     cbEndSync: null,
     clientData: null,
     serverData: null,
-    
+
     authenticationService: null, // basic authentication support
 
     /*************** PUBLIC FUNCTIONS ********************/
@@ -62,11 +62,12 @@ var DBSYNC = {
      * @param {Object} authenticationService : credentials provider for basic authentication support
      * @param {Object} timeout : the timeout in milliseconds for the ajax request making the sync
      */
-    initSync: function(theTablesToSync, dbObject, theSyncInfo, theServerUrl, attachmentUploadUrl, assetsDir, callBack, $cordovaFileTransfer, $cordovaFile, $q, authenticationService, timeout) {
+    initSync: function(dbService, schema, dbObject, theSyncInfo, theServerUrl, attachmentUploadUrl, assetsDir, callBack, $cordovaFileTransfer, $cordovaFile, $q, authenticationService, timeout) {
         var self = this, i = 0;
         this.db = dbObject;
+        this.dbService = dbService;
         this.serverUrl = theServerUrl;
-        this.tablesToSync = theTablesToSync;
+        this.tablesToSync = [];
         this.syncInfo = theSyncInfo;
         this.authenticationService = authenticationService;
         this.timeout = timeout;
@@ -75,7 +76,13 @@ var DBSYNC = {
         this.attachmentUploadUrl = attachmentUploadUrl;
         this.assetsDir = assetsDir;
         this.$q = $q;
-        
+
+        angular.forEach(schema, function(tableDef, tableName) {
+            if (tableDef.sync) {
+                self.tablesToSync.push({tableName : tableName});
+            }
+        })
+
         //Handle optional id :
         for (i = 0; i < self.tablesToSync.length; i++) {
             if (typeof self.tablesToSync[i].idName === 'undefined') {
@@ -154,7 +161,7 @@ var DBSYNC = {
                 self.syncResult.message = 'No new data to send to the server';
                 self.cbEndSync(self.syncResult);
                 return
-            } 
+            }
 
             callBackProgress('Sending ' + self.syncResult.nbSent + ' elements to the server', 20, 'sendData');
 
@@ -193,7 +200,7 @@ var DBSYNC = {
 
     /* You can override the following methods to use your own log */
     log: function(message) {
-        //console.log(message);
+        console.log(message);
     },
     error: function(message) {
         console.error(message);
@@ -263,11 +270,11 @@ var DBSYNC = {
 
         if (credentials.user != null && credentials.password != null && credentials.user != undefined && credentials.password != undefined) {
             XHR.open("POST", self.serverUrl, true);
-            XHR.setRequestHeader("Authorization", "Basic " + self._encodeBase64(credentials.user + ':' + credentials.password));    
+            XHR.setRequestHeader("Authorization", "Basic " + self._encodeBase64(credentials.user + ':' + credentials.password));
         } else {
             XHR.open("POST", self.serverUrl, true);
         }
-        
+
         XHR.setRequestHeader("Content-type", "application/json; charset=utf-8");
         XHR.onreadystatechange = function () {
             var serverAnswer;
@@ -325,15 +332,14 @@ var DBSYNC = {
         }
         if (typeof serverData.data === 'undefined' || serverData.data.length === 0) {
             //nothing to update
-            self.db.transaction(function(tx) {
-                //We only use the server date to avoid dealing with wrong date from the client
-                self._finishSync(serverData.now, tx, callBack);
-            });
+            //We only use the server date to avoid dealing with wrong date from the client
+            self._finishSync(serverData.now, callBack);
             return;
         }
-        self.db.transaction(function(tx) {
+//        self.db.transaction(function(tx) {
             var counterNbTable = 0, nbTables = self.tablesToSync.length;
             var counterNbElm = 0;
+            var promises = [];
             self.tablesToSync.forEach(function(table) {
                 var currData = serverData.data[table.tableName];
                 if (!currData) {
@@ -341,6 +347,19 @@ var DBSYNC = {
                     //Must not be null
                     currData = [];
                 }
+                angular.forEach(currData, function(updatedObject) {
+                    updatedObject.doc._table = table.tableName;
+                    promises.push(self.dbService.save(updatedObject.doc).then(function() {
+                        counterNbElm++;
+                    }));
+                });
+            });
+            self.$q.all(promises).then(function() {
+                self.syncResult.nbUpdated = counterNbElm;
+                self._finishSync(serverData.now, callBack);
+            });
+
+/*
                 var nb = currData.length;
                 counterNbElm += nb;
                 self.log('There are ' + nb + ' new or modified elements in the table ' + table.tableName + ' to save in the local DB');
@@ -349,18 +368,17 @@ var DBSYNC = {
                 for (i = 0; i < nb; i++) {
                     listIdToCheck.push(serverData.data[table.tableName][i][table.idName]);
                 }
-                
+
                 self._getIdExitingInDB(table.tableName, table.idName, listIdToCheck, tx, function(idInDb) {
-                    
+
                     var curr = null, sql = null;
 
                     for (i = 0; i < nb; i++) {
 
                         curr = serverData.data[table.tableName][i];
-    
+
                         if (idInDb[curr[table.idName]]) {//update
-                            
-                            /*ex : UPDATE "tableName" SET colonne 1 = [valeur 1], colonne 2 = [valeur 2]*/
+
                             var attList = self._getAttributesList(curr);
                             sql = self._buildUpdateSQL(table.tableName, curr, attList);
                             sql += ' WHERE ' + table.idName + ' = "' + curr[table.idName] + '"';
@@ -386,6 +404,7 @@ var DBSYNC = {
                 });//end getExisting Id
             });//end forEach
         });//end tx
+        */
     },
     /** return the listIdToCheck curated from the id that doesn't exist in tableName and idName
      * (used in the DBSync class to know if we need to insert new elem or just update)
@@ -409,49 +428,52 @@ var DBSYNC = {
             dataCallBack(idsInDb);
         });
     },
-    _finishSync: function(syncDate, tx, callBack) {
+    _finishSync: function(syncDate, callBack) {
         var self = this, tableName, idsToDelete, idName, i, idValue, idsString;
         var serverUpdatedAcks = self.serverData.updated || [];
         this.firstSync = false;
         this.syncInfo.lastSyncDate = syncDate;
-        this._executeSql('UPDATE sync_info SET last_sync = "' + syncDate + '"', [], tx);
+        self.db.transaction(function(tx) {
+            self._executeSql('UPDATE sync_info SET last_sync = "' + syncDate + '"', [], tx);
 
-        // Remove only the elem sent to the server (in case new_elem has been added during the sync)
-        // We don't do that anymore: this._executeSql('DELETE FROM new_elem', [], tx);
-        for (tableName in self.clientData.data) {
-            idsToDelete = new Array();
-            idName =  self.idNameFromTableName[tableName];
-            for (i=0; i < self.clientData.data[tableName].length; i++) {
-                idValue = self.clientData.data[tableName][i][idName];
-                // server now sends acks in "updated" id array. so only remove ids if they have successfully been updated by the server.
-                if (serverUpdatedAcks.indexOf(idValue) > -1) {
+            // Remove only the elem sent to the server (in case new_elem has been added during the sync)
+            // We don't do that anymore: this._executeSql('DELETE FROM new_elem', [], tx);
+            for (tableName in self.clientData.data) {
+                idsToDelete = new Array();
+                idName =  self.idNameFromTableName[tableName];
+                for (i=0; i < self.clientData.data[tableName].length; i++) {
+                    idValue = self.clientData.data[tableName][i][idName];
+                    // server now sends acks in "updated" id array. so only remove ids if they have successfully been updated by the server.
+                    if (serverUpdatedAcks.indexOf(idValue) > -1) {
+                        idsToDelete.push('"'+idValue+'"');
+                    }
+                    else {
+                        console.log(self.clientData);
+                        console.log("RETAINING " + idValue + ", because server didn't send ack.");
+                    }
+                }
+                if (idsToDelete.length > 0) {
+                    idsString = self._arrayToString(idsToDelete, ',');
+                    self._executeSql('DELETE FROM new_elem WHERE table_name = "'+tableName+'" AND id IN ('+idsString+')', [], tx);
+                }
+            }
+            // Remove elems received from the server that has triggered the SQL TRIGGERS, to avoid to send it again to the server and create a loop
+            for (tableName in self.serverData.data) {
+                idsToDelete = new Array();
+                idName =  self.idNameFromTableName[tableName];
+                for (i=0; i < self.serverData.data[tableName].length; i++) {
+                    idValue = self.serverData.data[tableName][i][idName];
                     idsToDelete.push('"'+idValue+'"');
                 }
-                else {
-                    console.log("RETAINING " + idValue + ", because server didn't send ack.");
+                if (idsToDelete.length > 0) {
+                    idsString = self._arrayToString(idsToDelete, ',');
+                    self._executeSql('DELETE FROM new_elem WHERE table_name = "'+tableName+'" AND id IN ('+idsString+')', [], tx);
                 }
             }
-            if (idsToDelete.length > 0) {
-                idsString = self._arrayToString(idsToDelete, ',');
-                self._executeSql('DELETE FROM new_elem WHERE table_name = "'+tableName+'" AND id IN ('+idsString+')', [], tx);
-            }
-        }
-        // Remove elems received from the server that has triggered the SQL TRIGGERS, to avoid to send it again to the server and create a loop
-        for (tableName in self.serverData.data) {
-            idsToDelete = new Array();
-            idName =  self.idNameFromTableName[tableName];
-            for (i=0; i < self.serverData.data[tableName].length; i++) {
-                idValue = self.serverData.data[tableName][i][idName];
-                idsToDelete.push('"'+idValue+'"');
-            }
-            if (idsToDelete.length > 0) {
-                idsString = self._arrayToString(idsToDelete, ',');
-                self._executeSql('DELETE FROM new_elem WHERE table_name = "'+tableName+'" AND id IN ('+idsString+')', [], tx);
-            }
-        }
-        callBack();
-        self.clientData = null;
-        self.serverData = null;
+            callBack();
+            self.clientData = null;
+            self.serverData = null;
+        });
     },
     _uploadAttachments: function(attachments) {
         var self = this;
@@ -655,51 +677,51 @@ var DBSYNC = {
         }
         return result;
     },
-    
+
     _keyStr : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
-    
+
 	// public method for encoding
 	_encodeBase64 : function (input) {
 		var output = "";
 		var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
 		var i = 0;
- 
+
 		input = this._utf8_encode(input);
- 
+
 		while (i < input.length) {
- 
+
 			chr1 = input.charCodeAt(i++);
 			chr2 = input.charCodeAt(i++);
 			chr3 = input.charCodeAt(i++);
- 
+
 			enc1 = chr1 >> 2;
 			enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
 			enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
 			enc4 = chr3 & 63;
- 
+
 			if (isNaN(chr2)) {
 				enc3 = enc4 = 64;
 			} else if (isNaN(chr3)) {
 				enc4 = 64;
 			}
- 
+
 			output = output +
 			this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) +
 			this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
- 
+
 		}
- 
+
 		return output;
 	},
-	
+
 	_utf8_encode : function (string) {
 		string = string.replace(/\r\n/g,"\n");
 		var utftext = "";
- 
+
 		for (var n = 0; n < string.length; n++) {
- 
+
 			var c = string.charCodeAt(n);
- 
+
 			if (c < 128) {
 				utftext += String.fromCharCode(c);
 			}
@@ -712,9 +734,9 @@ var DBSYNC = {
 				utftext += String.fromCharCode(((c >> 6) & 63) | 128);
 				utftext += String.fromCharCode((c & 63) | 128);
 			}
- 
+
 		}
- 
+
 		return utftext;
 	}
 };

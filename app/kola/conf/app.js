@@ -1,4 +1,4 @@
-angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked', 'kola.controllers', 'kola.services', 'kola.directives', 'kola.notification'])
+angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked', 'kola.controllers', 'kola.services', 'kola.directives', 'kola.notification', 'kola.storage'])
 
 .run(function($ionicPlatform) {
   // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -23,9 +23,11 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
   .state('home', {
     url: "/home",
     controller: 'TasksCtrl',
-    templateUrl: "templates/home.html"
-  })
-
+    templateUrl: "templates/home.html",
+    resolve: {
+        factory: checkRouting
+    }
+   })
   .state('task-choose-template', {
     url: '/new-task/chooseTemplate',
     templateUrl: 'templates/task-choose-template.html',
@@ -145,3 +147,28 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
 .constant("gcmSenderID", "686594383179")
 .constant("serverUrl", "https://staging.kola-projekt.de");
 // @endif
+
+var checkRouting = function (dbService) {
+    /*
+    if ($rootScope.userProfile) {
+        return true;
+    } else {
+        var deferred = $q.defer();
+        $http.post("/loadUserProfile", { userToken: "blah" })
+            .success(function (response) {
+                $rootScope.userProfile = response.userProfile;
+                deferred.resolve(true);
+            })
+            .error(function () {
+                deferred.reject();
+                $location.path("/");
+             });
+        return deferred.promise;
+    }
+    */
+    /*
+    console.log("--- check routing", dbService.initDeferred.promise);
+    return dbService.initDeferred.promise;
+    */
+    return true;
+};

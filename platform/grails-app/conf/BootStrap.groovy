@@ -186,7 +186,7 @@ class BootStrap {
             def doc = comment.properties.findAll { k, v ->
                 k in ["text", "deleted", "lastUpdated"]
             }
-            ["creator"].each {
+            ["creator", "reference"].each {
                 if (comment."$it" instanceof Collection) {
                     doc."$it" = comment."$it"?.collect {
                         it?.id
