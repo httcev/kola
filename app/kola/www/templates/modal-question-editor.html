@@ -3,7 +3,7 @@
 		<div class="buttons">
 			<button class="button button-clear" ng-click="checkCloseEditDocumentModal()"><i class="icon ion-close"></i></button>
 		</div>
-  		<h1 class="title">Frage bearbeiten</h1>
+		<h1 class="title">Frage bearbeiten</h1>
 		<div class="buttons">
 			<button ng-if="!editedDocument._isNew" class="button button-assertive icon ion-trash-a margin-horizontal" ng-click="deleteDocument()"></button>
 			<button class="button button-balanced icon-left" ng-disabled="!editedDocument.title || editedDocument.title.length == 0 || !editedDocument.text || editedDocument.text.length == 0" ng-click="saveDocument()"><i class="icon ion-checkmark"></i> Speichern</button>
@@ -16,7 +16,9 @@
 				<option value="">Gesamter Arbeitsauftrag</option>
 			</select>
 		</label>
-		<label class="item item-input"><input ng-model="editedDocument.title" type="text" placeholder="Titel der Frage" class="bold" ng-change="setEditedDocumentDirty()"></label>
+		<label class="item item-input">
+			<input ng-model="editedDocument.title" type="text" placeholder="Titel der Frage" class="bold" ng-change="setEditedDocumentDirty()">
+		</label>
 		<div class="item item-input">
 			<textarea ng-model="editedDocument.text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Beschreibung der Frage" ng-change="setEditedDocumentDirty()"></textarea>
 		</div>
@@ -25,13 +27,13 @@
 	<ion-footer-bar class="bar-stable">
 		<div class="title">
 			<i class="icon ion-android-attach"></i> Hinzufügen:
-        </div>
-        <div class="buttons">
-            <button class="button button-clear button-positive" ng-click="attachPhoto()"><i class="icon ion-camera"></i></button>
-            <span class="padding-horizontal"></span>
-            <button class="button button-clear button-positive" ng-click="attachVideo()"><i class="icon ion-videocamera"></i></button>
-            <span class="padding-horizontal"></span>
-            <button class="button button-clear button-positive" ng-click="attachChosenMedia()"><i class="icon ion-android-folder-open"></i></button>
-        </div>
+		</div>
+		<div class="buttons">
+			<button class="button button-clear button-positive" ng-click="attachPhoto()"><i class="icon ion-camera"></i></button>
+			<span class="padding-horizontal"></span>
+			<button class="button button-clear button-positive" ng-click="attachVideo()"><i class="icon ion-videocamera"></i></button>
+			<span class="padding-horizontal"></span>
+			<button class="button button-clear button-positive" ng-click="attachChosenMedia()"><i class="icon ion-android-folder-open"></i></button>
+		</div>
 	</ion-footer-bar>
 </div>

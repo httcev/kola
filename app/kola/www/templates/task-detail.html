@@ -1,28 +1,25 @@
 <ion-view>
-  <ion-nav-title>{{isStep ? 'Teilschritt: ' + taskOrStep.name : 'Arbeitsauftrag: ' + taskOrStep.name}}</ion-nav-title>
-  <ion-nav-buttons side="secondary">
-    <button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
-  </ion-nav-buttons>
-  <ion-content class="padding">
-    <div ng-if="!taskOrStep" class="center-horizontal">
-      <ion-spinner class="spinner-large"></ion-spinner>
-    </div>
-    <div ng-if="taskOrStep">
-      <h3>{{taskOrStep.name}}</h3>
-      <!--
-      <p ng-if="task.due"><b>Wann:</b> {{task.due | date:'fullDate'}}</p>
-      -->
-      <div class="text" marked="taskOrStep.description"></div>
-
-      <media-attachments ng-model="taskOrStep"></media-attachments>
-      <learning-resources ng-model="taskOrStep"></learning-resources>
-      <ion-list ng-if="!isStep && taskOrStep.steps.length">
-        <h1 class="task-section-header">Teilschritte:</h1>
-        <ion-item ng-repeat="step in taskOrStep.steps" class="item-icon-right" type="item-text-wrap" ui-sref="task.step({taskId:taskOrStep.id, stepId:step.id})">
-          {{$index+1}}. {{step.name}}
-          <i class="icon ion-chevron-right icon-accessory"></i>
-        </ion-item>
-      </ion-list>
-    </div>
-  </ion-content>
+	<ion-nav-title>{{isStep ? 'Teilschritt: ' + taskOrStep.name : 'Arbeitsauftrag: ' + taskOrStep.name}}</ion-nav-title>
+	<ion-nav-buttons side="secondary">
+		<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
+	</ion-nav-buttons>
+	<ion-content class="padding">
+		<div ng-if="!taskOrStep" class="center-horizontal">
+			<ion-spinner class="spinner-large"></ion-spinner>
+		</div>
+		<div ng-if="taskOrStep">
+			<h3>{{taskOrStep.name}}</h3>
+      		<p ng-if="taskOrStep.due"><b>Fällig:</b> {{taskOrStep.due | date:'fullDate'}}</p>
+			<div class="text" marked="taskOrStep.description"></div>
+			<media-attachments ng-model="taskOrStep"></media-attachments>
+			<learning-resources ng-model="taskOrStep"></learning-resources>
+			<ion-list ng-if="!isStep && taskOrStep.steps.length">
+				<h1 class="task-section-header">Teilschritte:</h1>
+				<ion-item ng-repeat="step in taskOrStep.steps" class="item-icon-right" type="item-text-wrap" ui-sref="task.step({taskId:taskOrStep.id, stepId:step.id})">
+					{{$index+1}}. {{step.name}}
+					<i class="icon ion-chevron-right icon-accessory"></i>
+				</ion-item>
+			</ion-list>
+		</div>
+	</ion-content>
 </ion-view>

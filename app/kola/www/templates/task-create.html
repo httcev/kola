@@ -1,42 +1,44 @@
 <ion-view>
-  <ion-nav-title>Neuer Arbeitsauftrag</ion-nav-title>
-  <ion-nav-buttons side="secondary">
-    <button class="button button-light icon-left" ng-disabled="!task.name" ng-click="save()"><i class="icon ion-checkmark"></i> Speichern</button>
-  </ion-nav-buttons>
-  <ion-content>
-    <div class="list">
-      <label class="item item-input item-floating-label">
-        <span class="input-label positive">Name</span>
-        <input type="text" ng-model="task.name" placeholder="Geben Sie hier den Namen des Arbeitsauftrags ein..." required autofocus>
-      </label>
-      <label class="item item-input item-floating-label">
-        <span class="input-label positive">Beschreibung</span>
-        <textarea ng-model="task.description" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier die Beschreibung des Arbeitsauftrags ein..."></textarea>
-      </label>
-      <label class="item item-input">
-        <span class="input-label positive">Fällig</span>
-        <input type="date" ng-model="task.due" placeholder="Fällig">
-      </label>
-      <label class="item item-input item-select">
-        <span class="input-label positive">Zuweisen an</span>
-        <select ng-model="task.assignee">
-          <option ng-repeat="user in assignableUsers" value="{{user.id}}">{{user.displayName}}</option>
-        </select>
-      </label>
-      <media-attachments ng-model="task" edit-mode="true"></media-attachments>
-      <learning-resources ng-model="task" edit-mode="true"></learning-resources>
-      <div ng-if="task.steps.length" class="item item-divider item-stable">Teilschritte</div>
-      <div ng-if="task.steps.length" ng-repeat="step in task.steps" class="item item-button-right">
-        <div>{{$index+1}}. <b>{{step.name}}</b></div>
-        <div class="text" marked="step.description"></div>
-        <div><media-attachments ng-model="step" edit-mode="true" hide-header="true"></media-attachments></div>
-        <button class="button button-clear icon ion-trash-a" ng-click="task.steps.splice($index, 1)"></button>
-      </div>
-      <div ng-if="task.reflectionQuestions.length" class="item item-divider item-stable">Fragen zu den Erfahrungen</div>
-      <div ng-if="task.reflectionQuestions.length" ng-repeat="reflectionQuestion in task.reflectionQuestions" class="item item-button-right">
-        {{reflectionQuestion.name}}
-        <button class="button button-clear icon ion-trash-a" ng-click="task.reflectionQuestions.splice($index, 1)"></button>
-      </div>
-    </div>
-  </ion-content>
+	<ion-nav-title>Neuer Arbeitsauftrag</ion-nav-title>
+	<ion-nav-buttons side="secondary">
+		<button class="button button-light icon-left" ng-disabled="!task.name" ng-click="save()"><i class="icon ion-checkmark"></i> Speichern</button>
+	</ion-nav-buttons>
+	<ion-content>
+		<div class="list">
+			<label class="item item-input item-floating-label">
+				<span class="input-label positive">Name</span>
+				<input type="text" ng-model="task.name" placeholder="Geben Sie hier den Namen des Arbeitsauftrags ein..." required autofocus>
+			</label>
+			<label class="item item-input item-floating-label">
+				<span class="input-label positive">Beschreibung</span>
+				<textarea ng-model="task.description" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier die Beschreibung des Arbeitsauftrags ein..."></textarea>
+			</label>
+			<label class="item item-input">
+				<span class="input-label positive">Fällig</span>
+				<input type="date" ng-model="task.due" placeholder="Fällig">
+			</label>
+			<label class="item item-input item-select">
+				<span class="input-label positive">Zuweisen an</span>
+				<select ng-model="task.assignee">
+					<option ng-repeat="user in assignableUsers" value="{{user.id}}">{{user.displayName}}</option>
+				</select>
+			</label>
+			<media-attachments ng-model="task" edit-mode="true"></media-attachments>
+			<learning-resources ng-model="task" edit-mode="true"></learning-resources>
+			<div ng-if="task.steps.length" class="item item-divider item-stable">Teilschritte</div>
+			<div ng-if="task.steps.length" ng-repeat="step in task.steps" class="item item-button-right">
+				<div>{{$index+1}}. <b>{{step.name}}</b></div>
+				<div class="text" marked="step.description"></div>
+				<div>
+					<media-attachments ng-model="step" edit-mode="true" hide-header="true"></media-attachments>
+				</div>
+				<button class="button button-clear icon ion-trash-a" ng-click="task.steps.splice($index, 1)"></button>
+			</div>
+			<div ng-if="task.reflectionQuestions.length" class="item item-divider item-stable">Fragen zu den Erfahrungen</div>
+			<div ng-if="task.reflectionQuestions.length" ng-repeat="reflectionQuestion in task.reflectionQuestions" class="item item-button-right">
+				{{reflectionQuestion.name}}
+				<button class="button button-clear icon ion-trash-a" ng-click="task.reflectionQuestions.splice($index, 1)"></button>
+			</div>
+		</div>
+	</ion-content>
 </ion-view>
