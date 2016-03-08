@@ -74,7 +74,7 @@ grails.project.dependency.resolution = {
         runtime ('org.springframework:spring-test:4.1.5.RELEASE')
 
         // fixes error messages in DB trace file (log file grows very large)
-        runtime ('com.h2database:h2:1.4.190')
+        runtime ('com.h2database:h2:1.4.191')
     }
 
     plugins {

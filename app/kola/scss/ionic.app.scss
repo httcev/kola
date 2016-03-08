@@ -16,12 +16,9 @@ $dark:                            #444 !default;
 */
 $balanced: #449d44 !default;
 $positive: #2860D0 !default;
-$energized: #FF8000 !default;
-// The path for our ionicons font files, relative to the built CSS in www/css
-$ionicons-font-path: "../lib/ionic/fonts" !default;
-// Include all of Ionic
-@import "www/lib/ionic/scss/ionic";
-// Include custom q&a font
+$energized: #FF8000 !default; // The path for our ionicons font files, relative to the built CSS in www/css
+$ionicons-font-path: "../lib/ionic/fonts" !default; // Include all of Ionic
+@import "www/lib/ionic/scss/ionic"; // Include custom q&a font
 @import "scss/httc-webfont";
 textarea {
 	padding-left: 3px;
@@ -88,6 +85,13 @@ media-attachments .center-horizontal {
 .float-right {
 	float: right;
 }
+.float-left {
+	float: left;
+}
+.icon-large {
+	font-size     : 32px;
+	vertical-align: middle;
+}
 .margin-horizontal {
 	margin-left : 10px;
 	margin-right: 10px;
@@ -120,6 +124,9 @@ media-attachments .center-horizontal {
 .author-info img {
 	border-radius : 50%;
 	vertical-align: middle;
+}
+.comments-list .author-info img {
+	width: 20px;
 }
 .author-info a {
 	text-decoration: none;
@@ -209,6 +216,9 @@ media-attachments .center-horizontal {
 .comments-list {
 	font-size: 80%;
 }
+.comments-list .author-info {
+	float:right;
+}
 .comments-list h2 {
 	font-size  : 15px;
 	font-weight: bold;
@@ -223,15 +233,17 @@ media-attachments .center-horizontal {
 .question {
 	margin-top: 20px;
 }
-.rating-control {
-	display     : inline-block;
-	text-align  : center;
+.rating-control-container {
 	float       : left;
+	text-align  : center;
 	position    : relative;
 	top         : -4px;
 	margin-right: 8px;
 }
-.padding .rating-control {
+.rating-control {
+	/*display     : inline-block;*/
+}
+.item .rating-control-container {
 	margin-left: -10px;
 }
 .rating-control .rating {

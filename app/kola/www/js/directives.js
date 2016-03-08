@@ -57,8 +57,7 @@ angular.module('kola.directives', [])
 					angular.forEach(doc.attachments, function(attachment, attachmentKey) {
 						if (attachment._localURL) {
 							attachmentUrls.push(attachment._localURL);
-						}
-						else {
+						} else {
 							attachmentUrls.push(attachment.url);
 						}
 					});
@@ -149,7 +148,7 @@ angular.module('kola.directives', [])
 	};
 })
 
-.directive('authorInfo', function($ionicModal, $ionicLoading) {
+.directive('authorInfo', function($ionicModal, $ionicLoading, $ionicPopup) {
 	return {
 		restrict: 'E',
 		require: '^ngModel',
@@ -195,6 +194,13 @@ angular.module('kola.directives', [])
 					window.open(url);
 				}
 			};
+
+			$scope.showUnsavedWarning = function() {
+				$ionicPopup.alert({
+					title: "<b>Noch nicht synchronisiert</b>",
+					template: "Dieser Eintrag wurde zunächst nur lokal auf dem Gerät gespeichert. Er wird synchronisiert, sobald eine Internetverbindung besteht."
+				});
+			}
 		}
 	};
 })
@@ -223,13 +229,16 @@ angular.module('kola.directives', [])
 						$scope.newComment = null;
 						$scope.saving = false;
 					});
+				} else {
+					// close edit mode when user didn't enter comment text
+					$scope.newComment = null;
 				}
 			}
 		}
 	};
 })
 
-.directive('ratingControl', function() {
+.directive('ratingControl', function(dbService) {
 	return {
 		restrict: 'E',
 		require: '^ngModel',
@@ -239,7 +248,6 @@ angular.module('kola.directives', [])
 		templateUrl: 'templates/directive-rating-control.html',
 		link: function($scope) {
 			$scope.click = function() {
-				console.log($scope);
 				if ($scope.ngModel.rated) {
 					$scope.ngModel.rated = false;
 					$scope.ngModel.rating--;
@@ -247,7 +255,7 @@ angular.module('kola.directives', [])
 					$scope.ngModel.rated = true;
 					$scope.ngModel.rating = ($scope.ngModel.rating || 0) + 1;
 				}
-				console.log("rated", $scope.ngModel.rated);
+				dbService.save($scope.ngModel);
 			}
 		}
 	};

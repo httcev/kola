@@ -148,7 +148,7 @@ class BootStrap {
         // QUESTIONS
         grails.converters.JSON.registerObjectMarshaller(Question) { question ->
             def doc = question.properties.findAll { k, v ->
-                k in ["title", "text", "deleted", "lastUpdated", "metadata", "rated", "rating"]
+                k in ["title", "text", "deleted", "lastUpdated", "dateCreated", "metadata", "rated", "rating"]
             }
             ["attachments", "creator", "acceptedAnswer", "reference"].each {
                 if (question."$it" instanceof Collection) {
@@ -166,7 +166,7 @@ class BootStrap {
         // ANSWERS
         grails.converters.JSON.registerObjectMarshaller(Answer) { answer ->
             def doc = answer.properties.findAll { k, v ->
-                k in ["text", "deleted", "lastUpdated", "rated", "rating"]
+                k in ["text", "deleted", "lastUpdated", "dateCreated", "rated", "rating"]
             }
             ["attachments", "creator", "question"].each {
                 if (answer."$it" instanceof Collection) {
@@ -184,7 +184,7 @@ class BootStrap {
         // COMMENTS
         grails.converters.JSON.registerObjectMarshaller(Comment) { comment ->
             def doc = comment.properties.findAll { k, v ->
-                k in ["text", "deleted", "lastUpdated"]
+                k in ["text", "deleted", "lastUpdated", "dateCreated"]
             }
             ["creator", "reference"].each {
                 if (comment."$it" instanceof Collection) {

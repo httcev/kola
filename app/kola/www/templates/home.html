@@ -16,7 +16,7 @@
 				<i class="icon ion-alert"></i>
 				<b>Anstehend:</b>
 			</div>
-			<ion-item ng-repeat="task in pendingTasks = (tasks | filter:{done:'!true', deleted:'!true'} | orderBy:[sortByDue, '-lastUpdated']) track by task.id" class="item-remove-animate item-icon-left item-icon-right" type="item-text-wrap" ui-sref="task.detail({taskId:task.id})">
+			<ion-item ng-repeat="task in pendingTasks = (tasks | filter:{done:'!true'} | orderBy:[sortByDue, '-lastUpdated']) track by task.id" class="item-remove-animate item-icon-left item-icon-right" type="item-text-wrap" ui-sref="task.detail({taskId:task.id})">
 				<i ng-if="task.type!='homework'" class="icon httc-task"></i>
 				<i ng-if="task.type=='homework'" class="icon ion-university"></i>
 				<h2>{{task.name}}</h2>
@@ -32,7 +32,7 @@
 				<i class="icon ion-checkmark-round balanced"></i>
 				<b>Erledigt:</b>
 			</div>
-			<ion-item ng-repeat="task in completedTasks = (tasks | filter:{done:true, deleted:'!true'} | orderBy:'-due') track by task.id" class="item-remove-animate item-icon-left item-icon-right" type="item-text-wrap" ui-sref="task.detail({taskId:task.id})" ui-sref-opts="{reload: true}">
+			<ion-item ng-repeat="task in completedTasks = (tasks | filter:{done:true} | orderBy:'-due') track by task.id" class="item-remove-animate item-icon-left item-icon-right" type="item-text-wrap" ui-sref="task.detail({taskId:task.id})" ui-sref-opts="{reload: true}">
 				<i class="icon httc-task"></i>
 				<h2>{{task.name}}</h2>
 				<p ng-if="task.due"><b>Fällig</b>: {{task.due | date:'fullDate'}}</p>

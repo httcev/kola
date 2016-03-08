@@ -29,7 +29,7 @@ class Task extends QuestionReference {
         description type: "text"
         lastDocumented formula:"(select d.LAST_UPDATED from TASK_DOCUMENTATION d where d.DELETED='false' and (d.REFERENCE_ID=ID or d.REFERENCE_ID in (select s.TASK_STEPS_ID from TASK_TASK_STEP s where s.TASK_STEP_ID=ID)) order by d.LAST_UPDATED desc limit 1)"
     }
- 
+
     String name
     String description
 
@@ -51,7 +51,7 @@ class Task extends QuestionReference {
     List<TaskStep> steps                            // defined as list to keep order in which elements got added
     List<ReflectionQuestion> reflectionQuestions    // defined as list to keep order in which elements got added
 
-    static _embedded = ["name", "description", "done", "deleted", "due", "isTemplate", "lastUpdated"]
+    static _embedded = ["name", "description", "done", "deleted", "due", "isTemplate", "lastUpdated", "dateCreated"]
     static _referenced = ["steps", "resources", "attachments", "reflectionQuestions", "template", "creator", "assignee"]
 
     static {

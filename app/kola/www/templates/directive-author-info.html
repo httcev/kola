@@ -1,7 +1,10 @@
-<div ng-if="ngModel.creator" class="author-info">
-	<a href="#" class="author" ng-click="showAuthorDetailsModal(ngModel.creator)">
+<div class="author-info">
+	<a ng-if="ngModel.creator" href="#" class="author" ng-click="showAuthorDetailsModal(ngModel.creator)">
 		<i ng-if="ngModel.creator.photo == null" class="icon ion-person"></i>
 		<img ng-if="ngModel.creator.photo.length" ng-src="data:image/png;base64,{{ngModel.creator.photo}}"> {{ngModel.creator.displayName}},
 		<span class="created-date">{{ngModel.lastUpdated | date}}</span>
 	</a>
+	<button ng-if="!ngModel._isNew && ngModel._modified" class="button button-icon button-small assertive" ng-click="showUnsavedWarning()">
+		<i class="icon ion-alert-circled"></i>
+	</button>
 </div>

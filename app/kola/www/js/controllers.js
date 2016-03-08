@@ -3,7 +3,6 @@ angular.module('kola.controllers', [])
 .controller('TasksCtrl', function($scope, $state, $rootScope, dbService) {
 	function reload() {
 		dbService.all("task").then(function(docs) {
-			console.log("GOT ALL TASKS", docs);
 			var filtered = [];
 			angular.forEach(docs, function(doc) {
 				if (!doc["isTemplate"] && !doc.deleted) {
@@ -37,10 +36,9 @@ angular.module('kola.controllers', [])
 		});
 	};
 
-	var unbind = $rootScope.$on("syncFinished", function() {
+	$scope.$on("$destroy", $rootScope.$on("syncFinished", function() {
 		reload();
-	});
-	$scope.$on("$destroy", unbind);
+	}));
 	reload();
 })
 
@@ -175,14 +173,13 @@ angular.module('kola.controllers', [])
 			template: "<div class='saving'><ion-spinner></ion-spinner> " + $scope.docName + " wird gespeichert...</div>"
 		});
 		angular.forEach($scope.editedDocument.attachments, function(attachment) {
-			console.log("--- att", attachment);
 			objectsToSave.push(attachment);
 		});
 		objectsToSave.push($scope.editedDocument);
 		dbService.save(objectsToSave).then(function() {
 			$scope.reload().then(function() {
 				$ionicLoading.show({
-					template: "<div class='saving'><i class='icon ion-checkmark balanced'></i> " + $scope.docName + " erfolgreich gespeichert.</div>",
+					template: "<div class='saving'><i class='icon ion-checkmark balanced icon-large'></i> " + $scope.docName + " erfolgreich gespeichert.</div>",
 					duration: 1500
 				});
 				$scope.closeEditDocumentModal();
@@ -190,7 +187,7 @@ angular.module('kola.controllers', [])
 		}, function(err) {
 			console.log(err);
 			$ionicLoading.show({
-				template: "<div class='saving'><i class='icon ion-alert-circled assertive'></i> Speichern fehlgeschlagen!</div>",
+				template: "<div class='saving'><i class='icon ion-alert-circled assertive icon-large'></i> Speichern fehlgeschlagen!</div>",
 				duration: 2000
 			});
 		});
@@ -319,24 +316,42 @@ angular.module('kola.controllers', [])
 	$scope.reload();
 })
 
-.controller('QuestionDetailCtrl', function($scope, $stateParams, $q, $controller, $ionicPopup, $ionicModal, $ionicLoading, dbService, mediaAttachment) {
+.controller('QuestionDetailCtrl', function($scope, $rootScope, $stateParams, $q, $controller, $ionicPopup, $ionicModal, $ionicLoading, $filter, dbService, mediaAttachment) {
 	$scope.docName = "Antwort";
 	$scope.firstProp = "text";
 	$scope.templateName = "templates/modal-answer-editor.html";
 	$controller('ModalEditCtrl', {
 		$scope: $scope
-	});
+	})
 
 	$scope.reload = function() {
 		return dbService.get($stateParams.questionId, "question").then(function(question) {
+			// order answers by hand to avoid resorting on accepting/rating answers
+			question._answers = $filter('orderBy')(question._answers, function(answer) {
+				// keep accepted answer on top of list
+				if (question.acceptedAnswer === answer.id) {
+					return 0;
+				}
+				return answer.dateCreated;
+			})
 			$scope.question = question;
 		});
-	};
+	}
 
 	$scope.createNewDocument = function() {
 		return dbService.createAnswer($scope.question);
 	}
 
+	$scope.setAcceptedAnswer = function(answer) {
+		if ($scope.canEdit($scope.question)) {
+			$scope.question.acceptedAnswer = answer.id;
+			dbService.save($scope.question);
+		}
+	}
+
+	$scope.$on("$destroy", $rootScope.$on("syncFinished", function() {
+		$scope.reload();
+	}));
 	$scope.reload();
 })
 
@@ -352,16 +367,6 @@ angular.module('kola.controllers', [])
 			authenticationService.updateCredentials($scope.profile.user, $scope.profile.password);
 			dbService.sync();
 			return $state.go("home");
-			/*
-						dbService.sync().then(function() {
-							return $state.go("home");
-						}, function(err) {
-							// in case we're offline, we'll get "sync denied" here. in that case, switch to tasks tab anyway
-							if ("sync denied" == err) {
-								return $state.go("home");
-							}
-						});
-			*/
 		}
 	};
 })
@@ -449,8 +454,6 @@ angular.module('kola.controllers', [])
 			});
 			objectsToSave.push($scope.task);
 			dbService.save(objectsToSave).then(function() {
-				// TODO: this is a hack to reload tasks
-				$rootScope.$broadcast("syncFinished");
 				$ionicLoading.show({
 					template: "Neuer Arbeitsauftrag gespeichert.",
 					duration: 2000

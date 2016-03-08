@@ -364,7 +364,7 @@
 				}
 				angular.forEach(currData, function(updatedObject) {
 					updatedObject.doc._table = table.tableName;
-					promises.push(self.dbService.save(updatedObject.doc).then(function() {
+					promises.push(self.dbService.save(updatedObject.doc, true).then(function() {
 						counterNbElm++;
 					}));
 				});

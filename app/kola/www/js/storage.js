@@ -65,16 +65,15 @@ angular.module('kola.storage', ['uuid'])
 			"references": {
 				"creator": "user",
 				"attachments": "asset",
-				"answers": "answer",
-				"comments": "comment",
-				"acceptedAnswer": "answer",
+				"_answers": "answer",
+				"_comments": "comment",
 			},
 			"joins": [{
-				"field": "answers",
+				"field": "_answers",
 				"targetTable": "answer",
 				"targetField": "question"
 			}, {
-				"field": "comments",
+				"field": "_comments",
 				"targetTable": "comment",
 				"targetField": "reference"
 			}, ],
@@ -88,10 +87,10 @@ angular.module('kola.storage', ['uuid'])
 			"references": {
 				"creator": "user",
 				"attachments": "asset",
-				"comments": "comment",
+				"_comments": "comment",
 			},
 			"joins": [{
-				"field": "comments",
+				"field": "_comments",
 				"targetTable": "comment",
 				"targetField": "reference"
 			}, ],
@@ -126,7 +125,7 @@ angular.module('kola.storage', ['uuid'])
 .service('dbService', function($rootScope, $q, $state, $ionicPlatform, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, serverUrl, schemaService, authenticationService, rfc4122) {
 	var self = this;
 	var firstRun = true;
-	var debug = true;
+	var debug = false;
 	self.initDeferred = $q.defer();
 
 	self.sync = dependOnInit(function() {
@@ -139,17 +138,20 @@ angular.module('kola.storage', ['uuid'])
 					openAccountTab("Login fehlgeschlagen. Bitte überprüfen Sie Nutzernamen und Passwort.");
 					deferred.reject("sync failed");
 				} else {
-					$rootScope.$broadcast("syncFinished");
 					if (result && result.syncOK === true) {
 						// synchronized successfully
 						deferred.resolve();
+						$rootScope.$broadcast("syncSucceeded");
 					} else {
 						deferred.reject("sync failed");
 					}
 				}
+				$rootScope.$broadcast("syncFinished");
 			});
 		} else {
-			deferred.reject("sync denied");
+			// in offline mode, let syncing pretend to be successful
+			deferred.resolve("sync denied");
+			$rootScope.$broadcast("syncFinished");
 		}
 		return deferred.promise;
 	});
@@ -160,7 +162,7 @@ angular.module('kola.storage', ['uuid'])
 		var docs = [];
 
 		self.db.transaction(function(t) {
-			var sql = "select doc from " + tableName + " where ";
+			var sql = "select doc,modified from " + tableName + " where ";
 			if (whereClause) {
 				sql += whereClause + " and ";
 			}
@@ -172,9 +174,13 @@ angular.module('kola.storage', ['uuid'])
 				for (var i = 0; i < results.rows.length; i++) {
 					var doc = JSON.parse(results.rows.item(i).doc);
 					doc._table = tableName;
+					doc._modified = (results.rows.item(i).modified === "true");
+//					console.log("--- loaded all", doc);
 					docs.push(doc);
 					if (resolve) {
-						promises.push(resolveIds(doc));
+						promises.push(self._attachOneToMany(doc, tx).then(function() {
+							return resolveIds(doc);
+						}));
 					}
 				}
 				d.resolve();
@@ -191,16 +197,16 @@ angular.module('kola.storage', ['uuid'])
 		});
 	});
 
-	self.save = dependOnInit(function(doc) {
+	self.save = dependOnInit(function(doc, isUpdateFromServer) {
 		var d = $q.defer();
 		self.db.transaction(function(tx) {
 			var promises = [];
 			if (angular.isArray(doc)) {
 				angular.forEach(doc, function(o) {
-					promises.push(_save(o, tx));
+					promises.push(_save(o, tx, isUpdateFromServer));
 				});
 			} else {
-				promises.push(_save(doc, tx));
+				promises.push(_save(doc, tx, isUpdateFromServer));
 			}
 			$q.all(promises).then(function() {
 				d.resolve();
@@ -213,16 +219,14 @@ angular.module('kola.storage', ['uuid'])
 
 		return d.promise.then(function() {
 			// saving should succeed in offline mode. since sync() rejects when offline, check canSync() first.
-			if (canSync()) {
-				return self.sync();
-			}
+			return self.sync();
 		});
 	});
 
 	self._get = dependOnInit(function(id, tableName) {
 		var d = $q.defer();
 		self.db.transaction(function(tx) {
-			var sql = "select doc from " + tableName + " where id=?";
+			var sql = "select doc,modified from " + tableName + " where id=?";
 			if (debug) {
 				console.log(sql, [id]);
 			}
@@ -231,8 +235,10 @@ angular.module('kola.storage', ['uuid'])
 					var result = results.rows.item(0);
 					var doc = JSON.parse(result.doc);
 					doc._table = tableName;
+					doc._modified = (result.modified === "true");
 					// attach oneToMany relations
 					self._attachOneToMany(doc, tx).then(function() {
+//						console.log("--- loaded", doc);
 						if (tableName == "asset" && doc.typeLabel == "attachment") {
 							self._setLocalURL(doc).then(function() {
 								d.resolve(doc);
@@ -264,7 +270,7 @@ angular.module('kola.storage', ['uuid'])
 			var joinPromise = $q.defer();
 			joinPromises.push(joinPromise.promise);
 			doc[join.field] = [];
-			var sql = "select id from " + join.targetTable + " where " + join.targetField + "=?";
+			var sql = "select id from " + join.targetTable + " where " + join.targetField + "=? and deleted <> 'true'";
 			if (debug) {
 				console.log(sql, [doc.id]);
 			}
@@ -314,7 +320,7 @@ angular.module('kola.storage', ['uuid'])
 				angular.forEach(tableDef.extract, function(type, field) {
 					sql += field + " " + type + ", ";
 				});
-				sql += "doc TEXT NOT NULL)";
+				sql += "modified BOOL, doc TEXT NOT NULL)";
 				if (debug) {
 					console.log(sql);
 				}
@@ -400,7 +406,8 @@ angular.module('kola.storage', ['uuid'])
 		return angular.extend({
 			id: rfc4122.v4(),
 			_table: tableName,
-			_isNew: true
+			_isNew: true,
+			_modified: true
 		}, props);
 	}
 
@@ -461,8 +468,8 @@ angular.module('kola.storage', ['uuid'])
 		var answer = _create("answer", {
 			question: question.id
 		});
-		question.answers = question.answers || [];
-		question.answers.push(answer);
+		question._answers = question._answers || [];
+		question._answers.push(answer);
 		return answer;
 	}
 
@@ -470,8 +477,8 @@ angular.module('kola.storage', ['uuid'])
 		var comment = _create("comment", {
 			reference: target.id
 		});
-		target.comments = target.comments || [];
-		target.comments.push(comment);
+		target._comments = target._comments || [];
+		target._comments.push(comment);
 		return comment;
 	}
 
@@ -487,7 +494,7 @@ angular.module('kola.storage', ['uuid'])
 		});
 	}
 
-	function _save(doc, tx) {
+	function _save(doc, tx, isUpdateFromServer) {
 		var d = $q.defer();
 		if (!doc._table) {
 			d.reject("Object has no _table property");
@@ -508,10 +515,10 @@ angular.module('kola.storage', ['uuid'])
 			var tableSchema = schemaService[doc._table];
 			_replaceIds(copy, tableSchema);
 
-			console.log("--- saving", copy);
-			var sql = "INSERT OR REPLACE INTO " + doc._table + " (id, doc";
-			var sqlValues = "?, ?";
-			var values = [copy.id, JSON.stringify(copy)];
+//			console.log("--- saving", copy);
+			var sql = "INSERT OR REPLACE INTO " + doc._table + " (id, modified, doc";
+			var sqlValues = "?, ?, ?";
+			var values = [copy.id, isUpdateFromServer !== true, JSON.stringify(copy)];
 			angular.forEach(tableSchema.extract, function(type, field) {
 				sql += ", " + field;
 				sqlValues += ", ?";

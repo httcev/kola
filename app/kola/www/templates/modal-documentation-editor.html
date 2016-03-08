@@ -3,7 +3,7 @@
 		<div class="buttons">
 			<button class="button button-clear" ng-click="checkCloseEditDocumentModal()"><i class="icon ion-close"></i></button>
 		</div>
-		<h1 class="title">Dokumentation bearbeiten</h1>
+		<h1 class="title"><span ng-if="editedDocument._isNew">Neue Dokumentation</span><span ng-if="!editedDocument._isNew">Dokumentation bearbeiten</span></h1>
 		<div class="buttons">
 			<button ng-if="!editedDocument._isNew" class="button button-assertive icon ion-trash-a margin-horizontal" ng-click="deleteDocument()"></button>
 			<button class="button button-balanced icon-left" ng-disabled="!(editedDocument.text || editedDocument.attachments)" ng-click="saveDocument()"><i class="icon ion-checkmark"></i> Speichern</button>
