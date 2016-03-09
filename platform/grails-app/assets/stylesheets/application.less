@@ -24,6 +24,10 @@ h2 { font-size:28px; }
 #google-play-link img { height:40px; }
 .error input { border-color:red; }
 .version { font-family:monospace; color:#CCC !important; font-size:14px }
+.btn-small { font-size:80%; padding:3px 5px }
+.padding-vertical { padding-top:10px; padding-bottom:10px }
+.padding-left { padding-left:10px }
+.full-width { width:100% }
 header h1, .navbar-default .navbar-brand { color:#a11d21 }
 header #logo, .navbar-header #logo { width:32px; margin-top:-6px;}
 footer.footer { position:absolute; bottom:0; width:100%; height:52px;}
@@ -49,6 +53,7 @@ th.sortable.sorted.desc a:after { font-family:"FontAwesome"; content:"\00a0\f0d7
 .form-padding { padding-top:7px }
 .form-padding-all { padding:7px 0 }
 .margin { margin-top:10px; }
+.margin-right { margin-right:10px }
 .attachments .thumbnail { width:80px; height:auto; min-height:70px; line-height:70px; margin-right:15px; vertical-align:middle }
 .attachments .thumbnail .caption { word-break:break-all; line-height:initial; font-size:75% }
 .drag-handle { cursor:move; cursor:-webkit-grabbing }
@@ -65,3 +70,16 @@ body.termsOfUse form { margin:40px 0; }
 .search-result-link.asset:before { content:'\00a0\f02d'; font-family:"FontAwesome"; width:25px; display:inline-block; text-align:left}
 .search-result-link.task:before { content:'\00a0\f044'; font-family:"FontAwesome"; width:25px; display:inline-block; text-align:left}
 .search-result-link.reflectionquestion:before { content:'\00a0\f128'; font-family:"FontAwesome"; width:25px; display:inline-block; text-align:left}
+
+body.question.show .question, .answer { display:flex}
+body.question.show h1 { font-size: 24px}
+body.question.show .rating-control { display:inline-block; margin-top:-12px }
+body.question.show .rating-control .rate { color:#AAA; }
+body.question.show .rating-control .rating { margin-top:-10px }
+body.question.show .rating-control .rating { font-size:2em; color:#AAA; }
+body.question.show .comments-list .header { color:#AAA }
+body.question.show .comments-list .comment { font-size:75%; border-bottom:1px dotted #EEE; padding:3px 0; margin:3px 0}
+body.question.show .comments-list .modal { font-size:initial }
+body.question.show .comments-list .profile-link img { width:28px; }
+body.question.show .answer { margin-top:20px; padding-top:20px; border-top:1px solid #EEE}
+body.question.show .accept-answer-button { color:#AAA }

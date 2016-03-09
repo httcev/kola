@@ -1,17 +1,17 @@
 <%@ page import="java.util.UUID" %>
 
 <g:set var="dialogId" value="id-${UUID.randomUUID().toString()}"/>
-
-<a href="#" data-toggle="modal" data-target="#${dialogId}">
-	<g:if test="${profile.photo?.length > 0}">
-		<img class="avatar img-circle" src="data:image/png;base64,${profile.photo.encodeBase64().toString()}">
+<a href="#" data-toggle="modal" data-target="#${dialogId}" class="profile-link">
+	<g:if test="${!hideImage}">
+		<g:if test="${profile.photo?.length > 0}">
+			<img class="avatar img-circle" src="data:image/png;base64,${profile.photo.encodeBase64().toString()}">
+		</g:if>
+		<g:else>
+			<i class="fa fa-user fa-lg text-muted"></i>
+		</g:else>
 	</g:if>
-	<g:else>
-		<i class="fa fa-user fa-lg text-muted"></i>
-	</g:else>
 	${profile.displayName}
 </a>
-
 <!-- Modal -->
 <div class="modal fade" id="${dialogId}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 	<div class="modal-dialog" role="document">

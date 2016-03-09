@@ -82,12 +82,12 @@ grails.project.dependency.resolution = {
         build ":tomcat:7.0.55.2" // or ":tomcat:8.0.20"
 
         // plugins for the compile step
-        compile "de.httc.plugins:user:2.0.0-SNAPSHOT"
-        compile "de.httc.plugins:push-notification:2.0.0-SNAPSHOT"
-        compile ("de.httc.plugins:repository:2.0.0-SNAPSHOT") {
+        compile "de.httc.plugins:httc-user:2.0.0-SNAPSHOT"
+        compile "de.httc.plugins:httc-push-notification:2.0.0-SNAPSHOT"
+        compile ("de.httc.plugins:httc-repository:2.0.0-SNAPSHOT") {
             excludes "lucene-snowball" // confleicts with elastic search
         }
-        compile ("de.httc.plugins:qaa:2.0.0-SNAPSHOT")
+        compile ("de.httc.plugins:httc-qaa:2.0.0-SNAPSHOT")
 
         compile ":scaffolding:2.1.2"
         compile ":cache:1.1.8"
@@ -118,6 +118,7 @@ grails.project.dependency.resolution = {
     }
 }
 /*
-grails.plugin.location."user" = "../../grails-plugins/user"
-grails.plugin.location."push-notification" = "../../grails-plugins/push-notification"
+grails.plugin.location."httc-user" = "../../grails-plugins/user"
+grails.plugin.location."httc-push-notification" = "../../grails-plugins/push-notification"
+grails.plugin.location."httc-repository" = "../../grails-plugins/repository"
 */
