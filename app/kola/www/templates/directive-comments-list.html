@@ -3,7 +3,7 @@
 	<ul class="comments">
 		<li class="comment clearfix" ng-repeat="comment in ngModel._comments | orderBy:['dateCreated']">
 			<span class="text">{{comment.text}}</span>
-			<author-info ng-model="comment"></author-info>
+			<author-info ng-model="comment" hide-image="true"></author-info>
 		</li>
 	</ul>
 </div>

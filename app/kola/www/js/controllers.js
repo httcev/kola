@@ -349,6 +349,10 @@ angular.module('kola.controllers', [])
 		}
 	}
 
+	$scope.prepareSave = function(answer) {
+		$scope.question._answers.push(answer)
+	}
+
 	$scope.$on("$destroy", $rootScope.$on("syncFinished", function() {
 		$scope.reload();
 	}));

@@ -153,7 +153,8 @@ angular.module('kola.directives', [])
 		restrict: 'E',
 		require: '^ngModel',
 		scope: {
-			ngModel: '='
+			ngModel: '=',
+			hideImage: '@',
 		},
 		templateUrl: 'templates/directive-author-info.html',
 		link: function($scope) {
@@ -225,6 +226,7 @@ angular.module('kola.directives', [])
 					var comment = dbService.createComment($scope.ngModel);
 					comment.text = $scope.newComment.text;
 					$scope.saving = true;
+					$scope.ngModel._comments.push(comment);
 					dbService.save(comment).then(function() {
 						$scope.newComment = null;
 						$scope.saving = false;

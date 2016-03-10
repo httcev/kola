@@ -468,8 +468,6 @@ angular.module('kola.storage', ['uuid'])
 		var answer = _create("answer", {
 			question: question.id
 		});
-		question._answers = question._answers || [];
-		question._answers.push(answer);
 		return answer;
 	}
 
@@ -477,8 +475,6 @@ angular.module('kola.storage', ['uuid'])
 		var comment = _create("comment", {
 			reference: target.id
 		});
-		target._comments = target._comments || [];
-		target._comments.push(comment);
 		return comment;
 	}
 
