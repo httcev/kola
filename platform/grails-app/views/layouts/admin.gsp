@@ -43,7 +43,7 @@
 					<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REFLECTION_QUESTION_CREATOR">
 						<li class="${controllerName == 'reflectionQuestion' ? 'active' : ''}"><g:link controller="reflectionQuestion" action="index"><g:message code="kola.reflectionQuestions" /></g:link></li>
 					</sec:ifAnyGranted>
-					<li class="${controllerName == 'asset' ? 'active' : ''}"><g:link controller="asset" action="index" plugins="repository"><g:message code="kola.assets" /></g:link></li>
+					<li class="${controllerName == 'asset' ? 'active' : ''}"><g:link controller="asset" action="index" plugin="httcRepository"><g:message code="kola.assets" /></g:link></li>
 				</ul>
 				</sec:ifLoggedIn>
 				<ul class="nav navbar-nav navbar-right">
@@ -51,7 +51,7 @@
 					<li class="dropdown">
 						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-wrench fa-lg"></i> <g:message code="kola.admin" /> <span class="caret"></span></a>
 						<ul class="dropdown-menu">
-							<li><g:link controller="user" action="index" plugin="user"><i class="fa fa-users fa-fw"></i> <g:message code="kola.admin.users" /></g:link></li>
+							<li><g:link controller="user" action="index" plugin="httcUser"><i class="fa fa-users fa-fw"></i> <g:message code="kola.admin.users" /></g:link></li>
 							<li><g:link controller="settings"><i class="fa fa-cogs fa-fw"></i> <g:message code="kola.settings" /></g:link></li>
 							<li><g:link controller="backup"><i class="fa fa-cloud fa-fw"></i> Backup</g:link></li>
 							<li><g:link controller="platformInfo"><i class="fa fa-cubes fa-fw"></i> <g:message code="kola.admin.system" /></g:link></li>
@@ -100,7 +100,7 @@
 						<g:if test="${grailsApplication.config.kola.termsOfUseExisting}"><li><g:link controller="termsOfUse" action="index"><g:message code="kola.termsOfUse" /></g:link></li></g:if>
 						<li><a href="http://www.kola-projekt.de/ueber_kola.html" target="_blank"><g:message code="kola.about" /></a></li>
 						<li><a href="http://www.kola-projekt.de/ueber_das_projekt.html" target="_blank"><g:message code="kola.projectLink" /></a></li>
-						<sec:ifLoggedIn><li><a href="${grailsApplication.config.kola.appDownloadUrl}" id="google-play-link" target="_blank"><asset:image src="google-play-badge.png" /></a></li></sec:ifLoggedIn>
+						<li><a href="${grailsApplication.config.kola.appDownloadUrl}" id="google-play-link" target="_blank"><asset:image src="google-play-badge.png" /></a></li>
 					</ul>
 				</div><!-- /.navbar-collapse -->
 			</div><!-- /.container-fluid -->

@@ -15,6 +15,9 @@
 			<li><g:link action="index">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.show.label" args="[entityName]" /></li>
 		</ol>
+		<g:if test="${flash.error}">
+			<div class="message alert alert-danger" role="status">${flash.error}</div>
+		</g:if>
 		<g:if test="${flash.message}">
 			<div class="message alert alert-success" role="status">${flash.message}</div>
 		</g:if>
@@ -48,33 +51,21 @@
 
 		<g:if test="${question?.answers?.size() > 0}">
 			<h3><g:message code="de.httc.plugin.qaa.answers"/></h3>
-			<g:each var="answer" in="${question?.answers}">
-				<div class="answer clearfix">
-					<div class="text-center">
-						<g:render bean="${answer}" template="ratingControl" var="rateable" />
-						<div>
-							<g:if test="${question?.acceptedAnswer?.id == answer.id}"><i class="text-success fa fa-check fa-2x"></i></g:if>
-							<g:elseif test="${authService.canEdit(question)}">
-								<g:link class="accept-answer-button btn btn-default btn-small" action="acceptAnswer" id="${question.id}"><i class="fa fa-check fa-2x"></i></g:link>
-							</g:elseif>
-						</div>
-					</div>
-					<div class="full-width padding-left">
-						${answer?.text}
-						<div class="clearfix">
-							<div class="pull-right">
-								<g:render model="${[profile:answer?.creator?.profile]}" template="/profile/show" />,
-								<g:formatDate date="${answer?.dateCreated}" type="date" />
-							</div>
-						</div>
-						<g:if test="${answer?.attachments?.size() > 0}">
-							<g:render model="${[attachments:answer?.attachments]}" template="/task/attachments" />
-						</g:if>
-						<g:render bean="${answer}" template="comments" var="commentable" />
-					</div>
-				</div>
+			<g:each var="answer" in="${sortedAnswers}">
+				<g:render model="${[answer:answer, question:question]}" template="answer" />
 			</g:each>
 		</g:if>
-		<div class="text-center margin">add answer</div>
+		<div class="text-center margin">
+			<button type="button" class="btn btn-success" onclick="$(this).hide().parent().next('.new-answer').removeClass('hidden').find('textarea').focus()"><i class="fa fa-plus"></i> <g:message code="default.add.label" args="[message(code:'de.httc.plugin.qaa.answer')]"/></button>
+		</div>
+		<div class="new-answer hidden">
+			<h1><g:message code="default.add.label" args="[message(code:'de.httc.plugin.qaa.answer')]"/>:</h1>
+			<g:form class="form" action="saveAnswer" enctype="multipart/form-data">
+				<input type="hidden" name="question" value="${question.id}">
+				<textarea name="text" class="form-control" rows="5" placeholder="${message(code:'de.httc.plugin.qaa.answer.placeholder')}" required></textarea>
+				<g:render model="${[attachments:[], mode:'edit']}" template="/task/attachments" />
+				<div class="text-right form-padding"><button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <g:message code="default.save.label" args="[message(code:'de.httc.plugin.qaa.answer')]"/></button></div>
+			</g:form>
+		</div>
 	</body>
 </html>

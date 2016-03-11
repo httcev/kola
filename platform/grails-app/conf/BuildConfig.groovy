@@ -85,7 +85,7 @@ grails.project.dependency.resolution = {
         compile "de.httc.plugins:httc-user:2.0.0-SNAPSHOT"
         compile "de.httc.plugins:httc-push-notification:2.0.0-SNAPSHOT"
         compile ("de.httc.plugins:httc-repository:2.0.0-SNAPSHOT") {
-            excludes "lucene-snowball" // confleicts with elastic search
+            excludes "lucene-snowball" // conflicts with elastic search
         }
         compile ("de.httc.plugins:httc-qaa:2.0.0-SNAPSHOT")
 
@@ -102,7 +102,9 @@ grails.project.dependency.resolution = {
         runtime ":twitter-bootstrap:3.3.4"
         runtime ":font-awesome-resources:4.3.0.1"
 
-        runtime ":elasticsearch:0.0.4.6"
+        runtime (":elasticsearch:0.0.4.6") {
+			excludes "groovy-all" // elastic search pulls in old groovy version 2.4.3
+		}
         runtime ":quartz:1.0.2"
 
         compile ":webflow:2.1.0"

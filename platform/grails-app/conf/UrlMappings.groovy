@@ -14,8 +14,24 @@ class UrlMappings {
             action = [POST:"update"]
         }
 
-        "/user/$action?/$id?(.$format)?" { controller = "user"; namespace = "admin"; plugin = "user" }
-        "/register/$action?" { controller = "register"; plugin = "user" }
+        "/user/$action?/$id?(.$format)?" { controller = "user"; namespace = "admin"; plugin = "httcUser" }
+        "/register/$action?" { controller = "register"; plugin = "httcUser" }
+
+		name rateAnswer: "/question/$questionId/answer/$answerId/rate"{
+            controller = "question"
+            action = "rateAnswer"
+            constraints {
+                // apply constraints here
+            }
+        }
+
+		name acceptAnswer: "/question/$questionId/answer/$answerId/accept"{
+            controller = "question"
+            action = "acceptAnswer"
+            constraints {
+                // apply constraints here
+            }
+        }
 
         "/$controller/$action?/$id?(.$format)?"{
             constraints {
