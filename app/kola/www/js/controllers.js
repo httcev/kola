@@ -237,6 +237,10 @@ angular.module('kola.controllers', [])
 				return dbService.all("taskDocumentation", true, "reference in " + $scope._getPossibleTaskReferences(task)).then(function(documentations) {
 					$scope.documentations = documentations;
 					$scope.reflectionAnswers = reflectionAnswers;
+					// update badge count on tab icon
+					$scope.badge = {
+						count:documentations.length
+					}
 				});
 			})
 		});
@@ -289,6 +293,10 @@ angular.module('kola.controllers', [])
 				});
 				return dbService.all("question", true, "reference in " + $scope._getPossibleTaskReferences(task)).then(function(questions) {
 					$scope.questions = questions;
+					// update badge count on tab icon
+					$scope.badge = {
+						count:questions.length
+					}
 				});
 			});
 		} else {
@@ -335,6 +343,8 @@ angular.module('kola.controllers', [])
 				return answer.dateCreated;
 			})
 			$scope.question = question;
+		}, function(error) {
+			console.log(error);
 		});
 	}
 

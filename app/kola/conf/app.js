@@ -38,7 +38,7 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
 			cache: false
 		})
 
-	.state('task', {
+		.state('task', {
 			url: "/task/:taskId",
 			abstract: true,
 			templateUrl: "templates/task.html",
@@ -49,7 +49,7 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
 			views: {
 				'task-detail': {
 					templateUrl: 'templates/task-detail.html',
-					controller: 'TaskDetailCtrl'
+//					controller: 'TaskDetailCtrl'
 				}
 			}
 		})
@@ -58,7 +58,7 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
 			views: {
 				'task-documentation': {
 					templateUrl: 'templates/task-documentation.html',
-					controller: 'TaskDocumentationCtrl'
+//					controller: 'TaskDocumentationCtrl'
 				}
 			}
 		})
@@ -67,7 +67,7 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
 			views: {
 				'task-questions': {
 					templateUrl: 'templates/questions.html',
-					controller: 'QuestionsCtrl'
+//					controller: 'QuestionsCtrl'
 				}
 			}
 		})

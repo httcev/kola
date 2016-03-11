@@ -1,5 +1,5 @@
 angular.module('kola.notification', ['kola.services'])
-.run(function($rootScope, $http, $ionicLoading, $sanitize, gcmSenderID, serverUrl, authenticationService, dbService) {
+.run(function($rootScope, $http, $ionicLoading, $sanitize, $state, gcmSenderID, serverUrl, authenticationService, dbService) {
 	var registrationId;
 	var credentials = authenticationService.getCredentials();
 
@@ -13,9 +13,10 @@ angular.module('kola.notification', ['kola.services'])
 			var push = PushNotification.init({
 				android: {
 					senderID: gcmSenderID,
-					//forceShow: true,
+					forceShow: true,
 					icon: "notification",
-					iconColor: "#a11d21"
+					iconColor: "#a11d21",
+					clearNotifications: false
 				},
 				ios: {
 					alert: "true",
@@ -37,15 +38,38 @@ angular.module('kola.notification', ['kola.services'])
 				// data.sound,
 				// data.image,
 				// data.additionalData
-				console.log("on notification: " + data.message);
+				console.log("on notification: ", data);
 				// only display toast if app is currently in foreground
+				/*
 				if (data.additionalData && data.additionalData.foreground) {
 					$ionicLoading.show({
 						template: "<h3>" + $sanitize(data.title) + "</h3>" + $sanitize(data.message),
 						duration: 4000
 					});
 				}
-				dbService.sync();
+				*/
+				dbService.sync().then(function() {
+					try {
+						if (data.additionalData) {
+							var collapseKey = data.additionalData.collapse_key;
+							var referenceId = data.additionalData.referenceId;
+							if (referenceId) {
+								if ("new_questions" === collapseKey || "new_answers" === collapseKey|| "new_comments" === collapseKey) {
+									$state.go("question", {questionId:referenceId});
+								}
+								else if ("assigned_tasks" === collapseKey) {
+									$state.go("task.detail", {taskId:referenceId});
+								}
+							}
+						}
+					}
+					catch(e) {
+						console.log(e);
+					}
+				});
+				push.finish(function() {
+				   console.log("processing of push data is finished");
+			   });
 			});
 
 			push.on('error', function(e) {
