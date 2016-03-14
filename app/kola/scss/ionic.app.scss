@@ -20,9 +20,6 @@ $energized: #FF8000 !default; // The path for our ionicons font files, relative 
 $ionicons-font-path: "../lib/ionic/fonts" !default; // Include all of Ionic
 @import "www/lib/ionic/scss/ionic"; // Include custom q&a font
 @import "scss/httc-webfont";
-textarea {
-	padding-left: 3px;
-}
 *[ui-sref] {
 	cursor: pointer;
 }

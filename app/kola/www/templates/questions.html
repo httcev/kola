@@ -15,7 +15,7 @@
 				<ion-item ng-repeat="question in questions | orderBy:'lastUpdated' track by question.id" class="item-remove-animate item-icon-left item-icon-right" type="item-text-wrap" ui-sref="^.question({questionId:question.id})">
 					<i class="icon httc-question" ng-class="{'balanced':question.acceptedAnswer}"></i>
 					<h2>{{question.title}}</h2>
-					<p>Anworten: {{question.answers.length || 0}}, beantwortet: <span class="balanced" ng-if="question.acceptedAnswer">Ja</span><span class="assertive" ng-if="!question.acceptedAnswer">Nein</span></p>
+					<p>Anworten: {{question._answers.length || 0}}, beantwortet: <span class="balanced" ng-if="question.acceptedAnswer">Ja</span><span class="assertive" ng-if="!question.acceptedAnswer">Nein</span></p>
 					<i class="icon ion-chevron-right icon-accessory"></i>
 				</ion-item>
 			</ion-list>

@@ -23,6 +23,7 @@
 		</g:if>
 		<h1 class="page-header clearfix">
 			${question?.title}
+<%--
 			<div class="buttons pull-right">
 				<g:if test="${authService.canDelete(question)}">
 					<g:link class="delete btn btn-danger" action="delete" id="${question.id}" title="${message(code: 'default.button.delete.label', args:[entityName])}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><i class="fa fa-times"></i></g:link>
@@ -31,6 +32,7 @@
 					<g:link class="edit btn btn-primary" action="edit" id="${question.id}" title="${message(code: 'default.edit.label', args:[entityName])}"><i class="fa fa-pencil"></i></g:link>
 				</g:if>
 			</div>
+--%>
 		</h1>
 		<div class="question">
 			<g:render bean="${question}" template="ratingControl" var="rateable" />

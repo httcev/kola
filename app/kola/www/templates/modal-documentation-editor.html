@@ -16,7 +16,7 @@
 				<option value="">Gesamter Auftrag</option>
 			</select>
 		</label>
-		<div class="card card-positive">
+		<div class="item item-input">
 			<textarea ng-model="editedDocument.text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Welche Arbeiten habe ich erledigt? Wie bin ich vorgegangen?" ng-change="setEditedDocumentDirty()"></textarea>
 		</div>
 		<media-attachments ng-model="editedDocument" edit-mode="true"></media-attachments>

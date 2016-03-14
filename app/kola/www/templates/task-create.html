@@ -15,12 +15,12 @@
 			</label>
 			<label class="item item-input">
 				<span class="input-label positive">Fällig</span>
-				<input type="date" ng-model="task.due" placeholder="Fällig">
+				<input type="date" ng-model="task.due" placeholder="Fällig" class="text-right">
 			</label>
 			<label class="item item-input item-select">
 				<span class="input-label positive">Zuweisen an</span>
 				<select ng-model="task.assignee">
-					<option ng-repeat="user in assignableUsers" value="{{user.id}}">{{user.displayName}}</option>
+					<option ng-repeat="user in assignableUsers | orderBy:'displayName'" value="{{user.id}}">{{user.displayName}}</option>
 				</select>
 			</label>
 			<media-attachments ng-model="task" edit-mode="true"></media-attachments>

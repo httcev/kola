@@ -122,7 +122,7 @@ environments {
         grails.serverURL = "http://130.83.139.161:8080/platform"
         elasticSearch.client.mode = "local"
         elasticSearch.index.store.type = "memory"
-        //elasticSearch.bulkIndexOnStartup = false
+//        elasticSearch.bulkIndexOnStartup = false
 
         de.httc.plugin.repository.directory = "./data/repository"
         de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyAJQJjAOE53yqqTbgi3Nj3rfeMjREc-fOo"
