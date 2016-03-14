@@ -5,7 +5,7 @@
 
 <g:if test="${mode == 'edit'}">
 	<g:if test="${attachments?.size() > 0}">
-		<ul class="list-group sortable">
+		<ul class="list-group sortable margin">
 			<g:each var="asset" in="${attachments}">
 				<li class="list-group-item clearfix">
 					<input type="hidden" name="${prefix}attachments" value="${asset.id}">

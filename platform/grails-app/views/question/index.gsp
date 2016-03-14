@@ -13,6 +13,9 @@
 				<i class="fa fa-plus"></i> <g:message code="default.button.create.label" />
 			</g:link>
 		</h1>
+		<g:if test="${flash.error}">
+			<div class="message alert alert-danger" role="status">${flash.error}</div>
+		</g:if>
 		<g:if test="${flash.message}">
 			<div class="message alert alert-success" role="status">${flash.message}</div>
 		</g:if>
