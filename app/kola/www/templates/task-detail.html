@@ -7,19 +7,21 @@
 		<div ng-if="!taskOrStep" class="center-horizontal">
 			<ion-spinner class="spinner-large"></ion-spinner>
 		</div>
-		<div ng-if="taskOrStep">
+		<div ng-if="taskOrStep" class="task-detail">
 			<h3>{{taskOrStep.name}}</h3>
       		<p ng-if="taskOrStep.due"><b>Fällig:</b> {{taskOrStep.due | date:'fullDate'}}</p>
 			<div class="text" marked="taskOrStep.description"></div>
 			<media-attachments ng-model="taskOrStep"></media-attachments>
 			<learning-resources ng-model="taskOrStep"></learning-resources>
-			<ion-list ng-if="!isStep && taskOrStep.steps.length">
-				<h1 class="task-section-header">Teilschritte:</h1>
-				<ion-item ng-repeat="step in taskOrStep.steps" class="item-icon-right" type="item-text-wrap" ui-sref="task.step({taskId:taskOrStep.id, stepId:step.id})">
-					{{$index+1}}. {{step.name}}
-					<i class="icon ion-chevron-right icon-accessory"></i>
-				</ion-item>
-			</ion-list>
+			<div class="padding-bottom">
+				<ion-list ng-if="!isStep && taskOrStep.steps.length">
+					<h1 class="task-section-header padding-top">Teilschritte:</h1>
+					<ion-item ng-repeat="step in taskOrStep.steps" class="item-icon-right" type="item-text-wrap" ui-sref="task.step({taskId:taskOrStep.id, stepId:step.id})">
+						{{$index+1}}. {{step.name}}
+						<i class="icon ion-chevron-right icon-accessory"></i>
+					</ion-item>
+				</ion-list>
+			</div>
 		</div>
 	</ion-content>
 </ion-view>

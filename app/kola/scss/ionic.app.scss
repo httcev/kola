@@ -26,7 +26,6 @@ $ionicons-font-path: "../lib/ionic/fonts" !default; // Include all of Ionic
 .task-section-header {
 	font-size: 1.5em;
 	color    : $positive;
-	padding  : 0 0 10px;
 }
 media-attachments .center-horizontal {
 	padding: 24.5px;
@@ -214,7 +213,7 @@ media-attachments .center-horizontal {
 	font-size: 80%;
 }
 .comments-list .author-info {
-	float:right;
+	float: right;
 }
 .comments-list h2 {
 	font-size  : 15px;
@@ -226,9 +225,6 @@ media-attachments .center-horizontal {
 }
 .comment .author-info {
 	display: inline;
-}
-.question {
-	margin-top: 20px;
 }
 .rating-control-container {
 	float       : left;

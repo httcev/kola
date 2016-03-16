@@ -2,14 +2,8 @@ angular.module('kola.controllers', [])
 
 .controller('TasksCtrl', function($scope, $state, $rootScope, dbService) {
 	function reload() {
-		dbService.all("task").then(function(docs) {
-			var filtered = [];
-			angular.forEach(docs, function(doc) {
-				if (!doc["isTemplate"] && !doc.deleted) {
-					filtered.push(doc);
-				}
-			});
-			$scope.tasks = filtered;
+		dbService.all("task", false, "isTemplate<>'true'").then(function(tasks) {
+			$scope.tasks = tasks;
 		}, function() {
 			// this error handling is needed on the first start of the app. dbService initialization is rejected in this case.
 			$scope.tasks = [];
@@ -266,7 +260,7 @@ angular.module('kola.controllers', [])
 			form.$dirty = false;
 			$scope.reload();
 			$ionicLoading.show({
-				template: "Antwort " + (reflectionAnswer.deleted ? "gelöscht" : "gespeichert"),
+				template: "Eingabe " + (reflectionAnswer.deleted ? "gelöscht" : "gespeichert"),
 				duration: 2000
 			});
 		});

@@ -19,7 +19,8 @@ angular.module('kola.storage', ['uuid'])
 			},
 			"sync": true,
 			"extract": {
-				"deleted": "BOOL"
+				"deleted": "BOOL",
+				"isTemplate": "BOOL",
 			}
 		},
 		"taskStep": {
@@ -158,7 +159,7 @@ angular.module('kola.storage', ['uuid'])
 
 	self.all = dependOnInit(function(tableName, resolve, whereClause) {
 		var d = $q.defer();
-		var promises = [d.promise];
+		var promises = [];
 		var docs = [];
 
 		self.db.transaction(function(t) {
@@ -175,10 +176,9 @@ angular.module('kola.storage', ['uuid'])
 					var doc = JSON.parse(results.rows.item(i).doc);
 					doc._table = tableName;
 					doc._modified = (results.rows.item(i).modified === "true");
-//					console.log("--- loaded all", doc);
 					docs.push(doc);
 					if (resolve) {
-						promises.push(self._attachOneToMany(doc, tx).then(function() {
+						promises.push(self._attachOneToMany(doc, tx).then(function(doc) {
 							return resolveIds(doc);
 						}));
 					}
@@ -192,8 +192,10 @@ angular.module('kola.storage', ['uuid'])
 			console.log(err);
 			d.reject(err);
 		});
-		return $q.all(promises).then(function() {
-			return docs;
+		return d.promise.then(function() {
+			return $q.all(promises).then(function() {
+				return docs;
+			})
 		});
 	});
 
@@ -281,7 +283,9 @@ angular.module('kola.storage', ['uuid'])
 				joinPromise.resolve();
 			});
 		});
-		return $q.all(joinPromises);
+		return $q.all(joinPromises).then(function() {
+			return doc;
+		});
 	}
 
 	self._setLocalURL = dependOnInit(function(attachment) {
@@ -581,7 +585,9 @@ angular.module('kola.storage', ['uuid'])
 				}
 			}
 		});
-		return $q.all(promises);
+		return $q.all(promises).then(function() {
+			return target;
+		});
 	}
 
 	function _replaceIds(target, tableSchema) {
