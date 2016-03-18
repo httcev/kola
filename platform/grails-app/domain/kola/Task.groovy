@@ -27,7 +27,7 @@ class Task extends QuestionReference {
         steps cascade: "all-delete-orphan"
         name type: "text"
         description type: "text"
-        lastDocumented formula:"(select d.LAST_UPDATED from TASK_DOCUMENTATION d where d.DELETED='false' and (d.REFERENCE_ID=ID or d.REFERENCE_ID in (select s.TASK_STEPS_ID from TASK_TASK_STEP s where s.TASK_STEP_ID=ID)) order by d.LAST_UPDATED desc limit 1)"
+        lastDocumented formula:"(select d.LAST_UPDATED from TASK_DOCUMENTATION d where d.DELETED='false' and (d.REFERENCE_ID=ID or d.REFERENCE_ID in (select s.TASK_STEP_ID from TASK_TASK_STEP s where s.TASK_STEPS_ID=ID)) order by d.LAST_UPDATED desc limit 1)"
     }
 
     String name
