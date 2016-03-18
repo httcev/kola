@@ -80,6 +80,15 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
 				}
 			}
 		})
+		.state('task.reflectionQuestions', {
+			url: '/reflectionQuestions',
+			views: {
+				'task-reflectionQuestions': {
+					templateUrl: 'templates/reflectionQuestions.html',
+//					controller: 'QuestionsCtrl'
+				}
+			}
+		})
 		.state('task.step', {
 			url: '/step/:stepId',
 			views: {

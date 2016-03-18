@@ -52,10 +52,6 @@ class QuestionController {
 		  notFound()
 		  return
 	  }
-	  if (!authService.canDelete(question)) {
-		  forbidden()
-		  return
-	  }
 	  def sortedAnswers = question.answers?.sort { a,b ->
 		  if (question.acceptedAnswer?.id == a.id) {
 			  return -1
@@ -89,6 +85,10 @@ class QuestionController {
   def delete(Question question) {
 	  if (question == null) {
 		  notFound()
+		  return
+	  }
+	  if (!authService.canDelete(question)) {
+		  forbidden()
 		  return
 	  }
 	  question.deleted = true

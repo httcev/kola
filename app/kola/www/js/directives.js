@@ -68,7 +68,8 @@ angular.module('kola.directives', [])
 			$scope.removeAttachment = function(index) {
 				var confirmPopup = $ionicPopup.confirm({
 					title: "<b>Anhang entfernen</b>",
-					template: "Soll der Anhang wirklich entfernt werden?"
+					template: "Soll der Anhang wirklich entfernt werden?",
+					cancelText: "Abbrechen"
 				});
 				confirmPopup.then(function(res) {
 					if (res) {
@@ -129,13 +130,15 @@ angular.module('kola.directives', [])
 		templateUrl: 'templates/directive-sync-control.html',
 		link: function($scope) {
 			$scope.click = function() {
-				if ($scope.online) {
-					dbService.sync();
-				} else {
-					$ionicPopup.alert({
-						title: "<b>Kein Netzzugang</b>",
-						template: "Das Gerät hat momentan keinen Netzzugang. <span class='assertive bold'>Alle Änderungen werden zunächst nur lokal auf dem Gerät gespeichert</span> und synchronisiert, sobald eine Internetverbindung besteht"
-					});
+				if (!$scope.syncing) {
+					if ($scope.online) {
+						dbService.sync();
+					} else {
+						$ionicPopup.alert({
+							title: "<b>Kein Netzzugang</b>",
+							template: "Das Gerät hat momentan keinen Netzzugang. <span class='assertive bold'>Alle Änderungen werden zunächst nur lokal auf dem Gerät gespeichert</span> und synchronisiert, sobald eine Internetverbindung besteht"
+						});
+					}
 				}
 			};
 			$rootScope.$watch("onlineState.isSyncing", function(state) {

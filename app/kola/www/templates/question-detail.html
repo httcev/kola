@@ -31,8 +31,8 @@
 					<div class="rating-control-container">
 						<rating-control ng-model="answer"></rating-control>
 						<div class="answer-accept padding-top">
-							<i ng-if="question.acceptedAnswer === answer.id" class="icon ion-checkmark balanced icon-large"></i>
-							<button ng-if="canEdit(question) && question.acceptedAnswer !== answer.id" class="button button-outline button-small button-icon icon ion-checkmark" ng-click="setAcceptedAnswer(answer)"></button>
+							<i ng-if="!canEdit(question) && question.acceptedAnswer === answer.id" class="icon ion-checkmark balanced icon-large"></i>
+							<button ng-if="canEdit(question)" class="button button-outline button-small button-icon icon ion-checkmark" ng-class="{'button-balanced':question.acceptedAnswer === answer.id}" ng-click="toggleAcceptedAnswer(answer)"></button>
 						</div>
 					</div>
 					<div class="text">{{answer.text}}</div>
@@ -45,7 +45,7 @@
 				<comments-list class="item" ng-model="answer"></comments-list>
 			</div>
 			<div class="center-horizontal padding">
-				<button class="button button-balanced icon-left icon httc-answer-add add-answer-button" ng-click="editDocument()">Neue Antwort geben</button>
+				<button class="button button-balanced icon-left icon httc-answer-add add-answer-button" ng-click="editDocument()">Antwort geben</button>
 			</div>
 		</div>
 	</ion-content>

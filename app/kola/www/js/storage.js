@@ -123,7 +123,7 @@ angular.module('kola.storage', ['uuid'])
 	}
 })
 
-.service('dbService', function($rootScope, $q, $state, $ionicPlatform, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, serverUrl, schemaService, authenticationService, rfc4122) {
+.service('dbService', function($rootScope, $q, $state, $ionicPlatform, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, serverUrl, appVersion, schemaService, authenticationService, rfc4122) {
 	var self = this;
 	var firstRun = true;
 	var debug = false;
@@ -221,7 +221,9 @@ angular.module('kola.storage', ['uuid'])
 
 		return d.promise.then(function() {
 			// saving should succeed in offline mode. since sync() rejects when offline, check canSync() first.
-			return self.sync();
+			if (!isUpdateFromServer) {
+				return self.sync();
+			}
 		});
 	});
 
@@ -341,33 +343,38 @@ angular.module('kola.storage', ['uuid'])
 	}
 
 	function _init() {
-		var user = authenticationService.getCredentials().user;
-		if (user) {
-			if (window.cordova) {
-				//      self._assetsDirName = cordova.file.dataDirectory + "assets/";
-				self._cacheDirName = cordova.file.externalCacheDirectory;
-				self._dataDirName = cordova.file.externalDataDirectory;
-				self._assetsDirName = self._dataDirName + "assets/";
-				$cordovaFile.createDir(self._dataDirName, "assets", false).finally(function() {
-					window.resolveLocalFileSystemURL(self._assetsDirName, function(dir) {
-						self._assetsDir = dir;
+		try {
+			var user = authenticationService.getCredentials().user;
+			if (user) {
+				if (window.cordova) {
+					//      self._assetsDirName = cordova.file.dataDirectory + "assets/";
+					self._cacheDirName = cordova.file.externalCacheDirectory;
+					self._dataDirName = cordova.file.externalDataDirectory;
+					self._assetsDirName = self._dataDirName + "assets/";
+					$cordovaFile.createDir(self._dataDirName, "assets", false).finally(function() {
+						window.resolveLocalFileSystemURL(self._assetsDirName, function(dir) {
+							self._assetsDir = dir;
+						});
 					});
+				}
+				self.db = (window.cordova ? window.sqlitePlugin : window).openDatabase(user + "-new", '1', 'KOLA DB', 1024 * 1024 * 100);
+				_createTables().then(function() {
+					DBSYNC.initSync(self, schemaService, self.db, {
+						version: appVersion
+					}, serverUrl + "/api/changes", serverUrl + "/api/upload", self._assetsDirName, function() {
+						self.initDeferred.resolve();
+						if (firstRun) {
+							$rootScope.$watch("onlineState.isOnline", onOnlineStateChanged);
+							firstRun = false;
+						}
+					}, $cordovaFileTransfer, $cordovaFile, $q, authenticationService);
 				});
+			} else {
+				self.initDeferred.reject("no_user");
 			}
-			self.db = (window.cordova ? window.sqlitePlugin : window).openDatabase(user + "-new", '1', 'KOLA DB', 1024 * 1024 * 100);
-			_createTables().then(function() {
-				DBSYNC.initSync(self, schemaService, self.db, {
-					foo: "bar"
-				}, serverUrl + "/api/changes", serverUrl + "/api/upload", self._assetsDirName, function() {
-					self.initDeferred.resolve();
-					if (firstRun) {
-						$rootScope.$watch("onlineState.isOnline", onOnlineStateChanged);
-						firstRun = false;
-					}
-				}, $cordovaFileTransfer, $cordovaFile, $q, authenticationService);
-			});
-		} else {
-			self.initDeferred.reject("no_user");
+		}
+		catch(e) {
+			self.initDeferred.reject(e);
 		}
 	}
 
@@ -382,7 +389,7 @@ angular.module('kola.storage', ['uuid'])
 				} else {
 					console.log(err);
 				}
-				return $q.reject("init failed");
+				return $q.reject(err);
 			});
 		}
 	}

@@ -47,7 +47,7 @@
 							<p class="text-muted"><g:message code="kola.tasks.assigned.empty" /></p>
 						</div>
 					</g:else>
-				</div>				
+				</div>
 
 				<div class="panel panel-default">
 					<div class="panel-heading">
@@ -73,7 +73,7 @@
 							<p class="text-muted"><g:message code="app.filter.empty" args="${[message(code: 'kola.assets')]}" /></p>
 						</div>
 					</g:else>
-				</div>				
+				</div>
 			</div>
 
 			<div class="col-sm-3">
@@ -86,6 +86,7 @@
 						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_TASK_TEMPLATE_CREATOR">
 							<g:link class="btn btn-default btn-block" controller="task" action="createTemplate"><i class="fa fa-plus"></i> <g:message code="kola.taskTemplate" /></g:link>
 						</sec:ifAnyGranted>
+						<g:link class="btn btn-default btn-block" controller="question" action="create"><i class="fa fa-plus"></i> <g:message code="de.httc.plugin.qaa.question" /></g:link>
 						<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REPOSITORY_ADMIN">
 							<g:link class="btn btn-default btn-block" controller="asset" namespace="admin" action="create"><i class="fa fa-plus"></i> <g:message code="kola.asset" /></g:link>
 						</sec:ifAnyGranted>

@@ -1,12 +1,19 @@
 angular.module('kola.controllers', [])
 
-.controller('TasksCtrl', function($scope, $state, $rootScope, dbService) {
+.controller('TasksCtrl', function($scope, $state, $rootScope, $ionicPopup, dbService) {
 	function reload() {
 		dbService.all("task", false, "isTemplate<>'true'").then(function(tasks) {
 			$scope.tasks = tasks;
-		}, function() {
+		}, function(err) {
 			// this error handling is needed on the first start of the app. dbService initialization is rejected in this case.
 			$scope.tasks = [];
+			if (err !== "no_user") {
+				console.log(err);
+				$ionicPopup.alert({
+					title: "<b>Fehler</b>",
+					template: "<p class='assertive bold'>Es ist ein Fehler aufgetreten:</p>" + err
+				});
+			}
 		});
 	}
 
@@ -43,8 +50,6 @@ angular.module('kola.controllers', [])
 	//  var taskDocumentationProp = $scope.isStep ? "step" : "task";
 	var table = $scope.isStep ? "taskStep" : "task";
 
-	reload();
-
 	function reload() {
 		return dbService.get(targetId, table).then(function(target) {
 			$scope.taskOrStep = target;
@@ -54,8 +59,10 @@ angular.module('kola.controllers', [])
 		});
 	}
 
-	$scope.$on("$destroy", $scope.$on('$ionicView.enter', function() {
+	reload();
+	$scope.$on("$destroy", $scope.$on("$ionicView.enter", function() {
 		$rootScope.lastOpenedTaskOrStepId = targetId;
+		//console.log("last opened task/step", $rootScope.lastOpenedTaskOrStepId);
 	}));
 })
 
@@ -102,8 +109,10 @@ angular.module('kola.controllers', [])
 	$scope.deleteDocument = function() {
 		$ionicPopup.confirm({
 			title: '<b>' + $scope.docName + ' löschen</b>',
-			template: 'Soll diese ' + $scope.docName + ' wirklich gelöscht werden?'
+			template: 'Soll diese ' + $scope.docName + ' wirklich gelöscht werden?',
+			cancelText: 'Abbrechen'
 		}).then(function(result) {
+			console.log(result);
 			if (result) {
 				$ionicLoading.show({
 					template: "<ion-spinner class='spinner-large'></ion-spinner><p>" + $scope.docName + " wird gelöscht</p>"
@@ -135,7 +144,8 @@ angular.module('kola.controllers', [])
 		if ($scope.editedDocumentDirty) {
 			$ionicPopup.confirm({
 				title: "<b>Änderungen verwerfen</b>",
-				template: "Sollen alle Änderungen an der " + $scope.docName + " verworfen werden?"
+				template: "Sollen alle Änderungen an der " + $scope.docName + " verworfen werden?",
+				cancelText: "Abbrechen"
 			}).then(function(result) {
 				if (result) {
 					$scope.reload();
@@ -201,7 +211,7 @@ angular.module('kola.controllers', [])
 	}
 })
 
-.controller('TaskDocumentationCtrl', function($scope, $rootScope, $stateParams, $q, $ionicModal, $ionicLoading, $controller, dbService) {
+.controller('TaskDocumentationCtrl', function($scope, $rootScope, $stateParams, $controller, dbService) {
 	$scope.docName = "Dokumentation";
 	$scope.firstProp = "text";
 	$scope.templateName = "templates/modal-documentation-editor.html";
@@ -209,6 +219,38 @@ angular.module('kola.controllers', [])
 		$scope: $scope
 	});
 
+	$scope.reload = function() {
+		// load task
+		return dbService.get($stateParams.taskId, "task").then(function(task) {
+			$scope.task = task;
+
+			// load documentations for current task and its steps
+			return dbService.all("taskDocumentation", true, "reference in " + $scope._getPossibleTaskReferences(task)).then(function(documentations) {
+				$scope.documentations = documentations;
+				// update badge count on tab icon
+				$scope.badge = {
+					count:documentations.length
+				}
+			});
+		});
+	}
+
+	$scope.createNewDocument = function() {
+		var documentation = dbService.createTaskDocumentation();
+		documentation.reference = $rootScope.lastOpenedTaskOrStepId;
+		return documentation;
+	}
+
+	$scope.prepareSave = function(document) {
+		if (!document.reference) {
+			document.reference = $scope.task.id;
+		}
+	}
+
+	$scope.reload();
+})
+
+.controller('ReflectionQuestionsCtrl', function($scope, $stateParams, $ionicLoading, dbService) {
 	$scope.reload = function() {
 		// load task
 		return dbService.get($stateParams.taskId, "task").then(function(task) {
@@ -226,45 +268,36 @@ angular.module('kola.controllers', [])
 						reflectionAnswers[reflectionQuestion.id] = dbService.createReflectionAnswer($stateParams.taskId, reflectionQuestion.id);
 					}
 				});
-
-				// load documentations for current task and its steps
-				return dbService.all("taskDocumentation", true, "reference in " + $scope._getPossibleTaskReferences(task)).then(function(documentations) {
-					$scope.documentations = documentations;
-					$scope.reflectionAnswers = reflectionAnswers;
-					// update badge count on tab icon
-					$scope.badge = {
-						count:documentations.length
-					}
-				});
+				$scope.task = task;
+				$scope.reflectionAnswers = reflectionAnswers;
 			})
 		});
 	}
 
-	$scope.createNewDocument = function() {
-		var documentation = dbService.createTaskDocumentation();
-		documentation.reference = $rootScope.lastOpenedTaskOrStepId;
-		return documentation;
-	}
-
-	$scope.prepareSave = function(document) {
-		if (!document.reference) {
-			document.reference = $scope.task.id;
-		}
-	}
-
 	$scope.saveReflectionAnswer = function(reflectionAnswer, form) {
-		if (reflectionAnswer.text.length == 0) {
-			reflectionAnswer.deleted = true;
-		}
-		dbService.save(reflectionAnswer).then(function() {
-			form.$dirty = false;
-			$scope.reload();
-			$ionicLoading.show({
-				template: "Eingabe " + (reflectionAnswer.deleted ? "gelöscht" : "gespeichert"),
-				duration: 2000
+		if (reflectionAnswer.text != null) {
+			if (reflectionAnswer.text.length == 0) {
+				reflectionAnswer.deleted = true;
+			}
+			dbService.save(reflectionAnswer).then(function() {
+				form.$setPristine();
+				$scope.reload();
+				$ionicLoading.show({
+					template: "Eingabe " + (reflectionAnswer.deleted ? "gelöscht" : "gespeichert"),
+					duration: 2000
+				});
 			});
-		});
+		}
+		else {
+			$scope.reload();
+		}
 	};
+
+	$scope.checkReflectionQuestionsVisible = function() {
+		if ($scope.task && $scope.task.reflectionQuestions.length == 0) {
+			return "ng-hide";
+		}
+	}
 
 	$scope.reload();
 })
@@ -304,7 +337,7 @@ angular.module('kola.controllers', [])
 
 	$scope.createNewDocument = function() {
 		var question = dbService.createQuestion();
-		console.log("setting default selected task/step to " + $rootScope.lastOpenedTaskOrStepId);
+		//console.log("setting default selected task/step to " + $rootScope.lastOpenedTaskOrStepId);
 		question.reference = $rootScope.lastOpenedTaskOrStepId;
 		return question;
 	}
@@ -346,9 +379,14 @@ angular.module('kola.controllers', [])
 		return dbService.createAnswer($scope.question);
 	}
 
-	$scope.setAcceptedAnswer = function(answer) {
+	$scope.toggleAcceptedAnswer = function(answer) {
 		if ($scope.canEdit($scope.question)) {
-			$scope.question.acceptedAnswer = answer.id;
+			if ($scope.question.acceptedAnswer === answer.id) {
+				$scope.question.acceptedAnswer = null;
+			}
+			else {
+				$scope.question.acceptedAnswer = answer.id;
+			}
 			dbService.save($scope.question);
 		}
 	}
@@ -380,18 +418,8 @@ angular.module('kola.controllers', [])
 })
 
 .controller('TaskChooseTemplateCtrl', function($scope, $state, $q, dbService) {
-	dbService.all("task").then(function(docs) {
-		var filtered = [];
-		var promises = [];
-		angular.forEach(docs, function(doc) {
-			if (doc["isTemplate"] == true && !doc.deleted) {
-				//promises.push(dbService.resolveIds(doc, "task"));
-				filtered.push(doc);
-			}
-		});
-		$q.all(promises).finally(function() {
-			$scope.templates = filtered;
-		});
+	dbService.all("task", false, "isTemplate='true'").then(function(templates) {
+		$scope.templates = templates;
 	});
 
 	$scope.choose = function(template) {
@@ -439,7 +467,7 @@ angular.module('kola.controllers', [])
 				}
 			});
 			angular.forEach(docs, function(doc) {
-				if (!doc.deleted && currentUser.id != doc.id && currentUser.company && currentUser.company == doc.company) {
+				if (currentUser.id != doc.id && currentUser.company && currentUser.company == doc.company) {
 					filtered.push(doc);
 				}
 			});
