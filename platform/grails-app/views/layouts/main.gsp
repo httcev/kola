@@ -26,6 +26,7 @@
 				<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_TASK_TEMPLATE_CREATOR">
 					<li class="${(controllerName == 'task' && params.isTemplate?.toBoolean()) ? 'active' : ''}"><g:link controller="task" action="index" params="[isTemplate:true]" title="${message(code:'kola.taskTemplates')}"><i class="fa fa-fw fa-clipboard"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.taskTemplates" /></span></g:link></li>
 				</sec:ifAnyGranted>
+				<li class="${controllerName == 'documentation' ? 'active' : ''}"><g:link controller="documentation" action="index" title="${message(code:'kola.task.documentations')}"><i class="httc-fw httc-compose"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.task.documentations" /></span></g:link></li>
 				<li class="${controllerName == 'asset' ? 'active' : ''}"><g:link controller="asset" action="index" plugin="httcRepository" title="${message(code:'kola.assets')}"><i class="fa fa-fw fa-book"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.assets" /></span></g:link></li>
 				<li class="${controllerName == 'question' ? 'active' : ''}"><g:link controller="question" action="index" title="${message(code:'de.httc.plugin.qaa.questions')}"><i class="httc-fw httc-comments"></i> <span class="hide-sidemenu-collapsed"><g:message code="de.httc.plugin.qaa.questions" /></span></g:link></li>
 				<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REFLECTION_QUESTION_CREATOR">
@@ -47,15 +48,15 @@
 	</sec:ifLoggedIn>
 	<div id="content-wrapper">
 		<div id="site-header" class="container-fluid">
-			<sec:ifLoggedIn><button type="button" class="btn btn-default external-toggle-sidemenu" onclick="$('#sidebar-wrapper').toggleClass('expanded')"><i class="fa fa-bars"></i></button></sec:ifLoggedIn>
+			<sec:ifLoggedIn><a href="#" class="external-toggle-sidemenu site-header-link site-header-control" onclick="$('#sidebar-wrapper').toggleClass('expanded'); return false;"><i class="fa fa-bars"></i></a></sec:ifLoggedIn>
 			<a class="site-header-brand" href="${createLink(uri:'/')}"><asset:image src="kola-logo.png" class="logo" alt="KOLA"/> KOLA</a>
-			<div class="pull-right">
+			<div class="site-header-right">
 				<sec:ifNotLoggedIn>
 					<g:link controller="login" class="site-header-link"><i class="fa fa-sign-in fa-lg"></i> <g:message code="kola.signin" /></g:link>
 				</sec:ifNotLoggedIn>
 				<sec:ifLoggedIn>
 					<div class="dropdown">
-						<a href="#" class="site-header-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user fa-lg"></i> <kola:displayName /> <span class="caret"></span></a>
+						<a href="#" class="site-header-link site-header-control dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user fa-lg"></i> <kola:displayName /> <span class="caret"></span></a>
 						<ul class="dropdown-menu dropdown-menu-right">
 							<li>
 								<g:link controller="profile">
