@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--[if lt IE 7 ]> <html lang="de" class="no-js ie6"> <![endif]-->
-<!--[if IE 7 ]>    <html lang="de" class="no-js ie7"> <![endif]-->
-<!--[if IE 8 ]>    <html lang="de" class="no-js ie8"> <![endif]-->
-<!--[if IE 9 ]>    <html lang="de" class="no-js ie9"> <![endif]-->
+<!--[if IE 7 ]>	<html lang="de" class="no-js ie7"> <![endif]-->
+<!--[if IE 8 ]>	<html lang="de" class="no-js ie8"> <![endif]-->
+<!--[if IE 9 ]>	<html lang="de" class="no-js ie9"> <![endif]-->
 <!--[if (gt IE 9)|!(IE)]><!--> <html lang="de" class="no-js"><!--<![endif]-->
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -76,15 +76,13 @@
 		<footer class="footer">
 			<nav class="navbar navbar-default">
 				<div class="container-fluid">
-				    <!-- Brand and toggle get grouped for better mobile display -->
-				    <div class="navbar-header">
-				      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#footer-links" aria-expanded="false">
-				        <span class="sr-only">Toggle navigation</span>
-				        <span class="toggle-icon"></span>
-				      </button>
-				    </div>
-				    <!-- Collect the nav links, forms, and other content for toggling -->
-				    <div class="collapse navbar-collapse" id="footer-links">
+					<div class="navbar-header">
+						<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#footer-links" aria-expanded="false">
+							<span class="sr-only">Toggle navigation</span>
+							<i class="fa toggle-icon"></i>
+						</button>
+					</div>
+					<div class="collapse navbar-collapse" id="footer-links">
 						<ul class="nav navbar-nav navbar-right">
 							<g:if test="${grailsApplication.config.kola.termsOfUseExisting}"><li><g:link controller="termsOfUse" action="index"><g:message code="kola.termsOfUse" /></g:link></li></g:if>
 							<li><a href="http://www.kola-projekt.de/ueber_kola.html" target="_blank"><g:message code="kola.about" /></a></li>
