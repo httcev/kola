@@ -144,7 +144,7 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
 // @endif
 // @if ENV == 'prod'
 .constant("gcmSenderID", "502614463037")
-.constant("serverUrl", "http://plattform.kola-projekt.de");
+.constant("serverUrl", "https://plattform.kola-projekt.de");
 // @endif
 // @if ENV == 'demo'
 .constant("gcmSenderID", "406168835925")

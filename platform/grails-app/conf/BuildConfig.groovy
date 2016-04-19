@@ -123,4 +123,5 @@ grails.project.dependency.resolution = {
 grails.plugin.location."httc-user" = "../../grails-plugins/user"
 grails.plugin.location."httc-push-notification" = "../../grails-plugins/push-notification"
 grails.plugin.location."httc-repository" = "../../grails-plugins/repository"
+grails.plugin.location."httc-qaa" = "../../grails-plugins/qaa"
 */
