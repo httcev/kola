@@ -7,9 +7,9 @@
 		<li class="search-result-hit list-group-item clearfix" id="${hit.id}">
 			<h4 class="list-group-item-heading">
 				<a href="${createLink(resource:hit, action:'show')}" class="search-result-link ${(hit.class.simpleName).toLowerCase()}">
-                    <g:if test="${hit.hasProperty('name')}">${hit.name?.take(100)}</g:if>
-                    <g:elseif test="${hit.hasProperty('title')}">${hit.title?.take(100)}</g:elseif>
-                    <g:else>unknown resource title</g:else>
+                    <g:if test="${hit.hasProperty('name')}"><kola:abbreviate>${hit.name}</kola:abbreviate></g:if>
+                    <g:elseif test="${hit.hasProperty('title')}"><kola:abbreviate>${hit.title}</kola:abbreviate></g:elseif>
+                    <g:else>unknown search hit title</g:else>
 				</a>
 			</h4>
 			<p class="list-group-item-text">
@@ -24,10 +24,10 @@
 				</g:each>
 			</g:elseif>
             <g:elseif test="${hit.hasProperty('description')}">
-				<kola:markdown>${hit.description?.take(100)}</kola:markdown>
+				<kola:markdown><kola:abbreviate>${hit.description}</kola:abbreviate></kola:markdown>
 			</g:elseif>
             <g:elseif test="${hit.hasProperty('text')}">
-				<kola:markdown>${hit.text?.take(100)}</kola:markdown>
+				<kola:markdown><kola:abbreviate>${hit.text}</kola:abbreviate></kola:markdown>
 			</g:elseif>
 			</p>
 		</li>

@@ -60,9 +60,9 @@
 						<ul class="list-group">
 							<g:each var="question" in="${latestQuestions}">
 								<a href="${createLink(resource:question, action:'show')}" class="list-group-item">
-									<h4 class="list-group-item-heading">${question.title}</h4>
+									<h4 class="list-group-item-heading"><kola:abbreviate>${question.title}</kola:abbreviate></h4>
 									<p class="list-group-item-text">
-										${question.text?.take(100)}
+										<kola:abbreviate>${question.text}</kola:abbreviate>
 									</p>
 								</a>
 							</g:each>
@@ -86,9 +86,9 @@
 						<ul class="list-group">
 							<g:each var="asset" in="${latestAssets}">
 								<a href="${createLink(resource:asset, action:'show')}" class="list-group-item">
-									<h4 class="list-group-item-heading">${asset.name}</h4>
+									<h4 class="list-group-item-heading"><kola:abbreviate>${asset.name}</kola:abbreviate></h4>
 									<p class="list-group-item-text">
-										${asset.props['_description']?.take(100)}
+										<kola:abbreviate>${asset.props['_description']}</kola:abbreviate>
 									</p>
 								</a>
 							</g:each>

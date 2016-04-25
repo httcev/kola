@@ -29,7 +29,7 @@
 							<button class="choose btn btn-primary pull-right" name="template.id" value="${task.id}"><i class="fa fa-check-square-o"></i> <g:message code="kola.choose" /></button>
 						</h4>
 						<p class="list-group-item-text">
-							<kola:markdown>${task.description?.take(400)}</kola:markdown>
+							<kola:markdown><kola:abbreviate max="400">${task.description}</kola:abbreviate></kola:markdown>
 						</p>
 					</li>
 				</g:each>

@@ -29,6 +29,14 @@ class TaskStep extends QuestionReference {
     List<Asset> resources       // defined as list to keep order in which elements got added
     List<Asset> attachments     // defined as list to keep order in which elements got added
 
+    def getTask() {
+        Task.where {
+            steps {
+                id == this.id
+            }
+        }.first()
+    }
+
     static _exported = ["name", "description", "deleted"]
     static _referenced = ["resources", "attachments", "creator"]
     static {

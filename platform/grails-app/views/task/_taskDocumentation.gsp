@@ -1,6 +1,6 @@
 <g:set var="authService" bean="authService"/>
 <li class="list-group-item">
-	<div class="list-group-item-text clearfix">
+	<div id="${taskDocumentation.id}" class="list-group-item-text clearfix">
 		<div class="taskDocumentation">
 			<p class="formatted">${taskDocumentation.text}</p>
 			<g:render model="${[attachments:taskDocumentation.attachments]}" template="attachments" />

@@ -26,9 +26,7 @@
 				<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_TASK_TEMPLATE_CREATOR">
 					<li class="${(controllerName == 'task' && params.isTemplate?.toBoolean()) ? 'active' : ''}"><g:link controller="task" action="index" params="[isTemplate:true]" title="${message(code:'kola.taskTemplates')}"><i class="fa fa-fw fa-clipboard"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.taskTemplates" /></span></g:link></li>
 				</sec:ifAnyGranted>
-<%--
-				<li class="${controllerName == 'documentation' ? 'active' : ''}"><g:link controller="documentation" action="index" title="${message(code:'kola.task.documentations')}"><i class="httc-fw httc-compose"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.task.documentations" /></span></g:link></li>
---%>
+                <li class="${controllerName == 'taskDocumentation' ? 'active' : ''}"><g:link controller="taskDocumentation" action="index" title="${message(code:'kola.task.documentations')}"><i class="httc-fw httc-compose"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.task.documentations" /></span></g:link></li>
 				<li class="${controllerName == 'asset' ? 'active' : ''}"><g:link controller="asset" action="index" plugin="httcRepository" title="${message(code:'kola.assets')}"><i class="fa fa-fw fa-book"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.assets" /></span></g:link></li>
 				<li class="${controllerName == 'question' ? 'active' : ''}"><g:link controller="question" action="index" title="${message(code:'de.httc.plugin.qaa.questions')}"><i class="httc-fw httc-comments"></i> <span class="hide-sidemenu-collapsed"><g:message code="de.httc.plugin.qaa.questions" /></span></g:link></li>
 				<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REFLECTION_QUESTION_CREATOR">

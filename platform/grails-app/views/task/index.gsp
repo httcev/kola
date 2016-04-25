@@ -52,9 +52,11 @@
 							<g:sortableColumn property="cp.lastName" title="${message(code: 'kola.meta.creator')}" params="${sortParams}" />
 							<g:sortableColumn property="cp.company" title="${message(code: 'de.httc.plugin.user.company')}" params="${sortParams}" />
 							<g:sortableColumn property="lastUpdated" title="${message(code: 'kola.meta.lastUpdated')}" params="${sortParams}" />
+<%--
 							<g:if test="${!params.isTemplate?.toBoolean()}">
 								<g:sortableColumn property="lastDocumented" title="${message(code: 'kola.task.lastDocumented')}" params="${sortParams}" />
 							</g:if>
+--%>
 						</tr>
 					</thead>
 					<tbody>
@@ -69,9 +71,11 @@
 							<td>${fieldValue(bean: task.creator?.profile, field: "displayNameReverse")}</td>
 							<td>${fieldValue(bean: task.creator?.profile, field: "company")}</td>
 							<td><g:formatDate date="${task.lastUpdated}" type="date"/></td>
+<%--
 							<g:if test="${!params.isTemplate?.toBoolean()}">
 								<td><g:formatDate date="${task.lastDocumented}" type="date"/></td>
 							</g:if>
+--%>
 						</tr>
 					</g:each>
 					</tbody>

@@ -77,7 +77,7 @@
 						<h4 class="list-group-item-heading">
 							<i class="fa fa-external-link"></i> ${asset.name}
 						</h4>
-						<p class="list-group-item-text text-default formatted">${asset.description?.take(100)}</p>
+						<p class="list-group-item-text text-default formatted"><kola:abbreviate>${asset.description}</kola:abbreviate></p>
 					</a>
 				</g:each>
 			</div>

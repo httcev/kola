@@ -80,7 +80,7 @@
 						<button type="button" class="btn btn-danger pull-right" onclick="$(this).closest('li').remove()" title="${message(code:'default.button.delete.label')}"><i class="fa fa-times"></i></button>
 					</h4>
 					<p class="list-group-item-text">
-						${asset.description?.take(100)}
+						<kola:abbreviate>${asset.description}</kola:abbreviate>
 					</p>
 				</li>
 			</g:each>
@@ -149,4 +149,3 @@
 		updateStepIndices();
 	}
 </script>
-

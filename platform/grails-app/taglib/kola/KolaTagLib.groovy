@@ -7,7 +7,7 @@ import org.pegdown.ast.AutoLinkNode
 import org.pegdown.ast.ExpLinkNode
 import org.pegdown.ast.MailLinkNode
 import org.pegdown.ast.WikiLinkNode
-
+import org.apache.commons.lang.StringUtils
 
 class KolaTagLib {
 	def springSecurityService
@@ -28,6 +28,11 @@ class KolaTagLib {
         } catch(Throwable e) {
             log.error e
         }
+    }
+
+    def abbreviate = { attrs, body ->
+        def max = attrs.max?.toInteger() ?: 100
+        out << StringUtils.abbreviate(body().toString(), max)
     }
 
     /* Custom LinkRender for adding target="_blank" attribute to markdown links */
