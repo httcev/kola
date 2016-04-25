@@ -7,7 +7,7 @@ import org.pegdown.ast.AutoLinkNode
 import org.pegdown.ast.ExpLinkNode
 import org.pegdown.ast.MailLinkNode
 import org.pegdown.ast.WikiLinkNode
-import org.apache.commons.lang.StringUtils
+import java.text.BreakIterator
 
 class KolaTagLib {
 	def springSecurityService
@@ -32,7 +32,16 @@ class KolaTagLib {
 
     def abbreviate = { attrs, body ->
         def max = attrs.max?.toInteger() ?: 100
-        out << StringUtils.abbreviate(body().toString(), max)
+        def text = body().toString()
+        def textLength = text.length()
+        if (textLength > max) {
+            BreakIterator bi = BreakIterator.getWordInstance()
+            bi.setText(text)
+            out << text.substring(0, bi.following(max)) + "..."
+        }
+        else {
+            out << text
+        }
     }
 
     /* Custom LinkRender for adding target="_blank" attribute to markdown links */
