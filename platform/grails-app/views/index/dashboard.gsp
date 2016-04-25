@@ -20,7 +20,7 @@
 				<div class="panel panel-success">
 					<div class="panel-heading">
 						<h3 class="panel-title">
-							<g:message code="kola.tasks.assigned" />:
+							<i class="httc-fw httc-task"></i> <g:message code="kola.tasks.assigned" />:
 							<a href="${createLink(controller:'task', action:'index', params:[own:'on', assigned:'on'])}" class="pull-right"><g:message code="kola.all" /> <i class="fa fa-chevron-right"></i></a>
 						</h3>
 					</div>
@@ -49,10 +49,36 @@
 					</g:else>
 				</div>
 
+				<div class="panel panel-info">
+					<div class="panel-heading">
+						<h3 class="panel-title">
+							<i class="httc-fw httc-comments"></i> <g:message code="kola.question.newest" />:
+							<a href="${createLink(controller:'question', action:'index')}" class="pull-right"><g:message code="kola.all" /> <i class="fa fa-chevron-right"></i></a>
+						</h3>
+					</div>
+					<g:if test="${latestQuestions?.size() > 0}">
+						<ul class="list-group">
+							<g:each var="question" in="${latestQuestions}">
+								<a href="${createLink(resource:question, action:'show')}" class="list-group-item">
+									<h4 class="list-group-item-heading">${question.title}</h4>
+									<p class="list-group-item-text">
+										${question.text?.take(100)}
+									</p>
+								</a>
+							</g:each>
+						</ul>
+					</g:if>
+					<g:else>
+						<div class="panel-body">
+							<p class="text-muted"><g:message code="app.filter.empty" args="${[message(code: 'de.httc.plugin.qaa.questions')]}" /></p>
+						</div>
+					</g:else>
+				</div>
+
 				<div class="panel panel-default">
 					<div class="panel-heading">
 						<h3 class="panel-title">
-							<g:message code="kola.asset.newest" />:
+							<i class="fa fa-fw fa-book"></i> <g:message code="kola.asset.newest" />:
 							<a href="${createLink(controller:'asset', action:'index')}" class="pull-right"><g:message code="kola.all" /> <i class="fa fa-chevron-right"></i></a>
 						</h3>
 					</div>
