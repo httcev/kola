@@ -15,7 +15,7 @@
 	<label for="description" class="col-sm-2 control-label">
 		<g:message code="kola.meta.description" />:
 	</label>
-	<div class="col-sm-10"><g:textArea rows="8" name="description" class="form-control" data-provide="markdown" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdImage cmdCode cmdQuote" value="${task?.description}"/></div>
+	<div class="col-sm-10"><g:textArea rows="8" name="description" class="form-control" data-provide="markdown" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdImage cmdCode cmdQuote cmdPreview" value="${task?.description}"/></div>
 </div>
 
 <g:if test="${!task?.isTemplate?.toBoolean()}">
@@ -148,6 +148,7 @@
 	function addStep() {
 		var $step = $($("#newStepTemplate").html()).appendTo($("#step-list"));
 		updateStepIndices();
+        $step.find("textarea").first().markdown();
         $step.find("input[type='text']").first().focus();
 	}
 </script>
