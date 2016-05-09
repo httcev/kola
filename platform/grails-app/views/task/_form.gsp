@@ -5,7 +5,7 @@
 
 <div class="form-group ${hasErrors(bean: task, field: 'name', 'error')} required">
 	<label for="name" class="col-sm-2 control-label">
-		<g:message code="kola.meta.name" />
+		<g:message code="kola.task.title" />
 		<span class="required-indicator">*</span>:
 	</label>
 	<div class="col-sm-10"><g:textField name="name" class="form-control" required="" value="${task?.name}"/></div>

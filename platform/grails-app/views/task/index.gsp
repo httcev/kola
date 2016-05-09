@@ -43,7 +43,7 @@
 				<table class="table table-striped">
 					<thead>
 						<tr>
-							<g:sortableColumn property="name" title="${message(code: 'kola.meta.name')}" params="${sortParams}" />
+							<g:sortableColumn property="name" title="${message(code: 'kola.task.title')}" params="${sortParams}" />
 							<g:if test="${!params.isTemplate?.toBoolean()}">
 								<g:sortableColumn property="due" title="${message(code: 'kola.task.due')}" params="${sortParams}" />
 								<g:sortableColumn property="done" class="text-center" title="${message(code: 'kola.task.done')}" params="${sortParams}" />
