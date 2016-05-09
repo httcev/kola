@@ -39,19 +39,20 @@
 		</label>
 		<div class="col-sm-10"><input type="date" id="due" class="form-control" name="due" value="${formatDate(format:'yyyy-MM-dd',date:task?.due)}" placeholder="yyyy-MM-dd"></div>
 	</div>
-
-	<div class="form-group ${hasErrors(bean: task, field: 'done', 'error')}">
-		<label for="done" class="col-sm-2 control-label">
-			<g:message code="kola.task.done" />:
-		</label>
-		<div class="col-sm-10">
-			<div class="checkbox">
-				<label>
-					<g:checkBox name="done" value="${task?.done}" /> <g:message code="kola.task.done" />
-				</label>
-			</div>
-		</div>
-	</div>
+    <g:if test="${task?.attached}">
+    	<div class="form-group ${hasErrors(bean: task, field: 'done', 'error')}">
+    		<label for="done" class="col-sm-2 control-label">
+    			<g:message code="kola.task.done" />:
+    		</label>
+    		<div class="col-sm-10">
+    			<div class="checkbox">
+    				<label>
+    					<g:checkBox name="done" value="${task?.done}" /> <g:message code="kola.task.done" />
+    				</label>
+    			</div>
+    		</div>
+    	</div>
+    </g:if>
 </g:if>
 
 <div class="form-group ${hasErrors(bean: task, field: 'attachments', 'error')} ">
