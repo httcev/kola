@@ -105,7 +105,7 @@
 			<ul class="list-group">
 				<g:each var="reflectionQuestion" in="${task?.reflectionQuestions}">
 					<li class="list-group-item clearfix">
-						<b class="text-warning">${reflectionQuestion.name}</b>
+						<b class="text-warning" onclick="$(this).parent().nextAll('.new-answer').first().removeClass('hidden').find('textarea').focus()">${reflectionQuestion.name}</b>
 						<g:if test="${authService.canAttach(task)}">
 							<button type="button" title="${message(code:'kola.reflectionAnswer.create')}" class="btn btn-default pull-right" onclick="$(this).parent().nextAll('.new-answer').first().removeClass('hidden').find('textarea').focus()"><i class="fa fa-comment-o"></i></button>
 						</g:if>
