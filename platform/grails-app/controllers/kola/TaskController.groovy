@@ -20,7 +20,7 @@ class TaskController {
         params.max = Math.min(max ?: 10, 100)
         params.sort = params.sort ?: "lastUpdated"
         params.order = params.order ?: "desc"
-        
+
         def user = springSecurityService.currentUser
         def userCompany = user.profile?.company
         def filtered = params.own || params.assigned || params.ownCompany
@@ -66,7 +66,7 @@ class TaskController {
             taskInstance.reflectionQuestions?.each { reflectionQuestion ->
                 reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false, [sort:'lastUpdated', order:'asc'])
             }
-            
+
             def docs = TaskDocumentation.findAllByReferenceAndDeleted(taskInstance, false, [sort:'lastUpdated', order:'asc'])
             if (docs) {
                 taskDocumentations[taskInstance.id] = docs
@@ -142,7 +142,7 @@ class TaskController {
         taskService.save taskInstance
 
         flash.message = message(code: 'default.created.message', args: [message(code: taskInstance.isTemplate ? 'kola.taskTemplate.noshy' : 'kola.task', default: 'Task'), taskInstance.name])
-        redirect action:"edit", id:taskInstance.id
+        redirect action:"index"
     }
 
     def edit(Task taskInstance) {
@@ -175,7 +175,7 @@ class TaskController {
         taskService.save taskInstance
 
         flash.message = message(code: 'default.updated.message', args: [message(code: taskInstance.isTemplate ? 'kola.taskTemplate.noshy' : 'kola.task', default: 'Task'), taskInstance.name])
-        redirect action:"edit", id:taskInstance.id
+        redirect action:"index"
     }
 
     @Transactional
@@ -203,7 +203,7 @@ class TaskController {
             taskInstance.reflectionQuestions?.each { reflectionQuestion ->
                 reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false)
             }
-            
+
             def docs = TaskDocumentation.findAllByReferenceAndDeleted(taskInstance, false)
             if (docs) {
                 taskDocumentations[taskInstance.id] = docs
@@ -428,7 +428,7 @@ class TaskController {
                     log.error "Couldn't add attachment: Asset not found: ${it}"
                 }
             }
-        }  
+        }
 
         // update reflection questions
         taskInstance.reflectionQuestions?.clear()
@@ -441,12 +441,12 @@ class TaskController {
                 log.error "Couldn't add reflection question: ReflectionQuestion not found: ${it}"
             }
         }
-        
+
         // create new attachments
         request.multiFileMap?.each { k,files ->
             def domainName = k - "._newAttachment" - "_newAttachment"
             def domain = taskInstance
-            
+
             if (domainName.length() > 0) {
                 def matcher = domainName =~ /(.*)\[(.*)\]/
                 if (matcher.matches()) {
@@ -458,7 +458,7 @@ class TaskController {
                     }
                 }
             }
-            
+
             files?.each { f ->
                 if (!f.empty) {
                     def asset = new Asset(name:f.originalFilename, typeLabel:"attachment", mimeType:f.getContentType(), content:new AssetContent(data:f.bytes))
