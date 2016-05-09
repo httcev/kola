@@ -145,7 +145,8 @@
 	}
 
 	function addStep() {
-		$("#step-list").append($("#newStepTemplate").html());
+		var $step = $($("#newStepTemplate").html()).appendTo($("#step-list"));
 		updateStepIndices();
+        $step.find("input[type='text']").first().focus();
 	}
 </script>

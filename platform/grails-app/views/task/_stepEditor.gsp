@@ -18,7 +18,7 @@
 		</div>
 		<div class="form-group">
 			<label class="col-sm-2 control-label">
-				<g:message code="kola.meta.description" />
+				<g:message code="kola.meta.description" />:
 			</label>
 			<div class="col-sm-10"><textarea name="steps[${index}].description" class="form-control" rows="6" data-provide="markdown-editable" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdImage cmdCode cmdQuote">${step.description}</textarea></div>
 		</div>
