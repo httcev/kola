@@ -18,19 +18,19 @@
 			</h1>
 			<p class="text-danger"><b><g:message code="kola.task.chooseTemplate.prompt" /></b></p>
 			<div class="well">
-				<g:message code="kola.task.chooseTemplate.none" />
-				<button class="choose btn btn-primary pull-right" name="template.id" value=""><i class="fa fa-check-square-o"></i> <g:message code="kola.choose" /></button>
+				<g:message code="kola.task.chooseTemplate.none" />:
+				<button class="choose btn btn-default pull-right" name="template.id" value=""><g:message code="kola.task.chooseTemplate.selectNone" /></button>
 			</div>
 			<ul class="list-group">
 				<g:each var="task" in="${taskList}">
 					<li class="list-group-item clearfix">
 						<h4 class="list-group-item-heading">
 							<a href="${createLink(resource:task, action:"show")}" target="_blank">${task.name}</a>
-							<button class="choose btn btn-primary pull-right" name="template.id" value="${task.id}"><i class="fa fa-check-square-o"></i> <g:message code="kola.choose" /></button>
 						</h4>
 						<p class="list-group-item-text">
 							<kola:markdown><kola:abbreviate max="400">${task.description}</kola:abbreviate></kola:markdown>
 						</p>
+                        <button class="choose btn btn-primary pull-right" name="template.id" value="${task.id}"><g:message code="kola.task.chooseTemplate.select" /></button>
 					</li>
 				</g:each>
 			</ul>
