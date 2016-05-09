@@ -20,7 +20,7 @@
 			<g:message code="default.show.label" args="[entityName]" />
 			<div class="buttons pull-right">
 				<g:if test="${authService.canDelete(reflectionQuestion)}">
-					<g:link class="delete btn btn-danger" action="delete" id="${reflectionQuestion.id}" title="${message(code: 'default.button.delete.label', args:[entityName])}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><i class="fa fa-times"></i></g:link>
+					<g:link class="delete btn btn-danger" action="delete" id="${reflectionQuestion.id}" title="${message(code: 'default.button.delete.label', args:[entityName])}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', args: [entityName])}');"><i class="fa fa-times"></i></g:link>
 				</g:if>
 				<g:if test="${authService.canEdit(reflectionQuestion)}">
 					<g:link class="edit btn btn-primary" action="edit" id="${reflectionQuestion.id}" title="${message(code: 'default.button.edit.label', args:[entityName])}"><i class="fa fa-pencil"></i></g:link>
