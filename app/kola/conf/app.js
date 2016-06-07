@@ -55,6 +55,10 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
 		})
 		.state('task.documentation', {
 			url: '/documentation',
+			params: {
+				triggerCreateDocument: false,
+				refId: null
+			},
 			views: {
 				'task-documentation': {
 					templateUrl: 'templates/task-documentation.html',
@@ -64,6 +68,10 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
 		})
 		.state('task.questions', {
 			url: '/questions',
+			params: {
+				triggerCreateDocument: false,
+				refId: null
+			},
 			views: {
 				'task-questions': {
 					templateUrl: 'templates/questions.html',
@@ -162,19 +170,19 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
 var checkRouting = function(dbService) {
 	/*
 	if ($rootScope.userProfile) {
-	    return true;
+		return true;
 	} else {
-	    var deferred = $q.defer();
-	    $http.post("/loadUserProfile", { userToken: "blah" })
-	        .success(function (response) {
-	            $rootScope.userProfile = response.userProfile;
-	            deferred.resolve(true);
-	        })
-	        .error(function () {
-	            deferred.reject();
-	            $location.path("/");
-	         });
-	    return deferred.promise;
+		var deferred = $q.defer();
+		$http.post("/loadUserProfile", { userToken: "blah" })
+			.success(function (response) {
+				$rootScope.userProfile = response.userProfile;
+				deferred.resolve(true);
+			})
+			.error(function () {
+				deferred.reject();
+				$location.path("/");
+			 });
+		return deferred.promise;
 	}
 	*/
 	/*

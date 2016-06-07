@@ -43,11 +43,9 @@ angular.module('kola.controllers', [])
 	reload();
 })
 
-.controller('TaskDetailCtrl', function($scope, $stateParams, $rootScope, dbService) {
+.controller('TaskDetailCtrl', function($scope, $stateParams, $rootScope, $state, dbService) {
 	$scope.isStep = $stateParams.stepId != null;
 	var targetId = $scope.isStep ? $stateParams.stepId : $stateParams.taskId;
-	// store last opened task/step id in rootscope to be able to set default reference when creating new documentation
-	//  var taskDocumentationProp = $scope.isStep ? "step" : "task";
 	var table = $scope.isStep ? "taskStep" : "task";
 
 	function reload() {
@@ -59,11 +57,15 @@ angular.module('kola.controllers', [])
 		});
 	}
 
+	$scope.createDocumentation = function() {
+		$state.go("task.documentation", { triggerCreateDocument: true, refId: $scope.taskOrStep.id });
+	}
+
+	$scope.createQuestion = function() {
+		$state.go("task.questions", { triggerCreateDocument: true, refId: $scope.taskOrStep.id });
+	}
+
 	reload();
-	$scope.$on("$destroy", $scope.$on("$ionicView.enter", function() {
-		$rootScope.lastOpenedTaskOrStepId = targetId;
-		//console.log("last opened task/step", $rootScope.lastOpenedTaskOrStepId);
-	}));
 })
 
 .controller('ModalEditCtrl', function($scope, $stateParams, $q, $ionicPopup, $ionicModal, $ionicLoading, $rootScope, dbService, mediaAttachment, authenticationService) {
@@ -236,9 +238,7 @@ angular.module('kola.controllers', [])
 	}
 
 	$scope.createNewDocument = function() {
-		var documentation = dbService.createTaskDocumentation();
-		documentation.reference = $rootScope.lastOpenedTaskOrStepId;
-		return documentation;
+		return dbService.createTaskDocumentation();
 	}
 
 	$scope.prepareSave = function(document) {
@@ -246,6 +246,15 @@ angular.module('kola.controllers', [])
 			document.reference = $scope.task.id;
 		}
 	}
+
+	$scope.$on("$ionicView.afterEnter", function(event, data) {
+		if (data.stateParams.triggerCreateDocument) {
+			data.stateParams.triggerCreateDocument = false;
+			var doc = $scope.createNewDocument();
+			doc.reference = data.stateParams.refId;
+			$scope.editDocument(doc);
+		}
+	});
 
 	$scope.reload();
 })
@@ -327,8 +336,6 @@ angular.module('kola.controllers', [])
 				});
 			});
 		} else {
-			// clear last selected task/step since we're not in task context here
-			$rootScope.lastOpenedTaskOrStepId = null;
 			return dbService.all("question", true).then(function(questions) {
 				$scope.questions = questions;
 			});
@@ -336,10 +343,7 @@ angular.module('kola.controllers', [])
 	}
 
 	$scope.createNewDocument = function() {
-		var question = dbService.createQuestion();
-		//console.log("setting default selected task/step to " + $rootScope.lastOpenedTaskOrStepId);
-		question.reference = $rootScope.lastOpenedTaskOrStepId;
-		return question;
+		return dbService.createQuestion();
 	}
 
 	$scope.prepareSave = function(document) {
@@ -347,6 +351,15 @@ angular.module('kola.controllers', [])
 			document.reference = $scope.task.id;
 		}
 	}
+
+	$scope.$on("$ionicView.afterEnter", function(event, data) {
+		if (data.stateParams.triggerCreateDocument) {
+			data.stateParams.triggerCreateDocument = false;
+			var doc = $scope.createNewDocument();
+			doc.reference = data.stateParams.refId;
+			$scope.editDocument(doc);
+		}
+	});
 
 	$scope.reload();
 })
