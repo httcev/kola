@@ -9,6 +9,6 @@
     "angular-i18n": "~1.4.1",
     "angular-marked": "~1.0.1",
     "angular-uuid-service": "~0.1.0",
-    "ngCordova": "~0.1.23-alpha"
+    "ngCordova": "~0.1.26-alpha"
   }
 }

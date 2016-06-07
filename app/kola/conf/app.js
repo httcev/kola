@@ -154,6 +154,10 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
 .constant("gcmSenderID", "686594383179")
 .constant("serverUrl", "https://staging.kola-projekt.de");
 // @endif
+// @if ENV == 'lvg'
+.constant("gcmSenderID", "502140985287")
+.constant("serverUrl", "https://lvg.kola-projekt.de");
+// @endif
 
 var checkRouting = function(dbService) {
 	/*

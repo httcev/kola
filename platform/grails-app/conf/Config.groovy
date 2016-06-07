@@ -136,6 +136,9 @@ environments {
     staging {
         de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyAJQJjAOE53yqqTbgi3Nj3rfeMjREc-fOo"
     }
+    lvg {
+        de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyDZ71xb2yLt1eaO8qw9pRsPw-Whzlo036s"
+    }
 }
 
 // log4j configuration
@@ -162,10 +165,11 @@ log4j.appender.file.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
     rollingFile.setRollingPolicy rollingPolicy
 
     appenders {
-        console name: 'stdout'
+//        appender new org.apache.kafka.log4jappender.KafkaLog4jAppender(name:'kafka', topic:'KOLA_LOG', brokerList:'localhost:9092', compressionType:'none', requiredNumAcks:0, syncSend:true, layout: pattern(conversionPattern:'%c{2} %m%n'))
+//        appender new org.springframework.amqp.rabbit.log4j.AmqpAppender(name:'amqp', host:'localhost', port:5672, username:'guest', password:'guest', virtualHost:'/', exchangeName:'', routingKeyPattern:'log-test', layout:pattern(conversionPattern:'[%d{yyyy-MM-dd HH:mm:ss}] %X{userAgent},%X{sessionId},%X{user},%X{method},%m%n'))
         appender rollingFile
+        console name: 'stdout'
     }
-
     // Example of changing the log pattern for the default console appender:
     //
     //appenders {
@@ -178,6 +182,7 @@ log4j.appender.file.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
 
     debug 'grails.app'
     debug rollingFileAppender: 'usagetracking', additivity:false
+//    debug amqp:'usagetracking', additivity:false
     //debug 'org.codehaus.groovy.grails.web.mapping', 'org.codehaus.groovy.grails.web.mapping.filter'
 
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
