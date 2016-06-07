@@ -21,6 +21,7 @@
 				<g:message code="kola.task.chooseTemplate.none" />:
 				<button class="choose btn btn-default pull-right" name="template.id" value=""><g:message code="kola.task.chooseTemplate.selectNone" /></button>
 			</div>
+            <h2><g:message code="kola.taskTemplates" />:</h2>
 			<ul class="list-group">
 				<g:each var="task" in="${taskList}">
 					<li class="list-group-item clearfix">
