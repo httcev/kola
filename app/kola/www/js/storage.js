@@ -347,7 +347,7 @@ angular.module('kola.storage', ['uuid'])
 			var user = authenticationService.getCredentials().user;
 			if (user) {
 				if (window.cordova) {
-					//      self._assetsDirName = cordova.file.dataDirectory + "assets/";
+					//	  self._assetsDirName = cordova.file.dataDirectory + "assets/";
 					self._cacheDirName = cordova.file.externalCacheDirectory;
 					self._dataDirName = cordova.file.externalDataDirectory;
 					self._assetsDirName = self._dataDirName + "assets/";
@@ -356,8 +356,12 @@ angular.module('kola.storage', ['uuid'])
 							self._assetsDir = dir;
 						});
 					});
+					window.openDatabase = function(dbname, ignored1, ignored2, ignored3) {
+						return window.sqlitePlugin.openDatabase({name: dbname, location: 'default', androidDatabaseImplementation: 2});
+					};
 				}
-				self.db = (window.cordova ? window.sqlitePlugin : window).openDatabase(user + "-new", '1', 'KOLA DB', 1024 * 1024 * 100);
+				self.db = window.openDatabase(user + '.db', '1', 'KOLA DB', 1024 * 1024 * 100);
+
 				_createTables().then(function() {
 					DBSYNC.initSync(self, schemaService, self.db, {
 						version: appVersion
@@ -450,14 +454,14 @@ angular.module('kola.storage', ['uuid'])
 	function createTaskDocumentation() {
 		/*
 		  function createTaskDocumentation(targetId, isStep) {
-		    var options = {};
-		    if (isStep) {
-		      options.step = targetId;
-		    }
-		    else {
-		      options.task = targetId;
-		    }
-		    return _create("taskDocumentation", options);
+			var options = {};
+			if (isStep) {
+			  options.step = targetId;
+			}
+			else {
+			  options.task = targetId;
+			}
+			return _create("taskDocumentation", options);
 		*/
 		return _create("taskDocumentation");
 	}
