@@ -114,7 +114,6 @@ angular.module('kola.controllers', [])
 			template: 'Soll diese ' + $scope.docName + ' wirklich gelöscht werden?',
 			cancelText: 'Abbrechen'
 		}).then(function(result) {
-			console.log(result);
 			if (result) {
 				$ionicLoading.show({
 					template: "<ion-spinner class='spinner-large'></ion-spinner><p>" + $scope.docName + " wird gelöscht</p>"
@@ -203,6 +202,22 @@ angular.module('kola.controllers', [])
 		return authenticationService.canEdit(doc);
 	}
 
+	$scope._resolveTaskReference = function(referencingModel) {
+		if (referencingModel.reference) {
+			return dbService.get(referencingModel.reference, "task", false).then(function(task) {
+				referencingModel._task = task;
+			}, function(error) {
+				// 404 for the task, so try loading task step
+				return dbService.get(referencingModel.reference, "taskStep", false).then(function(step) {
+					referencingModel._step = step;
+					return dbService.get(step.task, "task", false).then(function(task) {
+						referencingModel._task = task;
+					});
+				});
+			})
+		}
+	}
+
 	$scope._getPossibleTaskReferences = function(task) {
 		var referenceIds = "('" + task.id + "'";
 		angular.forEach(task.steps, function(step) {
@@ -248,7 +263,7 @@ angular.module('kola.controllers', [])
 	}
 
 	$scope.$on("$ionicView.afterEnter", function(event, data) {
-		if (data.stateParams.triggerCreateDocument) {
+		if (data && data.stateParams && data.stateParams.triggerCreateDocument) {
 			data.stateParams.triggerCreateDocument = false;
 			var doc = $scope.createNewDocument();
 			doc.reference = data.stateParams.refId;
@@ -323,21 +338,29 @@ angular.module('kola.controllers', [])
 		if ($stateParams.taskId) {
 			return dbService.get($stateParams.taskId, "task").then(function(task) {
 				$scope.task = task;
-				var referenceIds = [task.id];
-				angular.forEach(task.steps, function(step) {
-					referenceIds.push(step.id);
-				});
 				return dbService.all("question", true, "reference in " + $scope._getPossibleTaskReferences(task)).then(function(questions) {
-					$scope.questions = questions;
-					// update badge count on tab icon
 					$scope.badge = {
 						count:questions.length
 					}
+					var promises = [];
+					angular.forEach(questions, function(question) {
+						promises.push($scope._resolveTaskReference(question));
+					})
+					return $q.all(promises).finally(function() {
+						$scope.questions = questions;
+						// update badge count on tab icon
+					});
 				});
 			});
 		} else {
 			return dbService.all("question", true).then(function(questions) {
-				$scope.questions = questions;
+				var promises = [];
+				angular.forEach(questions, function(question) {
+					promises.push($scope._resolveTaskReference(question));
+				})
+				return $q.all(promises).finally(function() {
+					$scope.questions = questions;
+				});
 			});
 		}
 	}
@@ -353,7 +376,7 @@ angular.module('kola.controllers', [])
 	}
 
 	$scope.$on("$ionicView.afterEnter", function(event, data) {
-		if (data.stateParams.triggerCreateDocument) {
+		if (data && data.stateParams && data.stateParams.triggerCreateDocument) {
 			data.stateParams.triggerCreateDocument = false;
 			var doc = $scope.createNewDocument();
 			doc.reference = data.stateParams.refId;
@@ -382,7 +405,9 @@ angular.module('kola.controllers', [])
 				}
 				return answer.dateCreated;
 			})
-			$scope.question = question;
+			return $scope._resolveTaskReference(question).finally(function() {
+				$scope.question = question;
+			});
 		}, function(error) {
 			console.log(error);
 		});

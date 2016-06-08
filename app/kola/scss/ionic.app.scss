@@ -88,12 +88,18 @@ media-attachments .center-horizontal {
     font-size: 32px;
     vertical-align: middle;
 }
+.margin-top {
+	margin-top:10px;
+}
 .margin-horizontal {
     margin-left: 10px;
     margin-right: 10px;
 }
 .bold {
     font-weight: bold;
+}
+.italic {
+	font-style: italic;
 }
 .small {
     font-size: 85%;
@@ -244,8 +250,16 @@ media-attachments .center-horizontal {
     font-size: 2em;
     color: #999;
 }
-.reflection-answer {
+.reflection-answer, .new-comment {
     background-color: $stable;
     border:1px solid #DDD;
     padding:3px;
+}
+.question-reference {
+	clear:both;
+	margin-top:10px;
+	margin-bottom:10px;
+	font-style: italic;
+	font-size: 85%;
+	opacity: 0.6;
 }

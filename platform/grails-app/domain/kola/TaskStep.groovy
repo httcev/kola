@@ -8,7 +8,7 @@ import de.httc.plugins.qaa.QuestionReference
 class TaskStep extends QuestionReference {
     static mappedBy = [documentations:"reference"]
 	static hasMany = [documentations:TaskDocumentation, resources:Asset, attachments:Asset]
-	static belongsTo = Task
+	static belongsTo = [task:Task]
     static constraints = {
     	name blank:false
     	description nullable:true
@@ -28,7 +28,7 @@ class TaskStep extends QuestionReference {
 
     List<Asset> resources       // defined as list to keep order in which elements got added
     List<Asset> attachments     // defined as list to keep order in which elements got added
-
+/*
     def getTask() {
         Task.where {
             steps {
@@ -36,9 +36,9 @@ class TaskStep extends QuestionReference {
             }
         }.first()
     }
-
+*/
     static _exported = ["name", "description", "deleted"]
-    static _referenced = ["resources", "attachments", "creator"]
+    static _referenced = ["resources", "attachments", "creator", "task"]
     static {
         grails.converters.JSON.registerObjectMarshaller(TaskStep) { step ->
             def doc = step.properties.findAll { k, v ->

@@ -14,7 +14,7 @@ class Task extends QuestionReference {
         name boost:3.0
         description boost:2.0
     }
-    static mappedBy = [documentations:"reference"]
+    static mappedBy = [documentations:"reference", steps:"task"]
     static hasMany = [steps:TaskStep, documentations:TaskDocumentation, reflectionQuestions:ReflectionQuestion, resources:Asset, attachments:Asset]
     static constraints = {
         name blank:false

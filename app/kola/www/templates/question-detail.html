@@ -16,6 +16,7 @@
 					<button ng-if="canEdit(question)" class="button button-positive button-clear button-small icon ion-edit float-right" ng-click="editQuestion(question)"></button>
 				-->
 				</h4>
+				<p ng-if="question._task" class="question-reference">Diese Frage bezieht sich auf den Arbeitsauftrag <a ui-sref="task.detail({ taskId:question._task.id})">{{question._task.name | limitTo: 30 }}</a><span ng-if="question._step">, Teilschritt <a ui-sref="task.step({ taskId:question._task.id, stepId:question._step.id})">{{question._step.name | limitTo: 30 }}</a></span>.</p>
 				<div class="rating-control-container">
 					<rating-control class="float-left" ng-model="question"></rating-control>
 				</div>
@@ -32,7 +33,7 @@
 						<rating-control ng-model="answer"></rating-control>
 						<div class="answer-accept padding-top">
 							<i ng-if="!canEdit(question) && question.acceptedAnswer === answer.id" class="icon ion-checkmark balanced icon-large"></i>
-							<button ng-if="canEdit(question)" class="button button-outline button-small button-icon icon ion-checkmark" ng-class="{'button-balanced':question.acceptedAnswer === answer.id}" ng-click="toggleAcceptedAnswer(answer)"></button>
+							<button ng-if="canEdit(question)" class="button button-outline button-small button-icon icon ion-checkmark" ng-class="{'button-balanced':question.acceptedAnswer === answer.id, 'button-light':question.acceptedAnswer !== answer.id}" ng-click="toggleAcceptedAnswer(answer)"></button>
 						</div>
 					</div>
 					<div class="text">{{answer.text}}</div>
