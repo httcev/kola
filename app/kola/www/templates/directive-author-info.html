@@ -1,5 +1,5 @@
 <div class="author-info">
-	<a ng-if="ngModel.creator" href="#" class="author" ng-click="showAuthorDetailsModal(ngModel.creator)">
+	<a ng-if="ngModel.creator" href="" class="author" ng-click="showAuthorDetailsModal(ngModel.creator)">
 		<i ng-if="hideImage !== 'true' && ngModel.creator.photo == null" class="icon ion-person"></i>
 		<img ng-if="hideImage !== 'true' && ngModel.creator.photo.length" ng-src="data:image/png;base64,{{ngModel.creator.photo}}"> {{ngModel.creator.displayName}},
 		<span class="created-date">{{ngModel.lastUpdated | date}}</span>

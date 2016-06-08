@@ -10,9 +10,9 @@
 <div class="text-right padding-top clearfix">
 	<div ng-if="!saving">
 		<form ng-if="newComment" ng-submit="saveComment()">
-			<input type="text" class="fullwidth" ng-model="newComment.text" placeholder="Geben Sie hier Ihr Kommentar ein..." autofocus>
+			<input type="text" class="fullwidth new-comment" ng-model="newComment.text" placeholder="Geben Sie hier Ihr Kommentar ein..." autofocus>
 		</form>
-		<button class="button button-small add-comment-button" ng-disabled="saving" ng-class="{'button-outline':!newComment, 'button-balanced':newComment}" ng-click="newComment ? saveComment() : createComment()">
+		<button class="button button-small add-comment-button" ng-disabled="saving" ng-class="{'button-outline':!newComment,'button-stable':!newComment, 'button-balanced':newComment}" ng-click="newComment ? saveComment() : createComment()">
 			<span ng-if="newComment">Speichern</span>
 			<span ng-if="!newComment">Kommentieren</span>
 		</button>
