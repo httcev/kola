@@ -1,4 +1,4 @@
-package kola
+package de.httc.plugins.common
 
 import grails.transaction.Transactional
 import grails.plugin.springsecurity.SpringSecurityUtils

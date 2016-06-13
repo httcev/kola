@@ -10,7 +10,7 @@
 		<g:if test="${flash.message}">
 			<div class="message alert alert-danger" role="status">${flash.message}</div>
 		</g:if>
-		<kola:markdown>${terms}</kola:markdown>
+		<httc:markdown>${terms}</httc:markdown>
 		<g:if test="${showAcceptControls}">
 			<g:form controller="termsOfUse" action="accept" method="post" class="form form-inline">
 				<div class="checkbox">

@@ -56,7 +56,7 @@
 				</sec:ifNotLoggedIn>
 				<sec:ifLoggedIn>
 					<div class="dropdown">
-						<a href="#" class="site-header-link site-header-control dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user fa-lg"></i> <kola:displayName /> <span class="caret"></span></a>
+						<a href="#" class="site-header-link site-header-control dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user fa-lg"></i> <httc:displayName /> <span class="caret"></span></a>
 						<ul class="dropdown-menu dropdown-menu-right">
 							<li>
 								<g:link controller="profile">

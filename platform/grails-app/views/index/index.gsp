@@ -6,7 +6,7 @@
 	<body>
 		<div class="jumbotron">
 			<h1>${welcomeHeader}</h1>
-			<kola:markdown>${welcomeBody}</kola:markdown>
+			<httc:markdown>${welcomeBody}</httc:markdown>
 			<p><g:link controller="login" class="btn btn-primary btn-lg" role="button"><i class="fa fa-sign-in"></i> <g:message code="kola.signin" /></g:link></p>
 		</div>
 	</body>

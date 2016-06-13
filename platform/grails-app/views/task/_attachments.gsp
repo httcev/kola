@@ -28,6 +28,52 @@
 		<label class="text-muted"><g:message code="default.add.label" args="${[message(code:'kola.task.attachment')]}" />: </label>
 	</div>
 	<input type="file" name="${prefix}_newAttachment" class="new-attachment form-padding">
+<%--
+	<input type="file" name="${prefix}_newAttachment" class="new-attachment form-padding" onchange="uploadFile(this)">
+    <div class="progress" style="display:none">
+        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+    <script>
+        function uploadFile(fileInputElement) {
+            var fd = new FormData();
+            var $progressBar = $(fileInputElement).next(".progress");
+            $progressBar.show();
+            console.log($progressBar);
+            fd.append("file", fileInputElement.files[0]);
+
+            $.ajax({
+              xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+
+                xhr.upload.addEventListener("progress", function(evt) {
+                  if (evt.lengthComputable) {
+                    var percentComplete = evt.loaded / evt.total;
+                    percentComplete = parseInt(percentComplete * 100);
+                    console.log(percentComplete);
+                    $(".progress-bar", $progressBar).width(percentComplete + "%");
+                    if (percentComplete === 100) {
+                        $progressBar.hide();
+                    }
+                  }
+                }, false);
+                return xhr;
+              },
+              url: "${createLink(controller:'task', action:'')}/" + fileInputElement.name + "/attach",
+              type: "POST",
+              data: fd,
+              /*,
+              contentType: "application/json",
+              dataType: "json",
+              */
+              processData: false,
+              contentType: false,
+              success: function(result) {
+                console.log(result);
+              }
+            });
+        }
+    </script>
+--%>
 </g:if>
 <g:else>
 	<div class="attachments clearfix form-padding">

@@ -7,8 +7,8 @@
 		<li class="search-result-hit list-group-item clearfix" id="${hit.id}">
 			<h4 class="list-group-item-heading">
 				<a href="${createLink(resource:hit, action:'show')}" class="search-result-link ${(hit.class.simpleName).toLowerCase()}">
-                    <g:if test="${hit.hasProperty('name')}"><kola:abbreviate>${hit.name}</kola:abbreviate></g:if>
-                    <g:elseif test="${hit.hasProperty('title')}"><kola:abbreviate>${hit.title}</kola:abbreviate></g:elseif>
+                    <g:if test="${hit.hasProperty('name')}"><httc:abbreviate>${hit.name}</httc:abbreviate></g:if>
+                    <g:elseif test="${hit.hasProperty('title')}"><httc:abbreviate>${hit.title}</httc:abbreviate></g:elseif>
                     <g:else>unknown search hit title</g:else>
 				</a>
 			</h4>
@@ -20,14 +20,14 @@
 			</g:if>
 			<g:elseif test="${highlights[hitIndex]['description']?.fragments}">
 				<g:each var="fragment" in="${highlights[hitIndex]['description']?.fragments}">
-					<kola:markdown>${raw(fragment.toString())}</kola:markdown>
+					<httc:markdown>${raw(fragment.toString())}</httc:markdown>
 				</g:each>
 			</g:elseif>
             <g:elseif test="${hit.hasProperty('description')}">
-				<kola:markdown><kola:abbreviate>${hit.description}</kola:abbreviate></kola:markdown>
+				<httc:markdown><httc:abbreviate>${hit.description}</httc:abbreviate></httc:markdown>
 			</g:elseif>
             <g:elseif test="${hit.hasProperty('text')}">
-				<kola:markdown><kola:abbreviate>${hit.text}</kola:abbreviate></kola:markdown>
+				<httc:markdown><httc:abbreviate>${hit.text}</httc:abbreviate></httc:markdown>
 			</g:elseif>
 			</p>
 		</li>

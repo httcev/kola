@@ -29,7 +29,7 @@
 							<a href="${createLink(resource:task, action:"show")}" target="_blank">${task.name}</a>
 						</h4>
 						<p class="list-group-item-text">
-							<kola:markdown><kola:abbreviate max="400">${task.description}</kola:abbreviate></kola:markdown>
+							<httc:markdown><httc:abbreviate max="400">${task.description}</httc:abbreviate></httc:markdown>
 						</p>
                         <button class="choose btn btn-primary pull-right" name="template.id" value="${task.id}"><g:message code="kola.task.chooseTemplate.select" /></button>
 					</li>

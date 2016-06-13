@@ -44,7 +44,7 @@
 					<g:each in="${taskDocumentationList}" status="i" var="taskDocumentation">
                         <g:set var="task" value="${taskDocumentation.reference instanceof kola.TaskStep ? taskDocumentation.reference.task : taskDocumentation.reference}" />
                         <g:set var="text">
-                            <g:if test="${taskDocumentation.text?.length() > 0}"><kola:abbreviate>${taskDocumentation.text}</kola:abbreviate></g:if>
+                            <g:if test="${taskDocumentation.text?.length() > 0}"><httc:abbreviate>${taskDocumentation.text}</httc:abbreviate></g:if>
                             <g:else>${taskDocumentation.attachments.size()} <g:message code="${taskDocumentation.attachments.size() == 1 ? 'kola.task.attachment' : 'kola.task.attachments'}" /></g:else>
                         </g:set>
 						<tr>

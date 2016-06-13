@@ -6,17 +6,19 @@ import kola.TaskStep
 
 @Transactional(readOnly = true)
 class QuestionContextService {
+	def authService
+
 	def getPossibleQuestionReferences(contextId) {
 		def result
 		if (contextId) {
 			try {
 				def task = Task.get(contextId)
-				if (task) {
+				if (task && authService.canAttach(task)) {
 					result = _getTaskAndSteps(task)
 				}
 				else {
 					def taskStep = TaskStep.get(contextId)
-					if (taskStep) {
+					if (taskStep && authService.canAttach(taskStep)) {
 						result = _getTaskAndSteps(taskStep.task)
 					}
 				}

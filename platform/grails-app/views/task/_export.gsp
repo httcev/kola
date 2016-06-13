@@ -51,7 +51,7 @@
 				</tr>
 			</table>
 		</div>
-		<kola:markdown>${task.description}</kola:markdown>
+		<httc:markdown>${task.description}</httc:markdown>
 		<g:if test="${task?.attachments?.size() > 0}">
 			<g:render bean="${task?.attachments}" template="exportAttachments" var="attachments" />
 		</g:if>
@@ -77,7 +77,7 @@
 					<g:each var="step" in="${task?.steps}" status="i">
 						<li class="list-group-item">
 							<h4 class="list-group-item-heading"><span class="text-muted">${i+1}.</span> ${step.name}</h4>
-							<p class="list-group-item-text"><kola:markdown>${step.description}</kola:markdown></p>
+							<p class="list-group-item-text"><httc:markdown>${step.description}</httc:markdown></p>
 							<g:if test="${step.attachments?.size() > 0}">
 								<g:render bean="${step.attachments}" template="exportAttachments" var="attachments" />
 							</g:if>

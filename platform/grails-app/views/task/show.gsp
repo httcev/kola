@@ -83,7 +83,7 @@
 							</table>
 						</div>
 					</div>
-					<div class="col-md-8 col-md-pull-4"><kola:markdown>${task.description}</kola:markdown></div>
+					<div class="col-md-8 col-md-pull-4"><httc:markdown>${task.description}</httc:markdown></div>
 				</div>
 				<g:if test="${task?.attachments?.size() > 0}">
 				<g:render model="${[attachments:task?.attachments]}" template="attachments" />
@@ -97,7 +97,7 @@
 								<h4 class="list-group-item-heading">
 									<i class="fa fa-external-link"></i> ${asset.name}
 								</h4>
-								<p class="list-group-item-text text-default formatted"><kola:abbreviate>${asset.description}</kola:abbreviate></p>
+								<p class="list-group-item-text text-default formatted"><httc:abbreviate>${asset.description}</httc:abbreviate></p>
 							</a>
 						</g:each>
 					</div>
@@ -110,7 +110,7 @@
 						<g:each var="step" in="${task?.steps}">
 							<li class="list-group-item" id="${step.id}">
 								<h4 class="list-group-item-heading">${step.name}</h4>
-								<p class="list-group-item-text"><kola:markdown>${step.description}</kola:markdown></p>
+								<p class="list-group-item-text"><httc:markdown>${step.description}</httc:markdown></p>
 								<g:if test="${step.attachments?.size() > 0}">
 									<g:render model="${[attachments:step.attachments]}" template="attachments" />
 								</g:if>
