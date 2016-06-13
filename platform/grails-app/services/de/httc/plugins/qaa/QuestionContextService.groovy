@@ -1,0 +1,40 @@
+package de.httc.plugins.qaa
+
+import grails.transaction.Transactional
+import kola.Task
+import kola.TaskStep
+
+@Transactional(readOnly = true)
+class QuestionContextService {
+	def getPossibleQuestionReferences(contextId) {
+		def result
+		if (contextId) {
+			try {
+				def task = Task.get(contextId)
+				if (task) {
+					result = _getTaskAndSteps(task)
+				}
+				else {
+					def taskStep = TaskStep.get(contextId)
+					if (taskStep) {
+						result = _getTaskAndSteps(taskStep.task)
+					}
+				}
+			}
+			catch(e) {
+				log.error e
+			}
+		}
+		println result
+		return result
+	}
+
+	def _getTaskAndSteps(task) {
+		def result = []
+		result << task
+		task.steps?.each { step ->
+			result << step
+		}
+		return result
+	}
+}

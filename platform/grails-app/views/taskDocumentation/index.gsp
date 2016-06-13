@@ -48,7 +48,7 @@
                             <g:else>${taskDocumentation.attachments.size()} <g:message code="${taskDocumentation.attachments.size() == 1 ? 'kola.task.attachment' : 'kola.task.attachments'}" /></g:else>
                         </g:set>
 						<tr>
-							<td><g:link resource="${task}" action="show" fragment="${taskDocumentation.id}">${text}</g:link></td>
+							<td><g:link resource="${task}" action="show" fragment="documentations_${taskDocumentation.id}">${text}</g:link></td>
 							<td>${fieldValue(bean: taskDocumentation.creator?.profile, field: "displayNameReverse")}</td>
 							<td>${fieldValue(bean: taskDocumentation.creator?.profile, field: "company")}</td>
 							<td><g:formatDate date="${taskDocumentation.lastUpdated}" type="date"/></td>

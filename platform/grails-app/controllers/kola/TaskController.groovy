@@ -5,6 +5,7 @@ import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 import org.springframework.security.access.annotation.Secured
 import de.httc.plugins.user.User
+import de.httc.plugins.qaa.Question
 import de.httc.plugins.repository.Asset
 import de.httc.plugins.repository.AssetContent
 
@@ -62,24 +63,44 @@ class TaskController {
         }
         def reflectionAnswers = [:]
         def taskDocumentations = [:]
+		def taskQuestions = [:]
         if (!taskInstance.isTemplate) {
             taskInstance.reflectionQuestions?.each { reflectionQuestion ->
                 reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false, [sort:'lastUpdated', order:'asc'])
             }
 
-            def docs = TaskDocumentation.findAllByReferenceAndDeleted(taskInstance, false, [sort:'lastUpdated', order:'asc'])
-            if (docs) {
-                taskDocumentations[taskInstance.id] = docs
+            def documentations = TaskDocumentation.findAllByReferenceAndDeleted(taskInstance, false, [sort:'lastUpdated', order:'asc'])
+			def questions = Question.findAllByReferenceAndDeleted(taskInstance, false, [sort:'lastUpdated', order:'asc'])
+            if (documentations) {
+                taskDocumentations[taskInstance.id] = documentations
             }
+			if (questions) {
+				taskQuestions[taskInstance.id] = questions
+			}
             taskInstance.steps?.each { step ->
-                docs = TaskDocumentation.findAllByReferenceAndDeleted(step, false, [sort:'lastUpdated', order:'asc'])
-                if (docs) {
-                    taskDocumentations[step.id] = docs
+                documentations = TaskDocumentation.findAllByReferenceAndDeleted(step, false, [sort:'lastUpdated', order:'asc'])
+				questions = Question.findAllByReferenceAndDeleted(step, false, [sort:'lastUpdated', order:'asc'])
+                if (documentations) {
+                    taskDocumentations[step.id] = documentations
                 }
+				if (questions) {
+					taskQuestions[step.id] = questions
+				}
             }
         }
-
-        respond taskInstance, model:["reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations]
+		def reflectionAnswersCount = 0
+		reflectionAnswers.each { k, v ->
+			reflectionAnswersCount += v.size()
+		}
+		def taskDocumentationsCount = 0
+		taskDocumentations.each { k, v ->
+			taskDocumentationsCount += v.size()
+		}
+		def taskQuestionsCount = 0
+		taskQuestions.each { k, v ->
+			taskQuestionsCount += v.size()
+		}
+        respond taskInstance, model:["reflectionAnswers":reflectionAnswers, "reflectionAnswersCount":reflectionAnswersCount, "taskDocumentations":taskDocumentations, "taskDocumentationsCount":taskDocumentationsCount, "taskQuestions":taskQuestions, "taskQuestionsCount":taskQuestionsCount]
     }
 
     def create() {
@@ -234,6 +255,7 @@ class TaskController {
         }
         if (!authService.canAttach(taskDocumentationInstance.reference)) {
             forbidden()
+			return
         }
         def attachments = []
         request.multiFileMap?.each { k,files ->
@@ -259,7 +281,11 @@ class TaskController {
         }
 
         flash.message = message(code: 'default.created.message', args: [message(code: 'kola.task.documentation'), taskDocumentationInstance.id])
-        redirect action:"show", method:"GET", id:taskDocumentationInstance.reference.id
+		def task = taskDocumentationInstance.reference
+		if (task instanceof TaskStep) {
+			task = task.task
+		}
+        redirect action:"show", method:"GET", id:task.id, fragment:"documentations"
     }
 
     @Transactional
@@ -308,8 +334,11 @@ class TaskController {
         }
 
         flash.message = msg
-        def taskId = taskDocumentationInstance.reference ? taskDocumentationInstance.reference.id : params.parentTask
-        redirect action:"show", method:"GET", id:taskId
+		def task = taskDocumentationInstance.reference
+		if (task instanceof TaskStep) {
+			task = task.task
+		}
+        redirect action:"show", method:"GET", id:task.id, fragment:"documentations"
     }
 
     @Transactional
@@ -331,7 +360,7 @@ class TaskController {
         }
 
         flash.message = message(code: 'default.created.message', args: [message(code: 'kola.reflectionAnswer'), reflectionAnswerInstance.id])
-        redirect action:"show", method:"GET", id:reflectionAnswerInstance.task.id
+        redirect action:"show", method:"GET", id:reflectionAnswerInstance.task.id, fragment:"reflectionQuestions"
     }
 
     @Transactional
@@ -366,7 +395,7 @@ class TaskController {
         }
 
         flash.message = msg
-        redirect action:"show", method:"GET", id:reflectionAnswerInstance.task.id
+        redirect action:"show", method:"GET", id:reflectionAnswerInstance.task.id, fragment:"reflectionQuestions"
     }
 
     protected void notFound() {
@@ -405,7 +434,7 @@ class TaskController {
         // update steps
         taskInstance.steps?.clear()
         // TODO: UGLY HACK!!
-        for (i in 0..19) {
+        for (i in 0..29) {
             def stepDef = params["steps[$i]"]
             if (stepDef && stepDef.deleted != "true") {
                 def step = stepDef.id ? TaskStep.get(stepDef.id) : null

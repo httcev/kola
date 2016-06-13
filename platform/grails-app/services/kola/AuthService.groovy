@@ -17,6 +17,11 @@ class AuthService {
             if (domain?.hasProperty("assignee") && domain.assignee == user) {
                 return true
             }
+			if (domain instanceof kola.TaskStep) {
+				if (domain.task.assignee == user) {
+					return true
+				}
+			}
             return SpringSecurityUtils.ifAllGranted('ROLE_ADMIN')
         }
         return false

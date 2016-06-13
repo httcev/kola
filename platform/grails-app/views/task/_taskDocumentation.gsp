@@ -6,8 +6,18 @@
 			<g:render model="${[attachments:taskDocumentation.attachments]}" template="attachments" />
 		</div>
 		<g:if test="${authService.canEdit(taskDocumentation)}">
-			<g:form class="form hidden" action="updateTaskDocumentation" id="${taskDocumentation.id}" method="PUT" enctype="multipart/form-data">
-				<input type="hidden" name="parentTask" value="${task.id}">
+			<g:form class="hidden form-horizontal" action="updateTaskDocumentation" id="${taskDocumentation.id}" method="PUT" enctype="multipart/form-data">
+				<div class="form-group">
+					<label for="reference" class="col-sm-3 control-label"><g:message code="kola.task.documentation.for" />:</label>
+					<div class="col-sm-9">
+						<select id="reference" name="reference" class="form-control">
+							<option value="${task.id}"<g:if test="${taskDocumentation.reference?.id==task.id}"> selected</g:if>><g:message code="kola.task.documentation.forTask" /></option>
+							<g:each var="step" in="${task?.steps}">
+								<option value="${step.id}"<g:if test="${taskDocumentation.reference?.id==step.id}"> selected</g:if>><g:message code="kola.task.documentation.forStep" /> "${step.name}"</option>
+							</g:each>
+						</select>
+					</div>
+				</div>
 				<textarea name="text" class="form-control" rows="5" placeholder="${message(code:'kola.task.documentation.placeholder')}">${taskDocumentation.text}</textarea>
 				<g:render model="${[attachments:taskDocumentation.attachments, mode:'edit']}" template="attachments" />
 				<div class="text-right form-padding-all"><button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <g:message code="default.save.label" args="[message(code:'kola.task.documentation')]" /></button></div>
@@ -15,7 +25,7 @@
 		</g:if>
 		<small class="pull-right">
 			<g:if test="${authService.canEdit(taskDocumentation)}">
-				<button type="button" class="btn btn-default" onclick="$(this).hide().parent().prevAll('.taskDocumentation').hide().nextAll('.form').first().removeClass('hidden').find('textarea').focus()"><i class="fa fa-pencil"></i> <g:message code="default.button.edit.label" /></button>
+				<button type="button" class="btn btn-default" onclick="$(this).hide().closest('.list-group-item').addClass('list-group-item-warning').find('.taskDocumentation').hide().nextAll('form').first().removeClass('hidden').find('textarea').focus()"><i class="fa fa-pencil"></i> <g:message code="default.button.edit.label" /></button>
 			</g:if>
 			<g:render bean="${taskDocumentation.creator.profile}" template="/profile/show" var="profile" />,
 			<g:formatDate date="${taskDocumentation.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
