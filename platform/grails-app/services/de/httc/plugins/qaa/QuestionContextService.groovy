@@ -27,7 +27,6 @@ class QuestionContextService {
 				log.error e
 			}
 		}
-		println result
 		return result
 	}
 
