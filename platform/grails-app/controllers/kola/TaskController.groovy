@@ -24,7 +24,7 @@ class TaskController {
 
         def user = springSecurityService.currentUser
         def userCompany = user.profile?.company
-        def filtered = params.own || params.assigned || params.ownCompany
+        def filtered = params.own || params.assigned || params.ownCompany || params.key
 
         def results = Task.createCriteria().list(max:params.max, offset:params.offset) {
             // left join allows null values in the association
@@ -50,6 +50,12 @@ class TaskController {
                         }
                     }
                 }
+				if (params.key) {
+					or {
+						ilike("name", "%${params.key}%")
+						ilike("description", "%${params.key}%")
+					}
+				}
             }
             order(params.sort, params.order)
         }

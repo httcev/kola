@@ -16,7 +16,7 @@ angular.module('kola.controllers', [])
 			}
 		});
 	}
-	var template = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, einen neuen Auftrag anzulegen, der als Vorlage für die Dokumentation dient. Sie haben die Möglichkeit, bestehende Vorlagen anzupassen oder einen komplett neuen Auftrag anzulegen.</p><p>Seien Sie kreativ und probieren Sie sich aus! Mithilfe der Plattform können Sie selbst angelegte Aufträge auch im Nachhinein ändern.</p></div></ion-content></ion-popover-view>";
+	var template = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, einen neuen Arbeitsauftrag anzulegen, der als Grundlage für die Dokumentation dient. Sie haben die Möglichkeit, bestehende Vorlagen anzupassen oder einen komplett neuen Arbeitsauftrag anzulegen.</p><p>Seien Sie kreativ und probieren Sie sich aus! Mithilfe der Plattform können Sie selbst angelegte Aufträge auch im Nachhinein ändern.</p></div></ion-content></ion-popover-view>";
 	$scope.popover = $ionicPopover.fromTemplate(template, { scope: $scope });
 	$scope.openPopover = function($event) {
 		$scope.popover.show($event);
@@ -74,7 +74,7 @@ angular.module('kola.controllers', [])
 		$state.go("task.questions", { triggerCreateDocument: true, refId: $scope.taskOrStep.id });
 	}
 
-	var popoverTemplateDocumentation = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, den Auftrag zu dokumentieren. Dabei können Sie den gesamten Auftrag oder einzelne Teilschritte  per Text, Foto, Video oder Spracheingabe dokumentieren. Seien Sie kreativ und probieren Sie sich aus! Sie können alle Eingaben jederzeit rückgängig machen.</p></div></ion-content></ion-popover-view>";
+	var popoverTemplateDocumentation = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, den Arbeitsauftrag zu dokumentieren. Dabei können Sie den gesamten Arbeitsauftrag oder einzelne Teilschritte per Text, Foto, Video oder Spracheingabe dokumentieren. Seien Sie kreativ und probieren Sie sich aus! Sie können alle Eingaben jederzeit rückgängig machen.</p></div></ion-content></ion-popover-view>";
 	$scope.popoverDocumentation = $ionicPopover.fromTemplate(popoverTemplateDocumentation, { scope: $scope });
 	$scope.openPopoverDocumentation = function($event) {
 		$scope.popoverDocumentation.show($event);
@@ -295,7 +295,7 @@ angular.module('kola.controllers', [])
 		}
 	});
 
-	var popoverTemplateDocumentation = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, den Auftrag zu dokumentieren. Dabei können Sie den gesamten Auftrag oder einzelne Teilschritte  per Text, Foto, Video oder Spracheingabe dokumentieren. Seien Sie kreativ und probieren Sie sich aus! Sie können alle Eingaben jederzeit rückgängig machen.</p></div></ion-content></ion-popover-view>";
+	var popoverTemplateDocumentation = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, den Arbeitsauftrag zu dokumentieren. Dabei können Sie den gesamten Arbeitsauftrag oder einzelne Teilschritte per Text, Foto, Video oder Spracheingabe dokumentieren. Seien Sie kreativ und probieren Sie sich aus! Sie können alle Eingaben jederzeit rückgängig machen.</p></div></ion-content></ion-popover-view>";
 	$scope.popoverDocumentation = $ionicPopover.fromTemplate(popoverTemplateDocumentation, { scope: $scope });
 	$scope.openPopoverDocumentation = function($event) {
 		$scope.popoverDocumentation.show($event);

@@ -8,14 +8,14 @@
 		<g:message code="kola.task.title" />
 		<span class="required-indicator">*</span>:
 	</label>
-	<div class="col-sm-10"><g:textField name="name" class="form-control" required="" value="${task?.name}"/></div>
+	<div class="col-sm-10"><g:textField name="name" class="form-control" required="" value="${task?.name}" placeholder="${message(code:'kola.task.title.placeholder')}"/></div>
 </div>
 
 <div class="form-group ${hasErrors(bean: task, field: 'description', 'error')} ">
 	<label for="description" class="col-sm-2 control-label">
 		<g:message code="kola.meta.description" />:
 	</label>
-	<div class="col-sm-10"><g:textArea rows="8" name="description" class="form-control" data-provide="markdown" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdImage cmdCode cmdQuote cmdPreview" value="${task?.description}"/></div>
+	<div class="col-sm-10"><g:textArea rows="8" name="description" class="form-control" data-provide="markdown" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdImage cmdCode cmdQuote cmdPreview" value="${task?.description}" placeholder="${message(code:'kola.task.description.placeholder')}"/></div>
 </div>
 
 <g:if test="${!task?.isTemplate?.toBoolean()}">
