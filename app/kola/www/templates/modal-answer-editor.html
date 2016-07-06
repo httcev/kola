@@ -1,17 +1,17 @@
 <div class="modal modal-editor answer-editor">
-	<ion-header-bar class="bar-stable">
+	<ion-header-bar class="bar-calm">
 		<div class="buttons">
 			<button class="button button-clear" ng-click="checkCloseEditDocumentModal()"><i class="icon ion-close"></i></button>
 		</div>
 		<h1 class="title"><span ng-if="editedDocument._isNew">Neue Antwort</span><span ng-if="!editedDocument._isNew">Antwort bearbeiten</span></h1>
 		<div class="buttons">
 			<button ng-if="!editedDocument._isNew" class="button button-assertive icon ion-trash-a margin-horizontal" ng-click="deleteDocument()"></button>
-			<button class="button button-balanced icon-left" ng-disabled="!editedDocument.text || editedDocument.text.length == 0" ng-click="saveDocument()"><i class="icon ion-checkmark"></i> Speichern</button>
+			<button class="button button-stable icon-left" ng-disabled="!editedDocument.text || editedDocument.text.length == 0" ng-click="saveDocument()"><i class="icon ion-checkmark"></i> Speichern</button>
 		</div>
 	</ion-header-bar>
 	<ion-content>
 		<div class="item item-input">
-			<textarea ng-model="editedDocument.text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier Ihre Antwort ein..." ng-change="setEditedDocumentDirty()"></textarea>
+			<textarea ng-model="editedDocument.text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier Ihre Antwort ein." ng-change="setEditedDocumentDirty()"></textarea>
 		</div>
 		<media-attachments ng-model="editedDocument" edit-mode="true"></media-attachments>
 	</ion-content>

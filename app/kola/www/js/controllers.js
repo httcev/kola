@@ -1,6 +1,6 @@
 angular.module('kola.controllers', [])
 
-.controller('TasksCtrl', function($scope, $state, $rootScope, $ionicPopup, dbService) {
+.controller('TasksCtrl', function($scope, $state, $rootScope, $ionicPopup, $ionicPopover, dbService) {
 	function reload() {
 		dbService.all("task", false, "isTemplate<>'true'").then(function(tasks) {
 			$scope.tasks = tasks;
@@ -16,6 +16,11 @@ angular.module('kola.controllers', [])
 			}
 		});
 	}
+	var template = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, einen neuen Auftrag anzulegen, der als Vorlage für die Dokumentation dient. Sie haben die Möglichkeit, bestehende Vorlagen anzupassen oder einen komplett neuen Auftrag anzulegen.</p><p>Seien Sie kreativ und probieren Sie sich aus! Mithilfe der Plattform können Sie selbst angelegte Aufträge auch im Nachhinein ändern.</p></div></ion-content></ion-popover-view>";
+	$scope.popover = $ionicPopover.fromTemplate(template, { scope: $scope });
+	$scope.openPopover = function($event) {
+		$scope.popover.show($event);
+	};
 
 	$scope.toggleDone = function(task) {
 		task.done = !task.done;
@@ -37,13 +42,17 @@ angular.module('kola.controllers', [])
 		});
 	};
 
-	$scope.$on("$destroy", $rootScope.$on("syncFinished", function() {
+	var cb = $rootScope.$on("syncFinished", function() {
 		reload();
-	}));
+	});
+	$scope.$on("$destroy", function() {
+		$scope.popover.remove();
+		cb();
+	});
 	reload();
 })
 
-.controller('TaskDetailCtrl', function($scope, $stateParams, $rootScope, $state, dbService) {
+.controller('TaskDetailCtrl', function($scope, $stateParams, $rootScope, $state, $ionicPopover, dbService) {
 	$scope.isStep = $stateParams.stepId != null;
 	var targetId = $scope.isStep ? $stateParams.stepId : $stateParams.taskId;
 	var table = $scope.isStep ? "taskStep" : "task";
@@ -64,6 +73,21 @@ angular.module('kola.controllers', [])
 	$scope.createQuestion = function() {
 		$state.go("task.questions", { triggerCreateDocument: true, refId: $scope.taskOrStep.id });
 	}
+
+	var popoverTemplateDocumentation = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, den Auftrag zu dokumentieren. Dabei können Sie den gesamten Auftrag oder einzelne Teilschritte  per Text, Foto, Video oder Spracheingabe dokumentieren. Seien Sie kreativ und probieren Sie sich aus! Sie können alle Eingaben jederzeit rückgängig machen.</p></div></ion-content></ion-popover-view>";
+	$scope.popoverDocumentation = $ionicPopover.fromTemplate(popoverTemplateDocumentation, { scope: $scope });
+	$scope.openPopoverDocumentation = function($event) {
+		$scope.popoverDocumentation.show($event);
+	};
+	var popoverTemplateQuestion = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, eigene Fragen einzustellen (z.B. wenn etwas unklar ist, Sie Fragen zum weiteren Vorgehen haben o.ä.) und Fragen anderer Azubis zu beantworten. Fragen können auch von Lehrern und Ausbildern beantwortet werden.</p></div></ion-content></ion-popover-view>";
+	$scope.popoverQuestion = $ionicPopover.fromTemplate(popoverTemplateQuestion, { scope: $scope });
+	$scope.openPopoverQuestion = function($event) {
+		$scope.popoverQuestion.show($event);
+	};
+	$scope.$on("$destroy", function() {
+		$scope.popoverDocumentation.remove();
+		$scope.popoverQuestion.remove();
+	});
 
 	reload();
 })
@@ -228,7 +252,7 @@ angular.module('kola.controllers', [])
 	}
 })
 
-.controller('TaskDocumentationCtrl', function($scope, $rootScope, $stateParams, $controller, dbService) {
+.controller('TaskDocumentationCtrl', function($scope, $rootScope, $stateParams, $controller, $ionicPopover, dbService) {
 	$scope.docName = "Dokumentation";
 	$scope.firstProp = "text";
 	$scope.templateName = "templates/modal-documentation-editor.html";
@@ -271,6 +295,15 @@ angular.module('kola.controllers', [])
 		}
 	});
 
+	var popoverTemplateDocumentation = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, den Auftrag zu dokumentieren. Dabei können Sie den gesamten Auftrag oder einzelne Teilschritte  per Text, Foto, Video oder Spracheingabe dokumentieren. Seien Sie kreativ und probieren Sie sich aus! Sie können alle Eingaben jederzeit rückgängig machen.</p></div></ion-content></ion-popover-view>";
+	$scope.popoverDocumentation = $ionicPopover.fromTemplate(popoverTemplateDocumentation, { scope: $scope });
+	$scope.openPopoverDocumentation = function($event) {
+		$scope.popoverDocumentation.show($event);
+	};
+	$scope.$on("$destroy", function() {
+		$scope.popoverDocumentation.remove();
+	});
+
 	$scope.reload();
 })
 
@@ -283,6 +316,7 @@ angular.module('kola.controllers', [])
 			// load reflection answers for current task
 			return dbService.all("reflectionAnswer", true, "task='" + $stateParams.taskId + "'").then(function(docs) {
 				var reflectionAnswers = {};
+				var reflectionAnswerCount = docs.length;
 				angular.forEach(docs, function(doc) {
 					reflectionAnswers[doc.question] = doc;
 				});
@@ -294,6 +328,9 @@ angular.module('kola.controllers', [])
 				});
 				$scope.task = task;
 				$scope.reflectionAnswers = reflectionAnswers;
+				$scope.badge = {
+					count:reflectionAnswerCount
+				}
 			})
 		});
 	}
@@ -326,7 +363,7 @@ angular.module('kola.controllers', [])
 	$scope.reload();
 })
 
-.controller('QuestionsCtrl', function($scope, $rootScope, $stateParams, $q, $ionicModal, $controller, dbService) {
+.controller('QuestionsCtrl', function($scope, $rootScope, $stateParams, $q, $ionicModal, $controller, $ionicPopover, dbService) {
 	$scope.docName = "Frage";
 	$scope.firstProp = "title";
 	$scope.templateName = "templates/modal-question-editor.html";
@@ -382,6 +419,15 @@ angular.module('kola.controllers', [])
 			doc.reference = data.stateParams.refId;
 			$scope.editDocument(doc);
 		}
+	});
+
+	var popoverTemplateQuestion = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, eigene Fragen einzustellen (z.B. wenn etwas unklar ist, Sie Fragen zum weiteren Vorgehen haben o.ä.) und Fragen anderer Azubis zu beantworten. Fragen können auch von Lehrern und Ausbildern beantwortet werden.</p></div></ion-content></ion-popover-view>";
+	$scope.popoverQuestion = $ionicPopover.fromTemplate(popoverTemplateQuestion, { scope: $scope });
+	$scope.openPopoverQuestion = function($event) {
+		$scope.popoverQuestion.show($event);
+	};
+	$scope.$on("$destroy", function() {
+		$scope.popoverQuestion.remove();
 	});
 
 	$scope.reload();

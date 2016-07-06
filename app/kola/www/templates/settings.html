@@ -1,8 +1,11 @@
 <ion-view view-title="Einstellungen" hide-back-button="true">
-	<ion-nav-buttons side="secondary">
-		<button type="submit" form="settings-form" ng-disabled="profile.user.length==0 || profile.password.length==0" class="button button-light icon-left" ng-disabled="!profile.user || !profile.password"><i class="icon ion-checkmark"></i> Speichern</button>
-		<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
-	</ion-nav-buttons>
+	<ion-nav-bar class="bar-dark">
+		<ion-nav-back-button></ion-nav-back-button>
+		<ion-nav-buttons side="secondary">
+			<button type="submit" form="settings-form" ng-disabled="profile.user.length==0 || profile.password.length==0" class="button button-stable icon-left" ng-disabled="!profile.user || !profile.password"><i class="icon ion-checkmark"></i> Speichern</button>
+			<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
+		</ion-nav-buttons>
+	</ion-nav-bar>
 	<ion-content>
 		<form id="settings-form" ng-submit="update()">
 			<div class="list">

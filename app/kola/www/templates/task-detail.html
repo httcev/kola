@@ -1,8 +1,11 @@
 <ion-view>
-	<ion-nav-title>{{isStep ? 'Teilschritt: ' + taskOrStep.name : 'Arbeitsauftrag: ' + taskOrStep.name}}</ion-nav-title>
-	<ion-nav-buttons side="secondary">
-		<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
-	</ion-nav-buttons>
+	<ion-nav-bar class="bar-positive">
+		<ion-nav-back-button></ion-nav-back-button>
+		<ion-nav-title>{{isStep ? 'Teilschritt: ' + taskOrStep.name : 'Arbeitsauftrag: ' + taskOrStep.name}}</ion-nav-title>
+		<ion-nav-buttons side="secondary">
+			<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
+		</ion-nav-buttons>
+	</ion-nav-bar>
 	<ion-content class="padding">
 		<div ng-if="!taskOrStep" class="center-horizontal">
 			<ion-spinner class="spinner-large"></ion-spinner>
@@ -23,11 +26,11 @@
 				</ion-list>
 			</div>
             <div class="center-horizontal">
-                <button class="button button-balanced button-full icon-left icon httc-compose-add new-documentation-button" ng-click="createDocumentation()">
+                <button class="button button-balanced button-full icon-left icon httc-compose-add new-documentation-button" ng-click="createDocumentation()" on-hold="openPopoverDocumentation($event)">
                     <span ng-if="isStep">Teilschritt dokumentieren</span>
                     <span ng-if="!isStep">Arbeitsauftrag dokumentieren</span>
                 </button>
-                <button class="button button-balanced button-full icon-left icon httc-question-add new-question-button" ng-click="createQuestion()">
+                <button class="button button-calm button-full icon-left icon httc-question-add new-question-button" ng-click="createQuestion()" on-hold="openPopoverQuestion($event)">
                     <span ng-if="isStep">Frage zum Teilschritt stellen</span>
                     <span ng-if="!isStep">Frage zum Arbeitsauftrag stellen</span>
                 </button>

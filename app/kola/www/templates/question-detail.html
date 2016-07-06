@@ -1,9 +1,12 @@
 <ion-view>
-	<ion-nav-title>Frage</ion-nav-title>
-	<ion-nav-buttons side="secondary">
-		<button class="button button-icon icon httc-answer-add add-answer-button" ng-click="editDocument()"></button>
-		<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
-	</ion-nav-buttons>
+	<ion-nav-bar class="bar-calm">
+		<ion-nav-back-button></ion-nav-back-button>
+		<ion-nav-title>Frage</ion-nav-title>
+		<ion-nav-buttons side="secondary">
+			<button class="button button-icon icon httc-answer-add add-answer-button" ng-click="editDocument()"></button>
+			<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
+		</ion-nav-buttons>
+	</ion-nav-bar>
 	<ion-content class="padding">
 		<div ng-if="!question" class="center-horizontal">
 			<ion-spinner class="spinner-large"></ion-spinner>
@@ -46,7 +49,7 @@
 				<comments-list class="item" ng-model="answer"></comments-list>
 			</div>
 			<div class="center-horizontal padding">
-				<button class="button button-balanced icon-left icon httc-answer-add add-answer-button" ng-click="editDocument()">Antwort geben</button>
+				<button class="button button-calm icon-left icon httc-answer-add add-answer-button" ng-click="editDocument()">Antwort geben</button>
 			</div>
 		</div>
 	</ion-content>

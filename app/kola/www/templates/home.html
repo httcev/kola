@@ -1,11 +1,14 @@
 <ion-view view-title="Arbeitsaufträge" hide-back-button="true">
-	<ion-nav-buttons side="primary">
-		<sync-control></sync-control>
-	</ion-nav-buttons>
-	<ion-nav-buttons side="secondary">
-		<button class="button button-icon icon httc-task-add" ng-click="create()"></button>
-		<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
-	</ion-nav-buttons>
+	<ion-nav-bar class="bar-positive">
+		<ion-nav-back-button></ion-nav-back-button>
+		<ion-nav-buttons side="primary">
+			<sync-control></sync-control>
+		</ion-nav-buttons>
+		<ion-nav-buttons side="secondary">
+			<button class="button button-icon icon httc-task-add" ng-click="create()" on-hold="openPopover($event)"></button>
+			<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
+		</ion-nav-buttons>
+	</ion-nav-bar>
 	<ion-content>
 		<div ng-if="!tasks" class="center-horizontal">
 			<ion-spinner class="spinner-large"></ion-spinner>
@@ -44,7 +47,7 @@
 				<ion-item ng-hide="completedTasks.length" class="padding">Keine erledigten Arbeitsaufträge</ion-item>
 			</ion-list>
 			<div class="center-horizontal padding">
-				<button class="button button-balanced icon-left icon httc-task-add new-task-button" ng-click="create()">Neuen Arbeitsauftrag anlegen</button>
+				<button class="button button-positive icon-left icon httc-task-add new-task-button" ng-click="create()" on-hold="openPopover($event)">Neuen Arbeitsauftrag anlegen</button>
 			</div>
 		</div>
 	</ion-content>

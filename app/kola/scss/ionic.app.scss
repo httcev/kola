@@ -18,8 +18,11 @@ $balanced: #449d44 !default;
 $positive: #2860D0 !default;
 $energized: #FF8000 !default; // The path for our ionicons font files, relative to the built CSS in www/css
 $ionicons-font-path: "../lib/ionic/fonts" !default; // Include all of Ionic
-@import "www/lib/ionic/scss/ionic"; // Include custom q&a font
-@import "scss/httc-webfont";
+$popover-backdrop-bg-active:      rgba(0,0,0,0.2) !default;
+@import "www/lib/ionic/scss/ionic";
+@import "scss/httc-webfont"; // Include custom q&a font
+@import "scss/popover"; // Override Android Popover look and feel
+
 *[ui-sref] {
     cursor: pointer;
 }
@@ -90,6 +93,9 @@ media-attachments .center-horizontal {
 }
 .margin-top {
 	margin-top:10px;
+}
+.margin-bottom {
+	margin-bottom:10px;
 }
 .margin-horizontal {
     margin-left: 10px;

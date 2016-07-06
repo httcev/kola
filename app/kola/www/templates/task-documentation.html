@@ -1,14 +1,18 @@
 <ion-view>
-	<ion-nav-title>Dokumentation des Arbeitsauftrags</ion-nav-title>
-	<ion-nav-buttons side="secondary">
-		<button class="button button-icon icon httc-compose-add" ng-click="editDocument()"></button>
-		<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
-	</ion-nav-buttons>
+	<ion-nav-bar class="bar-balanced">
+		<ion-nav-back-button></ion-nav-back-button>
+		<ion-nav-title>Dokumentation des Arbeitsauftrags</ion-nav-title>
+		<ion-nav-buttons side="secondary">
+			<button class="button button-icon icon httc-compose-add" ng-click="editDocument()" on-hold="openPopoverDocumentation($event)"></button>
+			<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
+		</ion-nav-buttons>
+	</ion-nav-bar>
 	<ion-content class="padding">
 		<div ng-if="!documentations" class="center-horizontal">
 			<ion-spinner class="spinner-large"></ion-spinner>
 		</div>
 		<div ng-if="documentations">
+			<p class="small">Hier haben Sie die Möglichkeit, den Auftrag oder einzelne Teilschritte zu dokumentieren. Dabei können Sie den gesamten Auftrag oder einzelne Teilschritte per Text, Foto, Video oder Spracheingabe dokumentieren. Seien Sie kreativ und probieren Sie sich aus! Sie können alle Eingaben jederzeit rückgängig machen.</p>
 			<div ng-hide="documentations.length" class="center-horizontal padding assertive">Es ist noch keine Dokumentation zu diesem Arbeitsauftrag angelegt worden.</div>
 			<div ng-if="documentations.length">
 				<h1 ng-if="taskDocumentations.length" class="task-section-header">Dokumentation des Arbeitsauftrags:</h1>
@@ -37,7 +41,7 @@
 				</div>
 			</div>
 			<div class="center-horizontal">
-				<button class="button button-balanced icon-left icon httc-compose-add new-documentation-button" ng-click="editDocument()">Neue Dokumentation anlegen</button>
+				<button class="button button-balanced icon-left icon httc-compose-add new-documentation-button" ng-click="editDocument()" on-hold="openPopoverDocumentation($event)">Neue Dokumentation anlegen</button>
 			</div>
 		</div>
 	</ion-content>
