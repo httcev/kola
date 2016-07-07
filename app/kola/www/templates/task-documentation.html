@@ -15,7 +15,7 @@
 			<p class="small">Hier haben Sie die Möglichkeit, den Arbeitsauftrag zu dokumentieren. Dabei können Sie den gesamten Arbeitsauftrag oder einzelne Teilschritte per Text, Foto, Video oder Spracheingabe dokumentieren. Seien Sie kreativ und probieren Sie sich aus! Sie können alle Eingaben jederzeit rückgängig machen.</p>
 			<div ng-hide="documentations.length" class="center-horizontal padding assertive">Es ist noch keine Dokumentation zu diesem Arbeitsauftrag angelegt worden.</div>
 			<div ng-if="documentations.length">
-				<h1 ng-if="taskDocumentations.length" class="task-section-header">Dokumentation des Arbeitsauftrags:</h1>
+				<h1 ng-if="taskDocumentations.length" class="task-section-header padding-top">Dokumentation des Arbeitsauftrags:</h1>
 				<div class="list card documentation" ng-repeat="documentation in documentations | filter:{'reference':task.id}:true | orderBy:'lastUpdated' as taskDocumentations track by documentation.id">
 					<div class="item item-divider">
 						<author-info ng-model="documentation"></author-info>
@@ -27,7 +27,7 @@
 					<media-attachments ng-model="documentation" hide-header="true"></media-attachments>
 				</div>
 				<div ng-repeat="step in task.steps">
-					<h1 ng-if="stepDocumentations.length" class="task-section-header">Dokumentation des Teilschritts "{{step.name | limitTo: 30}}":</h1>
+					<h1 ng-if="stepDocumentations.length" class="task-section-header padding-top">Dokumentation des Teilschritts "{{step.name | limitTo: 30}}":</h1>
 					<div class="list card documentation" ng-repeat="documentation in documentations | filter:{'reference':step.id}:true | orderBy:'lastUpdated' as stepDocumentations track by documentation.id">
 						<div class="item item-divider">
 							<author-info ng-model="documentation"></author-info>

@@ -13,7 +13,7 @@
 		<div ng-if="reflectionAnswers">
 			<p class="small">Hier haben Sie die Möglichkeit, Ihr eigenes Handeln zu beurteilen und eigene Erfahrungen festzuhalten. Wie schätzen Sie sich selbst ein?</p>
 			<div ng-if="task.reflectionQuestions.length">
-				<h1 class="task-section-header padding">Meine Erfahrungen:</h1>
+				<h1 class="task-section-header padding-top">Meine Erfahrungen:</h1>
 				<div class="list card">
 					<form name="form" ng-repeat="reflectionQuestion in task.reflectionQuestions track by reflectionQuestion.id" class="item item-text-wrap">
 						<div class="bold padding-bottom">{{reflectionQuestion.name}}</div>
