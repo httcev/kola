@@ -349,7 +349,7 @@ angular.module('kola.storage', ['uuid'])
 				if (window.cordova) {
 					//	  self._assetsDirName = cordova.file.dataDirectory + "assets/";
 					self._cacheDirName = cordova.file.externalCacheDirectory;
-					self._dataDirName = cordova.file.externalDataDirectory;
+					self._dataDirName = ionic.Platform.isAndroid() ? cordova.file.externalDataDirectory : cordova.file.dataDirectory;
 					self._assetsDirName = self._dataDirName + "assets/";
 					$cordovaFile.createDir(self._dataDirName, "assets", false).finally(function() {
 						window.resolveLocalFileSystemURL(self._assetsDirName, function(dir) {
