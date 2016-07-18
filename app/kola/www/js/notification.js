@@ -53,8 +53,17 @@ angular.module('kola.notification', ['kola.services'])
 						if (data.additionalData) {
 							var collapseKey = data.additionalData.collapse_key;
 							var referenceId = data.additionalData.referenceId;
+							var referenceClass = data.additionalData.referenceClass;
 							if (referenceId) {
-								if ("new_questions" === collapseKey || "new_answers" === collapseKey|| "new_comments" === collapseKey) {
+								if ("new_comments" === collapseKey) {
+									if ("TaskDocumentation" === referenceClass) {
+										$state.go("task.documentation", {taskId:referenceId});
+									}
+									else {
+										$state.go("question", {questionId:referenceId});
+									}
+								}
+								if ("new_questions" === collapseKey || "new_answers" === collapseKey) {
 									$state.go("question", {questionId:referenceId});
 								}
 								else if ("assigned_tasks" === collapseKey) {

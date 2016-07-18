@@ -38,7 +38,13 @@ angular.module('kola.storage', ['uuid'])
 			"references": {
 				"creator": "user",
 				"attachments": "asset",
+				"_comments": "comment",
 			},
+			"joins": [{
+				"field": "_comments",
+				"targetTable": "comment",
+				"targetField": "reference"
+			}, ],
 			"sync": true,
 			"extract": {
 				"deleted": "BOOL",

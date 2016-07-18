@@ -6,6 +6,7 @@ import grails.transaction.Transactional
 import org.springframework.security.access.annotation.Secured
 import de.httc.plugins.user.User
 import de.httc.plugins.qaa.Question
+import de.httc.plugins.qaa.Comment
 import de.httc.plugins.repository.Asset
 import de.httc.plugins.repository.AssetContent
 
@@ -14,7 +15,8 @@ import de.httc.plugins.repository.AssetContent
 class TaskController {
     def springSecurityService
     def authService
-    def taskService
+	def taskService
+	def questionService
 
     def index(Integer max) {
         params.offset = params.offset && !params.resetOffset ? (params.offset as int) : 0
@@ -345,6 +347,24 @@ class TaskController {
 			task = task.task
 		}
         redirect action:"show", method:"GET", id:task.id, fragment:"documentations"
+    }
+
+	@Transactional
+    def saveComment(Comment comment) {
+		def documentation = comment.reference
+		def task = documentation.reference
+		if (task instanceof TaskStep) {
+			task = task.task
+		}
+
+		comment.creator = springSecurityService.currentUser
+		if (!questionService.saveComment(comment, task)) {
+			respond comment.errors, view:'show'
+			return
+		}
+
+		flash.message = message(code: 'default.created.message.single', args: [message(code: 'de.httc.plugin.qaa.comment')])
+		redirect action:"show", method:"GET", id:task.id, fragment:"documentations_${documentation.id}"
     }
 
     @Transactional

@@ -23,7 +23,8 @@ class TaskService {
                 "style":"inbox",
                 "collapse_key":"assigned_tasks",
                 "summaryText":messageSource.getMessage("kola.push.assigned.summaryText", null, Locale.GERMAN),
-				"referenceId":task.id
+				"referenceId":task.id,
+				"referenceClass":Task.class.simpleName
         ]
         pushNotificationService.sendPushNotification(task.assignee, msg)
     }

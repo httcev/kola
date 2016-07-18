@@ -1,35 +1,31 @@
 package kola
 
 import java.util.UUID
+import java.util.SortedSet
 import de.httc.plugins.user.User
 import de.httc.plugins.repository.Asset
 import de.httc.plugins.qaa.QuestionReference
+import de.httc.plugins.qaa.Commentable
+import de.httc.plugins.qaa.Comment
 
-class TaskDocumentation {
-	static hasMany = [ attachments:Asset ]
+class TaskDocumentation extends Commentable {
+	static hasMany = [ attachments:Asset, comments:Comment ]
 	static belongsTo = [ reference:QuestionReference ]
     static constraints = {
-        // ensure that either task or step is set
-        /*
-        task(nullable: true, validator: {field, inst -> inst.step || field})
-        step(nullable: true)
-        */
     	text nullable:true
-//        deleted bindable:true
     }
-//    static transients = ["deleted"]
     static mapping = {
-        id generator: "assigned"
         text type: "text"
+		comments sort:"dateCreated", "id"
     }
 
-    String id = UUID.randomUUID().toString()
     String text
     User creator
     Date lastUpdated
     boolean deleted
 
     List<Asset> attachments     // defined as list to keep order in which elements got added
+	SortedSet<Comment> comments       // sorted by Comment.compareTo
 
     static _exported = ["text", "lastUpdated", "deleted"]
     static _referenced = ["attachments", "creator", "reference"]

@@ -4,4 +4,5 @@ databaseChangeLog = {
 	include file: 'refactor-tasks.groovy'
 	include file: 'create-qaa-schema.groovy'
 	include file: 'refactor-task-steps.groovy'
+	include file: 'documentations-commentable.groovy'
 }

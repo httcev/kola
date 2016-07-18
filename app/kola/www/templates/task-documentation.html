@@ -25,6 +25,7 @@
 						<div class="text">{{documentation.text}}</div>
 					</div>
 					<media-attachments ng-model="documentation" hide-header="true"></media-attachments>
+					<comments-list class="item" ng-model="documentation"></comments-list>
 				</div>
 				<div ng-repeat="step in task.steps">
 					<h1 ng-if="stepDocumentations.length" class="task-section-header padding-top">Dokumentation des Teilschritts "{{step.name | limitTo: 30}}":</h1>
@@ -37,6 +38,7 @@
 							<div class="text">{{documentation.text}}</div>
 						</div>
 						<media-attachments ng-model="documentation" hide-header="true"></media-attachments>
+						<comments-list class="item" ng-model="documentation"></comments-list>
 					</div>
 				</div>
 			</div>

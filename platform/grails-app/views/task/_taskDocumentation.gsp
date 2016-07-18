@@ -23,12 +23,15 @@
 				<div class="text-right form-padding-all"><button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <g:message code="default.save.label" args="[message(code:'kola.task.documentation')]" /></button></div>
 			</g:form>
 		</g:if>
-		<small class="pull-right">
-			<g:if test="${authService.canEdit(taskDocumentation)}">
-				<button type="button" class="btn btn-default" onclick="$(this).hide().closest('.list-group-item').addClass('list-group-item-warning').find('.taskDocumentation').hide().nextAll('form').first().removeClass('hidden').find('textarea').focus()"><i class="fa fa-pencil"></i> <g:message code="default.button.edit.label" /></button>
-			</g:if>
-			<g:render bean="${taskDocumentation.creator.profile}" template="/profile/show" var="profile" />,
-			<g:formatDate date="${taskDocumentation.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
-		</small>
+		<div class="clearfix">
+			<small class="pull-right">
+				<g:if test="${authService.canEdit(taskDocumentation)}">
+					<button type="button" class="btn btn-default" onclick="$(this).hide().closest('.list-group-item').addClass('list-group-item-warning').find('.taskDocumentation,.comments-list').hide().nextAll('form').first().removeClass('hidden').find('textarea').focus()"><i class="fa fa-pencil"></i> <g:message code="default.button.edit.label" /></button>
+				</g:if>
+				<g:render bean="${taskDocumentation.creator.profile}" template="/profile/show" var="profile" />,
+				<g:formatDate date="${taskDocumentation.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
+			</small>
+		</div>
+		<g:render bean="${taskDocumentation}" template="/question/comments" var="commentable" plugin="httcQAA"/>
 	</div>
 </li>

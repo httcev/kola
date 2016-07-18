@@ -68,6 +68,7 @@ class ChangesController {
 			def questions = [] as Set
 			def answers = [] as Set
 			def comments = [] as Set
+			def taskDocumentations = [] as Set
 			tasks?.each { task ->
 				// add modified task attachments
 				_addModifiedDocs(task.attachments, assets, since, now)
@@ -90,7 +91,18 @@ class ChangesController {
 				_addModifiedQuestionTree(question, questions, answers, comments, assets, since, now)
 			}
 
-			def taskDocumentations = TaskDocumentation.findAllByLastUpdatedBetweenAndCreator(since, now, user);
+			def usersTaskDocumentations = TaskDocumentation.findAllByCreator(user)
+			usersTaskDocumentations?.each { taskDocumentation ->
+				if (_isMofifiedBetween(taskDocumentation, since, now)) {
+					taskDocumentations.add(taskDocumentation)
+				}
+				taskDocumentation.comments.each { comment ->
+					if (_isMofifiedBetween(comment, since, now)) {
+						comments.add(comment)
+						taskDocumentations.add(taskDocumentation)
+					}
+				}
+			}
 			taskDocumentations?.each { taskDocumentation ->
 				// add modified attachments
 				_addModifiedDocs(taskDocumentation.attachments, assets, since, now)
