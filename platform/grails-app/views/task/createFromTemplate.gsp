@@ -8,7 +8,7 @@
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><g:link uri="/"><g:message code="kola.home" default="Home" /></g:link></li>
+			<li><g:link uri="/"><g:message code="app.home" default="Home" /></g:link></li>
 			<li><g:link action="index">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.create.label" args="[entityName]" /></li>
 		</ol>
@@ -18,19 +18,20 @@
 			</h1>
 			<p class="text-danger"><b><g:message code="kola.task.chooseTemplate.prompt" /></b></p>
 			<div class="well">
-				<g:message code="kola.task.chooseTemplate.none" />
-				<button class="choose btn btn-primary pull-right" name="template.id" value=""><i class="fa fa-check-square-o"></i> <g:message code="kola.choose" /></button>
+				<g:message code="kola.task.chooseTemplate.none" />:
+				<button class="choose btn btn-default pull-right" name="template.id" value=""><g:message code="kola.task.chooseTemplate.selectNone" /></button>
 			</div>
+            <h2><g:message code="kola.taskTemplates" />:</h2>
 			<ul class="list-group">
 				<g:each var="task" in="${taskList}">
 					<li class="list-group-item clearfix">
 						<h4 class="list-group-item-heading">
 							<a href="${createLink(resource:task, action:"show")}" target="_blank">${task.name}</a>
-							<button class="choose btn btn-primary pull-right" name="template.id" value="${task.id}"><i class="fa fa-check-square-o"></i> <g:message code="kola.choose" /></button>
 						</h4>
 						<p class="list-group-item-text">
-							<kola:markdown>${task.description?.take(400)}</kola:markdown>
+							<httc:markdown><httc:abbreviate max="400">${task.description}</httc:abbreviate></httc:markdown>
 						</p>
+                        <button class="choose btn btn-primary pull-right" name="template.id" value="${task.id}"><g:message code="kola.task.chooseTemplate.select" /></button>
 					</li>
 				</g:each>
 			</ul>

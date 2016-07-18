@@ -1,54 +1,40 @@
 <ion-view>
-  <ion-nav-title>{{isStep ? 'Teilschritt: ' + taskOrStep.name : 'Arbeitsauftrag: ' + taskOrStep.name}}</ion-nav-title>
-  <ion-content class="padding">
-    <div ng-if="!taskOrStep" class="center-horizontal">
-      <ion-spinner></ion-spinner>
-    </div>
-    <div ng-if="taskOrStep">
-      <h3>{{taskOrStep.name}}</h3>
-      <!--
-      <p ng-if="task.due"><b>Wann:</b> {{task.due | date:'fullDate'}}</p>
-      -->
-      <div class="text" marked="taskOrStep.description"></div>
-
-      <media-attachments ng-model="taskOrStep"></media-attachments>
-      <learning-resources ng-model="taskOrStep"></learning-resources>
-      <ion-list ng-if="!isStep && taskOrStep.steps.length">
-        <h1 class="task-section-header">Teilschritte:</h1>
-        <ion-item ng-repeat="step in taskOrStep.steps" class="item-icon-right" type="item-text-wrap" href="#/tab/tasks/{{taskOrStep.id}}/step/{{step.id}}">
-          {{$index+1}}. {{step.name}}
-          <i class="icon ion-chevron-right icon-accessory"></i>
-        </ion-item>
-      </ion-list>
-
-      <h1 class="task-section-header">Meine Dokumentation<!-- und Fragen-->:</h1>
-      <div class="list card documentation" ng-repeat="documentation in documentations | orderBy:'lastUpdated'">
-        <div class="item item-divider">
-          <author-info ng-model="documentation"></author-info>
-          <button class="button button-positive button-clear button-small icon ion-edit edit-documentation-button" ng-click="editDocumentation(documentation)"></button>
-        </div>
-        <div class="item item-text-wrap">
-          <div class="text">{{documentation.text}}</div>
-        </div>
-        <media-attachments ng-model="documentation" hide-header="true"></media-attachments>
-      </div>
-      <div class="center-horizontal">
-        <button class="button button-balanced icon-left icon ion-plus new-documentation-button" ng-click="editDocumentation()">Neue Dokumentation anlegen</button>
-      </div>
-
-      <div ng-if="taskOrStep.reflectionQuestions.length">
-        <h1 class="task-section-header padding">Meine Erfahrungen:</h1>
-        <div class="list card">
-          <form name="form" ng-repeat="reflectionQuestion in taskOrStep.reflectionQuestions track by reflectionQuestion.id" class="item item-text-wrap">
-            <div class="energized reflection-question">{{reflectionQuestion.name}}</div>
-            <author-info ng-model="reflectionAnswers[reflectionQuestion.id]"></author-info>
-            <textarea ng-model="reflectionAnswers[reflectionQuestion.id].text" msd-elastic="\n" class="fullwidth animate no-resize" placeholder="Geben Sie hier Ihre Antwort ein..."></textarea>
-            <div class="text-center" ng-show="form.$dirty">
-              <button class="button button-balanced icon-left" ng-click="saveReflectionAnswer(reflectionAnswers[reflectionQuestion.id], form)"><i class="icon ion-checkmark"></i> Speichern</button>
-            </div>
-          </div>
-        </form>
-      </div>
-    </div>
-  </ion-content>
+	<ion-nav-bar class="bar-positive">
+		<ion-nav-back-button></ion-nav-back-button>
+		<ion-nav-title>{{isStep ? 'Teilschritt: ' + taskOrStep.name : 'Arbeitsauftrag: ' + taskOrStep.name}}</ion-nav-title>
+		<ion-nav-buttons side="secondary">
+			<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
+		</ion-nav-buttons>
+	</ion-nav-bar>
+	<ion-content class="padding">
+		<div ng-if="!taskOrStep" class="center-horizontal">
+			<ion-spinner class="spinner-large"></ion-spinner>
+		</div>
+		<div ng-if="taskOrStep" class="task-detail">
+			<h3>{{taskOrStep.name}}</h3>
+      		<p ng-if="taskOrStep.due"><b>Fällig:</b> {{taskOrStep.due | date:'fullDate'}}</p>
+			<div class="text" marked="taskOrStep.description"></div>
+			<media-attachments ng-model="taskOrStep"></media-attachments>
+			<learning-resources ng-model="taskOrStep"></learning-resources>
+			<div class="padding-bottom">
+				<ion-list ng-if="!isStep && taskOrStep.steps.length">
+					<h1 class="task-section-header padding-top">Teilschritte:</h1>
+					<ion-item ng-repeat="step in taskOrStep.steps" class="item-icon-right" type="item-text-wrap" ui-sref="task.step({taskId:taskOrStep.id, stepId:step.id})">
+						{{$index+1}}. {{step.name}}
+						<i class="icon ion-chevron-right icon-accessory"></i>
+					</ion-item>
+				</ion-list>
+			</div>
+            <div class="center-horizontal">
+                <button class="button button-balanced button-full icon-left icon httc-compose-add new-documentation-button" ng-click="createDocumentation()" on-hold="openPopoverDocumentation($event)">
+                    <span ng-if="isStep">Teilschritt dokumentieren</span>
+                    <span ng-if="!isStep">Arbeitsauftrag dokumentieren</span>
+                </button>
+                <button class="button button-calm button-full icon-left icon httc-question-add new-question-button" ng-click="createQuestion()" on-hold="openPopoverQuestion($event)">
+                    <span ng-if="isStep">Frage zum Teilschritt stellen</span>
+                    <span ng-if="!isStep">Frage zum Arbeitsauftrag stellen</span>
+                </button>
+			</div>
+		</div>
+	</ion-content>
 </ion-view>

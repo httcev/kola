@@ -1,9 +1,8 @@
 <div ng-if="ngModel.resources.length">
-	<h1 ng-if="hideHeader != 'true' && editMode != 'true'" class="task-section-header">Lernressourcen:</h1>
+	<h1 ng-if="hideHeader != 'true' && editMode != 'true'" class="task-section-header padding-top">Lernressourcen:</h1>
 	<div ng-if="hideHeader != 'true' && editMode == 'true'" class="item item-divider item-stable">Lernressourcen</div>
 	<a ng-if="editMode != 'true'" ng-repeat="resource in ngModel.resources" class="item item-list-detail" ng-click="openUrlNative(resource.url)">
-		<i class="icon ion-ios-book-outline"></i>
-		{{resource.name}}
+		<i class="icon ion-ios-book-outline"></i> {{resource.name}}
 	</a>
 	<div ng-if="editMode == 'true'" ng-repeat="resource in ngModel.resources" class="item item-button-right">
 		<a ng-click="openUrlNative(resource.url)"><i class="icon ion-ios-book-outline"></i>{{resource.name}}</a>

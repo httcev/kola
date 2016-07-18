@@ -1,0 +1,4 @@
+<div class="rating-control">
+	<button ng-class="['button', 'button-icon', 'button-clear', 'button-small', 'icon', 'ion-arrow-up-b', {'button-balanced':ngModel.rated, 'button-light':!ngModel.rated}]" ng-click="click()"></button>
+	<div class="rating">{{ngModel.rating || 0}}</div>
+</div>

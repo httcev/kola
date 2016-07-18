@@ -1,0 +1,50 @@
+<ion-view>
+	<ion-nav-bar class="bar-balanced">
+		<ion-nav-back-button></ion-nav-back-button>
+		<ion-nav-title>Dokumentation des Arbeitsauftrags</ion-nav-title>
+		<ion-nav-buttons side="secondary">
+			<button class="button button-icon icon httc-compose-add" ng-click="editDocument()" on-hold="openPopoverDocumentation($event)"></button>
+			<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
+		</ion-nav-buttons>
+	</ion-nav-bar>
+	<ion-content class="padding">
+		<div ng-if="!documentations" class="center-horizontal">
+			<ion-spinner class="spinner-large"></ion-spinner>
+		</div>
+		<div ng-if="documentations">
+			<p class="small">Hier haben Sie die Möglichkeit, den Arbeitsauftrag zu dokumentieren. Dabei können Sie den gesamten Arbeitsauftrag oder einzelne Teilschritte per Text, Foto, Video oder Spracheingabe dokumentieren. Seien Sie kreativ und probieren Sie sich aus! Sie können alle Eingaben jederzeit rückgängig machen.</p>
+			<div ng-hide="documentations.length" class="center-horizontal padding assertive">Es ist noch keine Dokumentation zu diesem Arbeitsauftrag angelegt worden.</div>
+			<div ng-if="documentations.length">
+				<h1 ng-if="taskDocumentations.length" class="task-section-header padding-top">Dokumentation des Arbeitsauftrags:</h1>
+				<div class="list card documentation" ng-repeat="documentation in documentations | filter:{'reference':task.id}:true | orderBy:'lastUpdated' as taskDocumentations track by documentation.id">
+					<div class="item item-divider">
+						<author-info ng-model="documentation"></author-info>
+						<button ng-if="canEdit(documentation)" class="button button-positive button-clear button-small icon ion-edit float-right" ng-click="editDocument(documentation)"></button>
+					</div>
+					<div class="item item-text-wrap">
+						<div class="text">{{documentation.text}}</div>
+					</div>
+					<media-attachments ng-model="documentation" hide-header="true"></media-attachments>
+					<comments-list class="item" ng-model="documentation"></comments-list>
+				</div>
+				<div ng-repeat="step in task.steps">
+					<h1 ng-if="stepDocumentations.length" class="task-section-header padding-top">Dokumentation des Teilschritts "{{step.name | limitTo: 30}}":</h1>
+					<div class="list card documentation" ng-repeat="documentation in documentations | filter:{'reference':step.id}:true | orderBy:'lastUpdated' as stepDocumentations track by documentation.id">
+						<div class="item item-divider">
+							<author-info ng-model="documentation"></author-info>
+							<button ng-if="canEdit(documentation)" class="button button-positive button-clear button-small icon ion-edit float-right" ng-click="editDocument(documentation)"></button>
+						</div>
+						<div class="item item-text-wrap">
+							<div class="text">{{documentation.text}}</div>
+						</div>
+						<media-attachments ng-model="documentation" hide-header="true"></media-attachments>
+						<comments-list class="item" ng-model="documentation"></comments-list>
+					</div>
+				</div>
+			</div>
+			<div class="center-horizontal">
+				<button class="button button-balanced icon-left icon httc-compose-add new-documentation-button" ng-click="editDocument()" on-hold="openPopoverDocumentation($event)">Neue Dokumentation anlegen</button>
+			</div>
+		</div>
+	</ion-content>
+</ion-view>

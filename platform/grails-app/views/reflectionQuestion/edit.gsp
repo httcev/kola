@@ -9,7 +9,7 @@
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><a class="home" href="${createLink(uri: '/')}"><g:message code="kola.home"/></a></li>
+			<li><g:link uri="/"><g:message code="app.home" /></g:link></li>
 			<li><g:link class="index" action="index">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.edit.label" args="[entityName]" /></li>
 		</ol>
@@ -17,7 +17,7 @@
 			<h1 class="page-header clearfix">
 				<g:message code="default.edit.label" args="[entityName]" />
 				<div class="buttons pull-right">
-					<g:link class="delete btn btn-danger" action="delete" id="${reflectionQuestion.id}" title="${message(code: 'default.button.delete.label', args:[entityName])}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');">
+					<g:link class="delete btn btn-danger" action="delete" id="${reflectionQuestion.id}" title="${message(code: 'default.button.delete.label', args:[entityName])}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', args: [entityName])}');">
 						<i class="fa fa-times"></i>
 					</g:link>
 				</div>

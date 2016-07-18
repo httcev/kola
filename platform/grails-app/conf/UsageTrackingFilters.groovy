@@ -12,7 +12,11 @@ class UsageTrackingFilters {
             before = {
                 MDC.put('user', springSecurityService.principal?.username)
                 MDC.put('method', request.method)
-                MDC.put('userAgent', request.getHeader("User-Agent")?.replaceAll(",", ";"))
+                def userAgent = request.getHeader("User-Agent")?.replaceAll(",", ";")
+                if (!userAgent) {
+                    userAgent = "unknown"
+                }
+                MDC.put('userAgent', userAgent)
                 String sessionId = RequestContextHolder.getRequestAttributes()?.getSessionId()
                 if(sessionId){
                     MDC.put('sessionId', sessionId)

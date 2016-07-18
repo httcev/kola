@@ -1,0 +1,21 @@
+<div ng-if="ngModel._comments.length" class="comments-list clearfix padding-top">
+	<h2>Kommentare:</h2>
+	<ul class="comments">
+		<li class="comment clearfix" ng-repeat="comment in ngModel._comments | orderBy:['dateCreated']">
+			<span class="text">{{comment.text}}</span>
+			<author-info ng-model="comment" hide-image="true"></author-info>
+		</li>
+	</ul>
+</div>
+<div class="text-right padding-top clearfix">
+	<div ng-if="!saving">
+		<form ng-if="newComment" ng-submit="saveComment()">
+			<input type="text" class="fullwidth new-comment margin-bottom" ng-model="newComment.text" placeholder="Geben Sie hier Ihr Kommentar ein..." autofocus>
+		</form>
+		<button class="button button-small add-comment-button" ng-disabled="saving" ng-class="{'button-outline':!newComment,'button-stable':!newComment, 'button-balanced':newComment}" ng-click="newComment ? saveComment() : createComment()">
+			<span ng-if="newComment"><i class="icon ion-checkmark"></i> Speichern</span>
+			<span ng-if="!newComment">Kommentieren</span>
+		</button>
+	</div>
+	<ion-spinner ng-if="saving" icon="spiral"></ion-spinner>
+</div>

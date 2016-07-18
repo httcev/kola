@@ -1,53 +1,67 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
-    <!--
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+	<!--
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; connect-src 'self' ws://localhost:35729 http://130.83.139.161:8080 http://plattform.kola-projekt.de; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:35729; img-src data: 'self' * cdvfile://* ; style-src 'self' 'unsafe-inline'; font-src 'self';">
     -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' ws://* http://* https://* data: cdvfile://* content://*;">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' ws://* http://* https://* data: cdvfile://* content://*;">
 
-   <title></title>
+	<title></title>
 
-    <!-- compiled css output -->
-    <link href="css/ionic.app.min.css" rel="stylesheet">
+	<!-- compiled css output -->
+	<link href="css/ionic.app.min.css" rel="stylesheet">
 
-    <!-- ionic/angularjs js -->
-    <script src="lib/ionic/js/ionic.bundle.js"></script>
-    <script src="lib/angular-i18n/angular-locale_de-de.js"></script>
+	<!-- ionic/angularjs js -->
+	<script src="lib/ionic/js/ionic.bundle.js"></script>
+	<script src="lib/angular-i18n/angular-locale_de-de.js"></script>
 
-    <!-- cordova script -->
-    <script src="lib/ngCordova/dist/ng-cordova.js"></script>
-    <script src="cordova.js"></script>
+	<!-- cordova script -->
+	<script src="lib/ngCordova/dist/ng-cordova.js"></script>
+	<script src="cordova.js"></script>
 
-    <!-- angular tools -->
-    <script src="lib/angular-uuid-service/angular-uuid-service.min.js"></script>
-    <script src="lib/angular-elastic/elastic.js"></script>
-    <script src="lib/marked/marked.min.js"></script>
-    <script src="lib/angular-marked/dist/angular-marked.min.js"></script>
+	<!-- angular tools -->
+	<script src="lib/angular-uuid-service/angular-uuid-service.min.js"></script>
+	<script src="lib/angular-elastic/elastic.js"></script>
+	<script src="lib/marked/marked.min.js"></script>
+	<script src="lib/angular-marked/dist/angular-marked.min.js"></script>
+ 	<!-- your app's js -->
+	<script src="js/app.js"></script>
+	<script src="js/controllers.js"></script>
+	<script src="js/services.js"></script>
+	<script src="js/directives.js"></script>
+	<script src="js/notification.js"></script>
+	<script src="js/webSqlSync.js"></script>
+	<script src="js/storage.js"></script>
+</head>
 
-    <!-- your app's js -->
-    <script src="js/app.js"></script>
-    <script src="js/controllers.js"></script>
-    <script src="js/services.js"></script>
-    <script src="js/directives.js"></script>
-    <script src="js/notification.js"></script>
-    <script src="js/webSqlSync.js"></script>
-  </head>
-  <body ng-app="kola" ng-csp>
-    <!--
-      The nav bar that will be updated as we navigate between views.
-    -->
-    <ion-nav-bar class="bar-positive">
-      <ion-nav-back-button></ion-nav-back-button>
-    </ion-nav-bar>
+<body ng-app="kola" ng-csp>
+	<ion-side-menus>
+		<ion-side-menu-content>
+			<ion-nav-view></ion-nav-view>
+		</ion-side-menu-content>
+		<!-- Right menu -->
+		<ion-side-menu side="right">
+			<ion-content>
+				<ion-list>
+					<ion-item class="item-divider">
+						KOLA
+					</ion-item>
+					<ion-item menu-close class="item-icon-left" ui-sref="home">
+						<i class="icon httc-task"></i> Arbeitsaufträge
+					</ion-item>
+					<ion-item menu-close class="item-icon-left" ui-sref="questions">
+						<i class="icon httc-comments"></i> Fragen
+					</ion-item>
+					<ion-item menu-close class="item-icon-left" ui-sref="settings">
+						<i class="icon ion-ios-gear"></i> Einstellungen
+					</ion-item>
+				</ion-list>
+			</ion-content>
+		</ion-side-menu>
+	</ion-side-menus>
+</body>
 
-    <!--
-      The views will be rendered in the <ion-nav-view> directive below
-      Templates are in the /templates folder (but you could also
-      have templates inline in this html file if you'd like).
-    -->
-    <ion-nav-view></ion-nav-view>
-  </body>
 </html>

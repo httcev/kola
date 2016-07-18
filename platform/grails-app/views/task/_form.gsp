@@ -1,21 +1,21 @@
 <%@ page import="kola.TaskStep" %>
 
-<g:set var="assetService" bean="assetService"/>
+<g:set var="repositoryService" bean="repositoryService"/>
 <g:set var="authService" bean="authService"/>
 
 <div class="form-group ${hasErrors(bean: task, field: 'name', 'error')} required">
 	<label for="name" class="col-sm-2 control-label">
-		<g:message code="kola.meta.name" />
+		<g:message code="kola.task.title" />
 		<span class="required-indicator">*</span>:
 	</label>
-	<div class="col-sm-10"><g:textField name="name" class="form-control" required="" value="${task?.name}"/></div>
+	<div class="col-sm-10"><g:textField name="name" class="form-control" required="" value="${task?.name}" placeholder="${message(code:'kola.task.title.placeholder')}"/></div>
 </div>
 
 <div class="form-group ${hasErrors(bean: task, field: 'description', 'error')} ">
 	<label for="description" class="col-sm-2 control-label">
 		<g:message code="kola.meta.description" />:
 	</label>
-	<div class="col-sm-10"><g:textArea rows="8" name="description" class="form-control" data-provide="markdown" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdImage cmdCode cmdQuote" value="${task?.description}"/></div>
+	<div class="col-sm-10"><g:textArea rows="8" name="description" class="form-control" data-provide="markdown" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdImage cmdCode cmdQuote cmdPreview" value="${task?.description}" placeholder="${message(code:'kola.task.description.placeholder')}"/></div>
 </div>
 
 <g:if test="${!task?.isTemplate?.toBoolean()}">
@@ -39,19 +39,20 @@
 		</label>
 		<div class="col-sm-10"><input type="date" id="due" class="form-control" name="due" value="${formatDate(format:'yyyy-MM-dd',date:task?.due)}" placeholder="yyyy-MM-dd"></div>
 	</div>
-
-	<div class="form-group ${hasErrors(bean: task, field: 'done', 'error')}">
-		<label for="done" class="col-sm-2 control-label">
-			<g:message code="kola.task.done" />:
-		</label>
-		<div class="col-sm-10">
-			<div class="checkbox">
-				<label>
-					<g:checkBox name="done" value="${task?.done}" /> <g:message code="kola.task.done" />
-				</label>
-			</div>
-		</div>
-	</div>
+    <g:if test="${task?.attached}">
+    	<div class="form-group ${hasErrors(bean: task, field: 'done', 'error')}">
+    		<label for="done" class="col-sm-2 control-label">
+    			<g:message code="kola.task.done" />:
+    		</label>
+    		<div class="col-sm-10">
+    			<div class="checkbox">
+    				<label>
+    					<g:checkBox name="done" value="${task?.done}" /> <g:message code="kola.task.done" />
+    				</label>
+    			</div>
+    		</div>
+    	</div>
+    </g:if>
 </g:if>
 
 <div class="form-group ${hasErrors(bean: task, field: 'attachments', 'error')} ">
@@ -76,11 +77,11 @@
 						<g:if test="${task?.resources?.size() > 1}">
 							<div class="btn btn-default drag-handle" title="${message(code:'kola.dnd')}"><i class="fa fa-arrows-v fa-lg"></i></div>
 						</g:if>
-						<a href="${assetService.createEncodedLink(asset)}" target="_blank">${asset.name}</a>
+						<a href="${repositoryService.createEncodedLink(asset)}" target="_blank">${asset.name}</a>
 						<button type="button" class="btn btn-danger pull-right" onclick="$(this).closest('li').remove()" title="${message(code:'default.button.delete.label')}"><i class="fa fa-times"></i></button>
 					</h4>
 					<p class="list-group-item-text">
-						${asset.description?.take(100)}
+						<httc:abbreviate>${asset.description}</httc:abbreviate>
 					</p>
 				</li>
 			</g:each>
@@ -145,8 +146,9 @@
 	}
 
 	function addStep() {
-		$("#step-list").append($("#newStepTemplate").html());
+		var $step = $($("#newStepTemplate").html()).appendTo($("#step-list"));
 		updateStepIndices();
+        $step.find("textarea").first().markdown();
+        $step.find("input[type='text']").first().focus();
 	}
 </script>
-

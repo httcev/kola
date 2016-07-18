@@ -1,21 +1,20 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<g:set var="assetService" bean="assetService"/>
+<g:set var="repositoryService" bean="repositoryService"/>
 <html>
 	<head>
 		<title>${task?.name}</title>
 		<link rel="stylesheet" href="${resource(dir:'assets', file:'application.css')}" type="text/css" media="all" />
-
 		<style  type="text/css">
 		  @page { size:210mm 297mm; @bottom-left { content: element(header); }}
 		  *::after, *::before { display:block !important; }
-		  #print-footer { position:running(header); font-size:10px; line-height:11px; vertical-align: middle; text-align: right }
+		  .print-footer { position:running(header); font-size:10px; line-height:11px; vertical-align: middle; text-align: right }
 		  img { width: 200px }
 		  .panel { page-break-inside: avoid; }
 		</style>
 	</head>
 	<body>
-		<div id="print-footer">
+		<div class="print-footer">
 			<img src="${assetPath(src: 'Kola-h-100.png', absolute:true)}" width="44"/>
 			Kompetenzorientiertes Lernen im Arbeitsprozess mit digitalen Medien
 		</div>
@@ -52,7 +51,7 @@
 				</tr>
 			</table>
 		</div>
-		<kola:markdown>${task.description}</kola:markdown>
+		<httc:markdown>${task.description}</httc:markdown>
 		<g:if test="${task?.attachments?.size() > 0}">
 			<g:render bean="${task?.attachments}" template="exportAttachments" var="attachments" />
 		</g:if>
@@ -61,7 +60,7 @@
 				<div class="panel-heading"><h3 class="panel-title"><g:message code="kola.assets" /></h3></div>
 				<div class="list-group">
 					<g:each var="asset" in="${task?.resources}">
-						<a href="${assetService.createEncodedLink(asset)}" class="list-group-item" target="_blank">
+						<a href="${repositoryService.createEncodedLink(asset)}" class="list-group-item" target="_blank">
 							<h4 class="list-group-item-heading">
 								<i class="fa fa-external-link"></i> ${asset.name}
 							</h4>
@@ -78,7 +77,7 @@
 					<g:each var="step" in="${task?.steps}" status="i">
 						<li class="list-group-item">
 							<h4 class="list-group-item-heading"><span class="text-muted">${i+1}.</span> ${step.name}</h4>
-							<p class="list-group-item-text"><kola:markdown>${step.description}</kola:markdown></p>
+							<p class="list-group-item-text"><httc:markdown>${step.description}</httc:markdown></p>
 							<g:if test="${step.attachments?.size() > 0}">
 								<g:render bean="${step.attachments}" template="exportAttachments" var="attachments" />
 							</g:if>

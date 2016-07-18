@@ -2,7 +2,7 @@ package kola
 
 import grails.transaction.Transactional
 
-@Transactional(readOnly = true)
+@Transactional
 class TaskService {
     def pushNotificationService
     def springSecurityService
@@ -22,7 +22,9 @@ class TaskService {
                 "message":task.name,
                 "style":"inbox",
                 "collapse_key":"assigned_tasks",
-                "summaryText":messageSource.getMessage("kola.push.assigned.summaryText", null, Locale.GERMAN)
+                "summaryText":messageSource.getMessage("kola.push.assigned.summaryText", null, Locale.GERMAN),
+				"referenceId":task.id,
+				"referenceClass":Task.class.simpleName
         ]
         pushNotificationService.sendPushNotification(task.assignee, msg)
     }

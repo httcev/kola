@@ -1,6 +1,5 @@
 
 <g:set var="authService" bean="authService"/>
-<g:set var="assetService" bean="assetService"/>
 <html>
 	<head>
 		<meta name="layout" content="main">
@@ -10,7 +9,7 @@
 	</head>
 	<body>
 		<ol class="breadcrumb">
-			<li><g:link uri="/"><g:message code="kola.home" /></g:link></li>
+			<li><g:link uri="/"><g:message code="app.home" /></g:link></li>
 			<li><g:link action="index">${entitiesName}</g:link></li>
 			<li class="active"><g:message code="default.show.label" args="[entityName]" /></li>
 		</ol>
@@ -21,7 +20,7 @@
 			<g:message code="default.show.label" args="[entityName]" />
 			<div class="buttons pull-right">
 				<g:if test="${authService.canDelete(reflectionQuestion)}">
-					<g:link class="delete btn btn-danger" action="delete" id="${reflectionQuestion.id}" title="${message(code: 'default.button.delete.label', args:[entityName])}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', default: 'Are you sure?')}');"><i class="fa fa-times"></i></g:link>
+					<g:link class="delete btn btn-danger" action="delete" id="${reflectionQuestion.id}" title="${message(code: 'default.button.delete.label', args:[entityName])}" onclick="return confirm('${message(code: 'default.button.delete.confirm.message', args: [entityName])}');"><i class="fa fa-times"></i></g:link>
 				</g:if>
 				<g:if test="${authService.canEdit(reflectionQuestion)}">
 					<g:link class="edit btn btn-primary" action="edit" id="${reflectionQuestion.id}" title="${message(code: 'default.button.edit.label', args:[entityName])}"><i class="fa fa-pencil"></i></g:link>

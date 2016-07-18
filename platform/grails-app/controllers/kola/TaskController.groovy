@@ -5,13 +5,18 @@ import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 import org.springframework.security.access.annotation.Secured
 import de.httc.plugins.user.User
+import de.httc.plugins.qaa.Question
+import de.httc.plugins.qaa.Comment
+import de.httc.plugins.repository.Asset
+import de.httc.plugins.repository.AssetContent
 
 @Transactional(readOnly = true)
 @Secured(['IS_AUTHENTICATED_REMEMBERED'])
 class TaskController {
     def springSecurityService
     def authService
-    def taskService
+	def taskService
+	def questionService
 
     def index(Integer max) {
         params.offset = params.offset && !params.resetOffset ? (params.offset as int) : 0
@@ -21,7 +26,7 @@ class TaskController {
 
         def user = springSecurityService.currentUser
         def userCompany = user.profile?.company
-        def filtered = params.own || params.assigned || params.ownCompany
+        def filtered = params.own || params.assigned || params.ownCompany || params.key
 
         def results = Task.createCriteria().list(max:params.max, offset:params.offset) {
             // left join allows null values in the association
@@ -47,6 +52,12 @@ class TaskController {
                         }
                     }
                 }
+				if (params.key) {
+					or {
+						ilike("name", "%${params.key}%")
+						ilike("description", "%${params.key}%")
+					}
+				}
             }
             and {
                 order(params.sort, params.order)
@@ -64,24 +75,44 @@ class TaskController {
         }
         def reflectionAnswers = [:]
         def taskDocumentations = [:]
+		def taskQuestions = [:]
         if (!taskInstance.isTemplate) {
             taskInstance.reflectionQuestions?.each { reflectionQuestion ->
                 reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false, [sort:'lastUpdated', order:'asc'])
             }
 
-            def docs = TaskDocumentation.findAllByTaskAndDeleted(taskInstance, false, [sort:'lastUpdated', order:'asc'])
-            if (docs) {
-                taskDocumentations[taskInstance.id] = docs
+            def documentations = TaskDocumentation.findAllByReferenceAndDeleted(taskInstance, false, [sort:'lastUpdated', order:'asc'])
+			def questions = Question.findAllByReferenceAndDeleted(taskInstance, false, [sort:'lastUpdated', order:'asc'])
+            if (documentations) {
+                taskDocumentations[taskInstance.id] = documentations
             }
+			if (questions) {
+				taskQuestions[taskInstance.id] = questions
+			}
             taskInstance.steps?.each { step ->
-                docs = TaskDocumentation.findAllByStepAndDeleted(step, false, [sort:'lastUpdated', order:'asc'])
-                if (docs) {
-                    taskDocumentations[step.id] = docs
+                documentations = TaskDocumentation.findAllByReferenceAndDeleted(step, false, [sort:'lastUpdated', order:'asc'])
+				questions = Question.findAllByReferenceAndDeleted(step, false, [sort:'lastUpdated', order:'asc'])
+                if (documentations) {
+                    taskDocumentations[step.id] = documentations
                 }
+				if (questions) {
+					taskQuestions[step.id] = questions
+				}
             }
         }
-
-        respond taskInstance, model:["reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations]
+		def reflectionAnswersCount = 0
+		reflectionAnswers.each { k, v ->
+			reflectionAnswersCount += v.size()
+		}
+		def taskDocumentationsCount = 0
+		taskDocumentations.each { k, v ->
+			taskDocumentationsCount += v.size()
+		}
+		def taskQuestionsCount = 0
+		taskQuestions.each { k, v ->
+			taskQuestionsCount += v.size()
+		}
+        respond taskInstance, model:["reflectionAnswers":reflectionAnswers, "reflectionAnswersCount":reflectionAnswersCount, "taskDocumentations":taskDocumentations, "taskDocumentationsCount":taskDocumentationsCount, "taskQuestions":taskQuestions, "taskQuestionsCount":taskQuestionsCount]
     }
 
     def create() {
@@ -144,7 +175,7 @@ class TaskController {
         taskService.save taskInstance
 
         flash.message = message(code: 'default.created.message', args: [message(code: taskInstance.isTemplate ? 'kola.taskTemplate.noshy' : 'kola.task', default: 'Task'), taskInstance.name])
-        redirect action:"edit", id:taskInstance.id
+        redirect action:"index"
     }
 
     def edit(Task taskInstance) {
@@ -177,7 +208,7 @@ class TaskController {
         taskService.save taskInstance
 
         flash.message = message(code: 'default.updated.message', args: [message(code: taskInstance.isTemplate ? 'kola.taskTemplate.noshy' : 'kola.task', default: 'Task'), taskInstance.name])
-        redirect action:"edit", id:taskInstance.id
+        redirect action:"index"
     }
 
     @Transactional
@@ -206,12 +237,12 @@ class TaskController {
                 reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false)
             }
 
-            def docs = TaskDocumentation.findAllByTaskAndDeleted(taskInstance, false)
+            def docs = TaskDocumentation.findAllByReferenceAndDeleted(taskInstance, false)
             if (docs) {
                 taskDocumentations[taskInstance.id] = docs
             }
             taskInstance.steps?.each { step ->
-                docs = TaskDocumentation.findAllByStepAndDeleted(step, false)
+                docs = TaskDocumentation.findAllByReferenceAndDeleted(step, false)
                 if (docs) {
                     taskDocumentations[step.id] = docs
                 }
@@ -231,18 +262,19 @@ class TaskController {
 
     @Transactional
     def saveTaskDocumentation(TaskDocumentation taskDocumentationInstance) {
-        if (taskDocumentationInstance == null || !taskDocumentationInstance.task) {
+        if (taskDocumentationInstance == null || !taskDocumentationInstance.reference) {
             throw new RuntimeException("no task for new documentation")
         }
-        if (!authService.canAttach(taskDocumentationInstance.task)) {
+        if (!authService.canAttach(taskDocumentationInstance.reference)) {
             forbidden()
+			return
         }
         def attachments = []
         request.multiFileMap?.each { k,files ->
             if ("_newAttachment" == k) {
                 files?.each { f ->
                     if (!f.empty) {
-                        attachments.add(new Asset(name:f.originalFilename, subType:"attachment", mimeType:f.getContentType(), content:f.bytes))
+                        attachments.add(new Asset(name:f.originalFilename, typeLabel:"attachment", mimeType:f.getContentType(), content:new AssetContent(data:f.bytes)))
                     }
                 }
             }
@@ -261,12 +293,16 @@ class TaskController {
         }
 
         flash.message = message(code: 'default.created.message', args: [message(code: 'kola.task.documentation'), taskDocumentationInstance.id])
-        redirect action:"show", method:"GET", id:taskDocumentationInstance.task.id
+		def task = taskDocumentationInstance.reference
+		if (task instanceof TaskStep) {
+			task = task.task
+		}
+        redirect action:"show", method:"GET", id:task.id, fragment:"documentations"
     }
 
     @Transactional
     def updateTaskDocumentation(TaskDocumentation taskDocumentationInstance) {
-        if (taskDocumentationInstance == null || !(taskDocumentationInstance.task || taskDocumentationInstance.step)) {
+        if (taskDocumentationInstance == null || !taskDocumentationInstance.reference) {
             throw new RuntimeException("no task or step for update documentation")
         }
         if (!authService.canEdit(taskDocumentationInstance)) {
@@ -280,7 +316,7 @@ class TaskController {
             if ("_newAttachment" == k) {
                 files?.each { f ->
                     if (!f.empty) {
-                        def asset = new Asset(name:f.originalFilename, subType:"attachment", mimeType:f.getContentType(), content:f.bytes)
+                        def asset = new Asset(name:f.originalFilename, typeLabel:"attachment", mimeType:f.getContentType(), content:new AssetContent(data:f.bytes))
                         if (!asset.save(true)) {
                             asset.errors.allErrors.each { println it }
                         }
@@ -310,8 +346,29 @@ class TaskController {
         }
 
         flash.message = msg
-        def taskId = taskDocumentationInstance.task ? taskDocumentationInstance.task.id : params.parentTask
-        redirect action:"show", method:"GET", id:taskId
+		def task = taskDocumentationInstance.reference
+		if (task instanceof TaskStep) {
+			task = task.task
+		}
+        redirect action:"show", method:"GET", id:task.id, fragment:"documentations"
+    }
+
+	@Transactional
+    def saveComment(Comment comment) {
+		def documentation = comment.reference
+		def task = documentation.reference
+		if (task instanceof TaskStep) {
+			task = task.task
+		}
+
+		comment.creator = springSecurityService.currentUser
+		if (!questionService.saveComment(comment, task)) {
+			respond comment.errors, view:'show'
+			return
+		}
+
+		flash.message = message(code: 'default.created.message.single', args: [message(code: 'de.httc.plugin.qaa.comment')])
+		redirect action:"show", method:"GET", id:task.id, fragment:"documentations_${documentation.id}"
     }
 
     @Transactional
@@ -333,7 +390,7 @@ class TaskController {
         }
 
         flash.message = message(code: 'default.created.message', args: [message(code: 'kola.reflectionAnswer'), reflectionAnswerInstance.id])
-        redirect action:"show", method:"GET", id:reflectionAnswerInstance.task.id
+        redirect action:"show", method:"GET", id:reflectionAnswerInstance.task.id, fragment:"reflectionQuestions"
     }
 
     @Transactional
@@ -368,7 +425,7 @@ class TaskController {
         }
 
         flash.message = msg
-        redirect action:"show", method:"GET", id:reflectionAnswerInstance.task.id
+        redirect action:"show", method:"GET", id:reflectionAnswerInstance.task.id, fragment:"reflectionQuestions"
     }
 
     protected void notFound() {
@@ -407,7 +464,7 @@ class TaskController {
         // update steps
         taskInstance.steps?.clear()
         // TODO: UGLY HACK!!
-        for (i in 0..19) {
+        for (i in 0..29) {
             def stepDef = params["steps[$i]"]
             if (stepDef && stepDef.deleted != "true") {
                 def step = stepDef.id ? TaskStep.get(stepDef.id) : null
@@ -463,7 +520,7 @@ class TaskController {
 
             files?.each { f ->
                 if (!f.empty) {
-                    def asset = new Asset(name:f.originalFilename, subType:"attachment", mimeType:f.getContentType(), content:f.bytes)
+                    def asset = new Asset(name:f.originalFilename, typeLabel:"attachment", mimeType:f.getContentType(), content:new AssetContent(data:f.bytes))
                     if (!asset.save(true)) {
                         asset.errors.allErrors.each { println it }
                     }

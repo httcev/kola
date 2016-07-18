@@ -1,11 +1,11 @@
 <%@ page import="java.util.UUID" %>
 
 <g:set var="galleryId" value="id-${UUID.randomUUID().toString()}"/>
-<g:set var="assetService" bean="assetService"/>
+<g:set var="repositoryService" bean="repositoryService"/>
 
 <g:if test="${mode == 'edit'}">
 	<g:if test="${attachments?.size() > 0}">
-		<ul class="list-group sortable">
+		<ul class="list-group sortable margin">
 			<g:each var="asset" in="${attachments}">
 				<li class="list-group-item clearfix">
 					<input type="hidden" name="${prefix}attachments" value="${asset.id}">
@@ -13,7 +13,7 @@
 						<g:if test="${attachments.size() > 1}">
 							<div class="btn btn-default drag-handle" title="${message(code:'kola.dnd')}"><i class="fa fa-arrows-v fa-lg"></i></div>
 						</g:if>
-						<a href="${assetService.createEncodedLink(asset)}" target="_blank">${asset.name}</a>
+						<a href="${repositoryService.createEncodedLink(asset)}" target="_blank">${asset.name}</a>
 						<button type="button" class="btn btn-danger pull-right" title="${message(code:'default.delete.label', args:[message(code:'kola.task.attachment')])}" onclick="$(this).closest('li').remove()"><i class="fa fa-times"></i></button>
 					</h4>
 					<p class="list-group-item-text">
@@ -28,11 +28,57 @@
 		<label class="text-muted"><g:message code="default.add.label" args="${[message(code:'kola.task.attachment')]}" />: </label>
 	</div>
 	<input type="file" name="${prefix}_newAttachment" class="new-attachment form-padding">
+<%--
+	<input type="file" name="${prefix}_newAttachment" class="new-attachment form-padding" onchange="uploadFile(this)">
+    <div class="progress" style="display:none">
+        <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+    <script>
+        function uploadFile(fileInputElement) {
+            var fd = new FormData();
+            var $progressBar = $(fileInputElement).next(".progress");
+            $progressBar.show();
+            console.log($progressBar);
+            fd.append("file", fileInputElement.files[0]);
+
+            $.ajax({
+              xhr: function() {
+                var xhr = new window.XMLHttpRequest();
+
+                xhr.upload.addEventListener("progress", function(evt) {
+                  if (evt.lengthComputable) {
+                    var percentComplete = evt.loaded / evt.total;
+                    percentComplete = parseInt(percentComplete * 100);
+                    console.log(percentComplete);
+                    $(".progress-bar", $progressBar).width(percentComplete + "%");
+                    if (percentComplete === 100) {
+                        $progressBar.hide();
+                    }
+                  }
+                }, false);
+                return xhr;
+              },
+              url: "${createLink(controller:'task', action:'')}/" + fileInputElement.name + "/attach",
+              type: "POST",
+              data: fd,
+              /*,
+              contentType: "application/json",
+              dataType: "json",
+              */
+              processData: false,
+              contentType: false,
+              success: function(result) {
+                console.log(result);
+              }
+            });
+        }
+    </script>
+--%>
 </g:if>
 <g:else>
 	<div class="attachments clearfix form-padding">
 		<g:each var="asset" in="${attachments}">
-			<g:set var="url" value="${assetService.createEncodedLink(asset)}" />
+			<g:set var="url" value="${repositoryService.createEncodedLink(asset)}" />
 			<a href="${url}"
 				<g:if test="${asset.mimeType?.startsWith("image") || asset.mimeType?.startsWith("video")}">
 					data-gallery="#${galleryId}" type="${asset.mimeType}"

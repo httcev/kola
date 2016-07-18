@@ -8,27 +8,47 @@
 * compiled file, but it's generally better to create a new file per style scope.
 *
 *= require custom-bootstrap
+*= require sidebar
 *= require font-awesome/font-awesome
+*= require httc-webfont
 *= require_self
 */
 
-html { position: relative; min-height: 100%; }
-body { margin-bottom:55px; }
-h1 { font-size:32px; }
-h2 { font-size:28px; }
+html, body { min-height:100%; position: relative}
+h1 { font-size:24px; }
+h2 { font-size:20px; }
 #wrapper { min-height:100%; height:auto; margin:0 auto -50px }
-#main-container { padding-bottom:15px }
+#main-container { padding-top:15px; padding-bottom:15px }
 #avatar-container { margin-bottom:15px }
 #loginWrapper { max-width:350px; margin:50px auto }
 #google-play-link { padding-top:6px; padding-bottom:0; padding-right:0;}
 #google-play-link img { height:40px; }
 .error input { border-color:red; }
-.version { font-family:monospace; color:#CCC !important; font-size:14px }
-header h1, .navbar-default .navbar-brand { color:#a11d21 }
-header #logo, .navbar-header #logo { width:32px; margin-top:-6px;}
+.version { font-family:monospace; font-size:10px; position:absolute; bottom:5px; left:8px; opacity:0.7; }
+.btn-small { font-size:80%; padding:3px 5px }
+.padding-vertical { padding-top:10px; padding-bottom:10px }
+.padding-left { padding-left:10px }
+.full-width { width:100% }
+.block-center { display:block; margin-left:auto; margin-right:auto }
+#site-header { display:flex; height:44px; line-height:44px; vertical-align:middle; background-color:#f8f8f8; position:relative; border-bottom:1px solid #e7e7e7 }
+#site-header a { text-decoration:none; }
+#site-header .site-header-brand { color:#a11d21; font-size:28px; flex-grow:1 }
+#site-header .site-header-brand .logo { width:32px; margin-top:-6px; }
+#site-header .site-header-link { color:#9d9d9d; }
+#site-header .site-header-link:hover { color:#333; }
+#site-header .site-header-control { display:inline-block; padding-left:10px; padding-right: 10px; }
+#site-header .site-header-right { align-self:flex-end }
+#site-header .dropdown { margin-right:-15px; }
+#site-header .dropdown.open .dropdown-toggle { color:#333 }
+#site-header .dropdown.open .dropdown-toggle { background-color:#e7e7e7 }
+#site-header .external-toggle-sidemenu { display:none; margin-left:-15px; padding-left:15px; padding-right:15px }
+#site-header .external-toggle-sidemenu:hover { background-color:#e7e7e7 }
+@media screen and (max-width: 480px) {
+	#site-header .external-toggle-sidemenu { display:inline-block }
+}
 footer.footer { position:absolute; bottom:0; width:100%; height:52px;}
-footer.footer .navbar { margin-bottom:0 }
-footer.footer .navbar-toggle .toggle-icon { display:block; width:24px; font-family:"FontAwesome"}
+footer.footer .navbar { margin-bottom:0; border-radius:0 }
+footer.footer .navbar-toggle { padding:5px 9px }
 footer.footer .navbar-toggle .toggle-icon:before { content:"\f077";}
 footer.footer .navbar-toggle.collapsed .toggle-icon:before { content:"\f078";}
 
@@ -49,6 +69,9 @@ th.sortable.sorted.desc a:after { font-family:"FontAwesome"; content:"\00a0\f0d7
 .form-padding { padding-top:7px }
 .form-padding-all { padding:7px 0 }
 .margin { margin-top:10px; }
+.margin-right { margin-right:10px }
+.margin-top { margin-top:10px }
+.margin-vertical { margin-top:10px; margin-bottom:10px; }
 .attachments .thumbnail { width:80px; height:auto; min-height:70px; line-height:70px; margin-right:15px; vertical-align:middle }
 .attachments .thumbnail .caption { word-break:break-all; line-height:initial; font-size:75% }
 .drag-handle { cursor:move; cursor:-webkit-grabbing }
@@ -65,3 +88,22 @@ body.termsOfUse form { margin:40px 0; }
 .search-result-link.asset:before { content:'\00a0\f02d'; font-family:"FontAwesome"; width:25px; display:inline-block; text-align:left}
 .search-result-link.task:before { content:'\00a0\f044'; font-family:"FontAwesome"; width:25px; display:inline-block; text-align:left}
 .search-result-link.reflectionquestion:before { content:'\00a0\f128'; font-family:"FontAwesome"; width:25px; display:inline-block; text-align:left}
+.search-result-link.question:before { content:'\00a0\f101'; font-family:"httc"; width:25px; display:inline-block; text-align:left}
+
+body.question.show .question, .answer { display:flex}
+body.question.show h1 { font-size: 24px}
+body.show .comments-list .header { color:#AAA }
+body.show .comments-list .comment { font-size:75%; border-bottom:1px dotted #EEE; padding:3px 0; margin:3px 0}
+body.show .comments-list .modal { font-size:initial }
+body.show .comments-list .profile-link img { width:28px; }
+body.question.show .answer { margin-top:20px; padding-top:20px; border-top:1px solid #EEE}
+body.question.show .accept-answer-button { color:#AAA }
+
+.rating-control { display:inline-block; margin-top:-12px }
+.rating-control .rate { color:#AAA; }
+.rating-control .rating { margin-top:-10px }
+.rating-control .rating { font-size:2em; color:#AAA; }
+.answer-count { float:left; margin-right:10px; font-size:1.3em; font-weight:bold; min-width:2.5em}
+.tab-pane { margin-top: 10px; }
+.nav-tabs li { white-space: nowrap}
+.question-reference { font-style:italic; opacity: 0.7}

@@ -17,7 +17,7 @@
 			</div>
 			<g:if test="${params.hideFilter}">
 				<input type="hidden" name="type" value="${params.type}">
-				<input type="hidden" name="subType" value="${params.subType}">
+				<input type="hidden" name="typeLabel" value="${params.typeLabel}">
 				<input type="hidden" name="hideFilter" value="true">
 			</g:if>
 			<g:else>

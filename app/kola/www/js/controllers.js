@@ -1,365 +1,595 @@
 angular.module('kola.controllers', [])
 
-.controller('TasksCtrl', function($scope, $state, $rootScope, dbService) {
-    function reloadTasks() {
-      dbService.all("task").then(function(docs) {
-        console.log("GOT ALL TASKS", docs);
-        var filtered = [];
-        angular.forEach(docs, function(doc) {
-          if (!doc["isTemplate"] && !doc.deleted) {
-            filtered.push(doc);
-          }
-        });
-        $scope.tasks = filtered;
-      }, function() {
-        // this error handling is needed on the first start of the app. dbService initialization is rejected in this case.
-        $scope.tasks = [];
-      });
-    }
+.controller('TasksCtrl', function($scope, $state, $rootScope, $ionicPopup, $ionicPopover, dbService) {
+	function reload() {
+		dbService.all("task", false, "isTemplate<>'true'").then(function(tasks) {
+			$scope.tasks = tasks;
+		}, function(err) {
+			// this error handling is needed on the first start of the app. dbService initialization is rejected in this case.
+			$scope.tasks = [];
+			if (err !== "no_user") {
+				console.log(err);
+				$ionicPopup.alert({
+					title: "<b>Fehler</b>",
+					template: "<p class='assertive bold'>Es ist ein Fehler aufgetreten:</p>" + err
+				});
+			}
+		});
+	}
+	var template = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, einen neuen Arbeitsauftrag anzulegen, der als Grundlage für die Dokumentation dient. Sie haben die Möglichkeit, bestehende Vorlagen anzupassen oder einen komplett neuen Arbeitsauftrag anzulegen.</p><p>Seien Sie kreativ und probieren Sie sich aus! Mithilfe der Plattform können Sie selbst angelegte Aufträge auch im Nachhinein ändern.</p></div></ion-content></ion-popover-view>";
+	$scope.popover = $ionicPopover.fromTemplate(template, { scope: $scope });
+	$scope.openPopover = function($event) {
+		$scope.popover.show($event);
+	};
 
-    $scope.toggleDone = function(task) {
-      task.done = !task.done;
-      dbService.save(task);
-    }
-/*
-    $scope.remove = function(task) {
-      task.deleted = true;
-      dbService.save(task);
-    };
-*/
-    $scope.create = function() {
-      $state.go("tab.task-choose-template");
-    };
+	$scope.toggleDone = function(task) {
+		task.done = !task.done;
+		dbService.save(task);
+	}
 
-    $scope.sortByDue = function(task) {
-        return task.due ? task.due : (task.lastUpdated ? 'zzzzzzz' : 0); 
-    };
+	$scope.create = function() {
+		$state.go("task-choose-template");
+	};
 
-    $scope.doRefresh = function() {
-      dbService.sync().finally(function() {
-         // Stop the ion-refresher from spinning
-         $scope.$broadcast('scroll.refreshComplete');
-      });
-    };
+	$scope.sortByDue = function(task) {
+		return task.due ? task.due : (task.lastUpdated ? 'zzzzzzz' : 0);
+	};
 
-    $rootScope.$on("syncFinished", function () {
-      reloadTasks();
-    });
-    reloadTasks();
+	$scope.doRefresh = function() {
+		dbService.sync().finally(function() {
+			// Stop the ion-refresher from spinning
+			$scope.$broadcast('scroll.refreshComplete');
+		});
+	};
+
+	var cb = $rootScope.$on("syncFinished", function() {
+		reload();
+	});
+	$scope.$on("$destroy", function() {
+		$scope.popover.remove();
+		cb();
+	});
+	reload();
 })
 
-.controller('TaskDetailCtrl', function($scope, $stateParams, $q, $ionicPopup, $ionicModal, $ionicLoading, dbService, mediaAttachment) {
-  $scope.isStep = $stateParams.stepId != null;
-  var targetId = $scope.isStep ? $stateParams.stepId : $stateParams.taskId;
-  var taskDocumentationProp = $scope.isStep ? "step" : "task";
-  var table = $scope.isStep ? "taskStep" : "task";
+.controller('TaskDetailCtrl', function($scope, $stateParams, $rootScope, $state, $ionicPopover, dbService) {
+	$scope.isStep = $stateParams.stepId != null;
+	var targetId = $scope.isStep ? $stateParams.stepId : $stateParams.taskId;
+	var table = $scope.isStep ? "taskStep" : "task";
 
-  loadTargetAndDocumentations();
+	function reload() {
+		return dbService.get(targetId, table).then(function(target) {
+			$scope.taskOrStep = target;
+		}, function(err) {
+			// TODO: 404 error message and open default/main page
+			console.log(err);
+		});
+	}
 
-  function loadTargetAndDocumentations() {
-    // load documentation
-    dbService.all("taskDocumentation").then(function(docs) {
-      var documentations = [];
-      var promises = [];
-      angular.forEach(docs, function(doc) {
-        if (doc[taskDocumentationProp] == targetId && !doc.deleted) {
-          promises.push(dbService.resolveIds(doc, "taskDocumentation"));
-          documentations.push(doc);
-        }
-      });
-      $q.all(promises).finally(function() {
-        if (!$scope.isStep) {
-          // load reflection answers and questions
-          promises = [];
-          dbService.all("reflectionAnswer").then(function(allReflectionAnswers) {
-            var reflectionAnswers = {};
-            angular.forEach(allReflectionAnswers, function(doc) {
-              if (doc.task == $stateParams.taskId && !doc.deleted) {
-                promises.push(dbService.resolveIds(doc, "reflectionAnswer").then(function() {
-                  reflectionAnswers[doc.question] = doc;
-                }));
-              }
-            });
-            $q.all(promises).finally(function() {
-              loadTarget(documentations, reflectionAnswers);
-            });
-          });
-        }
-        else {
-          loadTarget(documentations);
-        }
-      });
-    });
-  }
+	$scope.createDocumentation = function() {
+		$state.go("task.documentation", { triggerCreateDocument: true, refId: $scope.taskOrStep.id });
+	}
 
-  function loadTarget(documentations, reflectionAnswers) {
-    dbService.get(targetId, table).then(function(target) {
-      angular.forEach(target.reflectionQuestions, function(reflectionQuestion) {
-        if (!reflectionAnswers[reflectionQuestion.id]) {
-          reflectionAnswers[reflectionQuestion.id] = dbService.createReflectionAnswer(target.id, reflectionQuestion.id);
-        }
-      });
-      $scope.newDocumentation = false;
-      $scope.documentations = documentations;
-      $scope.reflectionAnswers = reflectionAnswers;
-      $scope.taskOrStep = target;
-    }, function(err) {
-      // TODO: 404 error message and open default/main page
-      console.log(err);
-    });
-  }
+	$scope.createQuestion = function() {
+		$state.go("task.questions", { triggerCreateDocument: true, refId: $scope.taskOrStep.id });
+	}
 
-  $scope.attachPhoto = function() {
-    mediaAttachment.attachPhoto($scope.editedDocumentation);
-  }
+	var popoverTemplateDocumentation = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, den Arbeitsauftrag zu dokumentieren. Dabei können Sie den gesamten Arbeitsauftrag oder einzelne Teilschritte per Text, Foto, Video oder Spracheingabe dokumentieren. Seien Sie kreativ und probieren Sie sich aus! Sie können alle Eingaben jederzeit rückgängig machen.</p></div></ion-content></ion-popover-view>";
+	$scope.popoverDocumentation = $ionicPopover.fromTemplate(popoverTemplateDocumentation, { scope: $scope });
+	$scope.openPopoverDocumentation = function($event) {
+		$scope.popoverDocumentation.show($event);
+	};
+	var popoverTemplateQuestion = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, eigene Fragen einzustellen (z.B. wenn etwas unklar ist, Sie Fragen zum weiteren Vorgehen haben o.ä.) und Fragen anderer Azubis zu beantworten. Fragen können auch von Lehrern und Ausbildern beantwortet werden.</p></div></ion-content></ion-popover-view>";
+	$scope.popoverQuestion = $ionicPopover.fromTemplate(popoverTemplateQuestion, { scope: $scope });
+	$scope.openPopoverQuestion = function($event) {
+		$scope.popoverQuestion.show($event);
+	};
+	$scope.$on("$destroy", function() {
+		$scope.popoverDocumentation.remove();
+		$scope.popoverQuestion.remove();
+	});
 
-  $scope.attachVideo = function() {
-    mediaAttachment.attachVideo($scope.editedDocumentation);
-  }
-
-  $scope.attachAudio = function() {
-    mediaAttachment.attachAudio($scope.editedDocumentation);
-  }
-
-  $scope.attachChosenMedia = function() {
-    mediaAttachment.attachChosenMedia($scope.editedDocumentation);
-  }
-
-  $scope.removeDocumentation = function() {
-    $ionicPopup.confirm({
-      title: '<b>Dokumentation löschen</b>',
-      template: 'Soll diese Dokumentation wirklich gelöscht werden?'
-    }).then(function(result) {
-      if(result) {
-        $ionicLoading.show({template: "<ion-spinner></ion-spinner><p>Dokumentation wird gelöscht</p>" });
-        $scope.editedDocumentation.deleted = true;
-        dbService.save($scope.editedDocumentation).then(function() {
-          loadTargetAndDocumentations();
-          $ionicLoading.show({template: "Dokumentation wurde gelöscht", duration:1500});
-          $scope.closeEditDocumentationModal();
-        }, function(err) {
-          $ionicLoading.show({template: "Löschen fehlgeschlagen", duration:2000});
-          console.log(err);
-        });
-      }
-    });
-  };
-
-  $scope.editDocumentation = function(documentation) {
-    if (!documentation) {
-      documentation = dbService.createTaskDocumentation(targetId, $scope.isStep);
-    }
-    var autoFocus = !documentation.text || documentation.text.length <= 0;
-    $ionicModal.fromTemplateUrl("templates/modal-documentation-editor.html", {
-      scope: $scope,
-      animation: "slide-in-up",
-      focusFirstInput: autoFocus
-    }).then(function(modal) {
-      $scope.editDocumentationModal = modal;
-      $scope.editedDocumentation = documentation;
-      $scope.editedDocumentationDirty = false;
-      $scope.unbindWatch = $scope.$watchCollection("editedDocumentation.attachments", function(newValue, oldValue) {
-        if (newValue !== oldValue) {
-          $scope.setEditedDocumentationDirty();
-        }
-      });
-      $scope.openEditDocumentationModal();
-    });
-  };
-
-  $scope.openEditDocumentationModal = function() {
-    $scope.editDocumentationModal.show();
-  };
-
-  $scope.checkCloseEditDocumentationModal = function() {
-    if ($scope.editedDocumentationDirty) {
-      $ionicPopup.confirm({
-        title: "<b>Änderungen verwerfen</b>",
-        template: "Sollen alle Änderungen an der Dokumentation verworfen werden?"
-      }).then(function(result) {
-        if(result) {
-          loadTargetAndDocumentations();
-          $scope.closeEditDocumentationModal();
-        }
-      });
-    }
-    else {
-      $scope.closeEditDocumentationModal();
-    }
-  };
-
-  $scope.closeEditDocumentationModal = function() {
-    $scope.unbindWatch();
-    $scope.editDocumentationModal.hide();
-    $scope.editDocumentationModal.remove();
-  }
-
-  $scope.setEditedDocumentationDirty = function() {
-    $scope.editedDocumentationDirty = true;
-  }
-
-  $scope.saveDocumentation = function() {
-    var objectsToSave = [];
-    $ionicLoading.show({template: "<ion-spinner></ion-spinner><p>Dokumentation wird gespeichert</p>" });
-    angular.forEach($scope.editedDocumentation.attachments, function(attachment) {
-      objectsToSave.push(attachment);
-    });
-    objectsToSave.push($scope.editedDocumentation);
-    dbService.save(objectsToSave).then(function() {
-      loadTargetAndDocumentations();
-      $ionicLoading.show({template: "Dokumentation erfolgreich gespeichert", duration:1500});
-      $scope.closeEditDocumentationModal();
-    }, function(err) {
-      console.log(err);
-      $ionicLoading.show({template: "Speichern fehlgeschlagen!", duration:2000});
-    });
-  };
-
-  $scope.saveReflectionAnswer = function(reflectionAnswer, form) {
-    dbService.save(reflectionAnswer).then(function() {
-      form.$dirty = false;
-      loadTargetAndDocumentations();
-      $ionicLoading.show({template: "Antwort gespeichert", duration:2000});
-    });
-  };
+	reload();
 })
 
-.controller('ChatsCtrl', function($scope, Chats) {
-  // With the new view caching in Ionic, Controllers are only called
-  // when they are recreated or on app start, instead of every page change.
-  // To listen for when this page is active (for example, to refresh data),
-  // listen for the $ionicView.enter event:
-  //
-  //$scope.$on('$ionicView.enter', function(e) {
-  //});
-  
-  $scope.chats = Chats.all();
-  $scope.remove = function(chat) {
-    Chats.remove(chat);
-  }
+.controller('ModalEditCtrl', function($scope, $stateParams, $q, $ionicPopup, $ionicModal, $ionicLoading, $rootScope, dbService, mediaAttachment, authenticationService) {
+	$scope.docName = $scope.docName || "Dokument";
+	$scope.attachPhoto = function() {
+		mediaAttachment.attachPhoto($scope.editedDocument);
+	}
+
+	$scope.attachVideo = function() {
+		mediaAttachment.attachVideo($scope.editedDocument);
+	}
+
+	$scope.attachAudio = function() {
+		mediaAttachment.attachAudio($scope.editedDocument);
+	}
+
+	$scope.attachChosenMedia = function() {
+		mediaAttachment.attachChosenMedia($scope.editedDocument);
+	}
+
+	$scope.editDocument = function(doc) {
+		if (!doc) {
+			doc = $scope.createNewDocument();
+		}
+		var autoFocus = $scope.firstProp && !doc[$scope.firstProp] || doc[$scope.firstProp].length <= 0;
+		$ionicModal.fromTemplateUrl($scope.templateName, {
+			scope: $scope,
+			animation: "slide-in-up",
+			focusFirstInput: autoFocus
+		}).then(function(modal) {
+			$scope.editDocumentModal = modal;
+			$scope.editedDocument = doc;
+			$scope.editedDocumentDirty = false;
+			$scope.unbindWatch = $scope.$watchCollection("editedDocument.attachments", function(newValue, oldValue) {
+				if (newValue !== oldValue) {
+					$scope.setEditedDocumentDirty();
+				}
+			});
+			$scope.openEditDocumentModal();
+		});
+	};
+
+	$scope.deleteDocument = function() {
+		$ionicPopup.confirm({
+			title: '<b>' + $scope.docName + ' löschen</b>',
+			template: 'Soll diese ' + $scope.docName + ' wirklich gelöscht werden?',
+			cancelText: 'Abbrechen'
+		}).then(function(result) {
+			if (result) {
+				$ionicLoading.show({
+					template: "<ion-spinner class='spinner-large'></ion-spinner><p>" + $scope.docName + " wird gelöscht</p>"
+				});
+				$scope.editedDocument.deleted = true;
+				dbService.save($scope.editedDocument).then(function() {
+					$scope.reload();
+					$ionicLoading.show({
+						template: $scope.docName + " wurde gelöscht",
+						duration: 1500
+					});
+					$scope.closeEditDocumentModal();
+				}, function(err) {
+					$ionicLoading.show({
+						template: "Löschen fehlgeschlagen",
+						duration: 2000
+					});
+					console.log(err);
+				});
+			}
+		});
+	};
+
+	$scope.openEditDocumentModal = function() {
+		$scope.editDocumentModal.show();
+	};
+
+	$scope.checkCloseEditDocumentModal = function() {
+		if ($scope.editedDocumentDirty) {
+			$ionicPopup.confirm({
+				title: "<b>Änderungen verwerfen</b>",
+				template: "Sollen alle Änderungen an der " + $scope.docName + " verworfen werden?",
+				cancelText: "Abbrechen"
+			}).then(function(result) {
+				if (result) {
+					$scope.reload();
+					$scope.closeEditDocumentModal();
+				}
+			});
+		} else {
+			$scope.closeEditDocumentModal();
+		}
+	};
+
+	$scope.closeEditDocumentModal = function() {
+		$scope.unbindWatch();
+		$scope.editDocumentModal.hide();
+		$scope.editDocumentModal.remove();
+	};
+
+	$scope.setEditedDocumentDirty = function() {
+		$scope.editedDocumentDirty = true;
+	};
+
+	$scope.saveDocument = function() {
+		if (typeof $scope.prepareSave === "function") {
+			$scope.prepareSave($scope.editedDocument);
+		}
+
+		var objectsToSave = [];
+		$ionicLoading.show({
+			template: "<div class='saving'><ion-spinner></ion-spinner> " + $scope.docName + " wird gespeichert...</div>"
+		});
+		angular.forEach($scope.editedDocument.attachments, function(attachment) {
+			objectsToSave.push(attachment);
+		});
+		objectsToSave.push($scope.editedDocument);
+		dbService.save(objectsToSave).then(function() {
+			$scope.reload().then(function() {
+				$ionicLoading.show({
+					template: "<div class='saving'><i class='icon ion-checkmark balanced icon-large'></i> " + $scope.docName + " erfolgreich gespeichert.</div>",
+					duration: 1500
+				});
+				$scope.closeEditDocumentModal();
+			});
+		}, function(err) {
+			console.log(err);
+			$ionicLoading.show({
+				template: "<div class='saving'><i class='icon ion-alert-circled assertive icon-large'></i> Speichern fehlgeschlagen!</div>",
+				duration: 2000
+			});
+		});
+	}
+
+	$scope.canEdit = function(doc) {
+		return authenticationService.canEdit(doc);
+	}
+
+	$scope._resolveTaskReference = function(referencingModel) {
+		if (referencingModel.reference) {
+			return dbService.get(referencingModel.reference, "task", false).then(function(task) {
+				referencingModel._task = task;
+			}, function(error) {
+				// 404 for the task, so try loading task step
+				return dbService.get(referencingModel.reference, "taskStep", false).then(function(step) {
+					referencingModel._step = step;
+					return dbService.get(step.task, "task", false).then(function(task) {
+						referencingModel._task = task;
+					});
+				});
+			})
+		}
+	}
+
+	$scope._getPossibleTaskReferences = function(task) {
+		var referenceIds = "('" + task.id + "'";
+		angular.forEach(task.steps, function(step) {
+			referenceIds += ",'" + step.id + "'";
+		});
+		referenceIds += ")";
+		return referenceIds;
+	}
 })
 
-.controller('ChatDetailCtrl', function($scope, $stateParams, Chats) {
-  $scope.chat = Chats.get($stateParams.chatId);
+.controller('TaskDocumentationCtrl', function($scope, $rootScope, $stateParams, $controller, $ionicPopover, dbService) {
+	$scope.docName = "Dokumentation";
+	$scope.firstProp = "text";
+	$scope.templateName = "templates/modal-documentation-editor.html";
+	$controller('ModalEditCtrl', {
+		$scope: $scope
+	});
+
+	$scope.reload = function() {
+		// load task
+		return dbService.get($stateParams.taskId, "task").then(function(task) {
+			$scope.task = task;
+
+			// load documentations for current task and its steps
+			return dbService.all("taskDocumentation", true, "reference in " + $scope._getPossibleTaskReferences(task)).then(function(documentations) {
+				$scope.documentations = documentations;
+				// update badge count on tab icon
+				$scope.badge = {
+					count:documentations.length
+				}
+			});
+		});
+	}
+
+	$scope.createNewDocument = function() {
+		return dbService.createTaskDocumentation();
+	}
+
+	$scope.prepareSave = function(document) {
+		if (!document.reference) {
+			document.reference = $scope.task.id;
+		}
+	}
+
+	$scope.$on("$ionicView.afterEnter", function(event, data) {
+		if (data && data.stateParams && data.stateParams.triggerCreateDocument) {
+			data.stateParams.triggerCreateDocument = false;
+			var doc = $scope.createNewDocument();
+			doc.reference = data.stateParams.refId;
+			$scope.editDocument(doc);
+		}
+	});
+
+	var popoverTemplateDocumentation = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, den Arbeitsauftrag zu dokumentieren. Dabei können Sie den gesamten Arbeitsauftrag oder einzelne Teilschritte per Text, Foto, Video oder Spracheingabe dokumentieren. Seien Sie kreativ und probieren Sie sich aus! Sie können alle Eingaben jederzeit rückgängig machen.</p></div></ion-content></ion-popover-view>";
+	$scope.popoverDocumentation = $ionicPopover.fromTemplate(popoverTemplateDocumentation, { scope: $scope });
+	$scope.openPopoverDocumentation = function($event) {
+		$scope.popoverDocumentation.show($event);
+	};
+	$scope.$on("$destroy", function() {
+		$scope.popoverDocumentation.remove();
+	});
+
+	$scope.reload();
 })
 
-.controller('AccountCtrl', function($scope, $state, appName, appVersion, dbService, authenticationService) {
-  $scope.profile = authenticationService.getCredentials();
-  $scope.scaleImages = ((localStorage["scaleImages"]  || "true") === "true");
-  $scope.appName = appName;
-  $scope.appVersion = appVersion;
+.controller('ReflectionQuestionsCtrl', function($scope, $stateParams, $ionicLoading, dbService) {
+	$scope.reload = function() {
+		// load task
+		return dbService.get($stateParams.taskId, "task").then(function(task) {
+			$scope.task = task;
 
-  $scope.updateProfile = function() {
-    localStorage["scaleImages"] = $scope.scaleImages.toString();
-    if ($scope.profile.user && $scope.profile.password) {
-      authenticationService.updateCredentials($scope.profile.user, $scope.profile.password);
+			// load reflection answers for current task
+			return dbService.all("reflectionAnswer", true, "task='" + $stateParams.taskId + "'").then(function(docs) {
+				var reflectionAnswers = {};
+				var reflectionAnswerCount = docs.length;
+				angular.forEach(docs, function(doc) {
+					reflectionAnswers[doc.question] = doc;
+				});
+				// create empty reflection answers when not existing
+				angular.forEach(task.reflectionQuestions, function(reflectionQuestion) {
+					if (!reflectionAnswers[reflectionQuestion.id]) {
+						reflectionAnswers[reflectionQuestion.id] = dbService.createReflectionAnswer($stateParams.taskId, reflectionQuestion.id);
+					}
+				});
+				$scope.task = task;
+				$scope.reflectionAnswers = reflectionAnswers;
+				$scope.badge = {
+					count:reflectionAnswerCount
+				}
+			})
+		});
+	}
 
-      dbService.sync().then(function() {
-        return $state.go("tab.tasks");
-      }, function(err) {
-        // in case we're offline, we'll get "sync denied" here. in that case, switch to tasks tab anyway
-        if ("sync denied" == err) {
-          return $state.go("tab.tasks");
-        }
-      });
-    }
-  };
+	$scope.saveReflectionAnswer = function(reflectionAnswer, form) {
+		if (reflectionAnswer.text != null) {
+			if (reflectionAnswer.text.length == 0) {
+				reflectionAnswer.deleted = true;
+			}
+			dbService.save(reflectionAnswer).then(function() {
+				form.$setPristine();
+				$scope.reload();
+				$ionicLoading.show({
+					template: "Eingabe " + (reflectionAnswer.deleted ? "gelöscht" : "gespeichert"),
+					duration: 2000
+				});
+			});
+		}
+		else {
+			$scope.reload();
+		}
+	};
+
+	$scope.checkReflectionQuestionsVisible = function() {
+		if ($scope.task && $scope.task.reflectionQuestions.length == 0) {
+			return "ng-hide";
+		}
+	}
+
+	$scope.reload();
+})
+
+.controller('QuestionsCtrl', function($scope, $rootScope, $stateParams, $q, $ionicModal, $controller, $ionicPopover, dbService) {
+	$scope.docName = "Frage";
+	$scope.firstProp = "title";
+	$scope.templateName = "templates/modal-question-editor.html";
+	$controller('ModalEditCtrl', {
+		$scope: $scope
+	});
+
+	$scope.reload = function() {
+		if ($stateParams.taskId) {
+			return dbService.get($stateParams.taskId, "task").then(function(task) {
+				$scope.task = task;
+				return dbService.all("question", true, "reference in " + $scope._getPossibleTaskReferences(task)).then(function(questions) {
+					$scope.badge = {
+						count:questions.length
+					}
+					var promises = [];
+					angular.forEach(questions, function(question) {
+						promises.push($scope._resolveTaskReference(question));
+					})
+					return $q.all(promises).finally(function() {
+						$scope.questions = questions;
+						// update badge count on tab icon
+					});
+				});
+			});
+		} else {
+			return dbService.all("question", true).then(function(questions) {
+				var promises = [];
+				angular.forEach(questions, function(question) {
+					promises.push($scope._resolveTaskReference(question));
+				})
+				return $q.all(promises).finally(function() {
+					$scope.questions = questions;
+				});
+			});
+		}
+	}
+
+	$scope.createNewDocument = function() {
+		return dbService.createQuestion();
+	}
+
+	$scope.prepareSave = function(document) {
+		if (!document.reference && $scope.task) {
+			document.reference = $scope.task.id;
+		}
+	}
+
+	$scope.$on("$ionicView.afterEnter", function(event, data) {
+		if (data && data.stateParams && data.stateParams.triggerCreateDocument) {
+			data.stateParams.triggerCreateDocument = false;
+			var doc = $scope.createNewDocument();
+			doc.reference = data.stateParams.refId;
+			$scope.editDocument(doc);
+		}
+	});
+
+	var popoverTemplateQuestion = "<ion-popover-view><ion-content><div class='margin-horizontal'><p>Hier haben Sie die Möglichkeit, eigene Fragen einzustellen (z.B. wenn etwas unklar ist, Sie Fragen zum weiteren Vorgehen haben o.ä.) und Fragen anderer Azubis zu beantworten. Fragen können auch von Lehrern und Ausbildern beantwortet werden.</p></div></ion-content></ion-popover-view>";
+	$scope.popoverQuestion = $ionicPopover.fromTemplate(popoverTemplateQuestion, { scope: $scope });
+	$scope.openPopoverQuestion = function($event) {
+		$scope.popoverQuestion.show($event);
+	};
+	$scope.$on("$destroy", function() {
+		$scope.popoverQuestion.remove();
+	});
+
+	$scope.reload();
+})
+
+.controller('QuestionDetailCtrl', function($scope, $rootScope, $stateParams, $q, $controller, $ionicPopup, $ionicModal, $ionicLoading, $filter, dbService, mediaAttachment) {
+	$scope.docName = "Antwort";
+	$scope.firstProp = "text";
+	$scope.templateName = "templates/modal-answer-editor.html";
+	$controller('ModalEditCtrl', {
+		$scope: $scope
+	})
+
+	$scope.reload = function() {
+		return dbService.get($stateParams.questionId, "question").then(function(question) {
+			// order answers by hand to avoid resorting on accepting/rating answers
+			question._answers = $filter('orderBy')(question._answers, function(answer) {
+				// keep accepted answer on top of list
+				if (question.acceptedAnswer === answer.id) {
+					return 0;
+				}
+				return answer.dateCreated;
+			})
+			return $scope._resolveTaskReference(question).finally(function() {
+				$scope.question = question;
+			});
+		}, function(error) {
+			console.log(error);
+		});
+	}
+
+	$scope.createNewDocument = function() {
+		return dbService.createAnswer($scope.question);
+	}
+
+	$scope.toggleAcceptedAnswer = function(answer) {
+		if ($scope.canEdit($scope.question)) {
+			if ($scope.question.acceptedAnswer === answer.id) {
+				$scope.question.acceptedAnswer = null;
+			}
+			else {
+				$scope.question.acceptedAnswer = answer.id;
+			}
+			dbService.save($scope.question);
+		}
+	}
+
+	$scope.prepareSave = function(answer) {
+		$scope.question._answers.push(answer)
+	}
+
+	$scope.$on("$destroy", $rootScope.$on("syncFinished", function() {
+		$scope.reload();
+	}));
+	$scope.reload();
+})
+
+.controller('SettingsCtrl', function($scope, $state, appName, appVersion, dbService, authenticationService) {
+	$scope.profile = authenticationService.getCredentials();
+	$scope.scaleImages = ((localStorage["scaleImages"] || "true") === "true");
+	$scope.appName = appName;
+	$scope.appVersion = appVersion;
+
+	$scope.update = function() {
+		localStorage["scaleImages"] = $scope.scaleImages.toString();
+		if ($scope.profile.user && $scope.profile.password) {
+			authenticationService.updateCredentials($scope.profile.user, $scope.profile.password);
+			dbService.sync();
+			return $state.go("home");
+		}
+	};
 })
 
 .controller('TaskChooseTemplateCtrl', function($scope, $state, $q, dbService) {
-  dbService.all("task").then(function(docs) {
-    var filtered = [];
-    var promises = [];
-    angular.forEach(docs, function(doc) {
-      if (doc["isTemplate"] == true && !doc.deleted) {
-        //promises.push(dbService.resolveIds(doc, "task"));
-        filtered.push(doc);
-      }
-    });
-    $q.all(promises).finally(function() {
-      $scope.templates = filtered;
-    });
-  });
+	dbService.all("task", false, "isTemplate='true'").then(function(templates) {
+		$scope.templates = templates;
+	});
 
-  $scope.choose = function(template) {
-    var params = {};
-    if (template) {
-      params.templateId = template.id;
-    }
-    $state.go("tab.task-create", params);
-  }
+	$scope.choose = function(template) {
+		var params = {};
+		if (template) {
+			params.templateId = template.id;
+		}
+		$state.go("task-create", params);
+	};
 })
 
 .controller('TaskCreateCtrl', function($scope, $state, $stateParams, $ionicLoading, $rootScope, $ionicHistory, dbService, rfc4122) {
-  if ($stateParams.templateId) {
-    dbService.get($stateParams.templateId, "task").then(function(template) {
-      var task = angular.copy(template);
-      task.id = rfc4122.v4();
-      task.isTemplate = false;
-      task.template = template.id;
-      delete task.creator
-      angular.forEach(task.steps, function(step) {
-        step.id = rfc4122.v4();
-      });
-      setTaskAndAssignableUsers(task)
-    }, function(err) {
-      // TODO: 404 error message and open default/main page
-      console.log(err);
-    });
-  }
-  else {
-    dbService.createTask().then(function(task) {
-      setTaskAndAssignableUsers(task);
-    });
-  }
+	if ($stateParams.templateId) {
+		dbService.get($stateParams.templateId, "task").then(function(template) {
+			var task = angular.copy(template);
+			task.id = rfc4122.v4();
+			task.isTemplate = false;
+			task.template = template.id;
+			delete task.creator
+			angular.forEach(task.steps, function(step) {
+				step.id = rfc4122.v4();
+			});
+			setTaskAndAssignableUsers(task)
+		}, function(err) {
+			// TODO: 404 error message and open default/main page
+			console.log(err);
+		});
+	} else {
+		dbService.createTask().then(function(task) {
+			setTaskAndAssignableUsers(task);
+		});
+	}
 
-  function setTaskAndAssignableUsers(task) {
-    dbService.all("user").then(function(docs) {
-      var filtered = [];
-      var currentUser = {};
-      angular.forEach(docs, function(doc) {
-        if (localStorage["user"] == doc.username) {
-          currentUser = doc;
-          if (!task.assignee) {
-            task.assignee = currentUser.id;
-          }
-          filtered.push(currentUser);
-        }
-      });
-      angular.forEach(docs, function(doc) {
-        if (!doc.deleted && currentUser.id != doc.id && currentUser.company && currentUser.company == doc.company) {
-          filtered.push(doc);
-        }
-      });
-      $scope.assignableUsers = filtered;
-      $scope.task = task;
-    });
-  }
+	function setTaskAndAssignableUsers(task) {
+		dbService.all("user").then(function(docs) {
+			var filtered = [];
+			var currentUser = {};
+			angular.forEach(docs, function(doc) {
+				if (localStorage["user"] == doc.username) {
+					currentUser = doc;
+					if (!task.assignee) {
+						task.assignee = currentUser.id;
+					}
+					filtered.push(currentUser);
+				}
+			});
+			angular.forEach(docs, function(doc) {
+				if (currentUser.id != doc.id && currentUser.company && currentUser.company == doc.company) {
+					filtered.push(doc);
+				}
+			});
+			$scope.assignableUsers = filtered;
+			$scope.task = task;
+		});
+	}
 
-  $scope.removeReflectionQuestion = function(index) {
-    if (index > -1 && $scope.task && $scope.task.reflectionQuestions && $scope.task.reflectionQuestions.length > index) {
-      $scope.task.reflectionQuestions.splice(index, 1);
-    }
-  }
+	$scope.removeReflectionQuestion = function(index) {
+		if (index > -1 && $scope.task && $scope.task.reflectionQuestions && $scope.task.reflectionQuestions.length > index) {
+			$scope.task.reflectionQuestions.splice(index, 1);
+		}
+	};
 
-  $scope.save = function() {
-    if ($scope.task.name) {
-      var objectsToSave = [];
-      angular.forEach($scope.task.steps, function(step) {
-        objectsToSave.push(step);
-      });
-      objectsToSave.push($scope.task);
-      dbService.save(objectsToSave).then(function() {
-        // TODO: this is a hack to reload tasks
-        $rootScope.$broadcast("syncFinished");
-        $ionicLoading.show({template: "Neuer Arbeitsauftrag gespeichert.", duration:2000});
-        // prevent going back to editor
-        $ionicHistory.nextViewOptions({ disableBack:true });
-        $state.go("tab.tasks");
-      }, function(err) {
-        console.log(err);
-        $ionicLoading.show({template: "Speichern fehlgeschlagen!", duration:2000});
-      });
-    }
-  }
+	$scope.save = function() {
+		if ($scope.task.name) {
+			var objectsToSave = [];
+			angular.forEach($scope.task.steps, function(step) {
+				objectsToSave.push(step);
+			});
+			objectsToSave.push($scope.task);
+			dbService.save(objectsToSave).then(function() {
+				$ionicLoading.show({
+					template: "Neuer Arbeitsauftrag gespeichert.",
+					duration: 2000
+				});
+				// prevent going back to editor
+				$ionicHistory.nextViewOptions({
+					disableBack: true
+				});
+				$state.go("home");
+			}, function(err) {
+				console.log(err);
+				$ionicLoading.show({
+					template: "Speichern fehlgeschlagen!",
+					duration: 2000
+				});
+			});
+		}
+	};
 });

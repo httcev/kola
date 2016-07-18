@@ -14,27 +14,38 @@ $assertive:                       #ef473a !default;
 $royal:                           #886aea !default;
 $dark:                            #444 !default;
 */
-
-// The path for our ionicons font files, relative to the built CSS in www/css
-$ionicons-font-path: "../lib/ionic/fonts" !default;
-
-// Include all of Ionic
+$balanced: #449d44 !default;
+$positive: #2860D0 !default;
+$energized: #FF8000 !default; // The path for our ionicons font files, relative to the built CSS in www/css
+$ionicons-font-path: "../lib/ionic/fonts" !default; // Include all of Ionic
+$popover-backdrop-bg-active:      rgba(0,0,0,0.2) !default;
 @import "www/lib/ionic/scss/ionic";
+@import "scss/httc-webfont"; // Include custom q&a font
+@import "scss/popover"; // Override Android Popover look and feel
 
-.task-section-header { font-size:1.5em; color:$positive; padding:15px 0 10px 0}
-
-/* Empty. Add your own CSS if you like */
-/*
-.image-list-thumb {
-    height: 100px;
-    margin:0 5px;
+*[ui-sref] {
+    cursor: pointer;
 }
-*/
-media-attachments .center-horizontal { padding:24.5px }
-sync-control span { padding-top:10px; }
-.spinner svg {
+.task-section-header {
+    font-size: 1.5em;
+    color: $positive;
+}
+media-attachments .center-horizontal {
+    padding: 24.5px;
+}
+.spinner.spinner-large svg {
     width: 50px;
     height: 50px;
+}
+.saving {}
+.saving .spinner svg {
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+}
+.saving .icon {
+    font-size: 32px;
+    vertical-align: middle;
 }
 .image-modal {
     width: 100% !important;
@@ -43,17 +54,15 @@ sync-control span { padding-top:10px; }
     left: 0 !important;
 }
 .modal {
-  top: 0 ;
-  bottom: 0 ; 
-  left: 0 ;
-  right: 0 ;
-  width: 100% ;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
 }
 .transparent {
-    /*background: transparent !important;*/
-    background-color:rgba(100,100,100,0.8)
+    background-color: rgba(0,0,0,0.8);
 }
- 
 .fullscreen-image {
     max-width: 100%;
     max-height: 100%;
@@ -65,41 +74,198 @@ sync-control span { padding-top:10px; }
     right: 0;
     top: 0;
 }
- 
 .slider {
     width: 100%;
     height: 100%;
 }
-
-.fullwidth { width:100% }
-.margin-horizontal { margin-left:10px; margin-right:10px;}
-
-.spinner { width:100%; text-align:center}
-.center-horizontal { text-align:center }
-.author-info { display:inline-block; font-size:75%; font-weight:bold; color:#999 }
-.author-info img { border-radius:50%; vertical-align:middle }
-.author-info a { text-decoration:none; color:inherit; }
-.reflection-question { padding-bottom:10px }
-.text { white-space:pre-line }
-.text ul { list-style: disc; padding-left:20px; white-space:initial }
-.text ol { list-style-type:decimal; padding-left:20px; white-space:initial }
-.small { font-size:85% }
-.version { font-family:monospace; color:#888; font-size:12px; font-weight: normal;}
+.fullwidth {
+    width: 100%;
+}
+.float-right {
+    float: right;
+}
+.float-left {
+    float: left;
+}
+.icon-large {
+    font-size: 32px;
+    vertical-align: middle;
+}
+.margin-top {
+	margin-top:10px;
+}
+.margin-bottom {
+	margin-bottom:10px;
+}
+.margin-horizontal {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.bold {
+    font-weight: bold;
+}
+.italic {
+	font-style: italic;
+}
+.small {
+    font-size: 85%;
+}
+.text-right {
+    text-align: right;
+}
+.clearfix {
+    clear: both;
+}
+.spinner {
+    width: 100%;
+    text-align: center;
+}
+.center-horizontal {
+    text-align: center;
+}
+.author-info {
+    display: inline-block;
+    font-size: 75%;
+    font-weight: bold;
+    color: #999;
+}
+.author-info img {
+    border-radius: 50%;
+    vertical-align: middle;
+}
+.comments-list .author-info img {
+    width: 20px;
+}
+.author-info a {
+    text-decoration: none;
+    color: inherit;
+    padding: 10px;
+}
+.text {
+    white-space: pre-line;
+}
+.text ul {
+    list-style: disc;
+    padding-left: 20px;
+    white-space: initial;
+}
+.text ol {
+    list-style-type: decimal;
+    padding-left: 20px;
+    white-space: initial;
+}
+.version {
+    font-family: monospace;
+    color: #999;
+    font-size: 12px;
+    font-weight: normal;
+}
 .animate:focus {
     -webkit-transition: height 50ms ease-in-out;
     -moz-transition: height 50ms ease-in-out;
     -o-transition: height 50ms ease-in-out;
     transition: height 50ms ease-in-out;
 }
-.external-attachment { display:inline-block; vertical-align:top; width:100px; white-space:normal }
-.new-documentation-button { margin-bottom:30px; }
-.edit-documentation-button { float:right; }
-.documentation-editor .card { margin-left:5px; margin-right:5px; }
-.documentation-editor textarea { min-height:100px; font-size:16px;}
+.external-attachment {
+    display: inline-block;
+    vertical-align: top;
+    width: 100px;
+    white-space: normal;
+}
+.add-answer-button,
+.card,
+.new-documentation-button {
+    margin-bottom: 50px;
+}
+.modal-editor .card {
+    margin: 1px 0;
+    position: relative;
+}
+.modal-editor textarea {
+    min-height: 100px;
+    font-size: 16px;
+}
+.modal-editor input {
+    font-size: 16px;
+}
 /*.media-edit { display:inline-block; position:relative; min-width:100px; min-height:100px; text-align:right; vertical-align:top; }*/
-.media-container { display:flex; flex-wrap:wrap; justify-content:space-between }
-.media-container .media-item { height:100px; position:relative; margin:5px; cursor:pointer; font-size:11px; line-height:11px}
-.media-container .media-item img { height:100%; }
-.media-container .media-item .external-attachment { text-align:center; }
-.media-container .media-item .external-attachment .symbol { font-size:72px; }
-.media-container .button-overlay { position:absolute; z-index:1; top:0; left:0; right:0; background-color:#888; opacity:0.7; text-align:right; cursor:default;}
+.media-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+.media-container .media-item {
+    height: 100px;
+    position: relative;
+    margin: 5px;
+    cursor: pointer;
+    font-size: 11px;
+    line-height: 11px;
+    border: 1px solid #EEE;
+    padding: 1px;
+}
+.media-container .media-item img {
+    height: 100%;
+}
+.media-container .media-item .external-attachment {
+    text-align: center;
+}
+.media-container .media-item .external-attachment .symbol {
+    font-size: 72px;
+}
+.media-container .button-overlay {
+    position: absolute;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    right: 0;
+    text-align: right;
+    cursor: default;
+}
+.comments-list {
+    font-size: 80%;
+}
+.comments-list .author-info {
+    float: right;
+}
+.comments-list h2 {
+    font-size: 15px;
+    font-weight: bold;
+    color: $dark;
+}
+.comment:not(:last-child) {
+    border-bottom: 1px dotted #DDD;
+}
+.comment .author-info {
+    display: inline;
+}
+.rating-control-container {
+    float: left;
+    text-align: center;
+    position: relative;
+    top: -4px;
+    margin-right: 8px;
+}
+.rating-control {
+    /*display     : inline-block;*/
+}
+.item .rating-control-container {
+    margin-left: -10px;
+}
+.rating-control .rating {
+    font-size: 2em;
+    color: #999;
+}
+.reflection-answer, .new-comment {
+    background-color: $stable;
+    border:1px solid #DDD;
+    padding:3px;
+}
+.question-reference {
+	clear:both;
+	margin-top:10px;
+	margin-bottom:10px;
+	font-style: italic;
+	font-size: 85%;
+	opacity: 0.6;
+}

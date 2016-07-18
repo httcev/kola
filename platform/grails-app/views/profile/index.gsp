@@ -30,8 +30,8 @@
 				</ul>
 			</g:hasErrors>
 			<g:hiddenField name="version" value="${user?.version}" />
-			<g:render template="/user/form" plugin="user"/>
-			<g:render template="/user/profile" plugin="user"/>
+			<g:render template="/user/form" plugin="httcUser"/>
+			<g:render template="/user/profile" plugin="httcUser"/>
 			<div class="buttons pull-right">
 				<button class="save btn btn-success"><i class="fa fa-save"></i> <g:message code="default.button.update.label" default="Update" /></button>
 			</div>

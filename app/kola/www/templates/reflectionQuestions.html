@@ -1,0 +1,30 @@
+<ion-view>
+	<ion-nav-bar class="bar-energized">
+		<ion-nav-back-button></ion-nav-back-button>
+		<ion-nav-title>Erfahrungen zum Arbeitsauftrag</ion-nav-title>
+		<ion-nav-buttons side="secondary">
+			<button menu-toggle="right" class="button button-icon icon ion-navicon"></button>
+		</ion-nav-buttons>
+	</ion-nav-bar>
+	<ion-content class="padding">
+		<div ng-if="!reflectionAnswers" class="center-horizontal">
+			<ion-spinner class="spinner-large"></ion-spinner>
+		</div>
+		<div ng-if="reflectionAnswers">
+			<p class="small">Hier haben Sie die Möglichkeit, Ihr eigenes Handeln zu beurteilen und eigene Erfahrungen festzuhalten. Wie schätzen Sie sich selbst ein?</p>
+			<div ng-if="task.reflectionQuestions.length">
+				<h1 class="task-section-header padding-top">Meine Erfahrungen:</h1>
+				<div class="list card">
+					<form name="form" ng-repeat="reflectionQuestion in task.reflectionQuestions track by reflectionQuestion.id" class="item item-text-wrap">
+						<div class="bold padding-bottom">{{reflectionQuestion.name}}</div>
+						<author-info ng-model="reflectionAnswers[reflectionQuestion.id]"></author-info>
+						<textarea ng-model="reflectionAnswers[reflectionQuestion.id].text" msd-elastic="\n" class="fullwidth animate no-resize reflection-answer" placeholder="Geben Sie hier Ihre Antwort ein."></textarea>
+						<div class="text-right padding-top" ng-show="form.$dirty">
+							<button class="button button-balanced button-small" ng-click="saveReflectionAnswer(reflectionAnswers[reflectionQuestion.id], form)"><i class="icon ion-checkmark"></i> Speichern</button>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</ion-content>
+</ion-view>
