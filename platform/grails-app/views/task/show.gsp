@@ -1,3 +1,5 @@
+<%@ page import="kola.ReflectionAnswer.Rating" %>
+
 <g:set var="authService" bean="authService"/>
 <g:set var="repositoryService" bean="repositoryService"/>
 <html>
@@ -140,7 +142,7 @@
 						<g:if test="${authService.canAttach(task)}">
 							<div id="new-documentation-controls" class="text-center margin">
 								<g:if test="${taskDocumentationsCount < 1}">
-									<div class="margin-vertical text-center"><g:message code="kola.task.documentation.empty" /></div>
+									<div class="margin-vertical-large text-center"><g:message code="kola.task.documentation.empty" /></div>
 								</g:if>
 								<button type="button" class="btn btn-primary" title="${message(code: 'kola.task.documentation.add')}" onclick="addDocumentation()"><i class="httc-compose-add"></i> <g:message code="kola.task.documentation.add" /></button>
 							</div>
@@ -184,7 +186,7 @@
 					</div>
 					<div id="new-question-controls" class="text-center margin">
 						<g:if test="${taskQuestionsCount < 1}">
-							<div class="margin-vertical text-center"><g:message code="kola.task.questions.empty" /></div>
+							<div class="margin-vertical-large text-center"><g:message code="kola.task.questions.empty" /></div>
 						</g:if>
 						<g:if test="${authService.canAttach(task)}"><g:link controller="question" action="create" params="[context:task.id]" class="btn btn-primary" title="${message(code: 'de.httc.plugin.qaa.question.create')}"><i class="httc-question-add"></i> <g:message code="de.httc.plugin.qaa.question.create" /></g:link></g:if>
 					</div>
@@ -197,24 +199,42 @@
 						<li class="list-group-item clearfix">
 							<b class="text-warning" onclick="$(this).parent().nextAll('.new-answer').first().removeClass('hidden').find('textarea').focus()">${reflectionQuestion.name}</b>
 							<g:if test="${!task.isTemplate && authService.canAttach(task)}">
-								<button type="button" title="${message(code:'kola.reflectionAnswer.create')}" class="btn btn-primary pull-right" onclick="$(this).parent().nextAll('.new-answer').first().removeClass('hidden').find('textarea').focus()"><i class="fa fa-comment-o"></i> <g:message code="kola.reflectionAnswer.create" /></button>
+								<button type="button" title="${message(code:'kola.reflectionAnswer.create')}" class="btn btn-primary pull-right" onclick="$(this).parent().nextAll('.new-answer').first().removeClass('hidden').find('textarea').focus()"><i class="httc-rating-positive"></i> <g:message code="kola.reflectionAnswer.create" /></button>
 							</g:if>
 						</li>
 						<g:each var="reflectionAnswer" in="${reflectionAnswers[reflectionQuestion.id]}">
 							<li class="list-group-item">
 								<div class="list-group-item-text clearfix">
-									<p class="formatted reflectionAnswer">${reflectionAnswer.text}</p>
+									<div class="reflectionAnswerDisplay">
+										<g:if test="${reflectionAnswer.rating}">
+											<span class="fa-stack fa-lg pull-left display-rating" title="${message(code:'kola.reflectionAnswer.' + reflectionAnswer.rating.toString().toLowerCase())}">
+												<i class="fa fa-circle fa-stack-2x ${reflectionAnswer.rating == Rating.POSITIVE ? 'display-rating-positive' : reflectionAnswer.rating == Rating.NEUTRAL ? 'display-rating-neutral' : 'display-rating-negative'}"></i>
+												<i class="fa fa-stack-1x fa-inverse ${reflectionAnswer.rating == Rating.POSITIVE ? 'httc-rating-positive' : reflectionAnswer.rating == Rating.NEUTRAL ? 'httc-rating-neutral' : 'httc-rating-negative'}"></i>
+											</span>
+										</g:if>
+										<p class="formatted reflectionAnswer">${reflectionAnswer.text}</p>
+									</div>
 									<g:if test="${authService.canEdit(reflectionAnswer)}">
 										<g:form class="form hidden" action="updateReflectionAnswer" id="${reflectionAnswer.id}" method="PUT">
-											<textarea name="text" class="form-control" rows="5" placeholder="${message(code:'kola.reflectionAnswer.placeholder')}">${reflectionAnswer.text}</textarea>
-											<div class="text-right form-padding-all"><button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <g:message code="default.save.label" args="[message(code:'kola.reflectionAnswer')]" /></button></div>
+											<input type="hidden" name="rating" value="${reflectionAnswer.rating}" />
+											<div class="row">
+												<div class="col-md-3">
+													<div class="btn-group btn-group-lg btn-group-rating form-padding-all" role="group">
+														<button type="button" value="${Rating.POSITIVE}" title="${message(code:'kola.reflectionAnswer.positive')}" class="positive btn btn-default${reflectionAnswer.rating == Rating.POSITIVE ? ' active' : ''}"><i class="fa httc-rating-positive${reflectionAnswer.rating == Rating.POSITIVE ? ' fa-inverse' : ''}"></i></button>
+														<button type="button" value="${Rating.NEUTRAL}" title="${message(code:'kola.reflectionAnswer.neutral')}" class="neutral btn btn-default${reflectionAnswer.rating == Rating.NEUTRAL ? ' active' : ''}"><i class="fa httc-rating-neutral${reflectionAnswer.rating == Rating.NEUTRAL ? ' fa-inverse' : ''}"></i></button>
+														<button type="button" value="${Rating.NEGATIVE}" title="${message(code:'kola.reflectionAnswer.negative')}" class="negative btn btn-default${reflectionAnswer.rating == Rating.NEGATIVE ? ' active' : ''}"><i class="fa httc-rating-negative${reflectionAnswer.rating == Rating.NEGATIVE ? ' fa-inverse' : ''}"></i></button>
+													</div>
+												</div>
+												<div class="col-md-5"><div class="form-padding-all"><input name="text" type="text" class="form-control" rows="5" placeholder="${message(code:'kola.reflectionAnswer.placeholder')}" value="${reflectionAnswer.text}"></div></div>
+												<div class="col-md-4"><div class="form-padding-all"><button type="submit" class="btn btn-success pull-right"><i class="fa fa-save"></i> <g:message code="default.save.label" args="[message(code:'kola.reflectionAnswer')]" /></button></div></div>
+											</div>
 										</g:form>
 									</g:if>
 									<small class="pull-right">
 										<g:render bean="${reflectionAnswer.creator.profile}" template="/profile/show" var="profile" />,
 										<g:formatDate date="${reflectionAnswer.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
 										<g:if test="${authService.canEdit(reflectionAnswer)}">
-											<button type="button" class="btn btn-default" onclick="$(this).hide().parent().prevAll('.reflectionAnswer').hide().next('.form').removeClass('hidden').find('textarea').focus()"><i class="fa fa-pencil"></i> <g:message code="default.button.edit.label" /></button>
+											<button type="button" class="btn btn-default" onclick="$(this).hide().parent().prevAll('.reflectionAnswerDisplay').hide().next('.form').removeClass('hidden').find('textarea').focus()"><i class="fa fa-pencil"></i> <g:message code="default.button.edit.label" /></button>
 										</g:if>
 									</small>
 								</div>
@@ -224,8 +244,18 @@
 							<g:form class="form" action="saveReflectionAnswer">
 								<input type="hidden" name="task" value="${task.id}">
 								<input type="hidden" name="question" value="${reflectionQuestion.id}">
-								<textarea name="text" class="form-control" rows="5" placeholder="${message(code:'kola.reflectionAnswer.placeholder')}"></textarea>
-								<div class="text-right form-padding"><button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <g:message code="default.save.label" args="[message(code:'kola.reflectionAnswer')]"/></button></div>
+								<input type="hidden" name="rating" value="" />
+								<div class="row">
+									<div class="col-md-3">
+										<div class="btn-group btn-group-lg btn-group-rating form-padding-all" role="group">
+											<button type="button" value="${Rating.POSITIVE}" title="${message(code:'kola.reflectionAnswer.positive')}" class="positive btn btn-default"><i class="fa httc-rating-positive"></i></button>
+											<button type="button" value="${Rating.NEUTRAL}" title="${message(code:'kola.reflectionAnswer.neutral')}" class="neutral btn btn-default"><i class="fa httc-rating-neutral"></i></button>
+											<button type="button" value="${Rating.NEGATIVE}" title="${message(code:'kola.reflectionAnswer.negative')}" class="negative btn btn-default"><i class="fa httc-rating-negative"></i></button>
+										</div>
+									</div>
+									<div class="col-md-5"><div class="form-padding-all"><input name="text" type="text" class="form-control" rows="5" placeholder="${message(code:'kola.reflectionAnswer.placeholder')}" value=""></div></div>
+									<div class="col-md-4"><div class="form-padding-all"><button type="submit" class="btn btn-success pull-right"><i class="fa fa-save"></i> <g:message code="default.save.label" args="[message(code:'kola.reflectionAnswer')]" /></button></div></div>
+								</div>
 							</g:form>
 						</li>
 					</g:each>

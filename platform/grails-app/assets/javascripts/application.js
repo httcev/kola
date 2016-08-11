@@ -12,7 +12,7 @@
 if (typeof jQuery !== 'undefined') {
 	(function($) {
 		$(document).ready(function() {
-			$('[data-toggle="tooltip"]').tooltip({html:true}); 
+			$('[data-toggle="tooltip"]').tooltip({html:true});
 			$('#spinner').ajaxStart(function() {
 				$(this).fadeIn();
 			}).ajaxStop(function() {
@@ -20,6 +20,11 @@ if (typeof jQuery !== 'undefined') {
 			});
 			$("#footer-links").on("show.bs.collapse", function () {
 				$("html, body").animate({ scrollTop: $(document).height() }, "slow");
+			});
+			$(".btn-group-rating > .btn").click(function(){
+			    $(this).addClass("active").find("i.fa").addClass("fa-inverse");
+				$(this).siblings().removeClass("active").find("i.fa").removeClass("fa-inverse");
+				$(this).closest("form").find("input[name='rating']").val($(this).val());
 			});
 		});
 	})(jQuery);

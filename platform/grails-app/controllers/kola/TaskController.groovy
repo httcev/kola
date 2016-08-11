@@ -9,6 +9,7 @@ import de.httc.plugins.qaa.Question
 import de.httc.plugins.qaa.Comment
 import de.httc.plugins.repository.Asset
 import de.httc.plugins.repository.AssetContent
+import de.httc.plugins.taxonomy.TaxonomyTerm
 
 @Transactional(readOnly = true)
 @Secured(['IS_AUTHENTICATED_REMEMBERED'])
@@ -124,6 +125,7 @@ class TaskController {
             // copy relevant values from template into new task
             task.name = task.template.name
             task.description = task.template.description
+			task.type = task.template.type
             task.template = task.template
             task.attachments = task.template.attachments
             task.resources = task.template.resources
@@ -160,6 +162,7 @@ class TaskController {
         taskInstance.name = params.name
         taskInstance.description = params.description
         taskInstance.assignee = params.assignee?.id ? User.get(params.assignee.id) : null
+		taskInstance.type = params.type?.id ? TaxonomyTerm.get(params.type.id) : null
         taskInstance.due = params.due ? new java.text.SimpleDateFormat("yyyy-MM-dd").parse(params.due) : null
         taskInstance.done = params.done ? params.done : false
         taskInstance.creator = springSecurityService.currentUser
@@ -379,7 +382,7 @@ class TaskController {
         if (!authService.canAttach(reflectionAnswerInstance.task)) {
             forbidden()
         }
-        if (reflectionAnswerInstance.text) {
+        if (reflectionAnswerInstance.rating) {
             reflectionAnswerInstance.creator = springSecurityService.currentUser
 
             reflectionAnswerInstance.save flush:true
@@ -403,7 +406,7 @@ class TaskController {
         }
 
         def msg
-        if (reflectionAnswerInstance.text) {
+        if (reflectionAnswerInstance.rating) {
             reflectionAnswerInstance.save flush:true
             if (reflectionAnswerInstance.hasErrors()) {
                 reflectionAnswerInstance.errors.each {

@@ -114,7 +114,7 @@ angular.module('kola.controllers', [])
 		if (!doc) {
 			doc = $scope.createNewDocument();
 		}
-		var autoFocus = $scope.firstProp && !doc[$scope.firstProp] || doc[$scope.firstProp].length <= 0;
+		var autoFocus = $scope.firstProp && (!doc[$scope.firstProp] || doc[$scope.firstProp].length <= 0);
 		$ionicModal.fromTemplateUrl($scope.templateName, {
 			scope: $scope,
 			animation: "slide-in-up",
@@ -192,7 +192,8 @@ angular.module('kola.controllers', [])
 		$scope.editedDocumentDirty = true;
 	};
 
-	$scope.saveDocument = function() {
+	$scope.saveDocument = function(doc) {
+		doc = doc || $scope.editedDocument;
 		if (typeof $scope.prepareSave === "function") {
 			$scope.prepareSave($scope.editedDocument);
 		}
@@ -201,10 +202,10 @@ angular.module('kola.controllers', [])
 		$ionicLoading.show({
 			template: "<div class='saving'><ion-spinner></ion-spinner> " + $scope.docName + " wird gespeichert...</div>"
 		});
-		angular.forEach($scope.editedDocument.attachments, function(attachment) {
+		angular.forEach(doc.attachments, function(attachment) {
 			objectsToSave.push(attachment);
 		});
-		objectsToSave.push($scope.editedDocument);
+		objectsToSave.push(doc);
 		dbService.save(objectsToSave).then(function() {
 			$scope.reload().then(function() {
 				$ionicLoading.show({
@@ -307,23 +308,31 @@ angular.module('kola.controllers', [])
 	$scope.reload();
 })
 
-.controller('ReflectionQuestionsCtrl', function($scope, $stateParams, $ionicLoading, dbService) {
+.controller('ReflectionQuestionsCtrl', function($scope, $stateParams, $ionicLoading, $controller, dbService) {
+	$scope.docName = "Einschätzung";
+	//$scope.firstProp = null;
+	$scope.templateName = "templates/modal-reflectionAnswer-editor.html";
+	$controller('ModalEditCtrl', {
+		$scope: $scope
+	});
+
 	$scope.reload = function() {
 		// load task
 		return dbService.get($stateParams.taskId, "task").then(function(task) {
-			$scope.task = task;
-
 			// load reflection answers for current task
 			return dbService.all("reflectionAnswer", true, "task='" + $stateParams.taskId + "'").then(function(docs) {
 				var reflectionAnswers = {};
 				var reflectionAnswerCount = docs.length;
 				angular.forEach(docs, function(doc) {
-					reflectionAnswers[doc.question] = doc;
+					if (!reflectionAnswers[doc.question]) {
+						reflectionAnswers[doc.question] = [];
+					}
+					reflectionAnswers[doc.question].push(doc);
 				});
 				// create empty reflection answers when not existing
 				angular.forEach(task.reflectionQuestions, function(reflectionQuestion) {
 					if (!reflectionAnswers[reflectionQuestion.id]) {
-						reflectionAnswers[reflectionQuestion.id] = dbService.createReflectionAnswer($stateParams.taskId, reflectionQuestion.id);
+						reflectionAnswers[reflectionQuestion.id] = [dbService.createReflectionAnswer($stateParams.taskId, reflectionQuestion.id)];
 					}
 				});
 				$scope.task = task;
@@ -334,25 +343,6 @@ angular.module('kola.controllers', [])
 			})
 		});
 	}
-
-	$scope.saveReflectionAnswer = function(reflectionAnswer, form) {
-		if (reflectionAnswer.text != null) {
-			if (reflectionAnswer.text.length == 0) {
-				reflectionAnswer.deleted = true;
-			}
-			dbService.save(reflectionAnswer).then(function() {
-				form.$setPristine();
-				$scope.reload();
-				$ionicLoading.show({
-					template: "Eingabe " + (reflectionAnswer.deleted ? "gelöscht" : "gespeichert"),
-					duration: 2000
-				});
-			});
-		}
-		else {
-			$scope.reload();
-		}
-	};
 
 	$scope.checkReflectionQuestionsVisible = function() {
 		if ($scope.task && $scope.task.reflectionQuestions.length == 0) {

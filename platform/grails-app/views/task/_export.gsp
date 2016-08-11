@@ -1,3 +1,4 @@
+<%@ page import="kola.ReflectionAnswer.Rating" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <g:set var="repositoryService" bean="repositoryService"/>
@@ -95,7 +96,12 @@
 						<g:each var="reflectionAnswer" in="${reflectionAnswers[reflectionQuestion.id]}">
 							<li class="list-group-item">
 								<div class="list-group-item-text clearfix">
-									<p class="formatted">${reflectionAnswer.text}</p>
+									<g:if test="${reflectionAnswer.rating}">
+										<i class="fa-lg httc-rating-${reflectionAnswer.rating.toString().toLowerCase()} display-rating-${reflectionAnswer.rating.toString().toLowerCase()}"></i>${message(code:'kola.reflectionAnswer')}: ${message(code:'kola.reflectionAnswer.' + reflectionAnswer.rating.toString().toLowerCase())}
+									</g:if>
+									<p class="formatted">
+										${reflectionAnswer.text}
+									</p>
 									<small class="pull-right">
 										${reflectionAnswer.creator.profile.displayName},
 										<g:formatDate date="${reflectionAnswer.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>

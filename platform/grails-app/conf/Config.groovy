@@ -183,7 +183,6 @@ log4j.appender.file.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
     debug 'grails.app'
     debug rollingFileAppender: 'usagetracking', additivity:false
 //    debug amqp:'usagetracking', additivity:false
-    //debug 'org.codehaus.groovy.grails.web.mapping', 'org.codehaus.groovy.grails.web.mapping.filter'
 
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
            'org.codehaus.groovy.grails.web.pages',          // GSP
@@ -197,6 +196,8 @@ log4j.appender.file.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
            'org.springframework',
            'net.sf.ehcache.hibernate',
            'org.grails.plugins'
+
+//   debug 'org.codehaus.groovy.grails.web.mapping', 'org.codehaus.groovy.grails.web.mapping.filter'
 }
 
 // Added by the Spring Security Core plugin:

@@ -6,6 +6,7 @@ import org.apache.commons.collections.FactoryUtils
 import de.httc.plugins.user.User
 import de.httc.plugins.repository.Asset
 import de.httc.plugins.qaa.QuestionReference
+import de.httc.plugins.taxonomy.TaxonomyTerm
 
 class Task extends QuestionReference {
     static searchable = {
@@ -22,13 +23,15 @@ class Task extends QuestionReference {
         due nullable:true
         template nullable:true
         assignee nullable:true
+		type nullable:true, validator: { val, obj ->
+			def label = obj.type?.taxonomy?.label
+			return label == null || label == "taskType"
+		}
     }
     static mapping = {
         steps cascade: "all-delete-orphan"
         name type: "text"
         description type: "text"
-//		lastDocumented formula:"(select d.LAST_UPDATED from TASK_DOCUMENTATION d where d.DELETED='false' and (d.REFERENCE_ID=ID or d.REFERENCE_ID in (select s.TASK_STEP_ID from TASK_TASK_STEP s where s.TASK_STEPS_ID=ID)) order by d.LAST_UPDATED desc limit 1)"
-//		lastDocumented formula:"(select d.LAST_UPDATED from TASK_DOCUMENTATION d where d.DELETED='false' and (d.REFERENCE_ID=ID) order by d.LAST_UPDATED desc limit 1)"
     }
 
     String name
@@ -52,7 +55,9 @@ class Task extends QuestionReference {
     List<TaskStep> steps                            // defined as list to keep order in which elements got added
     List<ReflectionQuestion> reflectionQuestions    // defined as list to keep order in which elements got added
 
-    static _embedded = ["name", "description", "done", "deleted", "due", "isTemplate", "lastUpdated", "dateCreated"]
+	TaxonomyTerm type
+
+    static _embedded = ["name", "description", "done", "deleted", "due", "isTemplate", "lastUpdated", "dateCreated", "type"]
     static _referenced = ["steps", "resources", "attachments", "reflectionQuestions", "template", "creator", "assignee"]
 
     static {

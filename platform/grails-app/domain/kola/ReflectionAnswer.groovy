@@ -4,9 +4,10 @@ import java.util.UUID
 import de.httc.plugins.user.User
 
 class ReflectionAnswer {
-
+	static enum Rating { POSITIVE, NEUTRAL, NEGATIVE }
     static constraints = {
-    	text blank:false
+    	text nullable:true
+		rating nullable:true
     }
     static mapping = {
         id generator: "assigned"
@@ -22,11 +23,12 @@ class ReflectionAnswer {
 
     String id = UUID.randomUUID().toString()
     String text
+	Rating rating
     Date lastUpdated
     User creator
     boolean deleted
 
-    static _exported = ["text", "lastUpdated", "deleted"]
+    static _exported = ["text", "rating", "lastUpdated", "deleted"]
     static _referenced = ["creator", "task", "question"]
     static {
         grails.converters.JSON.registerObjectMarshaller(ReflectionAnswer) { answer ->

@@ -3,6 +3,8 @@ import de.httc.plugins.user.Role
 import de.httc.plugins.user.UserRole
 import de.httc.plugins.repository.Asset
 import de.httc.plugins.repository.AssetContent
+import de.httc.plugins.taxonomy.Taxonomy
+import de.httc.plugins.taxonomy.TaxonomyTerm
 import de.httc.plugins.qaa.Question
 import de.httc.plugins.qaa.Answer
 import de.httc.plugins.qaa.Comment
@@ -71,6 +73,14 @@ class BootStrap {
 					}
 					assert Asset.count() == numAssets
 
+					def typeTaxonomy = new Taxonomy(label:"taskType")
+					def companyTypeTerm = new TaxonomyTerm(label:"Betrieb")
+					typeTaxonomy.addToTerms(companyTypeTerm)
+					typeTaxonomy.addToTerms(new TaxonomyTerm(label:"Schule"))
+					typeTaxonomy.save(true)
+					assert Taxonomy.count() == 1
+					assert TaxonomyTerm.count() == 2
+
 					def numTaskTemplates = 2
 					def description = "### Abschnitt 1\n\n1. Aufzählungstext 1\n1. Aufzählungstext 2\n1. Aufzählungstext 3\n\n### Abschnitt 2\n\n- Aufzählungstext 1\n- Aufzählungstext 2\n- Aufzählungstext 3\n\n**Fett**\n_Kursiv_\n[Link](http://www.example.com)"
 					for (int i=0; i<numTaskTemplates; i++) {
@@ -88,10 +98,12 @@ class BootStrap {
 
 					def numTasks = 2
 					for (int i=0; i<numTasks; i++) {
-						def task = new Task(name:"Example Task $i", description:description, creator:User.findByUsername("admin"), assignee:testUser)
+						def task = new Task(name:"Example Task $i", description:description, creator:User.findByUsername("admin"), assignee:testUser, type:companyTypeTerm)
 						task.addToSteps(new TaskStep(name:"Step 1 example", description:description))
 						task.addToSteps(new TaskStep(name:"Step 2 example", description:description))
-						task.save(true)
+						if (!task.save(true)) {
+							task.errors.allErrors.each { println it }
+						}
 						def question = new Question(title:"Ich habe eine Frage $i", text:"Was ist grün und hüpft von Baum zu Baum?", creator:testUser, reference:task)
 						def answer = new Answer(text:"Weiss nicht! Ein Frosch?", creator:testUser)
 						answer.addToComments(new Comment(text:"Antwortkommentar...", creator:testUser))
@@ -102,6 +114,7 @@ class BootStrap {
 							question.errors.allErrors.each { println it }
 						}
 					}
+
 					assert Task.count() == numTaskTemplates + numTasks
 					assert Question.count() == numTasks
 					assert Answer.count() == numTasks
@@ -198,6 +211,10 @@ class BootStrap {
 			}
 			doc.id = comment.id
 			return [id:comment.id, doc:doc]
+		}
+		// REFLECTION ANSWER RATINGS
+		grails.converters.JSON.registerObjectMarshaller(kola.ReflectionAnswer$Rating) { rating ->
+			return rating.toString()
 		}
 	}
 	def destroy = {
