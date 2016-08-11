@@ -5,4 +5,6 @@ databaseChangeLog = {
 	include file: 'create-qaa-schema.groovy'
 	include file: 'refactor-task-steps.groovy'
 	include file: 'documentations-commentable.groovy'
+	include file: 'task-type-taxonomy.groovy'
+	include file: 'reflection-answer-rating.groovy'
 }
