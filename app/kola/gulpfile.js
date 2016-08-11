@@ -1,4 +1,4 @@
-var appVersion = "1.1.8"
+var appVersion = "1.1.9"
 
 var gulp = require('gulp');
 var gutil = require('gulp-util');
