@@ -19,9 +19,14 @@
 						<div class="bold padding-bottom">{{reflectionQuestion.name}}</div>
 						<form name="form" ng-repeat="reflectionAnswer in reflectionAnswers[reflectionQuestion.id] track by reflectionAnswer.id" class="padding-bottom">
 							<div ng-if="!reflectionAnswer._isNew">
-								<div class="display-rating {{reflectionAnswer.rating.toLowerCase()}}"><i class="httc-rating-{{reflectionAnswer.rating.toLowerCase()}}"></i></div> {{reflectionAnswer.text}}
-								<author-info ng-model="reflectionAnswer"></author-info>
-								<button ng-if="canEdit(reflectionAnswer)" class="button button-positive button-clear button-small icon ion-edit float-right" ng-click="editDocument(reflectionAnswer)"></button>
+								<div>
+									<div class="table-cell"><div class="display-rating {{reflectionAnswer.rating.toLowerCase()}}"><i class="httc-rating-{{reflectionAnswer.rating.toLowerCase()}}"></i></div></div>
+									<div class="table-cell">{{reflectionAnswer.text}}</div>
+								</div>
+								<div class="padding-vertical">
+									<author-info ng-model="reflectionAnswer"></author-info>
+									<button ng-if="canEdit(reflectionAnswer)" class="button button-positive button-clear button-small icon ion-edit float-right" ng-click="editDocument(reflectionAnswer)"></button>
+								</div>
 							</div>
 							<div ng-if="reflectionAnswer._isNew">
 								<div class="padding-vertical">

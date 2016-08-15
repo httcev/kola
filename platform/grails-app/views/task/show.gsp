@@ -205,14 +205,18 @@
 						<g:each var="reflectionAnswer" in="${reflectionAnswers[reflectionQuestion.id]}">
 							<li class="list-group-item">
 								<div class="list-group-item-text clearfix">
-									<div class="reflectionAnswerDisplay">
-										<g:if test="${reflectionAnswer.rating}">
-											<span class="fa-stack fa-lg pull-left display-rating" title="${message(code:'kola.reflectionAnswer.' + reflectionAnswer.rating.toString().toLowerCase())}">
-												<i class="fa fa-circle fa-stack-2x ${reflectionAnswer.rating == Rating.POSITIVE ? 'display-rating-positive' : reflectionAnswer.rating == Rating.NEUTRAL ? 'display-rating-neutral' : 'display-rating-negative'}"></i>
-												<i class="fa fa-stack-1x fa-inverse ${reflectionAnswer.rating == Rating.POSITIVE ? 'httc-rating-positive' : reflectionAnswer.rating == Rating.NEUTRAL ? 'httc-rating-neutral' : 'httc-rating-negative'}"></i>
-											</span>
-										</g:if>
-										<p class="formatted reflectionAnswer">${reflectionAnswer.text}</p>
+									<div class="media reflectionAnswerDisplay">
+										<div class="media-left">
+											<g:if test="${reflectionAnswer.rating}">
+												<span class="fa-stack fa-lg pull-left display-rating" title="${message(code:'kola.reflectionAnswer.' + reflectionAnswer.rating.toString().toLowerCase())}">
+													<i class="fa fa-circle fa-stack-2x ${reflectionAnswer.rating == Rating.POSITIVE ? 'display-rating-positive' : reflectionAnswer.rating == Rating.NEUTRAL ? 'display-rating-neutral' : 'display-rating-negative'}"></i>
+													<i class="fa fa-stack-1x fa-inverse ${reflectionAnswer.rating == Rating.POSITIVE ? 'httc-rating-positive' : reflectionAnswer.rating == Rating.NEUTRAL ? 'httc-rating-neutral' : 'httc-rating-negative'}"></i>
+												</span>
+											</g:if>
+										</div>
+										<div class="media-body">
+											<p class="formatted reflectionAnswer">${reflectionAnswer.text}</p>
+										</div>
 									</div>
 									<g:if test="${authService.canEdit(reflectionAnswer)}">
 										<g:form class="form hidden" action="updateReflectionAnswer" id="${reflectionAnswer.id}" method="PUT">

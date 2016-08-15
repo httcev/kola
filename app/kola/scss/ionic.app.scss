@@ -270,6 +270,7 @@ media-attachments .center-horizontal {
 	opacity: 0.6;
 }
 
+.table-cell { display:table-cell; vertical-align:top; }
 .display-rating { display:inline-block; text-align:center; vertical-align:top; padding-top:6px; width:36px; height:36px; border-radius:50%; color:#FFF; margin-right:10px; font-size:24px }
 .display-rating.positive { background-color:$balanced }
 .display-rating.neutral { background-color:$energized }
