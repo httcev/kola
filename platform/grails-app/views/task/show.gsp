@@ -197,9 +197,9 @@
 				<ul class="list-group">
 					<g:each var="reflectionQuestion" in="${task?.reflectionQuestions}">
 						<li class="list-group-item clearfix">
-							<b class="text-warning" onclick="$(this).parent().nextAll('.new-answer').first().removeClass('hidden').find('textarea').focus()">${reflectionQuestion.name}</b>
+							<b class="text-warning">${reflectionQuestion.name}</b>
 							<g:if test="${!task.isTemplate && authService.canAttach(task)}">
-								<button type="button" title="${message(code:'kola.reflectionAnswer.create')}" class="btn btn-primary pull-right" onclick="$(this).parent().nextAll('.new-answer').first().removeClass('hidden').find('textarea').focus()"><i class="httc-rating-positive"></i> <g:message code="kola.reflectionAnswer.create" /></button>
+								<button type="button" title="${message(code:'kola.reflectionAnswer.create')}" class="btn btn-primary pull-right create-rating-button" onclick="addReflectionRating($(this))"><i class="httc-rating-positive"></i> <g:message code="kola.reflectionAnswer.create" /></button>
 							</g:if>
 						</li>
 						<g:each var="reflectionAnswer" in="${reflectionAnswers[reflectionQuestion.id]}">
@@ -234,7 +234,7 @@
 										<g:render bean="${reflectionAnswer.creator.profile}" template="/profile/show" var="profile" />,
 										<g:formatDate date="${reflectionAnswer.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
 										<g:if test="${authService.canEdit(reflectionAnswer)}">
-											<button type="button" class="btn btn-default" onclick="$(this).hide().parent().prevAll('.reflectionAnswerDisplay').hide().next('.form').removeClass('hidden').find('textarea').focus()"><i class="fa fa-pencil"></i> <g:message code="default.button.edit.label" /></button>
+											<button type="button" class="btn btn-default edit-rating-button" onclick="editReflectionRating($(this))"><i class="fa fa-pencil"></i> <g:message code="default.button.edit.label" /></button>
 										</g:if>
 									</small>
 								</div>
@@ -274,6 +274,17 @@
 				$('#new-documentation').find('textarea').focus();
 			}
 
+			function addReflectionRating($button) {
+				$(".create-rating-button,.edit-rating-button").hide();
+				$button.parent().nextAll('.new-answer').first().removeClass('hidden').find("input[type='text']").focus();
+			}
+
+			function editReflectionRating($button) {
+				$(".create-rating-button,.edit-rating-button").hide();
+				$button.hide().parent().prevAll('.reflectionAnswerDisplay').hide().next('.form').removeClass('hidden').find("input[type='text']").focus();
+				$button.parents("li.list-group-item").addClass("list-group-item-warning");
+			}
+
 			$(document).ready(function() {
 				function scrollToElement(elem) {
 					$('html, body').animate({
@@ -308,6 +319,13 @@
 					else {
 						location.hash = '#'+$(e.target).attr('href').substr(1);
 					}
+				});
+				// reflection rating buttons
+				$(".btn-group-rating > .btn").click(function(){
+				    $(this).addClass("active").find("i.fa").addClass("fa-inverse");
+					$(this).siblings().removeClass("active").find("i.fa").removeClass("fa-inverse");
+					$(this).closest("form").find("input[name='rating']").val($(this).val());
+					$(this).parents(".row").find("input[type='text']").focus();
 				});
 			});
 		</script>

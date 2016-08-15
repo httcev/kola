@@ -21,11 +21,6 @@ if (typeof jQuery !== 'undefined') {
 			$("#footer-links").on("show.bs.collapse", function () {
 				$("html, body").animate({ scrollTop: $(document).height() }, "slow");
 			});
-			$(".btn-group-rating > .btn").click(function(){
-			    $(this).addClass("active").find("i.fa").addClass("fa-inverse");
-				$(this).siblings().removeClass("active").find("i.fa").removeClass("fa-inverse");
-				$(this).closest("form").find("input[name='rating']").val($(this).val());
-			});
 		});
 	})(jQuery);
 }
