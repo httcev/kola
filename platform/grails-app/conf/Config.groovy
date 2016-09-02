@@ -119,7 +119,7 @@ elasticSearch {
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.serverURL = "http://130.83.139.161:8080/platform"
+        grails.serverURL = "http://130.83.139.161:8080/kola-platform"
         elasticSearch.client.mode = "local"
         elasticSearch.index.store.type = "memory"
 //        elasticSearch.bulkIndexOnStartup = false
@@ -197,7 +197,7 @@ log4j.appender.file.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
            'net.sf.ehcache.hibernate',
            'org.grails.plugins'
 
-//   debug 'org.codehaus.groovy.grails.web.mapping', 'org.codehaus.groovy.grails.web.mapping.filter'
+   //debug 'org.codehaus.groovy.grails.web.mapping', 'org.codehaus.groovy.grails.web.mapping.filter'
 }
 
 // Added by the Spring Security Core plugin:

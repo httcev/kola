@@ -24,6 +24,7 @@ grails.project.fork = [
 
 grails.project.dependency.resolver = "maven" // or ivy
 grails.project.dependency.resolution = {
+	pom true
 	// inherit Grails' default dependencies
 	inherits("global") {
 		// specify dependency exclusions here; for example, uncomment this to disable ehcache:
@@ -117,9 +118,12 @@ grails.project.dependency.resolution = {
 		compile ":mail:1.0.7"
 	}
 }
-/*
+grails.plugin.location."httc-common" = "../../grails-plugins/common"
+grails.plugin.location."httc-competence" = "../../grails-plugins/competence"
+grails.plugin.location."httc-competence-inference" = "../../grails-plugins/competence-inference"
+grails.plugin.location."httc-esa" = "../../grails-plugins/esa"
 grails.plugin.location."httc-user" = "../../grails-plugins/user"
 grails.plugin.location."httc-push-notification" = "../../grails-plugins/push-notification"
 grails.plugin.location."httc-repository" = "../../grails-plugins/repository"
-grails.plugin.location."httc-qaa" = "../../grails-plugins/qaa"
-*/
+//grails.plugin.location."httc-qaa" = "../../grails-plugins/qaa"
+grails.plugin.location."httc-taxonomy" = "../../grails-plugins/taxonomy"

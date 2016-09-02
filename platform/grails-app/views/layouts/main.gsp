@@ -28,7 +28,7 @@
 				</sec:ifAnyGranted>
                 <li class="${controllerName == 'taskDocumentation' ? 'active' : ''}"><g:link controller="taskDocumentation" action="index" data-toggle="tooltip" data-placement="right" data-container="body" title="${message(code:'kola.task.documentations.tooltip')}"><i class="httc-fw httc-compose"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.task.documentations" /></span></g:link></li>
 				<li class="${controllerName == 'asset' ? 'active' : ''}"><g:link controller="asset" action="index" plugin="httcRepository" data-toggle="tooltip" data-placement="right" data-container="body" title="${message(code:'kola.assets.tooltip')}"><i class="fa fa-fw fa-book"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.assets" /></span></g:link></li>
-				<li class="${controllerName == 'question' ? 'active' : ''}"><g:link controller="question" action="index" data-toggle="tooltip" data-placement="right" data-container="body" title="${message(code:'kola.questions.tooltip')}"><i class="httc-fw httc-comments"></i> <span class="hide-sidemenu-collapsed"><g:message code="de.httc.plugin.qaa.questions" /></span></g:link></li>
+				<li class="${controllerName == 'question' ? 'active' : ''}"><g:link controller="question" action="index" plugin="httcQAA" data-toggle="tooltip" data-placement="right" data-container="body" title="${message(code:'kola.questions.tooltip')}"><i class="httc-fw httc-comments"></i> <span class="hide-sidemenu-collapsed"><g:message code="de.httc.plugin.qaa.questions" /></span></g:link></li>
 				<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_REFLECTION_QUESTION_CREATOR">
 					<li class="${controllerName == 'reflectionQuestion' ? 'active' : ''}"><g:link controller="reflectionQuestion" action="index" data-toggle="tooltip" data-placement="right" data-container="body" title="${message(code:'kola.reflectionQuestions.tooltip')}"><i class="fa fa-fw fa-lightbulb-o"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.reflectionQuestions" /></span></g:link></li>
 				</sec:ifAnyGranted>
@@ -39,6 +39,9 @@
 					<li class="sidemenu-divider"><span class="hide-sidemenu-collapsed text-info"><g:message code="kola.admin" />:</span></li>
 					<li class="${controllerName == 'user' ? 'active' : ''}"><g:link controller="user" action="index" plugin="httcUser" title="${message(code:'kola.admin.users')}"><i class="fa fa-users fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.admin.users" /></span></g:link></li>
 					<li class="${controllerName == 'settings' ? 'active' : ''}"><g:link controller="settings" title="${message(code:'kola.settings')}"><i class="fa fa-cogs fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.settings" /></span></g:link></li>
+<%--
+					<li class="${controllerName == 'taxonomies' ? 'active' : ''}"><g:link controller="taxonomies" action="index" namespace="admin" plugin="httcTaxonomy" title="${message(code:'de.httc.plugin.taxonomy.taxonomies')}"><i class="fa fa-tag fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="de.httc.plugin.taxonomy.taxonomies" /></span></g:link></li>
+--%>
 					<li class="${controllerName == 'backup' ? 'active' : ''}"><g:link controller="backup" title="Backup"><i class="fa fa-cloud fa-fw"></i> <span class="hide-sidemenu-collapsed">Backup</span></g:link></li>
 					<li class="${controllerName == 'platformInfo' ? 'active' : ''}"><g:link controller="platformInfo" title="${message(code:'kola.admin.system')}"><i class="fa fa-cubes fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.admin.system" /></span></g:link></li>
 				</ul>
