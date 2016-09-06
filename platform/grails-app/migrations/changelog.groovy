@@ -7,4 +7,5 @@ databaseChangeLog = {
 	include file: 'documentations-commentable.groovy'
 	include file: 'task-type-taxonomy.groovy'
 	include file: 'reflection-answer-rating.groovy'
+	include file: 'settings-to-common-plugin.groovy'
 }
