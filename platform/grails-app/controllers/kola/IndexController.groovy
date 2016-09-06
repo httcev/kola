@@ -4,6 +4,7 @@ import org.springframework.security.access.annotation.Secured
 import grails.transaction.Transactional
 import de.httc.plugins.repository.Asset
 import de.httc.plugins.qaa.Question
+import de.httc.plugins.common.Setting
 
 @Secured(['permitAll'])
 @Transactional(readOnly = true)

@@ -38,7 +38,7 @@
 				<ul class="sidemenu">
 					<li class="sidemenu-divider"><span class="hide-sidemenu-collapsed text-info"><g:message code="kola.admin" />:</span></li>
 					<li class="${controllerName == 'user' ? 'active' : ''}"><g:link controller="user" action="index" plugin="httcUser" title="${message(code:'kola.admin.users')}"><i class="fa fa-users fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.admin.users" /></span></g:link></li>
-					<li class="${controllerName == 'settings' ? 'active' : ''}"><g:link controller="settings" title="${message(code:'kola.settings')}"><i class="fa fa-cogs fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.settings" /></span></g:link></li>
+					<li class="${controllerName == 'settings' ? 'active' : ''}"><g:link controller="settings" title="${message(code:'de.httc.plugin.common.settings')}"><i class="fa fa-cogs fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="de.httc.plugin.common.settings" /></span></g:link></li>
 <%--
 					<li class="${controllerName == 'taxonomies' ? 'active' : ''}"><g:link controller="taxonomies" action="index" namespace="admin" plugin="httcTaxonomy" title="${message(code:'de.httc.plugin.taxonomy.taxonomies')}"><i class="fa fa-tag fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="de.httc.plugin.taxonomy.taxonomies" /></span></g:link></li>
 --%>

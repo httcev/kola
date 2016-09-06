@@ -8,10 +8,10 @@ import de.httc.plugins.taxonomy.TaxonomyTerm
 import de.httc.plugins.qaa.Question
 import de.httc.plugins.qaa.Answer
 import de.httc.plugins.qaa.Comment
+import de.httc.plugins.common.Setting
 import kola.Task
 import kola.TaskStep
 import kola.ReflectionQuestion
-import kola.Setting
 
 class BootStrap {
 	def repoDir
