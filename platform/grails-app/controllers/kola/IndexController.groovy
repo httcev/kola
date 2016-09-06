@@ -21,7 +21,7 @@ class IndexController {
     		render(view:"dashboard", model:[assignedTasks:assignedTasks, latestAssets:latestAssets, latestQuestions:latestQuestions])
     	}
     	else {
-    		render(view:"index", model:[welcomeHeader:Settings.settings.welcomeHeader, welcomeBody:Settings.settings.welcomeBody])
+    		render(view:"index", model:[welcomeHeader:Setting.getValue("welcomeHeader"), welcomeBody:Setting.getValue("welcomeBody")])
     	}
     }
 }

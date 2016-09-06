@@ -87,6 +87,7 @@ grails.project.dependency.resolution = {
 
 		// plugins for the compile step
 		compile "de.httc.plugins:httc-common:2.0.0-SNAPSHOT"
+		compile "de.httc.plugins:httc-lrs:2.0.0-SNAPSHOT"
 		compile "de.httc.plugins:httc-user:2.0.0-SNAPSHOT"
 		compile "de.httc.plugins:httc-push-notification:2.0.0-SNAPSHOT"
 		compile ("de.httc.plugins:httc-repository:2.0.0-SNAPSHOT") {
@@ -119,6 +120,7 @@ grails.project.dependency.resolution = {
 	}
 }
 grails.plugin.location."httc-common" = "../../grails-plugins/common"
+grails.plugin.location."httc-lrs" = "../../grails-plugins/lrs"
 grails.plugin.location."httc-competence" = "../../grails-plugins/competence"
 grails.plugin.location."httc-competence-inference" = "../../grails-plugins/competence-inference"
 grails.plugin.location."httc-esa" = "../../grails-plugins/esa"

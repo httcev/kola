@@ -11,7 +11,7 @@ import de.httc.plugins.qaa.Comment
 import kola.Task
 import kola.TaskStep
 import kola.ReflectionQuestion
-import kola.Settings
+import kola.Setting
 
 class BootStrap {
 	def repoDir
@@ -21,16 +21,14 @@ class BootStrap {
 		if (!repoDir.exists()) {
 			repoDir.mkdirs()
 		}
-		if (!Settings.getSettings()) {
-			def settings = new Settings()
-			if (!settings.save(true)) {
-				settings.errors.allErrors.each {
-					println it
-				}
-			}
+		if (Setting.count() == 0) {
+			new Setting(key:"welcomeHeader", value:"Willkommen", required:true, multiline:false, prefix:"kola.settings", weight:1).save()
+			new Setting(key:"welcomeBody", value:"Dies ist die KOLA Plattform.", required:false, multiline:true, prefix:"kola.settings", weight:2).save()
+			new Setting(key:"termsOfUse", value:null, required:false, multiline:true, prefix:"kola", weight:3).save(true)
+			assert Setting.count() == 3
 		}
 		// cache if terms of use is set
-		grailsApplication.config.kola.termsOfUseExisting = Settings.getSettings().termsOfUse?.length() > 0
+		grailsApplication.config.kola.termsOfUseExisting = Setting.getValue("termsOfUse")?.length() > 0
 
 		if (Role.count() == 0) {
 			def adminRole = new Role(authority: 'ROLE_ADMIN').save(flush: true)

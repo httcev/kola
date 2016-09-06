@@ -1,5 +1,3 @@
-<g:set var="settings" value="${kola.Settings.getSettings()}"/>
-
 <html>
 	<head>
 		<meta name="layout" content="main">

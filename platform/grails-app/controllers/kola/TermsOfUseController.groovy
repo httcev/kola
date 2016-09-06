@@ -13,7 +13,7 @@ class TermsOfUseController {
     @Secured(['permitAll'])
     def index() {
         def showAcceptControls = springSecurityService.loggedIn && !springSecurityService.currentUser.termsOfUseAccepted
-        [terms:Settings.getSettings().termsOfUse, showAcceptControls:showAcceptControls]
+        [terms:Setting.getValue("termsOfUse"), showAcceptControls:showAcceptControls]
     }
 
     @Transactional
