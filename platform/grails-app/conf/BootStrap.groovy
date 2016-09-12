@@ -25,7 +25,7 @@ class BootStrap {
 			new Setting(key:"welcomeHeader", value:"Willkommen", required:true, multiline:false, prefix:"kola.settings", weight:1).save()
 			new Setting(key:"welcomeBody", value:"Dies ist die KOLA Plattform.", required:false, multiline:true, prefix:"kola.settings", weight:2).save()
 			new Setting(key:"termsOfUse", value:null, required:false, multiline:true, prefix:"kola", weight:3).save(true)
-			assert Setting.count() == 3
+//			assert Setting.count() == 3 // removed assert since plugins can create own settings
 		}
 		// cache if terms of use is set
 		grailsApplication.config.kola.termsOfUseExisting = Setting.getValue("termsOfUse")?.length() > 0
