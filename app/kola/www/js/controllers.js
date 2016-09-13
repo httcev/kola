@@ -92,7 +92,7 @@ angular.module('kola.controllers', [])
 	reload();
 })
 
-.controller('ModalEditCtrl', function($scope, $stateParams, $q, $ionicPopup, $ionicModal, $ionicLoading, $rootScope, dbService, mediaAttachment, authenticationService) {
+.controller('ModalEditCtrl', function($scope, $stateParams, $ionicPopup, $ionicModal, $ionicLoading, $q, $rootScope, dbService, mediaAttachment, authenticationService) {
 	$scope.docName = $scope.docName || "Dokument";
 	$scope.attachPhoto = function() {
 		mediaAttachment.attachPhoto($scope.editedDocument);
@@ -240,6 +240,11 @@ angular.module('kola.controllers', [])
 					});
 				});
 			})
+		}
+		else {
+			var deferred = $q.defer();
+			deferred.resolve();
+			return deferred.promise;
 		}
 	}
 
@@ -423,7 +428,7 @@ angular.module('kola.controllers', [])
 	$scope.reload();
 })
 
-.controller('QuestionDetailCtrl', function($scope, $rootScope, $stateParams, $q, $controller, $ionicPopup, $ionicModal, $ionicLoading, $filter, dbService, mediaAttachment) {
+.controller('QuestionDetailCtrl', function($scope, $rootScope, $stateParams, $controller, $ionicPopup, $ionicModal, $ionicLoading, $filter, dbService, mediaAttachment) {
 	$scope.docName = "Antwort";
 	$scope.firstProp = "text";
 	$scope.templateName = "templates/modal-answer-editor.html";
@@ -491,7 +496,7 @@ angular.module('kola.controllers', [])
 	};
 })
 
-.controller('TaskChooseTemplateCtrl', function($scope, $state, $q, dbService) {
+.controller('TaskChooseTemplateCtrl', function($scope, $state, dbService) {
 	dbService.all("task", false, "isTemplate='true'").then(function(templates) {
 		$scope.templates = templates;
 	});
