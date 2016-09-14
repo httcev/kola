@@ -57,43 +57,12 @@ grails.project.dependency.resolution = {
 		// runtime 'mysql:mysql-connector-java:5.1.29'
 		// runtime 'org.postgresql:postgresql:9.3-1101-jdbc41'
 		test "org.grails:grails-datastore-test-support:1.0.2-grails-2.4"
-
-		// fixes a bug in grails
-		compile('com.google.guava:guava:18.0')
-
-		// for rolling log files
-		compile('log4j:apache-log4j-extras:1.0')
-		// for pub/sub logging via kafka
-//		compile('org.springframework.amqp:spring-rabbit:1.5.5.RELEASE')// { excludes "slf4j-log4j12" }
-
-		compile('org.apache.tika:tika-core:1.9')
-		compile('org.apache.tika:tika-parsers:1.9') { excludes "xercesImpl", "xmlParserAPIs", "xml-apis", "log4j", "httpcore" }
-		compile('org.hashids:hashids:1.0.1')
-		compile('org.pegdown:pegdown:1.5.0')
-
-		// used to remove exif metadata from uploaded images
-		compile('org.apache.commons:commons-imaging:1.0-SNAPSHOT')
-
-		// needed for rendering-plugin to work (PDF generation)
-		runtime ('org.springframework:spring-test:4.1.5.RELEASE')
-
-		// fixes error messages in DB trace file (log file grows very large)
-		runtime ('com.h2database:h2:1.4.191')
 	}
 
 	plugins {
 		// plugins for the build system only
+/*
 		build ":tomcat:7.0.55.2" // or ":tomcat:8.0.20"
-
-		// plugins for the compile step
-		compile "de.httc.plugins:httc-common:2.0.0-SNAPSHOT"
-		compile "de.httc.plugins:httc-lrs:2.0.0-SNAPSHOT"
-		compile "de.httc.plugins:httc-user:2.0.0-SNAPSHOT"
-		compile "de.httc.plugins:httc-push-notification:2.0.0-SNAPSHOT"
-		compile ("de.httc.plugins:httc-repository:2.0.0-SNAPSHOT") {
-			excludes "lucene-snowball" // conflicts with elastic search
-		}
-		compile ("de.httc.plugins:httc-qaa:2.0.0-SNAPSHOT")
 
 		compile ":scaffolding:2.1.2"
 		compile ":cache:1.1.8"
@@ -117,8 +86,10 @@ grails.project.dependency.resolution = {
 		compile ":rendering:1.0.0"
 		//compile (":spring-security-ui:1.0-RC2") { excludes "jquery-ui", "famfamfam" }
 		compile ":mail:1.0.7"
+*/
 	}
 }
+/*
 grails.plugin.location."httc-common" = "../../grails-plugins/common"
 grails.plugin.location."httc-lrs" = "../../grails-plugins/lrs"
 grails.plugin.location."httc-competence" = "../../grails-plugins/competence"
@@ -129,3 +100,4 @@ grails.plugin.location."httc-push-notification" = "../../grails-plugins/push-not
 grails.plugin.location."httc-repository" = "../../grails-plugins/repository"
 //grails.plugin.location."httc-qaa" = "../../grails-plugins/qaa"
 grails.plugin.location."httc-taxonomy" = "../../grails-plugins/taxonomy"
+*/

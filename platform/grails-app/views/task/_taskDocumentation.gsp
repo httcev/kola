@@ -32,6 +32,6 @@
 				<g:formatDate date="${taskDocumentation.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
 			</small>
 		</div>
-		<g:render bean="${taskDocumentation}" template="/question/comments" var="commentable" plugin="httcQAA"/>
+		<g:render bean="${taskDocumentation}" template="/question/comments" var="commentable" plugin="httcQaa"/>
 	</div>
 </li>

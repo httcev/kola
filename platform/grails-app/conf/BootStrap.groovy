@@ -21,7 +21,7 @@ class BootStrap {
 		if (!repoDir.exists()) {
 			repoDir.mkdirs()
 		}
-		if (Setting.count() == 0) {
+		if (!Setting.getValue("welcomeHeader")) {
 			new Setting(key:"welcomeHeader", value:"Willkommen", required:true, multiline:false, prefix:"kola.settings", weight:1).save()
 			new Setting(key:"welcomeBody", value:"Dies ist die KOLA Plattform.", required:false, multiline:true, prefix:"kola.settings", weight:2).save()
 			new Setting(key:"termsOfUse", value:null, required:false, multiline:true, prefix:"kola", weight:3).save(true)

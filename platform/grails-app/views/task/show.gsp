@@ -172,14 +172,14 @@
 						<g:if test="${taskQuestions[task.id]?.size() > 0}">
 							<div class="list-group-item disabled"><b><g:message code="kola.task.documentation.forTask"/>:</b></div>
 							<g:each var="taskQuestion" in="${taskQuestions[task.id]}">
-								<g:render bean="${taskQuestion}" var="question" template="/question/questionListItem" plugin="httcQAA" />
+								<g:render bean="${taskQuestion}" var="question" template="/question/questionListItem" plugin="httcQaa" />
 							</g:each>
 						</g:if>
 						<g:each var="step" in="${task?.steps}">
 							<g:if test="${taskQuestions[step.id]?.size() > 0}">
 								<div class="list-group-item disabled"><b><g:message code="kola.task.documentation.forStep"/> "${step.name}":</b></div>
 								<g:each var="taskQuestion" in="${taskQuestions[step.id]}">
-									<g:render bean="${taskQuestion}" var="question" template="/question/questionListItem" plugin="httcQAA" />
+									<g:render bean="${taskQuestion}" var="question" template="/question/questionListItem" plugin="httcQaa" />
 								</g:each>
 							</g:if>
 						</g:each>
