@@ -66,7 +66,7 @@ angular.module('kola.notification', ['kola.services'])
 								if ("new_questions" === collapseKey || "new_answers" === collapseKey) {
 									$state.go("question", {questionId:referenceId});
 								}
-								else if ("assigned_tasks" === collapseKey) {
+								else if ("assigned_tasks" === collapseKey || "documented_tasks" === collapseKey) {
 									$state.go("task.detail", {taskId:referenceId});
 								}
 							}
