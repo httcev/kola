@@ -89,7 +89,7 @@ grails.project.dependency.resolution = {
 */
 	}
 }
-/*
+
 grails.plugin.location."httc-common" = "../../grails-plugins/common"
 grails.plugin.location."httc-lrs" = "../../grails-plugins/lrs"
 grails.plugin.location."httc-competence" = "../../grails-plugins/competence"
@@ -98,6 +98,5 @@ grails.plugin.location."httc-esa" = "../../grails-plugins/esa"
 grails.plugin.location."httc-user" = "../../grails-plugins/user"
 grails.plugin.location."httc-push-notification" = "../../grails-plugins/push-notification"
 grails.plugin.location."httc-repository" = "../../grails-plugins/repository"
-//grails.plugin.location."httc-qaa" = "../../grails-plugins/qaa"
+grails.plugin.location."httc-qaa" = "../../grails-plugins/qaa"
 grails.plugin.location."httc-taxonomy" = "../../grails-plugins/taxonomy"
-*/

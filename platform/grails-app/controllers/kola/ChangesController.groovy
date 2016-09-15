@@ -294,6 +294,9 @@ class ChangesController {
 		if (model instanceof Task) {
 			return taskService.save(model)
 		}
+		else if (model instanceof TaskDocumentation) {
+			return taskService.saveTaskDocumentation(model)
+		}
 		else if (model instanceof Question) {
 			return questionService.saveQuestion(model)
 		}

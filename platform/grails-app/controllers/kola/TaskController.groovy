@@ -288,7 +288,7 @@ class TaskController {
             attachments.each {
                 taskDocumentationInstance.addToAttachments(it)
             }
-            taskDocumentationInstance.save flush:true
+			taskService.saveTaskDocumentation(taskDocumentationInstance)
             if (taskDocumentationInstance.hasErrors()) {
                 respond taskDocumentationInstance.errors, view:'show'
                 return
@@ -334,7 +334,7 @@ class TaskController {
 
         def msg
         if (taskDocumentationInstance.text || taskDocumentationInstance.attachments?.size() > 0) {
-            taskDocumentationInstance.save flush:true
+			taskService.saveTaskDocumentation(taskDocumentationInstance)
             if (taskDocumentationInstance.hasErrors()) {
                 respond taskDocumentationInstance.errors, view:'show'
                 return
@@ -344,7 +344,7 @@ class TaskController {
         else {
             taskDocumentationInstance.text = "DELETED"
             taskDocumentationInstance.deleted =true
-            taskDocumentationInstance.save flush:true
+			taskService.saveTaskDocumentation(taskDocumentationInstance)
             msg = message(code: 'default.deleted.message', args: [message(code: 'kola.task.documentation'), taskDocumentationInstance.id])
         }
 
