@@ -21,7 +21,7 @@ class TaskService {
 
 			sendAssignedNotification(task)
 		}
-		if (task.isDirty("done") && task.done) {
+		if (task.isDirty("done") && task.done && task.assignee) {
 			// log to LRS
 			def activity = new gov.adlnet.xapi.model.Activity()
 			activity.setId(grailsLinkGenerator.link(absolute:true, controller:"task", action:"show", id:task.id))
