@@ -1,4 +1,4 @@
-
+<%@ page import="de.httc.plugins.taxonomy.Taxonomy" %>
 <html>
 	<head>
 		<meta name="layout" content="main">
@@ -72,14 +72,15 @@
 			<g:if test="${taskList?.size() > 0}">
 				<g:set var="filterParams" value="${[own:params.own, ownCompany:params.ownCompany, assigned:params.assigned, isTemplate:params.isTemplate]}" />
 				<g:set var="sortParams" value="${[resetOffset:true] << filterParams}" />
+				<g:set var="typeTaxonomy" value="${Taxonomy.findByLabel("taskType")}" />
 				<div class="table-responsive">
 					<table class="table table-striped">
 						<thead>
 							<tr>
 								<g:sortableColumn property="name" title="${message(code: 'kola.task.title')}" params="${sortParams}" />
-<%--
-								<g:sortableColumn property="name" title="${message(code: 'kola.task.type.listLabel')}" params="${sortParams}" />
---%>
+								<g:if test="${typeTaxonomy}">
+									<g:sortableColumn property="type" title="${message(code: 'de.httc.plugin.taxonomy.label.taskType')}" params="${sortParams}" />
+								</g:if>
 								<g:if test="${!params.isTemplate?.toBoolean()}">
 									<g:sortableColumn property="due" title="${message(code: 'kola.task.due')}" params="${sortParams}" />
 									<g:sortableColumn property="done" class="text-center" title="${message(code: 'kola.task.done')}" params="${sortParams}" />
@@ -94,9 +95,9 @@
 						<g:each in="${taskList}" status="i" var="task">
 							<tr>
 								<td><g:link action="show" id="${task.id}" params="${[isTemplate:params.isTemplate]}">${fieldValue(bean: task, field: "name")}</g:link></td>
-<%--
-								<td><g:message code="kola.taxonomy.taskType.terms.${task.type?.label}" default="${task.type?.label}" /></td>
---%>
+								<g:if test="${typeTaxonomy}">
+									<td><g:message code="kola.taxonomy.taskType.terms.${task.type?.label}" default="${task.type?.label}" /></td>
+								</g:if>
 								<g:if test="${!params.isTemplate?.toBoolean()}">
 									<td><g:formatDate date="${task.due}" type="date"/></td>
 									<td class="text-center"><i class="fa fa-fw ${task.done ? 'fa-check text-success' : 'fa-minus text-warning'}"></i></td>

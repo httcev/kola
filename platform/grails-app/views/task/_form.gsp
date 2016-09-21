@@ -18,21 +18,18 @@
 	</label>
 	<div class="col-sm-10"><g:textArea rows="8" name="description" class="form-control" data-provide="markdown" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdImage cmdCode cmdQuote cmdPreview" value="${task?.description}" placeholder="${message(code:'kola.task.description.placeholder')}"/></div>
 </div>
-<%--
-<div class="form-group ${hasErrors(bean: task, field: 'type', 'error')} ">
-	<label for="type" class="col-sm-2 control-label">
-		<g:message code="kola.taxonomy.taskType.label" />:
-	</label>
-	<div class="col-sm-10">
-		<select name="type.id" class="form-control" value="${task?.type?.id}">
-			<option value=""></option>
-			<g:each var="term" in="${Taxonomy.findByLabel("taskType")?.terms}">
-				<option value="${term.id}"${task?.type?.id == term.id ? ' selected' : ''}><g:message code="kola.taxonomy.taskType.terms.${term.label}" default="${term.label}" /></option>
-			</g:each>
-		</select>
+
+<g:set var="typeTaxonomy" value="${Taxonomy.findByLabel("taskType")}" />
+<g:if test="${typeTaxonomy}">
+	<div class="form-group ${hasErrors(bean: task, field: 'type', 'error')} ">
+		<label for="type" class="col-sm-2 control-label">
+			<g:message code="de.httc.plugin.taxonomy.label.taskType" />:
+		</label>
+		<div class="col-sm-10">
+			<g:render template="/taxonomies/termSelect" plugin="httcTaxonomy" model="${[name:"type.id", taxonomy:typeTaxonomy, selectedValue:task?.type?.id, placeholder:" "]}" />
+		</div>
 	</div>
-</div>
---%>
+</g:if>
 <g:if test="${!task?.isTemplate?.toBoolean()}">
 	<div class="form-group ${hasErrors(bean: task, field: 'assignee', 'error')} ">
 		<label for="assignee" class="col-sm-2 control-label">

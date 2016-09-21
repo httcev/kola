@@ -14,8 +14,8 @@ class UrlMappings {
 		}
 
 		"/user/$action?/$id?(.$format)?" { controller = "user"; namespace = "admin"; plugin = "httcUser" }
-		"/admin/taxonomies/$action?/$id?(.$format)?" { controller = "taxonomies"; namespace = "admin"; plugin = "httcTaxonomy" }
 		"/taxonomies/$action?/$id?(.$format)?" { controller = "taxonomies"; plugin = "httcTaxonomy" }
+		"/admin/taxonomies/$action?/$id?(.$format)?" { controller = "taxonomies"; namespace = "admin"; plugin = "httcTaxonomy" }
 		"/register/$action?" { controller = "register"; plugin = "httcUser" }
 
 		name rateAnswer: "/question/$questionId/answer/$answerId/rate"{
