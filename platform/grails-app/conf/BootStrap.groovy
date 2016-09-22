@@ -72,7 +72,8 @@ class BootStrap {
 					assert Asset.count() == numAssets
 
 					def typeTaxonomy = new Taxonomy(label:"taskType")
-					typeTaxonomy.addToChildren(new TaxonomyTerm(label:"Betrieb"))
+					def companyTypeTerm = new TaxonomyTerm(label:"Betrieb")
+					typeTaxonomy.addToChildren(companyTypeTerm)
 					typeTaxonomy.addToChildren(new TaxonomyTerm(label:"Schule"))
 					if (!typeTaxonomy.save(true)) {
 						typeTaxonomy.errors.allErrors.each { println it }

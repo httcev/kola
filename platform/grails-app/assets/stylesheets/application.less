@@ -112,3 +112,12 @@ body.question.show .accept-answer-button { color:#AAA }
 .question-reference { font-style:italic; opacity: 0.7}
 .display-rating { margin-right:10px }
 .reflectionAnswer { padding-top:5px }
+
+.taxonomy-show > ul { padding-left:0 }
+.taxonomy-show ul { list-style-type:none }
+.taxonomy-show li.taxonomy-term:not(.taxonomy-term-last) { border-left:1px solid #E5E5E5}
+.taxonomy-show li.taxonomy-term:before { content:" "; display:inline-block; width:1em; height:10px; border-bottom:1px solid #E5E5E5; position:relative; top:-5px }
+.taxonomy-show li.taxonomy-term.taxonomy-term-last:before { border-left:1px solid #E5E5E5 }
+.taxonomy-show li.taxonomy-term a { color:inherit; cursor:default }
+.taxonomy-show li.taxonomy-term a:hover { text-decoration:none }
+.taxonomy-show li.taxonomy-term a:before { font-family:"FontAwesome"; content:"\f02b"; color:#AAA; margin-right:5px }
