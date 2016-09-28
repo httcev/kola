@@ -59,6 +59,20 @@ class BootStrap {
 
 			assert ReflectionQuestion.count() == 10
 		}
+		if (!Taxonomy.findByLabel("taskType")) {
+			def typeTaxonomy = new Taxonomy(label:"taskType")
+			typeTaxonomy.addToChildren(new TaxonomyTerm(label:"Betrieb"))
+			typeTaxonomy.addToChildren(new TaxonomyTerm(label:"Schule"))
+			if (!typeTaxonomy.save(true)) {
+				typeTaxonomy.errors.allErrors.each { println it }
+			}
+		}
+		if (!Taxonomy.findByLabel("organisations")) {
+			def organisationsTaxonomy = new Taxonomy(label:"organisations")
+			if (!organisationsTaxonomy.save(true)) {
+				organisationsTaxonomy.errors.allErrors.each { println it }
+			}
+		}
 
 		environments {
 			development {
@@ -70,16 +84,6 @@ class BootStrap {
 						new Asset(name:"Asset $i", typeLabel:"learning-resource", mimeType:"text/plain", content:new AssetContent(data:"Das ist ein Text! $i" as byte[]), props:[_description:"$i Huhu".toString()]).save(true)
 					}
 					assert Asset.count() == numAssets
-
-					def typeTaxonomy = new Taxonomy(label:"taskType")
-					def companyTypeTerm = new TaxonomyTerm(label:"Betrieb")
-					typeTaxonomy.addToChildren(companyTypeTerm)
-					typeTaxonomy.addToChildren(new TaxonomyTerm(label:"Schule"))
-					if (!typeTaxonomy.save(true)) {
-						typeTaxonomy.errors.allErrors.each { println it }
-					}
-					assert Taxonomy.count() == 1
-					assert TaxonomyTerm.count() == 2
 
 					def numTaskTemplates = 2
 					def description = "### Abschnitt 1\n\n1. Aufzählungstext 1\n1. Aufzählungstext 2\n1. Aufzählungstext 3\n\n### Abschnitt 2\n\n- Aufzählungstext 1\n- Aufzählungstext 2\n- Aufzählungstext 3\n\n**Fett**\n_Kursiv_\n[Link](http://www.example.com)"
@@ -98,7 +102,7 @@ class BootStrap {
 
 					def numTasks = 2
 					for (int i=0; i<numTasks; i++) {
-						def task = new Task(name:"Example Task $i", description:description, creator:User.findByUsername("admin"), assignee:testUser, type:companyTypeTerm)
+						def task = new Task(name:"Example Task $i", description:description, creator:User.findByUsername("admin"), assignee:testUser, type:TaxonomyTerm.findByTaxonomyAndLabel(Taxonomy.findByLabel("taskType"), "Betrieb"))
 						task.addToSteps(new TaskStep(name:"Step 1 example", description:description))
 						task.addToSteps(new TaskStep(name:"Step 2 example", description:description))
 						if (!task.save(true)) {
