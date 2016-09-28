@@ -125,12 +125,15 @@ class ChangesController {
 					"comment" : comments
 				]
 			]
-			println result
 			render result as JSON
 		}
 		catch(e) {
 			log.error e
 			render status:400, contentType:"text/plain", text:e?.message?:"unknown error"
+		}
+		finally {
+			// this is needed to prevent the java heap from growing full
+			sessionFactory.getCurrentSession().clear()
 		}
 	}
 
