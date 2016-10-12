@@ -20,30 +20,54 @@
 </div>
 
 <g:set var="typeTaxonomy" value="${Taxonomy.findByLabel("taskType")}" />
-<g:if test="${typeTaxonomy}">
+<g:if test="${typeTaxonomy?.termCount > 0}">
 	<div class="form-group ${hasErrors(bean: task, field: 'type', 'error')} ">
 		<label for="type" class="col-sm-2 control-label">
 			<g:message code="de.httc.plugin.taxonomy.label.taskType" />:
 		</label>
 		<div class="col-sm-10">
-			<g:render template="/taxonomies/termSelect" plugin="httcTaxonomy" model="${[name:"type.id", taxonomy:typeTaxonomy, selectedValue:task?.type?.id, placeholder:" "]}" />
+			<g:render template="/taxonomies/termSelect" plugin="httcTaxonomy" model="${[name:"type.id", terms:typeTaxonomy.children, selectedValues:[task?.type?.id], placeholder:" "]}" />
 		</div>
 	</div>
 </g:if>
 <g:if test="${!task?.isTemplate?.toBoolean()}">
-	<div class="form-group ${hasErrors(bean: task, field: 'assignee', 'error')} ">
-		<label for="assignee" class="col-sm-2 control-label">
-			<g:message code="kola.task.assign" />:
-		</label>
-		<div class="col-sm-10">
-			<select name="assignee.id" class="form-control" value="${task?.assignee?.id}">
-				<option value=""></option>
-				<g:each var="profile" in="${authService.assignableUserProfiles}">
-					<option value="${profile.user.id}"${task?.assignee?.id == profile.user.id ? ' selected' : ''}>${profile.displayNameReverse}</option>
-				</g:each>
-			</select>
+	<g:if test="${task.assignee}">
+		<div class="row">
+			<label class="col-sm-2 control-label">
+				<g:message code="kola.task.assignee" />:
+			</label>
+			<div class="col-sm-10 form-padding padding-bottom">
+				<g:render bean="${task.assignee.profile}" template="/profile/show" var="profile" />
+			</div>
 		</div>
-	</div>
+	</g:if>
+	<g:else>
+		<div class="form-group ${hasErrors(bean: task, field: 'assignee', 'error')} ">
+			<label for="assignee" class="col-sm-2 control-label">
+				<g:message code="kola.task.assign" />:
+			</label>
+			<g:set var="assignableOrganisations" value="${authService.assignableOrganisationsFirstLevel}" />
+			<g:if test="${assignableOrganisations}">
+				<div class="col-sm-2">
+					<select id="assigneeTypeChooser" name="assigneeType" class="form-control">
+						<option value="person" selected><g:message code="kola.task.assign.person" /></option>
+						<option value="group"><g:message code="kola.task.assign.group" /></option>
+					</select>
+				</div>
+				<div class="col-sm-8 select-container" style="display:none">
+					<g:render template="/taxonomies/termSelect" plugin="httcTaxonomy" model="${[id:"groupChooser", name:"assigneeGroup", terms:assignableOrganisations, placeholder:message(code:'kola.task.assign.group.placeholder')]}" />
+				</div>
+			</g:if>
+			<div class="${assignableOrganisations ? 'col-sm-8' : 'col-sm-10'} select-container">
+				<select id="personChooser" name="assignee.id" class="form-control-dummy" value="${task?.assignee?.id}" data-placeholder="${message(code:'kola.task.assign.person.placeholder')}">
+					<option value=""></option>
+					<g:each var="profile" in="${authService.assignableUserProfiles}">
+						<option value="${profile.user.id}"${task?.assignee?.id == profile.user.id ? ' selected' : ''}>${profile.displayNameReverse}</option>
+					</g:each>
+				</select>
+			</div>
+		</div>
+	</g:else>
 
 	<div class="form-group ${hasErrors(bean: task, field: 'due', 'error')} ">
 		<label for="due" class="col-sm-2 control-label">
@@ -51,20 +75,21 @@
 		</label>
 		<div class="col-sm-10"><input type="date" id="due" class="form-control" name="due" value="${formatDate(format:'yyyy-MM-dd',date:task?.due)}" placeholder="yyyy-MM-dd"></div>
 	</div>
-    <g:if test="${task?.attached}">
-    	<div class="form-group ${hasErrors(bean: task, field: 'done', 'error')}">
-    		<label for="done" class="col-sm-2 control-label">
-    			<g:message code="kola.task.done" />:
-    		</label>
-    		<div class="col-sm-10">
-    			<div class="checkbox">
-    				<label>
-    					<g:checkBox name="done" value="${task?.done}" /> <g:message code="kola.task.done" />
-    				</label>
-    			</div>
-    		</div>
-    	</div>
-    </g:if>
+
+	<g:if test="${task?.attached}">
+		<div class="form-group ${hasErrors(bean: task, field: 'done', 'error')}">
+			<label for="done" class="col-sm-2 control-label">
+				<g:message code="kola.task.done" />:
+			</label>
+			<div class="col-sm-10">
+				<div class="checkbox">
+					<label>
+						<g:checkBox name="done" value="${task?.done}" /> <g:message code="kola.task.done" />
+					</label>
+				</div>
+			</div>
+		</div>
+	</g:if>
 </g:if>
 
 <div class="form-group ${hasErrors(bean: task, field: 'attachments', 'error')} ">
@@ -160,7 +185,27 @@
 	function addStep() {
 		var $step = $($("#newStepTemplate").html()).appendTo($("#step-list"));
 		updateStepIndices();
-        $step.find("textarea").first().markdown();
-        $step.find("input[type='text']").first().focus();
+		$step.find("textarea").first().markdown();
+		$step.find("input[type='text']").first().focus();
 	}
+
+	$(function() {
+		$("#personChooser").chosen({
+			no_results_text:'<g:message code="app.filter.empty" args="${[message(code: 'kola.task.assign.person', default: 'Person')]}" default="No {0} found."/>'
+			, disable_search_threshold: 10
+			, width:"100%"
+			, allow_single_deselect: true
+			, inherit_select_classes: true
+		});
+		$("#assigneeTypeChooser").on("change", function() {
+			if ($(this).val() === "group") {
+				$("#personChooser_chosen").parent(".select-container").hide();
+				$("#groupChooser_chosen").parent(".select-container").show();
+			}
+			else {
+				$("#groupChooser_chosen").parent(".select-container").hide();
+				$("#personChooser_chosen").parent(".select-container").show();
+			}
+		});
+	});
 </script>
