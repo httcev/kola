@@ -33,17 +33,19 @@
 					<li class="${controllerName == 'reflectionQuestion' ? 'active' : ''}"><g:link controller="reflectionQuestion" action="index" data-toggle="tooltip" data-placement="right" data-container="body" title="${message(code:'kola.reflectionQuestions.tooltip')}"><i class="fa fa-fw fa-lightbulb-o"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.reflectionQuestions" /></span></g:link></li>
 				</sec:ifAnyGranted>
 			</ul>
-			<sec:ifAllGranted roles="ROLE_ADMIN">
+			<sec:ifAnyGranted roles="ROLE_ADMIN,ROLE_TEACHER">
 			<ul class="sidemenu">
 				<ul class="sidemenu">
 					<li class="sidemenu-divider"><span class="hide-sidemenu-collapsed text-info"><g:message code="kola.admin" />:</span></li>
-					<li class="${controllerName == 'user' ? 'active' : ''}"><g:link controller="user" action="index" plugin="httcUser" title="${message(code:'kola.admin.users')}"><i class="fa fa-users fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.admin.users" /></span></g:link></li>
-					<li class="${controllerName == 'settings' ? 'active' : ''}"><g:link controller="settings" title="${message(code:'de.httc.plugin.common.settings')}"><i class="fa fa-cogs fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="de.httc.plugin.common.settings" /></span></g:link></li>
 					<li class="${controllerName == 'taxonomies' ? 'active' : ''}"><g:link controller="taxonomies" action="index" plugin="httcTaxonomy" title="${message(code:'de.httc.plugin.taxonomy.taxonomies')}"><i class="fa fa-tags fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="de.httc.plugin.taxonomy.taxonomies" /></span></g:link></li>
-					<li class="${controllerName == 'backup' ? 'active' : ''}"><g:link controller="backup" title="Backup"><i class="fa fa-cloud fa-fw"></i> <span class="hide-sidemenu-collapsed">Backup</span></g:link></li>
-					<li class="${controllerName == 'platformInfo' ? 'active' : ''}"><g:link controller="platformInfo" title="${message(code:'kola.admin.system')}"><i class="fa fa-cubes fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.admin.system" /></span></g:link></li>
+					<sec:ifAllGranted roles="ROLE_ADMIN">
+						<li class="${controllerName == 'user' ? 'active' : ''}"><g:link controller="user" action="index" plugin="httcUser" title="${message(code:'kola.admin.users')}"><i class="fa fa-users fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.admin.users" /></span></g:link></li>
+						<li class="${controllerName == 'settings' ? 'active' : ''}"><g:link controller="settings" title="${message(code:'de.httc.plugin.common.settings')}"><i class="fa fa-cogs fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="de.httc.plugin.common.settings" /></span></g:link></li>
+						<li class="${controllerName == 'backup' ? 'active' : ''}"><g:link controller="backup" title="Backup"><i class="fa fa-cloud fa-fw"></i> <span class="hide-sidemenu-collapsed">Backup</span></g:link></li>
+						<li class="${controllerName == 'platformInfo' ? 'active' : ''}"><g:link controller="platformInfo" title="${message(code:'kola.admin.system')}"><i class="fa fa-cubes fa-fw"></i> <span class="hide-sidemenu-collapsed"><g:message code="kola.admin.system" /></span></g:link></li>
+					</sec:ifAllGranted>
 				</ul>
-			</sec:ifAllGranted>
+			</sec:ifAnyGranted>
 			<div class="version hide-sidemenu-collapsed">Version <g:meta name="app.version"/></div>
 		</div>
 	</sec:ifLoggedIn>

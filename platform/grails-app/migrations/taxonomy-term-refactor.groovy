@@ -84,4 +84,18 @@ databaseChangeLog = {
 	changeSet(author: "tittel (generated)", id: "1474458226310-26") {
 		addForeignKeyConstraint(baseColumnNames: "taxonomy_id", baseTableName: "taxonomy_node", constraintName: "FK_ddueml8i31xhiu52b0eecodif", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "taxonomy_node", referencesUniqueColumn: "false")
 	}
+
+	changeSet(author: "tittel (generated)", id: "1476264310037-4") {
+		createTable(tableName: "profile_taxonomy_term") {
+			column(name: "profile_organisations_id", type: "bigint")
+
+			column(name: "taxonomy_term_id", type: "varchar(255)")
+
+			column(name: "organisations_idx", type: "integer")
+		}
+	}
+
+	changeSet(author: "tittel (generated)", id: "1476264310037-19") {
+		addForeignKeyConstraint(baseColumnNames: "taxonomy_term_id", baseTableName: "profile_taxonomy_term", constraintName: "FK_trwl8b8uh1sn5uq5yrxeyhy4", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "taxonomy_node", referencesUniqueColumn: "false")
+	}
 }

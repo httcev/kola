@@ -96,7 +96,7 @@
 							<tr>
 								<td><g:link action="show" id="${task.id}" params="${[isTemplate:params.isTemplate]}">${fieldValue(bean: task, field: "name")}</g:link></td>
 								<g:if test="${typeTaxonomy}">
-									<td><g:message code="kola.taxonomy.taskType.terms.${task.type?.label}" default="${task.type?.label}" /></td>
+									<td>${task.type?.label}</td>
 								</g:if>
 								<g:if test="${!params.isTemplate?.toBoolean()}">
 									<td><g:formatDate date="${task.due}" type="date"/></td>

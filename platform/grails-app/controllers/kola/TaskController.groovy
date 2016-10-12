@@ -261,7 +261,6 @@ class TaskController {
 		if (userProfiles) {
 			userProfiles.eachWithIndex { profile, index ->
 				if (0 == index) {
-					println "--- assigning original task '${task.name}' to user ${profile.user.username}"
 					// first user gets the original task, all others get a copy
 					task.assignee = profile.user
 					if (!task.save()) {
@@ -292,7 +291,6 @@ class TaskController {
 					}
 
 					copy.assignee = profile.user
-					println "--- assigning copied task '${copy.name}' to user ${profile.user.username}"
 					if (!copy.save()) {
 						copy.errors.allErrors.each { println it }
 					}
