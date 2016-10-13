@@ -88,7 +88,7 @@
 					</div>
 					<div class="collapse navbar-collapse" id="footer-links">
 						<ul class="nav navbar-nav navbar-right">
-							<g:if test="${grailsApplication.config.kola.termsOfUseExisting}"><li><g:link controller="termsOfUse" action="index"><g:message code="kola.termsOfUse" /></g:link></li></g:if>
+							<g:if test="${grailsApplication.config.app.settings.termsOfUseExisting}"><li><g:link controller="termsOfUse" action="index"><g:message code="kola.termsOfUse" /></g:link></li></g:if>
 							<li><a href="http://www.kola-projekt.de/ueber_kola.html" target="_blank"><g:message code="kola.about" /></a></li>
 							<li><a href="http://www.kola-projekt.de/ueber_das_projekt.html" target="_blank"><g:message code="kola.projectLink" /></a></li>
 							<li><a href="${grailsApplication.config.kola.appDownloadUrl}" id="google-play-link" target="_blank"><asset:image src="google-play-badge.png" /></a></li>

@@ -26,31 +26,31 @@
 						<div class="col-xs-12">
 							<b>Filter</b>:
 							<span class="checkbox">
-								<label><input name="own" type="checkbox" onclick="$(this).closest('form').submit()"${params.own ? ' checked' : ''}> <g:message code="kola.filter.own" /></label>
+								<label><input name="own" type="checkbox" onclick="$(this).closest('form').submit()"${params.own ? ' checked' : ''}> <g:message code="app.filter.own" /></label>
 							</span>
 
 								<span class="checkbox">
-									<label><input name="assigned" type="checkbox" onclick="$(this).closest('form').submit()"${params.assigned ? ' checked' : ''}> <g:message code="kola.filter.assigned" /></label>
+									<label><input name="assigned" type="checkbox" onclick="$(this).closest('form').submit()"${params.assigned ? ' checked' : ''}> <g:message code="app.filter.assigned" /></label>
 								</span>
 
 							<span class="checkbox">
-								<label><input name="ownCompany" type="checkbox" onclick="$(this).closest('form').submit()"${params.ownCompany ? ' checked' : ''}> <g:message code="kola.filter.ownCompany" /></label>
+								<label><input name="ownCompany" type="checkbox" onclick="$(this).closest('form').submit()"${params.ownCompany ? ' checked' : ''}> <g:message code="app.filter.ownCompany" /></label>
 							</span>
 						</div>
 					</div>
 <%--
-					<b><g:message code="kola.filter" /></b>:
+					<b><g:message code="app.filter" /></b>:
 					<div class="row filter">
 						<div class="col-md-3"><span class="checkbox">
-							<label><input name="own" type="checkbox" onclick="$(this).closest('form').submit()"${params.own ? ' checked' : ''}> <g:message code="kola.filter.own" /></label>
+							<label><input name="own" type="checkbox" onclick="$(this).closest('form').submit()"${params.own ? ' checked' : ''}> <g:message code="app.filter.own" /></label>
 						</span></div>
 						<g:if test="${!params.isTemplate?.toBoolean()}">
 							<div class="col-md-3"><span class="checkbox">
-								<label><input name="assigned" type="checkbox" onclick="$(this).closest('form').submit()"${params.assigned ? ' checked' : ''}> <g:message code="kola.filter.assigned" /></label>
+								<label><input name="assigned" type="checkbox" onclick="$(this).closest('form').submit()"${params.assigned ? ' checked' : ''}> <g:message code="app.filter.assigned" /></label>
 							</span></div>
 						</g:if>
 						<div class="col-md-3"><span class="checkbox">
-							<label><input name="ownCompany" type="checkbox" onclick="$(this).closest('form').submit()"${params.ownCompany ? ' checked' : ''}> <g:message code="kola.filter.ownCompany" /></label>
+							<label><input name="ownCompany" type="checkbox" onclick="$(this).closest('form').submit()"${params.ownCompany ? ' checked' : ''}> <g:message code="app.filter.ownCompany" /></label>
 						</span></div>
 						<div class="col-md-3">
 							<div class="input-group">
@@ -64,7 +64,7 @@
 --%>
 				</form>
 				<g:if test="${taskList?.size() > 0}">
-					<div class="margin-top text-muted small"><g:message code="kola.search.hits.displaying" args="${[entitiesName, params.offset + 1, Math.min(params.offset + params.max, taskCount), taskCount]}" />:</div>
+					<div class="margin-top text-muted small"><g:message code="app.search.hits.displaying" args="${[entitiesName, params.offset + 1, Math.min(params.offset + params.max, taskCount), taskCount]}" />:</div>
 				</g:if>
 <%--
 			</div>

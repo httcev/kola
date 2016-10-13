@@ -23,7 +23,7 @@
 			<g:else>
 <%--
 				<div class="form-group">
-					<label class="col-sm-2 control-label"><g:message code="kola.filter"/>:</label>
+					<label class="col-sm-2 control-label"><g:message code="app.filter"/>:</label>
 					<div class="col-sm-3">
 						<div class="checkbox">
 							<label>

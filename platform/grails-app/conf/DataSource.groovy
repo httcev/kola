@@ -6,7 +6,7 @@ dataSource {
 	driverClassName = "org.h2.Driver"
 	username = "sa"
 	password = ""
-	url = "jdbc:h2:/srv/kola/${Environment.current.name}/db/prod;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE"
+	url = "jdbc:h2:/srv/kola/${Environment.current.name}/db/prod;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE;TRACE_LEVEL_FILE=0"
 	properties {
 		// See http://grails.org/doc/latest/guide/conf.html#dataSource for documentation
 		jmxEnabled = true

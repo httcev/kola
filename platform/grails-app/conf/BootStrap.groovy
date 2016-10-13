@@ -16,19 +16,21 @@ import kola.ReflectionQuestion
 class BootStrap {
 	def repoDir
 	def grailsApplication
+	def settingService
 
 	def init = { servletContext ->
 		if (!repoDir.exists()) {
 			repoDir.mkdirs()
 		}
-		if (!Setting.getValue("welcomeHeader")) {
+
+		if (!settingService.exists("welcomeHeader")) {
 			new Setting(key:"welcomeHeader", value:"Willkommen", required:true, multiline:false, prefix:"kola.settings", weight:1).save()
 			new Setting(key:"welcomeBody", value:"Dies ist die KOLA Plattform.", required:false, multiline:true, prefix:"kola.settings", weight:2).save()
 			new Setting(key:"termsOfUse", value:null, required:false, multiline:true, prefix:"kola", weight:3).save(true)
 //			assert Setting.count() == 3 // removed assert since plugins can create own settings
 		}
 		// cache if terms of use is set
-		grailsApplication.config.kola.termsOfUseExisting = Setting.getValue("termsOfUse")?.length() > 0
+		grailsApplication.config.app.settings.termsOfUseExisting = settingService.getValue("termsOfUse")?.length() > 0
 
 		if (Role.count() == 0) {
 			def adminRole = new Role(authority: 'ROLE_ADMIN').save(flush: true)
@@ -45,21 +47,13 @@ class BootStrap {
 			assert UserRole.count() == 1
 		}
 		if (ReflectionQuestion.count() == 0) {
-			new ReflectionQuestion(name:"Was ist mir gut gelungen?", autoLink:true).save()
-			new ReflectionQuestion(name:"Was ist mir schwer gefallen (z.B. technisch oder fachlich)?", autoLink:true).save()
-			new ReflectionQuestion(name:"Was würde ich beim nächsten Mal besser oder anders machen?", autoLink:true).save()
-			new ReflectionQuestion(name:"Welche Fragen sind mir noch offen geblieben?", autoLink:true).save()
-			new ReflectionQuestion(name:"Welche Fragen habe ich bereits zu den anstehenden Aufträgen?", autoLink:true).save()
-
-			new ReflectionQuestion(name:"Zu welchem Thema wünsche ich mir noch Erklärungen?").save()
-			new ReflectionQuestion(name:"Welche neuen Tätigkeiten würde ich gerne noch kennenlernen?").save()
-			new ReflectionQuestion(name:"Welche Probleme/Störungen sind bei der Arbeit entstanden? Wie bin ich vorgegangen um die Probleme zu lösen?").save()
-			new ReflectionQuestion(name:"Was habe ich bei diesem Arbeitsauftrag neu gelernt? Was kann ich jetzt besser?").save()
-			new ReflectionQuestion(name:"Welche Aufgaben waren interessant und würde ich gerne vertiefen?").save(true)
-
-			assert ReflectionQuestion.count() == 10
+			new ReflectionQuestion(name:"Ich fühle mich sicher und routiniert bei dem Auftrag.", autoLink:true).save()
+			new ReflectionQuestion(name:"Mit dem Arbeitsergebnis bin ich zufrieden.", autoLink:true).save()
+			new ReflectionQuestion(name:"Die Arbeit lief problemlos und störungsfrei.", autoLink:true).save()
+			new ReflectionQuestion(name:"Ich habe genug Hintergrundwissen/Fachwissen zum Auftrag.", autoLink:false).save()
+			assert ReflectionQuestion.count() == 4
 		}
-		if (!Taxonomy.findByLabel("taskType")) {
+		if (Taxonomy.countByLabel("taskType") == 0) {
 			def typeTaxonomy = new Taxonomy(label:"taskType")
 			typeTaxonomy.addToChildren(new TaxonomyTerm(label:"Betrieb"))
 			typeTaxonomy.addToChildren(new TaxonomyTerm(label:"Schule"))
@@ -67,7 +61,7 @@ class BootStrap {
 				typeTaxonomy.errors.allErrors.each { println it }
 			}
 		}
-		if (!Taxonomy.findByLabel("organisations")) {
+		if (Taxonomy.countByLabel("organisations") == 0) {
 			def organisationsTaxonomy = new Taxonomy(label:"organisations")
 			if (!organisationsTaxonomy.save(true)) {
 				organisationsTaxonomy.errors.allErrors.each { println it }

@@ -4,12 +4,12 @@ import org.springframework.security.access.annotation.Secured
 import grails.transaction.Transactional
 import de.httc.plugins.repository.Asset
 import de.httc.plugins.qaa.Question
-import de.httc.plugins.common.Setting
 
 @Secured(['permitAll'])
 @Transactional(readOnly = true)
 class IndexController {
 	def springSecurityService
+	def settingService
 
 	def index() {
 		if (springSecurityService.isLoggedIn()) {
@@ -22,7 +22,7 @@ class IndexController {
 			render(view:"dashboard", model:[assignedTasks:assignedTasks, latestAssets:latestAssets, latestQuestions:latestQuestions])
 		}
 		else {
-			render(view:"index", model:[welcomeHeader:Setting.getValue("welcomeHeader"), welcomeBody:Setting.getValue("welcomeBody")])
+			render(view:"index", model:[welcomeHeader:settingService.getValue("welcomeHeader"), welcomeBody:settingService.getValue("welcomeBody")])
 		}
 	}
 }

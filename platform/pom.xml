@@ -9,8 +9,8 @@
 	<description />
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<grails.version>2.5.3</grails.version>
-		<h2.version>1.4.191</h2.version>
+		<grails.version>2.5.5</grails.version>
+		<h2.version>1.4.192</h2.version>
 		<httc.plugins.version>2.0.1</httc.plugins.version>
 	</properties>
 	<developers>
@@ -124,7 +124,7 @@
 		<dependency>
 			<groupId>org.grails.plugins</groupId>
 			<artifactId>hibernate4</artifactId>
-			<version>4.3.8.1</version>
+			<version>4.3.10</version>
 			<type>zip</type>
 			<scope>runtime</scope>
 		</dependency>
@@ -283,6 +283,7 @@
 			<type>zip</type>
 			<scope>runtime</scope>
 		</dependency>
+<!--
 		<dependency>
 			<groupId>org.grails.plugins</groupId>
 			<artifactId>elasticsearch</artifactId>
@@ -296,6 +297,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+-->
 		<dependency>
 			<groupId>org.grails.plugins</groupId>
 			<artifactId>quartz</artifactId>

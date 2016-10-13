@@ -15,18 +15,18 @@
 		<form method="get">
 			<div class="row filter">
 				<div class="col-xs-12">
-					<b><g:message code="kola.filter" /></b>:
+					<b><g:message code="app.filter" /></b>:
 					<span class="checkbox">
-						<label><input name="own" type="checkbox" onclick="$(this).closest('form').submit()"${params.own ? ' checked' : ''}> <g:message code="kola.filter.own" /></label>
+						<label><input name="own" type="checkbox" onclick="$(this).closest('form').submit()"${params.own ? ' checked' : ''}> <g:message code="app.filter.own" /></label>
 					</span>
 					<span class="checkbox">
-						<label><input name="ownCompany" type="checkbox" onclick="$(this).closest('form').submit()"${params.ownCompany ? ' checked' : ''}> <g:message code="kola.filter.ownCompany" /></label>
+						<label><input name="ownCompany" type="checkbox" onclick="$(this).closest('form').submit()"${params.ownCompany ? ' checked' : ''}> <g:message code="app.filter.ownCompany" /></label>
 					</span>
 				</div>
 			</div>
 		</form>
 		<g:if test="${taskDocumentationList?.size() > 0}">
-			<p class="margin text-muted small"><g:message code="kola.search.hits.displaying" args="${[entitiesName, params.offset + 1, Math.min(params.offset + params.max, taskDocumentationCount), taskDocumentationCount]}" />:</p>
+			<p class="margin text-muted small"><g:message code="app.search.hits.displaying" args="${[entitiesName, params.offset + 1, Math.min(params.offset + params.max, taskDocumentationCount), taskDocumentationCount]}" />:</p>
 			<g:set var="filterParams" value="${[own:params.own, ownCompany:params.ownCompany]}" />
 			<g:set var="sortParams" value="${[resetOffset:true] << filterParams}" />
 			<div class="table-responsive">
