@@ -1,8 +1,8 @@
 package kola
 import org.springframework.security.access.annotation.Secured
-//import org.apache.lucene.queryparser.classic.QueryParser
-//import static org.elasticsearch.index.query.QueryBuilders.*;
-//import static org.elasticsearch.index.query.FilterBuilders.*;
+import org.apache.lucene.queryparser.classic.QueryParser
+import static org.elasticsearch.index.query.QueryBuilders.*;
+import static org.elasticsearch.index.query.FilterBuilders.*;
 import de.httc.plugins.repository.Asset
 
 @Secured(['IS_AUTHENTICATED_REMEMBERED'])
