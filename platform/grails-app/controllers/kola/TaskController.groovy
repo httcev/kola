@@ -20,6 +20,7 @@ class TaskController {
 	def authService
 	def taskService
 	def questionService
+	def taskExportService
 
 	def index(Integer max) {
 		params.offset = params.offset && !params.resetOffset ? (params.offset as int) : 0
@@ -302,33 +303,12 @@ class TaskController {
 	}
 
 	def export(Task taskInstance) {
-		def reflectionAnswers = [:]
-		def taskDocumentations = [:]
-		if (!taskInstance.isTemplate) {
-			taskInstance.reflectionQuestions?.each { reflectionQuestion ->
-				reflectionAnswers[reflectionQuestion.id] = ReflectionAnswer.findAllByTaskAndQuestionAndDeleted(taskInstance, reflectionQuestion, false)
-			}
-
-			def docs = TaskDocumentation.findAllByReferenceAndDeleted(taskInstance, false)
-			if (docs) {
-				taskDocumentations[taskInstance.id] = docs
-			}
-			taskInstance.steps?.each { step ->
-				docs = TaskDocumentation.findAllByReferenceAndDeleted(step, false)
-				if (docs) {
-					taskDocumentations[step.id] = docs
-				}
-			}
-		}
-		def filename = taskInstance.name?.replaceAll("\\W+", "_");
-		if (!filename) {
-			filename = "export"
-		}
 		if (params.preview) {
 			render(template:"export", model:["task":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations])
 		}
 		else {
-			renderPdf(template:"export", model:["task":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations], filename:"${filename}.pdf")
+			//taskExportService.exportToWord(taskInstance, response)
+			taskExportService.exportToPdf(taskInstance, response)
 		}
 	}
 

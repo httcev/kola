@@ -54,7 +54,7 @@
 		</div>
 		<httc:markdown>${task.description}</httc:markdown>
 		<g:if test="${task?.attachments?.size() > 0}">
-			<g:render bean="${task?.attachments}" template="exportAttachments" var="attachments" />
+			<g:render bean="${task?.attachments}" template="/task/exportAttachments" var="attachments" />
 		</g:if>
 		<g:if test="${task?.resources?.size() > 0}">
 			<div class="panel panel-default">
@@ -80,7 +80,7 @@
 							<h4 class="list-group-item-heading"><span class="text-muted">${i+1}.</span> ${step.name}</h4>
 							<p class="list-group-item-text"><httc:markdown>${step.description}</httc:markdown></p>
 							<g:if test="${step.attachments?.size() > 0}">
-								<g:render bean="${step.attachments}" template="exportAttachments" var="attachments" />
+								<g:render bean="${step.attachments}" template="/task/exportAttachments" var="attachments" />
 							</g:if>
 						</li>
 					</g:each>
@@ -121,7 +121,7 @@
 						<li class="list-group-item">
 							<div class="list-group-item-text clearfix">
 								<p class="formatted">${taskDocumentation.text}</p>
-								<g:render bean="${taskDocumentation.attachments}" template="exportAttachments" var="attachments" />
+								<g:render bean="${taskDocumentation.attachments}" template="/task/exportAttachments" var="attachments" />
 								<small class="pull-right">
 									${taskDocumentation.creator.profile.displayName},
 									<g:formatDate date="${taskDocumentation.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
@@ -136,7 +136,7 @@
 								<li class="list-group-item">
 									<div class="list-group-item-text clearfix">
 										<p class="formatted">${taskDocumentation.text}</p>
-										<g:render bean="${taskDocumentation.attachments}" template="exportAttachments" var="attachments" />
+										<g:render bean="${taskDocumentation.attachments}" template="/task/exportAttachments" var="attachments" />
 										<small class="pull-right">
 											${taskDocumentation.creator.profile.displayName},
 											<g:formatDate date="${taskDocumentation.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/>
