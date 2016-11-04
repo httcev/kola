@@ -259,8 +259,8 @@ class ChangesController {
 				if (!model.creator) {
 					model.creator = user
 				}
-				// check write access to model
-				if (model.creator == user) {
+				// check write access to model (special case for Task: allow write access to assignee to update "done" field)
+				if (model.creator == user || (model instanceof Task && model.assignee == user)) {
 					model.properties = doc
 				}
 				else {
