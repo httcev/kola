@@ -259,16 +259,18 @@ class ChangesController {
 				if (!model.creator) {
 					model.creator = user
 				}
-				// check write access to model (special case for Task: allow write access to assignee to update "done" field)
-				if (model.creator == user || (model instanceof Task && model.assignee == user)) {
+				// check write access to model
+				if (model.creator == user) {
 					model.properties = doc
 				}
-				else {
-					// special cases for questions/answers: update rating
-					if (model instanceof Question || model instanceof Answer) {
-						model.setRated(doc.rated == true)
-						println "--- UPDATED RATING -> " + model.rated
-					}
+				else if ((model instanceof Task) && (model.assignee == user)) {
+					// special case for Task: allow write access to assignee to update "done" field
+					model.done = doc.done
+				}
+				else if (model instanceof Question || model instanceof Answer) {
+					// special cases for questions/answers: allow to update rating
+					model.setRated(doc.rated == true)
+					println "--- UPDATED RATING -> " + model.rated
 				}
 				if (_saveModel(model)) {
 					modified = true
