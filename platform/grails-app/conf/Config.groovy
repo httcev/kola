@@ -140,7 +140,7 @@ environments {
         de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyDZ71xb2yLt1eaO8qw9pRsPw-Whzlo036s"
     }
     bau {
-        de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyBO_hJut2oe19_Br0e_uRzLseke8WaHie4"
+        de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyDx--Ido0Q790JrctqhHLhJsi6wjef6C3M"
     }
 }
 
