@@ -92,7 +92,7 @@ angular.module('kola.services', ['uuid'])
 		var options = {
 			quality: 90,
 			//      destinationType: Camera.DestinationType.DATA_URL,
-			destinationType: Camera.DestinationType.FILE_URI,
+			destinationType: ionic.Platform.isAndroid() ? Camera.DestinationType.FILE_URI : Camera.DestinationType.NATIVE_URI,
 			sourceType: Camera.PictureSourceType.CAMERA,
 			allowEdit: false,
 			//encodingType: Camera.EncodingType.JPEG,
@@ -134,7 +134,7 @@ angular.module('kola.services', ['uuid'])
 
 	this.attachChosenMedia = function(doc) {
 		var options = {
-			destinationType: Camera.DestinationType.FILE_URI,
+			destinationType: ionic.Platform.isAndroid() ? Camera.DestinationType.FILE_URI : Camera.DestinationType.NATIVE_URI,
 			sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM,
 			allowEdit: false,
 			MediaType: Camera.MediaType.ALLMEDIA
