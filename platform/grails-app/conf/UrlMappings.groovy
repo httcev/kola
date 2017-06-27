@@ -10,7 +10,7 @@ class UrlMappings {
 		}
 		"/api/pushToken"{
 			controller = "pushToken"
-			action = [POST:"update"]
+			action = [GET:"index", POST:"update"]
 		}
 
 		"/$controller/$action?/$id?(.$format)?"{

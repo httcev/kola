@@ -15,6 +15,8 @@ import grails.util.Environment
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
 
+grails.config.locations = [ "file:./${appName}-config.properties" ]
+
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 
 // The ACCEPT header will not be used for content negotiation for user agents containing the following strings (defaults to the 4 major rendering engines)
@@ -99,14 +101,12 @@ grails.databinding.dateFormats = [
 
 
 grails.logging.jul.usebridge = false
-grails.serverURL = "https://${Environment.current == Environment.PRODUCTION ? 'plattform' : Environment.current.name}.kola-projekt.de"
 kola {
     thumbnailSize = 80
     avatarSize = 40
-    appDownloadUrl = "https://play.google.com/apps/testing/de.httc.kola${Environment.current == Environment.PRODUCTION ? '' : '.' + Environment.current.name}"
+    appDownloadUrl = "https://play.google.com/apps/de.httc.kola"
 }
 de.httc.plugin.user.selfRegistrationEnabled = false
-de.httc.plugin.repository.directory = "/srv/kola/${Environment.current.name}/repository"
 
 elasticSearch {
     index.name = "kola-${Environment.current.name}"
@@ -119,28 +119,12 @@ elasticSearch {
 environments {
     development {
         grails.logging.jul.usebridge = true
-        grails.serverURL = "http://130.83.139.161:8080/kola-platform"
+        grails.serverURL = "http://localhost:8080/kola-platform"
         elasticSearch.client.mode = "local"
         elasticSearch.index.store.type = "memory"
 //        elasticSearch.bulkIndexOnStartup = false
 
         de.httc.plugin.repository.directory = "./data/repository"
-        de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyAJQJjAOE53yqqTbgi3Nj3rfeMjREc-fOo"
-    }
-    production {
-        de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyCEXmn4Ta8wvX8Nb9lIW8GEBGavBknequ8"
-    }
-    demo {
-        de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyAr2gXuBbLcDek4-zGcwvJPA-v9EHpuhOo"
-    }
-    staging {
-        de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyAJQJjAOE53yqqTbgi3Nj3rfeMjREc-fOo"
-    }
-    lvg {
-        de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyDZ71xb2yLt1eaO8qw9pRsPw-Whzlo036s"
-    }
-    bau {
-        de.httc.plugin.pushNotification.gcmApiKey = "AIzaSyDx--Ido0Q790JrctqhHLhJsi6wjef6C3M"
     }
 }
 

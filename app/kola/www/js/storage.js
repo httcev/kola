@@ -129,7 +129,7 @@ angular.module('kola.storage', ['uuid'])
 	}
 })
 
-.service('dbService', function($rootScope, $q, $state, $ionicPlatform, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, serverUrl, appVersion, schemaService, authenticationService, rfc4122) {
+.service('dbService', function($rootScope, $q, $state, $ionicPlatform, $ionicLoading, $cordovaFile, $cordovaFileTransfer, $window, appVersion, schemaService, authenticationService, rfc4122) {
 	var self = this;
 	var firstRun = true;
 	var debug = false;
@@ -150,6 +150,10 @@ angular.module('kola.storage', ['uuid'])
 						deferred.resolve();
 						$rootScope.$broadcast("syncSucceeded");
 					} else {
+						$ionicLoading.show({
+							template: "Server konnte nicht kontaktiert werden.",
+							duration: 2000
+						});
 						deferred.reject("sync failed");
 					}
 				}
@@ -248,7 +252,6 @@ angular.module('kola.storage', ['uuid'])
 					doc._modified = (result.modified === "true");
 					// attach oneToMany relations
 					self._attachOneToMany(doc, tx).then(function() {
-//						console.log("--- loaded", doc);
 						if (tableName == "asset" && doc.typeLabel == "attachment") {
 							self._setLocalURL(doc).then(function() {
 								d.resolve(doc);
@@ -350,38 +353,45 @@ angular.module('kola.storage', ['uuid'])
 
 	function _init() {
 		try {
-			var user = authenticationService.getCredentials().user;
-			if (user) {
-				if (window.cordova) {
-					//	  self._assetsDirName = cordova.file.dataDirectory + "assets/";
-					self._cacheDirName = cordova.file.externalCacheDirectory;
-					self._dataDirName = ionic.Platform.isAndroid() ? cordova.file.externalDataDirectory : cordova.file.dataDirectory;
-					self._assetsDirName = self._dataDirName + "assets/";
-					$cordovaFile.createDir(self._dataDirName, "assets", false).finally(function() {
-						window.resolveLocalFileSystemURL(self._assetsDirName, function(dir) {
-							self._assetsDir = dir;
-						});
-					});
-					window.openDatabase = function(dbname, ignored1, ignored2, ignored3) {
-						return window.sqlitePlugin.openDatabase({name: dbname, location: 'default', androidDatabaseImplementation: 2});
-					};
-				}
-				self.db = window.openDatabase(user + '.db', '1', 'KOLA DB', 1024 * 1024 * 100);
-
-				_createTables().then(function() {
-					DBSYNC.initSync(self, schemaService, self.db, {
-						version: appVersion
-					}, serverUrl + "/api/changes", serverUrl + "/api/upload", self._assetsDirName, function() {
-						self.initDeferred.resolve();
-						if (firstRun) {
-							$rootScope.$watch("onlineState.isOnline", onOnlineStateChanged);
-							firstRun = false;
-						}
-					}, $cordovaFileTransfer, $cordovaFile, $q, authenticationService);
-				});
-			} else {
+			var credentials = authenticationService.getCredentials();
+			var user = credentials.user;
+			var server = credentials.server;
+			if (!user) {
 				self.initDeferred.reject("no_user");
+				return;
 			}
+			if (!server) {
+				self.initDeferred.reject("no_server");
+				return;
+			}
+			var database = btoa(server + ":" + user) + ".db";
+
+			if (window.cordova) {
+				self._cacheDirName = cordova.file.externalCacheDirectory;
+				self._dataDirName = ionic.Platform.isAndroid() ? cordova.file.externalDataDirectory : cordova.file.dataDirectory;
+				self._assetsDirName = self._dataDirName + "assets/";
+				$cordovaFile.createDir(self._dataDirName, "assets", false).finally(function() {
+					window.resolveLocalFileSystemURL(self._assetsDirName, function(dir) {
+						self._assetsDir = dir;
+					});
+				});
+				window.openDatabase = function(dbname, ignored1, ignored2, ignored3) {
+					return window.sqlitePlugin.openDatabase({name: dbname, location: 'default', androidDatabaseImplementation: 2});
+				};
+			}
+			self.db = window.openDatabase(database, '1', 'KOLA DB', 1024 * 1024 * 100);
+
+			_createTables().then(function() {
+				DBSYNC.initSync(self, schemaService, self.db, {
+					version: appVersion
+				}, server + "/api/changes", server + "/api/upload", self._assetsDirName, function() {
+					self.initDeferred.resolve();
+					if (firstRun) {
+						$rootScope.$watch("onlineState.isOnline", onOnlineStateChanged);
+						firstRun = false;
+					}
+				}, $cordovaFileTransfer, $cordovaFile, $q, authenticationService);
+			});
 		}
 		catch(e) {
 			self.initDeferred.reject(e);
@@ -394,8 +404,8 @@ angular.module('kola.storage', ['uuid'])
 			return self.initDeferred.promise.then(function() {
 				return fn.apply(this, args);
 			}, function(err) {
-				if ("no_user" == err) {
-					openAccountTab("Willkommen bei KOLA! Bitte geben Sie Ihren Nutzernamen und Passwort ein.");
+				if ("no_user" == err || "no_server" == err) {
+					openAccountTab("Willkommen bei KOLA! Bitte geben Sie Ihren Server, Nutzernamen und Passwort ein.");
 				} else {
 					console.log(err);
 				}
@@ -532,7 +542,6 @@ angular.module('kola.storage', ['uuid'])
 			var tableSchema = schemaService[doc._table];
 			_replaceIds(copy, tableSchema);
 
-//			console.log("--- saving", copy);
 			var sql = "INSERT OR REPLACE INTO " + doc._table + " (id, modified, doc";
 			var sqlValues = "?, ?, ?";
 			var values = [copy.id, isUpdateFromServer !== true, JSON.stringify(copy)];

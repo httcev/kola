@@ -7,7 +7,7 @@ angular.module('kola.controllers', [])
 		}, function(err) {
 			// this error handling is needed on the first start of the app. dbService initialization is rejected in this case.
 			$scope.tasks = [];
-			if (err !== "no_user") {
+			if (err !== "no_user" && err !== "no_server") {
 				console.log(err);
 				$ionicPopup.alert({
 					title: "<b>Fehler</b>",
@@ -488,8 +488,9 @@ angular.module('kola.controllers', [])
 
 	$scope.update = function() {
 		localStorage["scaleImages"] = $scope.scaleImages.toString();
-		if ($scope.profile.user && $scope.profile.password) {
-			authenticationService.updateCredentials($scope.profile.user, $scope.profile.password);
+		if ($scope.profile.server && $scope.profile.user && $scope.profile.password) {
+			$scope.profile.server = $scope.profile.server.trim().toLowerCase();
+			authenticationService.updateCredentials($scope.profile.server, $scope.profile.user, $scope.profile.password);
 			dbService.sync();
 			return $state.go("home");
 		}

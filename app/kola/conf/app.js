@@ -146,30 +146,6 @@ angular.module('kola', ['ionic', 'ngCordova', 'monospaced.elastic', 'hc.marked',
 
 .constant("appName", "/* @echo APP_NAME */")
 .constant("appVersion", "/* @echo APP_VERSION */")
-// @if ENV == 'dev'
-.constant("gcmSenderID", "686594383179")
-.constant("serverUrl", "http://130.83.139.161:8080/kola-platform");
-// @endif
-// @if ENV == 'prod'
-.constant("gcmSenderID", "502614463037")
-.constant("serverUrl", "https://plattform.kola-projekt.de");
-// @endif
-// @if ENV == 'demo'
-.constant("gcmSenderID", "406168835925")
-.constant("serverUrl", "https://demo.kola-projekt.de");
-// @endif
-// @if ENV == 'staging'
-.constant("gcmSenderID", "686594383179")
-.constant("serverUrl", "https://staging.kola-projekt.de");
-// @endif
-// @if ENV == 'lvg'
-.constant("gcmSenderID", "502140985287")
-.constant("serverUrl", "https://lvg.kola-projekt.de");
-// @endif
-// @if ENV == 'bau'
-.constant("gcmSenderID", "305105097356")
-.constant("serverUrl", "https://bau.kola-projekt.de");
-// @endif
 
 var checkRouting = function(dbService) {
 	/*

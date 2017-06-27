@@ -2,7 +2,7 @@
 <widget id="<!-- @echo APP_PACKAGE -->" version="<!-- @echo APP_VERSION -->" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name><!-- @echo APP_NAME --></name>
     <description>
-        An Ionic Framework and Cordova project.
+        Kompetenzorientiertes Lernen im Arbeitsprozess mit digitalen Medien
     </description>
     <author email="support@httc.de" href="http://www.httc.de/">
       httc e.V.
@@ -87,6 +87,6 @@
 
     <icon src="resources/android/icon/drawable-xhdpi-icon.png" />
 
-    <engine name="android" spec="~4.1.1" />
+    <engine name="android" spec="~6.2.0" />
     <engine name="ios" spec="~3.9.1" />
 </widget>

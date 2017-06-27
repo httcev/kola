@@ -14,6 +14,7 @@ angular.module('kola.services', ['uuid'])
 
 	function loadCredentials() {
 		return {
+			"server": localStorage["server"],
 			"user": localStorage["user"],
 			"password": localStorage["password"]
 		};
@@ -23,7 +24,8 @@ angular.module('kola.services', ['uuid'])
 		return credentials;
 	}
 
-	function updateCredentials(user, password) {
+	function updateCredentials(server, user, password) {
+		localStorage["server"] = server;
 		localStorage["user"] = user;
 		localStorage["password"] = password;
 		credentials = loadCredentials();
