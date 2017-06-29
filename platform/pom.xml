@@ -55,7 +55,14 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-
+		<repository>
+			<id>httcev-grails-plugins-mvn-repo</id>
+			<url>https://raw.github.com/httcev/grails-plugins/mvn-repo/</url>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
