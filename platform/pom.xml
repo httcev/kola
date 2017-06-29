@@ -56,6 +56,7 @@
 			</snapshots>
 		</repository>
 		<repository>
+			<!-- for httc grails-plugins -->
 			<id>httcev-grails-plugins-mvn-repo</id>
 			<url>https://raw.github.com/httcev/grails-plugins/mvn-repo/</url>
 			<snapshots>
