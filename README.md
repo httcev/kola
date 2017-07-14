@@ -1,26 +1,25 @@
 KOLA
 ====
 
+| Releases ||
+| -------- | ----------- |
+| Server   | path to data files to supply the data that will be passed into templates. |
+| App      | https://play.google.com/apps/de.httc.kola |
+
 Building the server platform
 ------------
 
 **Requirements**
 
 - Java 8
-- Grails < 3.0
+- Apache Maven 3 (https://maven.apache.org/)
 
 ```bash
 $ cd platform
-$ grails war
+$ mvn package
 ```
 
-To run the server platform in dev mode, use
-
-```bash
-$ grails run-app
-```
-
-and point your browser at http://localhost:8080/platform
+The web application's `war` file will then be located in the `target` directory, ready to be deployed to an application server, e.g. Apache Tomcat.
 
 
 Building the App
@@ -30,7 +29,9 @@ Building the App
 
 - Java 8 (for targeting Android)
 - ?? (for targeting IOS)
-- Node
+- Node.js (https://nodejs.org/en/download/package-manager/)
+- Bower (`npm install -g bower`)
+- Ionic (`npm install -g ionic`)
 
 ```bash
 $ cd app/kola
@@ -39,7 +40,7 @@ $ bower install
 $ ionic build [android | ios]
 ```
 
-To run the app in dev mode, edit file app/kola/www/app.js (set the server URL at the bottom to your local machine) and then:
+To run the app in dev mode:
 
 ```bash
 $ ionic serve --lab

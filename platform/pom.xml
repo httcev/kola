@@ -11,7 +11,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<grails.version>2.5.3</grails.version>
 		<h2.version>1.4.192</h2.version>
-		<httc.plugins.version>2.0.4-SNAPSHOT</httc.plugins.version>
+		<httc.plugins.version>2.0.5</httc.plugins.version>
 	</properties>
 	<developers>
 		<developer>
@@ -28,9 +28,9 @@
 	</scm>
 	<repositories>
 		<repository>
-			<id>docendo</id>
-			<name>docendo Maven Repository</name>
-			<url>http://dev.docendo.org/maven/ext-releases-local/</url>
+			<id>httc</id>
+			<name>httc Maven Repository</name>
+			<url>https://repo.httc.de/artifactory/libs-release/</url>
 			<layout>default</layout>
 		</repository>
 		<repository>
@@ -55,16 +55,19 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
-		<repository>
-			<!-- for httc grails-plugins -->
-			<id>httcev-grails-plugins-mvn-repo</id>
-			<url>https://raw.github.com/httcev/grails-plugins/mvn-repo/</url>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>always</updatePolicy>
-			</snapshots>
-		</repository>
 	</repositories>
+	<distributionManagement>
+		<repository>
+			<id>httc-maven-repo-releases</id>
+			<name>httc-maven-repo-releases</name>
+			<url>https://repo.httc.de/artifactory/libs-release-local/</url>
+		</repository>
+		<snapshotRepository>
+			<id>httc-maven-repo-snapshots</id>
+			<name>httc-maven-repo-snapshots</name>
+			<url>https://repo.httc.de/artifactory/libs-snapshot-local/</url>
+		</snapshotRepository>
+	</distributionManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.grails</groupId>
