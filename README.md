@@ -3,7 +3,7 @@ KOLA
 
 | Releases ||
 | -------- | ----------- |
-| Server   | http://repo.httc.de/artifactory/libs-release/de/httc/kola-platform/2.0.9/kola-platform-2.0.9.war |
+| Server   | http://repo.httc.de/artifactory/libs-release/de/httc/kola-platform/2.0.10/kola-platform-2.0.10.war |
 | App      | https://play.google.com/apps/de.httc.kola |
 
 Building the server platform
