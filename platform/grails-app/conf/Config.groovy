@@ -104,7 +104,7 @@ grails.logging.jul.usebridge = false
 kola {
     thumbnailSize = 80
     avatarSize = 40
-    appDownloadUrl = "https://play.google.com/apps/de.httc.kola"
+    appDownloadUrl = "https://play.google.com/store/apps/details?id=de.httc.kola"
 }
 de.httc.plugin.user.selfRegistrationEnabled = false
 
