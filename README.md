@@ -3,7 +3,7 @@ KOLA
 
 | Releases ||
 | -------- | ----------- |
-| Server   | path to data files to supply the data that will be passed into templates. |
+| Server   | http://repo.httc.de/artifactory/libs-release/de/httc/kola-platform/2.0.9/kola-platform-2.0.9.war |
 | App      | https://play.google.com/apps/de.httc.kola |
 
 Building the server platform
@@ -21,6 +21,16 @@ $ mvn package
 
 The web application's `war` file will then be located in the `target` directory, ready to be deployed to an application server, e.g. Apache Tomcat.
 
+Server configuration
+------------
+Create a file named `kola-platform-config.properties` in your application server's directory. You can configure/override these settings:
+
+```properties
+grails.serverURL = <FILL-IN-YOUR-BASE-URL-HERE>
+de.httc.plugin.repository.directory = ./repo
+elasticSearch.index.name = kola-production
+dataSource.url = jdbc:h2:./data/db/kola;MVCC=TRUE;LOCK_TIMEOUT=10000;DB_CLOSE_ON_EXIT=FALSE;TRACE_LEVEL_FILE=0
+```
 
 Building the App
 ------------
