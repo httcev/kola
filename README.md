@@ -1,6 +1,8 @@
 KOLA
 ====
 
+Project page: http://www.kola-projekt.de
+
 | Releases ||
 | -------- | ----------- |
 | Server   | http://repo.httc.de/artifactory/libs-release/de/httc/kola-platform/2.0.10/kola-platform-2.0.10.war |
