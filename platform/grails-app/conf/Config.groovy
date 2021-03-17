@@ -175,7 +175,6 @@ log4j.appender.file.layout.ConversionPattern=%d{ABSOLUTE} %5p %c{1}:%L - %m%n
            'org.codehaus.groovy.grails.web.pages',          // GSP
            'org.codehaus.groovy.grails.web.sitemesh',       // layouts
            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
-           'org.codehaus.groovy.grails.web.mapping',        // URL mapping
            'org.codehaus.groovy.grails.commons',            // core / classloading
            'org.codehaus.groovy.grails.plugins',            // plugins
            'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
@@ -226,12 +225,11 @@ grails.plugins.twitterbootstrap.fixtaglib = true
 
 grails {
    mail {
-        host = "mailserver.kom.e-technik.tu-darmstadt.de"
-        port = 465
-        props = [
-            "mail.smtp.socketFactory.port":"465",
-            "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-            "mail.smtp.socketFactory.fallback":"false"]
+        host = "kommail.kom.e-technik.tu-darmstadt.de"
+        port = 25
+		props = [
+            'mail.smtp.starttls.enable': 'true',
+            'mail.smtp.port': '25']
    }
 }
 grails.plugin.springsecurity.ui.forgotPassword.emailSubject = "KOLA Benutzerkonto, neues Passwort"

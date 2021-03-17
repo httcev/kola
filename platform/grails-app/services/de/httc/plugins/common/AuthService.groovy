@@ -46,23 +46,31 @@ class AuthService {
 	def getAssignableUserProfiles() {
 		if (SpringSecurityUtils.ifAnyGranted('ROLE_ADMIN, ROLE_TEACHER')) {
 			return Profile.createCriteria().list {
-				and {
-					order("lastName", "asc")
-					order("firstName", "asc")
-					order("id", "asc")
+				user {
+					and {
+						eq("accountLocked", false)
+						eq("enabled", true)
+					}
 				}
+				order("lastName", "asc")
+				order("firstName", "asc")
+				order("id", "asc")
 			}
 		}
 		else {
 			def currentCompany = springSecurityService.currentUser?.profile?.company
 			return Profile.createCriteria().list {
-				and {
-					eq("company", currentCompany)
-
-					order("lastName", "asc")
-					order("firstName", "asc")
-					order("id", "asc")
+				eq("company", currentCompany)
+				user {
+					and {
+						eq("accountLocked", false)
+						eq("enabled", true)
+					}
 				}
+
+				order("lastName", "asc")
+				order("firstName", "asc")
+				order("id", "asc")
 			}
 		}
 	}

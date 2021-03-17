@@ -1,0 +1,19 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title *ngIf="question?._isNew">Neue Frage</ion-title>
+    <ion-title *ngIf="!question?._isNew">Frage bearbeiten</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()" color="primary" [disabled]="!form.valid">Abschicken</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [formGroup]="form">
+  <ion-item><ion-input formControlName="title" placeholder="Geben Sie hier Ihre Frage ein..." autofocus="true" required="true"></ion-input></ion-item>
+  <ion-item><ion-textarea formControlName="text" placeholder="Hier können Sie Ihre Frage weiter erläutern..." rows="8"></ion-textarea></ion-item>
+  <task-reference *ngIf="question" [referrer]="question" editmode="true"></task-reference>
+  <media-attachments [ref]="question" editmode="true"></media-attachments>
+</ion-content>

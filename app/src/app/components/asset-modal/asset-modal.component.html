@@ -1,0 +1,14 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{asset.name}}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismissModal()"><ion-icon slot="icon-only" name="close"></ion-icon></ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-content>
+  <ion-slides scrollbar="true">
+    <ion-slide><img [src]="asset.url"></ion-slide>
+  </ion-slides>
+
+</ion-content>

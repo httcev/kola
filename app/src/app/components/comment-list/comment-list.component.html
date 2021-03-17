@@ -1,0 +1,13 @@
+<ion-card *ngIf="comments?.length">
+  <ion-list>
+    <ion-list-header color="medium">
+      <ion-item color="medium" lines="none"><ion-icon name="chatbubbles" slot="start"></ion-icon><ion-label>Kommentare</ion-label></ion-item>
+    </ion-list-header>
+    <ion-item *ngFor="let comment of comments">
+      <div style="width:100%" class="ion-padding-top ion-padding-bottom">
+        <markdown ngPreserveWhitespaces [data]="comment.text"></markdown>
+        <user-info [ref]="comment"></user-info>
+      </div>
+    </ion-item>
+  </ion-list>
+</ion-card>

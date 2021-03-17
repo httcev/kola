@@ -1,0 +1,13 @@
+ion-slides { min-height:100% }
+ion-slide { justify-content: flex-start; }
+ion-slide {
+  min-height: 100%;
+  flex-direction: column;
+  padding-bottom:20px;
+}
+ion-item { width:100%; }
+ion-slide p { }
+ion-slide { color:var(--ion-color-medium) }
+ion-slide h1 { margin:15px 0; }
+ion-note { display:block; }
+img { width:64px; }

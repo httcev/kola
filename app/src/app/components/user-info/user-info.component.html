@@ -1,0 +1,7 @@
+<ion-text [color]="color">
+  <ion-icon *ngIf="prefixIcon" [src]="prefixIcon"></ion-icon>
+  <ion-icon name="person"></ion-icon>
+</ion-text>
+<ion-label *ngIf="displayName" [color]="color">
+  {{displayName}} {{date | amTimeAgo}}
+</ion-label>

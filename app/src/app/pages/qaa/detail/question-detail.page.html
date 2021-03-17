@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/question"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Frage</ion-title>
+  </ion-toolbar>
+</ion-header>
+<ion-fab *ngIf="question" vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button (click)="createAnswer()">
+    <ion-icon src="/assets/icons/answer.svg"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+<ion-content>
+  <div *ngIf="!loading; else loadingTemplate">
+    <div *ngIf="question; else notFoundTemplate">
+      <task-reference *ngIf="question?.reference" [referrer]="question" verbose="true" color=""></task-reference>
+      <div class="ion-padding">
+        <h3 class="ion-no-margin"><ion-text color="primary">{{question?.title}}</ion-text></h3>
+        <markdown ngPreserveWhitespaces [data]="question.text"></markdown>
+        <user-info [ref]="question"></user-info>
+      </div>
+      <media-attachments [ref]="question"></media-attachments>
+      <comment-list [comments]="question._comments"></comment-list>
+      <ion-item lines="none">
+        <ion-button (click)="openActionSheet(question)" slot="start" shape="round" fill="outline" color="primary"><ion-icon slot="icon-only" name="more"></ion-icon></ion-button>
+      </ion-item>
+
+      <div *ngIf="question._answers?.length">
+        <div class="ion-padding"><h3><ion-text color="secondary">Antworten:</ion-text></h3></div>
+        <ion-card *ngFor="let answer of question._answers" [color]="question.acceptedAnswer === answer.id ? 'success' : 'light'">
+          <ion-card-content>
+            <markdown ngPreserveWhitespaces [data]="answer.text"></markdown>
+            <user-info [ref]="answer" [color]="question.acceptedAnswer === answer.id ? 'light' : 'medium'"></user-info>
+          </ion-card-content>
+          <media-attachments [ref]="answer"></media-attachments>
+          <comment-list [comments]="answer._comments"></comment-list>
+          <ion-item lines="none" [color]="question.acceptedAnswer === answer.id ? 'success' : 'light'">
+            <ion-button (click)="openActionSheet(answer)" slot="start" shape="round" fill="outline" [color]="question.acceptedAnswer === answer.id ? 'light' : 'primary'"><ion-icon slot="icon-only" name="more"></ion-icon></ion-button>
+          </ion-item>
+        </ion-card>
+      </div>
+    </div>
+  </div>
+  <ng-template #loadingTemplate><div class="ion-margin-top ion-text-center"><ion-spinner color="medium"></ion-spinner></div></ng-template>
+  <ng-template #notFoundTemplate><ion-card color="danger"><ion-card-header>Die Frage wurde nicht gefunden</ion-card-header></ion-card></ng-template>
+</ion-content>

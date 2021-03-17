@@ -11,26 +11,28 @@ class TaskDocumentationController {
 	@Secured(['IS_AUTHENTICATED_REMEMBERED'])
 	def index(Integer max) {
 		params.offset = params.offset && !params.resetOffset ? (params.offset as int) : 0
-		params.max = Math.min(max ?: 10, 100)
+		params.max = Math.min(max ?: 10, 1000)
 		params.sort = params.sort ?: "lastUpdated"
 		params.order = params.order ?: "desc"
 
 		def user = springSecurityService.currentUser
 		def userCompany = user.profile?.company
-		def filtered = params.own || params.ownCompany
+		params.createdBy = params.createdBy ?: "company"
+		def filtered = (params.createdBy != "all")
 
 		def results = TaskDocumentation.createCriteria().list(max:params.max, offset:params.offset) {
 			// left join allows null values in the association
 			createAlias('creator', 'c', org.hibernate.Criteria.LEFT_JOIN)
 			createAlias('c.profile', 'cp', org.hibernate.Criteria.LEFT_JOIN)
+			createAlias('cp.company', 'cpc', org.hibernate.Criteria.LEFT_JOIN)
 
 			eq("deleted", false)
 			if (filtered) {
 				or {
-					if (params.own) {
+					if (params.createdBy == "own") {
 						eq("creator", user)
 					}
-					if (params.ownCompany) {
+					if (params.createdBy == "company") {
 						eq("cp.company", userCompany)
 					}
 				}

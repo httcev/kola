@@ -4,6 +4,7 @@ import grails.converters.JSON
 import static org.springframework.http.HttpStatus.*
 import grails.transaction.Transactional
 import org.springframework.security.access.annotation.Secured
+import org.springframework.context.i18n.LocaleContextHolder
 import de.httc.plugins.user.User
 import de.httc.plugins.user.Profile
 import de.httc.plugins.qaa.Question
@@ -21,21 +22,29 @@ class TaskController {
 	def taskService
 	def questionService
 	def taskExportService
+	def messageSource
 
 	def index(Integer max) {
 		params.offset = params.offset && !params.resetOffset ? (params.offset as int) : 0
-		params.max = Math.min(max ?: 10, 100)
+		params.max = Math.min(max ?: 10, 10000)
 		params.sort = params.sort ?: "lastUpdated"
 		params.order = params.order ?: "desc"
+		params.assigneeId = params.assigneeId ? (params.assigneeId as long) : null
+		params.createdBy = params.createdBy ?: "company"
 
 		def user = springSecurityService.currentUser
 		def userCompany = user.profile?.company
-		def filtered = params.own || params.assigned || params.ownCompany || params.key
+		// check if current user is allowed to access given assignee id
+		if (params.assigneeId != null && !authService.getAssignableUserProfiles().collect { it.id }.contains(params.assigneeId)) {
+			params.assigneeId = null
+		}
+		def filtered = (params.createdBy != "all") || params.assigned || params.key || params.assigneeId || params.taskType
 
 		def results = Task.createCriteria().list(max:params.max, offset:params.offset) {
 			// left join allows null values in the association
 			createAlias('creator', 'c', org.hibernate.Criteria.LEFT_JOIN)
 			createAlias('c.profile', 'cp', org.hibernate.Criteria.LEFT_JOIN)
+			createAlias('cp.company', 'cpc', org.hibernate.Criteria.LEFT_JOIN)
 			createAlias('assignee', 'a', org.hibernate.Criteria.LEFT_JOIN)
 			createAlias('a.profile', 'ap', org.hibernate.Criteria.LEFT_JOIN)
 
@@ -43,17 +52,17 @@ class TaskController {
 			eq("isTemplate", params.isTemplate?.toBoolean() ? true : false)
 			if (filtered) {
 				or {
-					if (params.own) {
+					if (params.createdBy == "own") {
 						eq("creator", user)
 					}
-					if (params.assigned) {
-						eq("assignee", user)
-					}
-					if (params.ownCompany) {
+					if (params.createdBy == "company") {
 						or {
 							eq("cp.company", userCompany)
 							eq("ap.company", userCompany)
 						}
+					}
+					if (params.assigned) {
+						eq("assignee", user)
 					}
 				}
 				if (params.key) {
@@ -61,6 +70,12 @@ class TaskController {
 						ilike("name", "%${params.key}%")
 						ilike("description", "%${params.key}%")
 					}
+				}
+				if (params.assigneeId) {
+					eq("ap.id", params.assigneeId)
+				}
+				if (params.taskType) {
+					eq("type.id", params.taskType)
 				}
 			}
 			and {
@@ -77,6 +92,12 @@ class TaskController {
 			notFound()
 			return
 		}
+		if (taskInstance.deleted) {
+			flash.message = message(code: 'kola.task.deleted')
+			respond taskInstance
+			return
+		}
+
 		def reflectionAnswers = [:]
 		def taskDocumentations = [:]
 		def taskQuestions = [:]
@@ -86,7 +107,7 @@ class TaskController {
 			}
 
 			def documentations = TaskDocumentation.findAllByReferenceAndDeleted(taskInstance, false, [sort:'lastUpdated', order:'asc'])
-			def questions = Question.findAllByReferenceAndDeleted(taskInstance, false, [sort:'lastUpdated', order:'asc'])
+			def questions = Question.findAllByReferenceAndDeleted(taskInstance, false, [sort:'dateCreated', order:'desc'])
 			if (documentations) {
 				taskDocumentations[taskInstance.id] = documentations
 			}
@@ -95,7 +116,7 @@ class TaskController {
 			}
 			taskInstance.steps?.each { step ->
 				documentations = TaskDocumentation.findAllByReferenceAndDeleted(step, false, [sort:'lastUpdated', order:'asc'])
-				questions = Question.findAllByReferenceAndDeleted(step, false, [sort:'lastUpdated', order:'asc'])
+				questions = Question.findAllByReferenceAndDeleted(step, false, [sort:'dateCreated', order:'desc'])
 				if (documentations) {
 					taskDocumentations[step.id] = documentations
 				}
@@ -159,6 +180,40 @@ class TaskController {
 		respond new Task(params), view:"create"
 	}
 
+	@Secured(['ROLE_ADMIN', 'ROLE_TASK_TEMPLATE_CREATOR'])
+	def copyTemplate(Task templateInstance) {
+		if (templateInstance == null || !templateInstance.isTemplate?.toBoolean()) {
+			notFound()
+			return
+		}
+		def task = new Task()
+		task.name = messageSource.getMessage("kola.taskTemplate.copy", null, "Copy of", LocaleContextHolder.locale) + " " + templateInstance.name
+		task.description = templateInstance.description
+		task.type = templateInstance.type
+		task.template = null
+		task.isTemplate = true
+		task.attachments = []
+		task.attachments.addAll(templateInstance.attachments)
+		task.resources = []
+		task.resources.addAll(templateInstance.resources)
+		// join reflection questions from template
+		task.reflectionQuestions = []
+		task.reflectionQuestions.addAll(templateInstance.reflectionQuestions)
+		task.creator = springSecurityService.currentUser
+
+		templateInstance.steps?.each { step ->
+			task.addToSteps(new TaskStep(name:step.name, description:step.description, attachments:step.attachments))
+		}
+
+		if (!task.save(flush:true)) {
+			task.errors.allErrors.each { println it }
+			respond task.errors, view:"create"
+			return
+		}
+
+		redirect action:"edit", id:task.id, params:[isTemplate:true]
+	}
+
 	@Transactional
 	def save(Task taskInstance) {
 		// TODO: data binding is somehow broken because of the steps in the form -> need to bind manually here.
@@ -166,7 +221,6 @@ class TaskController {
 		taskInstance.description = params.description
 		taskInstance.assignee = null
 		if (params.assigneeType == "person" && params.assignee?.id) {
-			println "--- assigning to single person..."
 			taskInstance.assignee = User.get(params.assignee.id)
 		}
 //		taskInstance.assignee = params.assignee?.id ? User.get(params.assignee.id) : null
@@ -247,6 +301,30 @@ class TaskController {
 		redirect action:"index", method:"GET"
 	}
 
+	@Transactional
+	def bulkdelete() {
+		def deletedTasksCounter = 0
+		def tasksToDelete = params.taskToDelete
+		def user = springSecurityService.currentUser
+		if (tasksToDelete) {
+			if (!(tasksToDelete instanceof String[])) {
+				tasksToDelete = [] << tasksToDelete
+			}
+			tasksToDelete.each { id ->
+				def task = Task.get(id)
+				if (authService.canDelete(task)) {
+					task.deleted = true
+					taskService.save(task)
+					deletedTasksCounter++
+				}
+			}
+		}
+		flash.message = message(code: 'kola.tasks.deleted.message', args: [deletedTasksCounter])
+		params.remove("taskToDelete")
+		params.offet = 0
+		redirect action:"index", method:"GET", params:params
+	}
+
 	def confirmAssign(Task task) {
 		def group = params.group ? TaxonomyTerm.get(params.group) : null
 		def userProfiles = validateTaskAndGroupForAssignment(task, group)
@@ -304,7 +382,7 @@ class TaskController {
 
 	def export(Task taskInstance) {
 		if (params.preview) {
-			render(template:"export", model:["task":taskInstance, "reflectionAnswers":reflectionAnswers, "taskDocumentations":taskDocumentations])
+			render(template:"export", model:taskExportService.prepareExportModel(taskInstance))
 		}
 		else {
 			//taskExportService.exportToWord(taskInstance, response)
@@ -422,6 +500,38 @@ class TaskController {
 		flash.message = message(code: 'default.created.message.single', args: [message(code: 'de.httc.plugin.qaa.comment')])
 		redirect action:"show", method:"GET", id:task.id, fragment:"documentations_${documentation.id}"
 	}
+
+	@Transactional
+  def updateComment(Comment comment) {
+	  if (!authService.canEdit(comment)) {
+		  forbidden()
+		  return
+	  }
+		def documentation = comment.reference
+		def task = documentation.reference
+		if (task instanceof TaskStep) {
+			task = task.task
+		}
+
+		def msg
+		if (comment.text) {
+		  if (!questionService.saveComment(comment)) {
+			  flash.error = comment.errors
+			  redirect action:"show", method:"GET", id:task.id
+			  return
+		  }
+		  msg = message(code: 'default.updated.message.single', args: [message(code: 'de.httc.plugin.qaa.comment')])
+	  }
+	  else {
+		  comment.text = "DELETED"
+		  comment.deleted = true
+		  questionService.saveComment(comment)
+		  msg = message(code: 'default.deleted.message', args: [message(code: 'de.httc.plugin.qaa.comment'), comment.id])
+	  }
+
+		flash.message = msg
+		redirect action:"show", method:"GET", id:task.id, fragment:"documentations_${documentation.id}"
+  }
 
 	@Transactional
 	def saveReflectionAnswer(ReflectionAnswer reflectionAnswerInstance) {
@@ -617,6 +727,12 @@ class TaskController {
 		def userProfiles = Profile.createCriteria().list {
 			organisations {
 				eq("id", group.id)
+			}
+			user {
+				and {
+					eq("accountLocked", false)
+					eq("enabled", true)
+				}
 			}
 			order("lastName", "asc")
 			order("firstName", "asc")

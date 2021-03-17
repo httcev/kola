@@ -21,7 +21,7 @@
 					<div class="panel-heading">
 						<h3 class="panel-title">
 							<i class="httc-fw httc-task"></i> <g:message code="kola.tasks.assigned" />:
-							<a href="${createLink(controller:'task', action:'index', params:[own:'on', assigned:'on'])}" class="pull-right"><g:message code="kola.all" /> <i class="fa fa-chevron-right"></i></a>
+							<a href="${createLink(controller:'task', action:'index', params:[])}" class="pull-right"><g:message code="kola.all" /> <i class="fa fa-chevron-right"></i></a>
 						</h3>
 					</div>
 					<g:if test="${assignedTasks?.size() > 0}">
@@ -31,7 +31,7 @@
 									<h4 class="list-group-item-heading">${task.name}</h4>
 									<div class="list-group-item-text">
 										<div>
-											<g:message code="kola.meta.creator" />:
+											<g:message code="app.meta.createdBy" />:
 											${task.creator?.profile?.displayName}
 										</div>
 										<g:if test="${task.due}">

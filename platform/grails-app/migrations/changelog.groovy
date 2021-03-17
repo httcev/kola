@@ -9,4 +9,9 @@ databaseChangeLog = {
 	include file: 'reflection-answer-rating.groovy'
 	include file: 'settings-to-common-plugin.groovy'
 	include file: 'taxonomy-term-refactor.groovy'
+	include file: 'settings-add-field.groovy'
+	include file: 'settings-add-valuelist.groovy'
+	include file: 'updatetrigger-commentable.groovy'
+	include file: 'taxonomy-company.groovy'
+	include file: 'task-expiry.groovy'
 }

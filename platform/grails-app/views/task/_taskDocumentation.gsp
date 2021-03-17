@@ -2,7 +2,7 @@
 <li class="list-group-item">
 	<div id="${taskDocumentation.id}" class="list-group-item-text clearfix">
 		<div class="taskDocumentation">
-			<p class="formatted">${taskDocumentation.text}</p>
+			<httc:markdown>${taskDocumentation.text}</httc:markdown>
 			<g:render model="${[attachments:taskDocumentation.attachments]}" template="attachments" />
 		</div>
 		<g:if test="${authService.canEdit(taskDocumentation)}">
@@ -18,7 +18,7 @@
 						</select>
 					</div>
 				</div>
-				<textarea name="text" class="form-control" rows="5" placeholder="${message(code:'kola.task.documentation.placeholder')}">${taskDocumentation.text}</textarea>
+				<g:textArea rows="5" name="text" class="form-control" value="${taskDocumentation.text}" data-provide="markdown" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdImage cmdCode cmdQuote cmdPreview" placeholder="${message(code:'kola.task.documentation.placeholder')}" />
 				<g:render model="${[attachments:taskDocumentation.attachments, mode:'edit']}" template="attachments" />
 				<div class="text-right form-padding-all"><button type="submit" class="btn btn-success"><i class="fa fa-save"></i> <g:message code="default.save.label" args="[message(code:'kola.task.documentation')]" /></button></div>
 			</g:form>

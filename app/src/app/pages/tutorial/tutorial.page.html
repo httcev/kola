@@ -1,0 +1,40 @@
+<ion-content class="ion-padding">
+  <ion-slides pager="true" [options]="slideOpts" #slides>
+    <ion-slide>
+      <h1><ion-text color="primary">Willkommen zu KOLA!</ion-text></h1>
+      <img src="/assets/icon/icon.png">
+      <p>KOLA hilft Ihnen beim selbstgesteurten Lernen.</p>
+      <p>Sie bekommen kleine Lernaufträge, können diese dokumentieren und Fragen dazu stellen.</p>
+      <ion-button (click)="nextSlide()" class="ion-margin">Weiter <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+    </ion-slide>
+    <ion-slide>
+      <h1><ion-text color="primary">Lernaufträge</ion-text></h1>
+      <ion-note color="medium">
+        <ion-icon src="/assets/icons/task.svg" class="large-icon"></ion-icon>
+      </ion-note>
+      <p>Über KOLA bekommen Sie von Ihrem Bildungsträger Lernaufträge zugewiesen.</p>
+      <p>Lernaufträge können Sie direkt in der App dokumentieren.</p>
+      <ion-button (click)="nextSlide()" class="ion-margin">Weiter <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+    </ion-slide>
+    <ion-slide>
+      <h1><ion-text color="primary">Fragen</ion-text></h1>
+      <ion-note color="medium">
+        <ion-icon src="/assets/icons/question.svg" class="large-icon"></ion-icon>
+      </ion-note>
+      <p>Mit KOLA können Sie Fragen stellen und die Fragen anderer Nutzer/Innen beantworten.</p>
+      <p>Fragen können sich direkt auf Lernaufträge beziehen.</p>
+      <ion-button (click)="nextSlide()" class="ion-margin">Weiter <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+    </ion-slide>
+    <ion-slide>
+      <h1><ion-text color="primary">Anmelden</ion-text></h1>
+      <p>Um KOLA nutzen zu können, benötigen Sie Zugangsdaten:</p>
+      <ul class="ion-text-left">
+        <li>Server-Adresse</li>
+        <li>Nutzernamen</li>
+        <li>Passwort</li>
+      </ul>
+      <p>Die Zugangsdaten bekommen Sie von Ihrem Bildungsträger mitgeteilt.</p>
+      <ion-button routerLink="/settings" class="ion-margin">Anmelden</ion-button>
+    </ion-slide>
+  </ion-slides>
+</ion-content>

@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Lernaufträge</ion-title>
+    <ion-buttons slot="end">
+      <sync-control></sync-control>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="tasks; else loading">
+    <ion-segment (ionChange)="segmentChanged($event)" [value]="segment">
+      <ion-segment-button value="new">
+        <ion-label>Neu</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="all">
+        <ion-label>Erledigt</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+    <task-list *ngIf="tasks.length" [tasks]="tasks"></task-list>
+    <div *ngIf="!tasks.length" class="ion-text-center ion-padding">
+      <ion-note color="medium">
+        <p><ion-icon src="/assets/icons/task.svg" class="large-icon"></ion-icon></p>
+        <p>Keine {{segment==='new' ? 'neuen ' :'erledigten '}}Lernaufträge vorhanden.</p>
+      </ion-note>
+    </div>
+  </div>
+  <ng-template #loading><div class="ion-margin-top ion-text-center"><ion-spinner color="medium"></ion-spinner></div></ng-template>
+</ion-content>

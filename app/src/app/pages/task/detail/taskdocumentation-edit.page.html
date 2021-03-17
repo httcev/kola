@@ -1,0 +1,18 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title *ngIf="taskDocumentation?._isNew">Neue Dokumentation</ion-title>
+    <ion-title *ngIf="!taskDocumentation?._isNew">Dokumentation bearbeiten</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()" color="primary" [disabled]="!form.valid">Abschicken</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [formGroup]="form">
+  <ion-item><ion-textarea formControlName="text" placeholder="Geben Sie hier Ihre Dokumentation ein. Sie können mit dem Knopf unten rechts auch Fotos anhängen." rows="8" autofocus="true"></ion-textarea></ion-item>
+  <task-reference *ngIf="taskDocumentation" [referrer]="taskDocumentation" [task]="task" editmode="true"></task-reference>
+  <media-attachments [ref]="taskDocumentation" editmode="true"></media-attachments>
+</ion-content>

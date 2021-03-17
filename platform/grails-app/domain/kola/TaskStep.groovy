@@ -19,6 +19,8 @@ class TaskStep extends QuestionReference {
 	static mapping = {
 		name type: "text"
 		description type: "text"
+		documentations cascade: "all-delete-orphan"
+		// attachments cascade:"all-delete-orphan" DO NOT CASCADE TO ATTACHMENTS! Reason: attachments are used multiple times, e.g. in templates and instanced tasks. since we can't define a proper many-to-many relation, the grails orphan detection is not working correctly.
 	}
 
 	String name

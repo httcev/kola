@@ -11,14 +11,14 @@
 	<div class="list-group-item-text">
 		<div class="form-group">
 			<label class="col-sm-2 control-label">
-				<g:message code="kola.meta.name" />
+				<g:message code="app.meta.name" />
 				<span class="required-indicator">*</span>:
 			</label>
 			<div class="col-sm-10"><input type="text" name="steps[${index}].name" class="form-control" value="${step.name}" required></div>
 		</div>
 		<div class="form-group">
 			<label class="col-sm-2 control-label">
-				<g:message code="kola.meta.description" />:
+				<g:message code="app.meta.description" />:
 			</label>
 			<div class="col-sm-10"><textarea name="steps[${index}].description" class="form-control" rows="6" data-provide="markdown" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdImage cmdCode cmdQuote cmdPreview">${step.description}</textarea></div>
 		</div>

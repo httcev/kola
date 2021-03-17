@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>
+      Start
+    </ion-title>
+    <ion-buttons slot="end">
+      <sync-control></sync-control>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="!(showSpinner | async); else loadingTemplate">
+    <div *ngIf="tasks && questions">
+      <ion-card *ngIf="settingsService.getCurrentSettings().showWelcomeText" class="welcome-card removable" color="success">
+        <!--<img src="/assets/shapes.svg" alt="" />-->
+        <ion-item color="success" lines="none">
+          <ion-label>Willkommen zu KOLA!</ion-label>
+          <ion-button slot="end" shape="round" color="light" fill="clear" (click)="hideWelcomeText($event)"><ion-icon name="close"></ion-icon></ion-button>
+        </ion-item>
+        <ion-item routerLink="/tutorial" button detail lines="none">
+          <ion-icon name="ribbon" slot="start"></ion-icon>Tutorial wiederholen
+        </ion-item>
+      </ion-card>
+
+      <ion-card>
+        <ion-item lines="none" color="light">
+          <ion-icon src="/assets/icons/task.svg" slot="start"></ion-icon>
+          <ion-label>Anstehende Lernaufträge</ion-label>
+        </ion-item>
+        <task-list *ngIf="tasks.length" [tasks]="tasks"></task-list>
+        <div *ngIf="!tasks.length" class="ion-text-center ion-padding">
+          <ion-note color="medium">
+            <p><ion-icon src="/assets/icons/task.svg" class="large-icon"></ion-icon></p>
+            <p>Keine anstehenden Lernaufträge vorhanden.</p>
+          </ion-note>
+        </div>
+        <ion-item *ngIf="tasks.length != taskCount" routerLink="/task" button detail lines="none"><ion-text color="medium">Weitere</ion-text></ion-item>
+      </ion-card>
+
+      <ion-card>
+        <ion-item lines="none" color="light">
+          <ion-icon src="/assets/icons/question.svg" slot="start"></ion-icon>
+          <ion-label>Neueste Fragen</ion-label>
+        </ion-item>
+        <question-list *ngIf="questions.length" [questions]="questions"></question-list>
+        <div *ngIf="!questions.length" class="ion-text-center ion-padding">
+          <ion-note color="medium">
+            <p><ion-icon src="/assets/icons/question.svg" class="large-icon"></ion-icon></p>
+            <p>Keine Fragen vorhanden.</p>
+          </ion-note>
+        </div>
+        <ion-item *ngIf="questions.length != questionCount" routerLink="/question" button detail lines="none"><ion-text color="medium">Weitere</ion-text></ion-item>
+      </ion-card>
+    </div>
+  </div>
+  <ng-template #loadingTemplate><div class="ion-margin-top ion-text-center"><ion-spinner color="medium"></ion-spinner></div></ng-template>
+</ion-content>

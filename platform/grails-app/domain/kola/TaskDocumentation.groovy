@@ -16,7 +16,8 @@ class TaskDocumentation extends Commentable {
     }
     static mapping = {
         text type: "text"
-		comments sort:"dateCreated", "id"
+				comments cascade: "all-delete-orphan", sort:"dateCreated", "id"
+				assets cascade: "all-delete-orphan"
     }
 
     String text
@@ -25,7 +26,7 @@ class TaskDocumentation extends Commentable {
     boolean deleted
 
     List<Asset> attachments     // defined as list to keep order in which elements got added
-	SortedSet<Comment> comments       // sorted by Comment.compareTo
+		SortedSet<Comment> comments       // sorted by Comment.compareTo
 
     static _exported = ["text", "lastUpdated", "deleted"]
     static _referenced = ["attachments", "creator", "reference"]

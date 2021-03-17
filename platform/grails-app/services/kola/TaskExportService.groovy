@@ -29,7 +29,6 @@ class TaskExportService {
 
 		def contents = groovyPageRenderer.render(template:"/task/export", model:prepareExportModel(taskInstance))
 		wordMLPackage.getMainDocumentPart().getContent().addAll(xHTMLImporter.convert(new StringReader(contents), null))
-		println "........ CONTENTS=${contents}"
 
 		def filename = createFilename(taskInstance, ".docx")
 		response.contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -43,7 +42,7 @@ class TaskExportService {
 		pdfRenderingService.render([template:"/task/export", model:prepareExportModel(taskInstance), filename:filename], response)
 	}
 
-	private def prepareExportModel(taskInstance) {
+	def prepareExportModel(taskInstance) {
 		def reflectionAnswers = [:]
 		def taskDocumentations = [:]
 		if (!taskInstance.isTemplate) {

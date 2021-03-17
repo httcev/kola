@@ -1,0 +1,127 @@
+{
+  "user": {
+    "idType": "integer",
+    "sync": true,
+    "extract": {
+      "deleted": "BOOL"
+    }
+  },
+  "task": {
+    "references": {
+      "creator": "user",
+      "assignee": "user",
+      "steps": "taskStep",
+      "attachments": "asset",
+      "resources": "asset",
+      "reflectionQuestions": "reflectionQuestion"
+    },
+    "sync": true,
+    "extract": {
+      "deleted": "BOOL",
+      "isTemplate": "BOOL"
+    }
+  },
+  "taskStep": {
+    "references": {
+      "creator": "user",
+      "attachments": "asset",
+      "resources": "asset"
+    },
+    "sync": true,
+    "extract": {
+      "deleted": "BOOL"
+    }
+  },
+  "taskDocumentation": {
+    "references": {
+      "creator": "user",
+      "attachments": "asset",
+      "_comments": "comment"
+    },
+    "joins": [{
+      "field": "_comments",
+      "targetTable": "comment",
+      "targetField": "reference"
+    }],
+    "sync": true,
+    "extract": {
+      "deleted": "BOOL",
+      "reference": "TEXT"
+    }
+  },
+  "reflectionQuestion": {
+    "idType": "integer",
+    "sync": true,
+    "extract": {
+      "deleted": "BOOL"
+    }
+  },
+  "reflectionAnswer": {
+    "references": {
+      "creator": "user"
+    },
+    "sync": true,
+    "extract": {
+      "deleted": "BOOL",
+      "task": "TEXT"
+    }
+  },
+  "question": {
+    "references": {
+      "creator": "user",
+      "attachments": "asset",
+      "_answers": "answer",
+      "_comments": "comment"
+    },
+    "joins": [{
+      "field": "_answers",
+      "targetTable": "answer",
+      "targetField": "question"
+    }, {
+      "field": "_comments",
+      "targetTable": "comment",
+      "targetField": "reference"
+    }],
+    "sync": true,
+    "extract": {
+      "deleted": "BOOL",
+      "reference": "TEXT"
+    }
+  },
+  "answer": {
+    "references": {
+      "creator": "user",
+      "attachments": "asset",
+      "_comments": "comment"
+    },
+    "joins": [{
+      "field": "_comments",
+      "targetTable": "comment",
+      "targetField": "reference"
+    }],
+    "sync": true,
+    "extract": {
+      "deleted": "BOOL",
+      "question": "TEXT"
+    }
+  },
+  "comment": {
+    "references": {
+      "creator": "user"
+    },
+    "sync": true,
+    "extract": {
+      "reference": "TEXT",
+      "deleted": "BOOL"
+    }
+  },
+  "asset": {
+    "references": {
+      "creator": "user"
+    },
+    "sync": true,
+    "extract": {
+      "deleted": "BOOL"
+    }
+  }
+}

@@ -24,6 +24,7 @@ class ChangesController {
 	static DOMAIN_CLASS_MAPPING = ["asset":Asset, "taskStep":TaskStep, "task":Task, "taskDocumentation":TaskDocumentation, "reflectionAnswer":ReflectionAnswer, "question":Question, "answer":Answer, "comment":Comment ]
 	def springSecurityService
 	def taskService
+	def settingService
 	def questionService
 	def sessionFactory
 
@@ -33,7 +34,6 @@ class ChangesController {
 			def clientData = request.JSON
 			def updatedIds = _update(clientData, user)
 
-			// TODO: incorporate current user in changes feed (return only relevant data)
 			def since = clientData?.info?.lastSyncDate ? DATEFORMAT.parse(clientData?.info?.lastSyncDate) : new Date(0)
 
 			def now = new Date()
@@ -51,35 +51,80 @@ class ChangesController {
 			// learning resources may change without having a changed task, so hand out all modified ones.
 			def assets = Asset.findAllByLastUpdatedBetweenAndTypeLabel(since, now, "learning-resource") as Set
 
-			def c = Task.createCriteria()
-			def tasks = c {
-				between("lastUpdated", since, now)
+			def allTasks = Task.createCriteria().list {
+				// between("lastUpdated", since, now)
 				or {
 					// always deliver task templates
 					eq("isTemplate", true)
 					// otherwise deliver only tasks created by or assigned to requesting user
-					or {
+					//or {
 						eq("creator", user)
 						eq("assignee", user)
-					}
+					//}
 				}
 			}
+
+			def tasks = [] as Set
 			def taskSteps = [] as Set
 			def questions = [] as Set
 			def answers = [] as Set
 			def comments = [] as Set
 			def taskDocumentations = [] as Set
-			tasks?.each { task ->
-				// add modified task attachments
-				_addModifiedDocs(task.attachments, assets, since, now)
+
+			allTasks.each { task ->
+				if (_isMofifiedBetween(task, since, now)) {
+					// we treat all data editable in the task editor as having changed
+					tasks.add(task)
+					// add task attachments
+					task.attachments?.each { attachment ->
+						assets.add(attachment)
+					}
+					// add task steps
+					task.steps?.each { step ->
+						taskSteps.add(step)
+						// add step attachments
+						step.attachments?.each { attachment ->
+							assets.add(attachment)
+						}
+					}
+				}
+
+				task.documentations.each { taskDocumentation ->
+					if (_isMofifiedBetween(taskDocumentation, since, now)) {
+						taskDocumentations.add(taskDocumentation)
+					}
+					// add modified task documentation attachments
+					_addModifiedDocs(taskDocumentation.attachments, assets, since, now)
+					// add modified task documentation comments
+					taskDocumentation.comments.each { comment ->
+						if (_isMofifiedBetween(comment, since, now)) {
+							comments.add(comment)
+							//taskDocumentations.add(taskDocumentation)
+						}
+					}
+				}
+
 				// add modified task questions and related answers/comments/attachments
 				Question.findAllByReference(task).each { question ->
 					_addModifiedQuestionTree(question, questions, answers, comments, assets, since, now)
 				}
+
 				task.steps?.each { step ->
-					taskSteps.add(step)
-					// add modified task step attachments
-					_addModifiedDocs(step.attachments, assets, since, now)
+					step.documentations.each { taskDocumentation ->
+						if (_isMofifiedBetween(taskDocumentation, since, now)) {
+							taskDocumentations.add(taskDocumentation)
+						}
+						// add modified task documentation attachments
+						_addModifiedDocs(taskDocumentation.attachments, assets, since, now)
+						// add modified task documentation comments
+						taskDocumentation.comments.each { comment ->
+							if (_isMofifiedBetween(comment, since, now)) {
+								comments.add(comment)
+								//taskDocumentations.add(taskDocumentation)
+							}
+						}
+					}
+
 					// add modified task step questions and related answers/comments/attachments
 					Question.findAllByReference(step).each { question ->
 						_addModifiedQuestionTree(question, questions, answers, comments, assets, since, now)
@@ -87,10 +132,49 @@ class ChangesController {
 				}
 			}
 
-			Question.getAll().each { question ->
-				_addModifiedQuestionTree(question, questions, answers, comments, assets, since, now)
+			// now deliver questions without task reference depending on channel setting
+			def questionChannelGeneral = settingService.getValue("questionChannelGeneral")
+			Question.where {
+				and {
+					between("lastUpdated", since, now)
+					isNull("reference")
+				}
+			}.list().each { question ->
+				def deliver = false
+				if (question.creator == user) {
+					println "--- 1 deliver because user is question creator"
+					deliver = true
+				}
+				else {
+					if ("broadcast" == questionChannelGeneral) {
+						println "--- 1 deliver because channel is 'broadcast'"
+						deliver = true
+					}
+					else if ("company" == questionChannelGeneral) {
+						def creatorCompany = question.creator?.profile?.company
+						if (creatorCompany != null && creatorCompany.id == user.profile?.company?.id) {
+							println "--- 2 deliver because channel is 'company' and user has same company [${user.profile?.company}]"
+							deliver = true
+						}
+					}
+					else if ("groups" == questionChannelGeneral) {
+						def creatorGroups = question.creator?.profile?.organisations
+						def userGroups = user.profile?.organisations
+						if (creatorGroups?.size() > 0 && userGroups?.size() > 0 && creatorGroups.intersect(userGroups).size() > 0) {
+							println "--- 3 deliver because channel is 'groups' and user intersects groups [${creatorGroups}]"
+							deliver = true
+						}
+					}
+				}
+				if (deliver) {
+					_addModifiedQuestionTree(question, questions, answers, comments, assets, since, now)
+				}
 			}
-
+/*
+			// TODO: we miss some task documentations in the following scenario:
+			// 1. user A assigns task to user B
+			// 2. user B creates task documentation
+			// 3. user A receives push notification (regarding 2.), opens app and doesn't see the documentation
 			def usersTaskDocumentations = TaskDocumentation.findAllByCreator(user)
 			usersTaskDocumentations?.each { taskDocumentation ->
 				if (_isMofifiedBetween(taskDocumentation, since, now)) {
@@ -107,14 +191,14 @@ class ChangesController {
 				// add modified attachments
 				_addModifiedDocs(taskDocumentation.attachments, assets, since, now)
 			}
-
+*/
 			def result = [
 				"now"  : DATEFORMAT.format(now),
 				"updated" : updatedIds,
 				"data" : [
 					"user" : users,
 					// reflection questions may change without having a changed task, so hand out all modified ones.
-					"reflectionQuestion" : ReflectionQuestion.findAllByLastUpdatedBetween(since, now),
+					"reflectionQuestion" : ReflectionQuestion.findAllByLastUpdatedBetween(since, now) as Set,
 					"reflectionAnswer" : ReflectionAnswer.findAllByLastUpdatedBetweenAndCreator(since, now, user),
 					"asset" : assets,
 					"taskStep" : taskSteps,
@@ -125,6 +209,7 @@ class ChangesController {
 					"comment" : comments
 				]
 			]
+			print result as JSON
 			render result as JSON
 		}
 		catch(e) {
@@ -138,6 +223,7 @@ class ChangesController {
 	}
 
 	def uploadAttachment(String id) {
+		println "-------------------------- uploading " + id
 		if (!id) {
 			println "--- ERROR 400, no id in url"
 			render status:400, contentType:"text/plain", text:"missing id in URL"
@@ -149,7 +235,6 @@ class ChangesController {
 			return
 		}
 		try {
-			def user = springSecurityService.currentUser
 			LOG.info("changes/uploadAttachment/$id")
 			// TODO: check write access
 			Asset asset = Asset.get(id)
@@ -164,33 +249,35 @@ class ChangesController {
 				asset.content = new AssetContent()
 			}
 			asset.content.data = request.getFile("file").bytes
+			if (!asset.creator) {
+				asset.creator = springSecurityService.currentUser
+			}
 			if (asset.save()) {
 				println "--- SUCCESS"
-				render status:200, contentType:"text/plain", text:"success"
+				render status:204
 				return
 			}
 			else {
 				println "--- ERROR 400, couldn't save"
-				render status:400, contentType:"text/plain", text:"couldn't save"
+				asset.errors.allErrors.each { println it }
+				render status:500
 			}
 		}
 		catch(e) {
 			log.error e
-			render status:400, contentType:"text/plain", text:e.message
+			render status:400
 		}
 	}
 
 	def _addModifiedDocs(docs, target, start, end) {
 		docs?.each { doc ->
-			if (doc) {
-				// TODO: clean this up. we currently deliver ALL assets to handle the following case:
-				// 1. Create task with attachments, do not assign to user.
-				// 2. Sync in App
-				// 3. Assign task to user.
-				// -> now, if we don't deliver all assets, the App will end up with unknown IDs...
-				if (true || _isMofifiedBetween(doc, start, end)) {
-					target.add(doc)
-				}
+			// TODO: clean this up. we currently deliver ALL assets to handle the following case:
+			// 1. Create task with attachments, do not assign to user.
+			// 2. Sync in App
+			// 3. Assign task to user.
+			// -> now, if we don't deliver all assets, the App will end up with unknown IDs...
+			if (_isMofifiedBetween(doc, start, end)) {
+				target.add(doc)
 			}
 		}
 	}

@@ -39,15 +39,15 @@
 				<g:if test="${!task?.isTemplate}">
 					<tr>
 						<td><g:message code="kola.task.done" />:</td>
-						<td><g:message code="kola.${task.done ? 'yes' : 'no'}" /></td>
+						<td><g:message code="app.${task.done ? 'yes' : 'no'}" /></td>
 					</tr>
 				</g:if>
 				<tr>
-					<td><g:message code="kola.meta.creator" />:</td>
+					<td><g:message code="app.meta.createdBy" />:</td>
 					<td>${task.creator.profile.displayName}</td>
 				</tr>
 				<tr>
-					<td><g:message code="kola.meta.lastUpdated" />:</td>
+					<td><g:message code="app.meta.lastUpdated" />:</td>
 					<td><g:formatDate date="${task.lastUpdated}" type="datetime" style="LONG" timeStyle="SHORT"/></td>
 				</tr>
 			</table>

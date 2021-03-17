@@ -24,9 +24,9 @@ class BootStrap {
 		}
 
 		if (!settingService.exists("welcomeHeader")) {
-			new Setting(key:"welcomeHeader", value:"Willkommen", required:true, multiline:false, prefix:"kola.settings", weight:1).save()
-			new Setting(key:"welcomeBody", value:"Dies ist die KOLA Plattform.", required:false, multiline:true, prefix:"kola.settings", weight:2).save()
-			new Setting(key:"termsOfUse", value:null, required:false, multiline:true, prefix:"kola", weight:3).save(true)
+			new Setting(key:"welcomeHeader", value:"Willkommen", required:true, multiline:false, exported:false, prefix:"kola.settings", weight:1).save()
+			new Setting(key:"welcomeBody", value:"Dies ist die KOLA Plattform.", required:false, multiline:true, exported:false, prefix:"kola.settings", weight:2).save()
+			new Setting(key:"termsOfUse", value:null, required:false, multiline:true, exported:false, prefix:"kola", weight:3).save(true)
 //			assert Setting.count() == 3 // removed assert since plugins can create own settings
 		}
 		// cache if terms of use is set
@@ -40,7 +40,10 @@ class BootStrap {
 			def teacherRole = new Role(authority: 'ROLE_TEACHER').save(flush: true)
 			assert Role.count() == 5
 
-			def adminUser = new User(username:"admin", password:"admin", email:"test@example.com", profile:[firstName:"User", lastName:"Admin", company:"KOLA"]).save(flush: true)
+			def adminUser = new User(username:"admin", password:"admin", email:"test@example.com", profile:[firstName:"User", lastName:"Admin"])
+			if (!adminUser.save(true)) {
+				adminUser.errors.allErrors.each { println it }
+			}
 			assert User.count() == 1
 
 			UserRole.create(adminUser, adminRole, true)
@@ -67,11 +70,17 @@ class BootStrap {
 				organisationsTaxonomy.errors.allErrors.each { println it }
 			}
 		}
+		if (Taxonomy.countByLabel("companies") == 0) {
+			def companiesTaxonomy = new Taxonomy(label:"companies")
+			if (!companiesTaxonomy.save(true)) {
+				companiesTaxonomy.errors.allErrors.each { println it }
+			}
+		}
 
 		environments {
 			development {
 				if (Task.count() == 0) {
-					def testUser = new User(username:"test", password:"test", email:"test@example.com", profile:[firstName:"John", lastName:"Doe", company:"Comp Inc.", phone:"+12345678", mobile:"+1234567"]).save(flush: true)
+					def testUser = new User(username:"test", password:"test", email:"test@example.com", profile:[firstName:"John", lastName:"Doe", phone:"+12345678", mobile:"+1234567"]).save(flush: true)
 
 					def numAssets = 3
 					for (int i=0; i<numAssets; i++) {
@@ -82,7 +91,7 @@ class BootStrap {
 					def numTaskTemplates = 2
 					def description = "### Abschnitt 1\n\n1. Aufzählungstext 1\n1. Aufzählungstext 2\n1. Aufzählungstext 3\n\n### Abschnitt 2\n\n- Aufzählungstext 1\n- Aufzählungstext 2\n- Aufzählungstext 3\n\n**Fett**\n_Kursiv_\n[Link](http://www.example.com)"
 					for (int i=0; i<numTaskTemplates; i++) {
-						def task = new Task(name:"Example Task Template $i", description:description, creator:testUser, isTemplate:true)
+						def task = new Task(name:"Example Task Template $i", description:description, creator:User.findByUsername("admin"), isTemplate:true)
 						task.addToSteps(new TaskStep(name:"Step 1 example", description:description))
 						task.addToSteps(new TaskStep(name:"Step 2 example", description:description))
 						ReflectionQuestion.getAll().each {
@@ -125,15 +134,17 @@ class BootStrap {
 		grails.converters.JSON.registerObjectMarshaller(User) {
 			def doc = [:]
 			doc.id = it.id
+			doc.displayName = it.profile?.displayName
+/*
 			doc.username = it.username
 			doc.email = it.email
-			doc.displayName = it.profile?.displayName
 			doc.company = it.profile?.company
 			doc.phone = it.profile?.phone
 			doc.mobile = it.profile?.mobile
 			if (it.profile?.photo?.length > 0) {
 				doc.photo = it.profile.photo.encodeBase64().toString()
 			}
+*/
 			return [id:it.id, doc:doc]
 		}
 

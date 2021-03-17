@@ -7,11 +7,11 @@ class ReflectionAnswer {
 	static enum Rating { POSITIVE, NEUTRAL, NEGATIVE }
     static constraints = {
     	text nullable:true
-		rating nullable:true
+			rating nullable:true
     }
     static mapping = {
-        id generator: "assigned"
-        text type:"text"
+      id generator: "assigned"
+      text type:"text"
     }
     /*
 	static searchable = {
@@ -23,7 +23,7 @@ class ReflectionAnswer {
 
     String id = UUID.randomUUID().toString()
     String text
-	Rating rating
+		Rating rating
     Date lastUpdated
     User creator
     boolean deleted

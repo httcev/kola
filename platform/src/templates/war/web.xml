@@ -51,6 +51,10 @@
         <filter-name>corsFilter</filter-name>
         <url-pattern>/api/*</url-pattern>
     </filter-mapping>
+    <filter-mapping>
+        <filter-name>corsFilter</filter-name>
+        <url-pattern>/v/*</url-pattern>
+    </filter-mapping>
 
     <listener>
         <listener-class>org.codehaus.groovy.grails.web.context.GrailsContextLoaderListener</listener-class>
@@ -73,7 +77,7 @@
         <servlet-name>gsp</servlet-name>
         <servlet-class>org.codehaus.groovy.grails.web.pages.GroovyPagesServlet</servlet-class>
     </servlet>
-    
+
     <servlet-mapping>
         <servlet-name>gsp</servlet-name>
         <url-pattern>*.gsp</url-pattern>

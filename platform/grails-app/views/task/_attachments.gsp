@@ -17,7 +17,7 @@
 						<button type="button" class="btn btn-danger pull-right" title="${message(code:'default.delete.label', args:[message(code:'kola.task.attachment')])}" onclick="$(this).closest('li').remove()"><i class="fa fa-times"></i></button>
 					</h4>
 					<p class="list-group-item-text">
-						<label><g:message code="kola.meta.mimeType" />:</label>
+						<label><g:message code="app.meta.mimeType" />:</label>
 						<code>${asset.mimeType}</code>
 					</p>
 				</li>

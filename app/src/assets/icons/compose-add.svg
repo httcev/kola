@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Generator: Adobe Illustrator 16.2.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   id="Layer_1"
+   x="0px"
+   y="0px"
+   width="512px"
+   height="512px"
+   viewBox="0 0 512 512"
+   style="enable-background:new 0 0 512 512;"
+   xml:space="preserve"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="compose-add.svg"><metadata
+     id="metadata4429"><rdf:RDF><cc:Work
+         rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+     id="defs4427" /><sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1646"
+     inkscape:window-height="930"
+     id="namedview4425"
+     showgrid="false"
+     inkscape:zoom="0.4609375"
+     inkscape:cx="61.830508"
+     inkscape:cy="256"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="Layer_1" /><g
+     id="g4415"><g
+       id="g4419" /><path
+       d="M 399.8125 64.025391 C 395.275 64.025391 390.75078 65.749219 387.30078 69.199219 L 355.5 101 L 411 156.5 L 442.80078 124.80078 C 449.70078 117.70078 449.70078 106.49961 442.80078 99.599609 L 412.40039 69.199219 C 408.90039 65.749219 404.35 64.025391 399.8125 64.025391 z M 87.400391 96 C 74.400391 96 64 106.30078 64 119.30078 L 64 424.59961 C 64 437.49961 74.500391 448 87.400391 448 L 311.44141 448 A 68.554266 68.554266 0 0 1 311.2832 443.60938 L 311.2832 418.68359 L 286.35742 418.68359 A 68.554266 68.554266 0 0 1 266.77539 416.06055 C 189.79515 416.03179 105.80078 416 105.80078 416 C 100.20078 416 96 410.6 96 406 L 96 138 C 96 133 100.69961 128 106.59961 128 L 256 128 L 288 96 L 87.400391 96 z M 346.09961 110.5 L 174.09961 288 L 160 352 L 217.76562 339.27344 A 68.554266 68.554266 0 0 1 281.29883 281.76953 L 311.37305 252.30664 A 68.554266 68.554266 0 0 1 377.82617 187.20898 L 400.59961 164.90039 L 346.09961 110.5 z "
+       id="path4423" /></g><path
+     inkscape:connector-curvature="0"
+     style="color:#000000;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:medium;line-height:normal;font-family:sans-serif;text-indent:0;text-align:start;text-decoration:none;text-decoration-line:none;text-decoration-style:solid;text-decoration-color:#000000;letter-spacing:normal;word-spacing:normal;text-transform:none;direction:ltr;block-progression:tb;writing-mode:lr-tb;baseline-shift:baseline;text-anchor:start;white-space:normal;clip-rule:nonzero;display:inline;overflow:visible;visibility:visible;opacity:1;isolation:auto;mix-blend-mode:normal;color-interpolation:sRGB;color-interpolation-filters:linearRGB;solid-color:#000000;solid-opacity:1;fill:#000000;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:220;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;color-rendering:auto;image-rendering:auto;shape-rendering:auto;text-rendering:auto;enable-background:accumulate"
+     d="m 385.16058,229.45085 a 33.238394,33.238394 0 0 0 -32.73464,33.7048 l 0,57.40604 -57.40603,0 a 33.238394,33.238394 0 1 0 0,66.47014 l 57.40603,0 0,57.40603 a 33.238394,33.238394 0 1 0 66.47015,0 l 0,-57.40603 57.40603,0 a 33.238394,33.238394 0 1 0 0,-66.47014 l -57.40603,0 0,-57.40604 a 33.238394,33.238394 0 0 0 -33.73551,-33.7048 z"
+     id="path5834-6" /></svg>

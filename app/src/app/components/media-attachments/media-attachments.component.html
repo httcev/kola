@@ -1,0 +1,32 @@
+<ion-card *ngIf="ref && ref[refProp]?.length">
+  <ion-list>
+    <ion-list-header color="medium">
+      <ion-item color="medium" lines="none"><ion-icon [name]="headerIcon" slot="start"></ion-icon><ion-label>{{header}}</ion-label></ion-item>
+    </ion-list-header>
+    <ion-item-sliding *ngFor="let attachment of ref[refProp]; let i = index" class="removable">
+      <ion-item-options *ngIf="editmode" side="start" (ionSwipe)="removeAttachment(i, $event)">
+        <ion-item-option color="danger" expandable (click)="removeAttachment(i, $event)"><ion-icon slot="icon-only" name="trash"></ion-icon></ion-item-option>
+      </ion-item-options>
+      <ion-item button (click)="this.assetsService.openAttachment(attachment)">
+        <ion-thumbnail slot="start">
+          <ion-img *ngIf="attachment?.mimeType?.indexOf('image/') === 0" [src]="attachment.url"></ion-img>
+          <ion-icon *ngIf="attachment?.mimeType?.indexOf('image/') !== 0" name="open" color="medium"></ion-icon>
+        </ion-thumbnail>
+        <ion-label>{{attachment.name}}</ion-label>
+      </ion-item>
+    </ion-item-sliding>
+  </ion-list>
+  <p *ngIf="editmode" class="ion-padding-start">
+    Anhänge können durch Wischen nach rechts gelöscht werden.
+  </p>
+</ion-card>
+<ion-fab *ngIf="editmode" vertical="bottom" horizontal="end">
+  <ion-fab-button>
+    <ion-icon name="attach"></ion-icon>
+  </ion-fab-button>
+  <ion-fab-list side="top">
+    <ion-fab-button><ion-icon name="folder-open" (click)="attachSelected()"></ion-icon></ion-fab-button>
+    <ion-fab-button><ion-icon name="videocam" (click)="attachVideo()"></ion-icon></ion-fab-button>
+    <ion-fab-button><ion-icon name="camera" (click)="attachPhoto()"></ion-icon></ion-fab-button>
+  </ion-fab-list>
+</ion-fab>

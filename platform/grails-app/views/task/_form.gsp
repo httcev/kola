@@ -14,7 +14,7 @@
 
 <div class="form-group ${hasErrors(bean: task, field: 'description', 'error')} ">
 	<label for="description" class="col-sm-2 control-label">
-		<g:message code="kola.meta.description" />:
+		<g:message code="app.meta.description" />:
 	</label>
 	<div class="col-sm-10"><g:textArea rows="8" name="description" class="form-control" data-provide="markdown" data-iconlibrary="fa" data-language="de" data-hidden-buttons="cmdImage cmdCode cmdQuote cmdPreview" value="${task?.description}" placeholder="${message(code:'kola.task.description.placeholder')}"/></div>
 </div>
@@ -58,6 +58,9 @@
 					<g:render template="/taxonomies/termSelect" plugin="httcTaxonomy" model="${[id:"groupChooser", name:"assigneeGroup", terms:assignableOrganisations, placeholder:message(code:'kola.task.assign.group.placeholder')]}" />
 				</div>
 			</g:if>
+			<g:else>
+				<input type="hidden" name="assigneeType" value="person">
+			</g:else>
 			<div class="${assignableOrganisations ? 'col-sm-8' : 'col-sm-10'} select-container">
 				<select id="personChooser" name="assignee.id" class="form-control-dummy" value="${task?.assignee?.id}" data-placeholder="${message(code:'kola.task.assign.person.placeholder')}">
 					<option value=""></option>
@@ -74,6 +77,13 @@
 			<g:message code="kola.task.due" />:
 		</label>
 		<div class="col-sm-10"><input type="date" id="due" class="form-control" name="due" value="${formatDate(format:'yyyy-MM-dd',date:task?.due)}" placeholder="yyyy-MM-dd"></div>
+	</div>
+
+	<div class="form-group ${hasErrors(bean: task, field: 'expires', 'error')} ">
+		<label for="expires" class="col-sm-2 control-label">
+			<g:message code="kola.task.expires" />:
+		</label>
+		<div class="col-sm-10"><input type="date" id="expires" class="form-control" name="expires" value="${formatDate(format:'yyyy-MM-dd',date:task?.expires)}" placeholder="yyyy-MM-dd"></div>
 	</div>
 
 	<g:if test="${task?.attached}">

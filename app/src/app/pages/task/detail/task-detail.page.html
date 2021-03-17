@@ -1,0 +1,131 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/task"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{currentStep != null ? ('Teilschritt ' + (currentStepIndex+1)) : 'Lernauftrag'}}</ion-title>
+    <ion-buttons slot="end" *ngIf="task">
+      <ion-button (click)="openMenu($event)" shape="round"><ion-icon name="more"></ion-icon></ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="!loading; else loadingTemplate">
+    <div *ngIf="task; else notFoundTemplate">
+      <ion-segment (ionChange)="segmentChanged($event)" [value]="segment">
+        <ion-segment-button value="task">
+          <ion-icon src="/assets/icons/task.svg"></ion-icon>
+          <ion-label>{{currentStep != null ? 'Teilschritt' : 'Auftrag'}}</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="documentations">
+          <div>
+            <ion-icon src="/assets/icons/compose.svg"></ion-icon>
+            <ion-badge *ngIf="documentations?.length" color="secondary">{{documentations.length}}</ion-badge>
+          </div>
+          <ion-label>Dokumentation</ion-label>
+        </ion-segment-button>
+        <ion-segment-button value="questions">
+          <div>
+            <ion-icon src="/assets/icons/question.svg"></ion-icon>
+            <ion-badge *ngIf="questions?.length" color="secondary">{{questions.length}}</ion-badge>
+          </div>
+          <ion-label>Fragen</ion-label>
+        </ion-segment-button>
+        <ion-segment-button *ngIf="task?.reflectionQuestions?.length" value="reflectionQuestions">
+          <ion-icon name="bulb"></ion-icon>
+          <ion-label>Erfahrungen</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <div *ngIf="segment === 'task'">
+        <div class="ion-padding">
+          <h3><ion-text color="primary">{{currentStep != null ? currentStep.name : task?.name}}</ion-text></h3>
+          <markdown ngPreserveWhitespaces [data]="currentStep != null ? currentStep.description : task?.description"></markdown>
+        </div>
+        <media-attachments [ref]="currentStep != null ? currentStep : task"></media-attachments>
+        <media-attachments [ref]="currentStep != null ? currentStep : task" refProp="resources" [header]="'Lernmaterialien'" [headerIcon]="'book'"></media-attachments>
+        <ion-card *ngIf="currentStep == null && task?.steps?.length">
+          <ion-list class="step-list">
+            <ion-list-header color="medium">
+              <ion-item color="medium" lines="none"><ion-icon name="walk" slot="start"></ion-icon><ion-label>Teilschritte</ion-label></ion-item>
+            </ion-list-header>
+            <ion-item detail *ngFor="let step of task.steps; let i = index" (click)="currentStepChanged(i)">
+              <ion-thumbnail slot="start">
+                <ion-badge color="light">{{i+1}}</ion-badge>
+              </ion-thumbnail>
+              <ion-label>{{step.name}}</ion-label>
+            </ion-item>
+          </ion-list>
+        </ion-card>
+      </div>
+
+      <div *ngIf="segment === 'documentations'">
+        <ion-card *ngFor="let documentation of documentations" color="light">
+          <task-reference *ngIf="task?.steps?.length" [referrer]="documentation" [task]="task"></task-reference>
+          <ion-card-content>
+            <ion-text color="primary"><markdown ngPreserveWhitespaces [data]="documentation.text"></markdown></ion-text>
+            <user-info [ref]="documentation" dateProperty="lastUpdated"></user-info>
+          </ion-card-content>
+          <media-attachments [ref]="documentation"></media-attachments>
+          <comment-list [comments]="documentation._comments"></comment-list>
+          <ion-item color="light" lines="none">
+            <ion-button (click)="openActionSheet(documentation)" slot="start" shape="round" fill="outline" color="primary"><ion-icon slot="icon-only" name="more"></ion-icon></ion-button>
+          </ion-item>
+        </ion-card>
+        <div *ngIf="!documentations?.length" class="ion-text-center ion-padding">
+          <ion-note color="medium">
+            <p><ion-icon src="/assets/icons/compose.svg" class="large-icon"></ion-icon></p>
+            <p>Keine Dokumentation vorhanden.</p>
+            <p>Mit dem Knopf unten rechts können Sie den Lernauftrag dokumentieren.</p>
+          </ion-note>
+        </div>
+      </div>
+
+      <div *ngIf="segment === 'questions'">
+        <question-list *ngIf="questions?.length" [questions]="questions"></question-list>
+        <div *ngIf="!questions?.length" class="ion-text-center ion-padding">
+          <ion-note color="medium">
+            <p><ion-icon src="/assets/icons/question.svg" class="large-icon"></ion-icon></p>
+            <p>Keine Fragen zum Lernauftrag vorhanden.</p>
+            <p>Mit dem Knopf unten rechts können Sie eine neue Frage stellen.</p>
+          </ion-note>
+        </div>
+      </div>
+
+      <div *ngIf="segment === 'reflectionQuestions'">
+        <div class="ion-padding"><ion-text color="medium">Hier haben Sie die Möglichkeit, Ihr eigenes Handeln zu beurteilen und eigene Erfahrungen festzuhalten. Wie schätzen Sie sich selbst ein?</ion-text></div>
+        <ion-card *ngFor="let reflectionQuestion of task?.reflectionQuestions" color="light" class="ion-padding-bottom">
+          <ion-card-content>
+            <ion-text color="primary"><q>{{reflectionQuestion.name}}</q></ion-text>
+          </ion-card-content>
+          <ion-item lines="none" color="light">
+            <ion-button [color]="reflectionAnswers[reflectionQuestion.id]?.rating === 'POSITIVE' ? 'success' : 'medium'" [fill]="reflectionAnswers[reflectionQuestion.id]?.rating === 'POSITIVE' ? 'solid' : 'outline'" (click)="setReflectionAnswer(reflectionAnswers[reflectionQuestion.id], 'POSITIVE')" size="large"><ion-icon slot="icon-only" src="/assets/icons/rating-positive.svg"></ion-icon></ion-button>
+            <ion-button [color]="reflectionAnswers[reflectionQuestion.id]?.rating === 'NEUTRAL' ? 'warning' : 'medium'" [fill]="reflectionAnswers[reflectionQuestion.id]?.rating === 'NEUTRAL' ? 'solid' : 'outline'" (click)="setReflectionAnswer(reflectionAnswers[reflectionQuestion.id], 'NEUTRAL')" size="large"><ion-icon slot="icon-only" src="/assets/icons/rating-neutral.svg"></ion-icon></ion-button>
+            <ion-button [color]="reflectionAnswers[reflectionQuestion.id]?.rating === 'NEGATIVE' ? 'danger' : 'medium'" [fill]="reflectionAnswers[reflectionQuestion.id]?.rating === 'NEGATIVE' ? 'solid' : 'outline'" (click)="setReflectionAnswer(reflectionAnswers[reflectionQuestion.id], 'NEGATIVE')" size="large"><ion-icon slot="icon-only" src="/assets/icons/rating-negative.svg"></ion-icon></ion-button>
+          </ion-item>
+          <ion-item *ngIf="reflectionAnswers[reflectionQuestion.id]?.text" lines="none" color="light">
+            {{reflectionAnswers[reflectionQuestion.id].text}}
+          </ion-item>
+          <ion-item *ngIf="!reflectionAnswers[reflectionQuestion.id]?._isNew" lines="none" color="light">
+            <user-info *ngIf="!reflectionAnswers[reflectionQuestion.id]?._isNew" [ref]="reflectionAnswers[reflectionQuestion.id]" dateProperty="lastUpdated"></user-info>
+          </ion-item>
+        </ion-card>
+      </div>
+    </div>
+  </div>
+  <ng-template #loadingTemplate><div class="ion-margin-top ion-text-center"><ion-spinner color="medium"></ion-spinner></div></ng-template>
+  <ng-template #notFoundTemplate><ion-card color="danger"><ion-card-header>Die Lernauftrag wurde nicht gefunden</ion-card-header></ion-card></ng-template>
+</ion-content>
+
+<ion-fab *ngIf="segment === 'documentations'" vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button (click)="createTaskDocumentation()">
+    <ion-icon src="/assets/icons/compose.svg"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
+<ion-fab *ngIf="segment === 'questions'" vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button (click)="createQuestion()">
+    <ion-icon src="/assets/icons/question.svg"></ion-icon>
+  </ion-fab-button>
+</ion-fab>

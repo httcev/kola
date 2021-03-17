@@ -1,0 +1,17 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title *ngIf="answer?._isNew">Neue Antwort</ion-title>
+    <ion-title *ngIf="!answer?._isNew">Antwort bearbeiten</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()" color="primary" [disabled]="!form.valid">Abschicken</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [formGroup]="form">
+  <ion-item><ion-textarea formControlName="text" placeholder="Geben Sie hier Ihre Antwort ein..." rows="8"></ion-textarea></ion-item>
+  <media-attachments [ref]="answer" editmode="true"></media-attachments>
+</ion-content>

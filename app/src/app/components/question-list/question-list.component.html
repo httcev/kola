@@ -1,0 +1,9 @@
+<ion-list *ngIf="questions?.length">
+  <ion-item *ngFor="let question of questions; trackBy:trackByFn" detail button (click)="show(question)">
+    <ion-label>
+      <ion-text color="primary">{{question.title}}</ion-text>
+      <user-info class="left" [ref]="question"></user-info>
+      <div class="small-text"><ion-text color="medium">Beantwortet</ion-text>:&#160;<ion-text [color]="question.acceptedAnswer ? 'success':'danger'">{{question.acceptedAnswer ? 'Ja':'Nein'}}</ion-text></div>
+    </ion-label>
+  </ion-item>
+</ion-list>

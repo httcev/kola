@@ -1,0 +1,18 @@
+<ion-list *ngIf="tasks?.length">
+  <ion-item-sliding *ngFor="let task of tasks; trackBy:trackByFn; let i = index" class="removable">
+    <ion-item-options *ngIf="!task.done" side="start" (ionSwipe)="completeTask(i, $event)">
+      <ion-item-option color="success" expandable (click)="completeTask(i, $event)"><ion-icon slot="icon-only" name="checkmark"></ion-icon></ion-item-option>
+    </ion-item-options>
+    <ion-item-options *ngIf="task.done && currentUserId === task.creator" side="start" (ionSwipe)="removeTask(i, $event)">
+      <ion-item-option color="danger" expandable (click)="removeTask(i, $event)"><ion-icon slot="icon-only" name="trash"></ion-icon></ion-item-option>
+    </ion-item-options>
+    <ion-item button detail (click)="show(task)">
+      <ion-label>
+        <ion-text color="primary">{{task.name}}</ion-text>
+        <user-info class="left" [ref]="task"></user-info>
+        <div *ngIf="currentUserId === task.creator"><ion-text class="small-text" color="medium"><b>Zugewiesen an:</b>&#160;</ion-text><user-info class="left" [ref]="task" refProperty="assignee"></user-info></div>
+        <div *ngIf="task.due"><ion-text class="small-text" color="medium"><b>Fällig</b>: {{task.due | amTimeAgo}} [{{task.due | date:'dd.MM.yy'}}]</ion-text></div>
+      </ion-label>
+    </ion-item>
+  </ion-item-sliding>
+</ion-list>

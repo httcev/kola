@@ -1,0 +1,27 @@
+<!-- display mode -->
+<ion-item *ngIf="task && !editmode" [color]="color" class="small" lines="none">
+  <ion-label class="ion-text-wrap" color="medium">
+    <ion-text color="medium">
+      Betrifft:
+      <span *ngIf="stepIndex < 0">
+        <span *ngIf="verbose">Lernauftrag <a [routerLink]="'/task/'+task.id">{{task.name}}</a></span>
+        <span *ngIf="!verbose">Gesamten Lernauftrag</span>
+      </span>
+      <span *ngIf="stepIndex >= 0">
+        <span *ngIf="verbose"><a [routerLink]="'/task/'+task.id+'/step/'+stepIndex">Teilschritt {{stepIndex+1}}</a> des Lernauftrags <a [routerLink]="'/task/'+task.id">{{task.name}}</a></span>
+        <span *ngIf="!verbose">Teilschritt {{stepIndex+1}}</span>
+      </span>
+    </ion-text>
+  </ion-label>
+</ion-item>
+<!-- edit mode -->
+<ion-item *ngIf="task && editmode && task.steps?.length">
+  <ion-label>Betrifft:</ion-label>
+  <ion-select [(ngModel)]="referrer.reference" cancelText="Abbrechen">
+    <ion-select-option [value]="task.id">Gesamten Lernauftrag</ion-select-option>
+    <ion-select-option *ngFor="let step of task.steps; let i = index" [value]="step.id">Teilschritt {{i+1}}: {{step.name}}</ion-select-option>
+  </ion-select>
+</ion-item>
+<ion-item *ngIf="task && editmode && !task.steps?.length">
+  <ion-label>Betrifft Lernauftrag: {{task.name}}</ion-label>
+</ion-item>

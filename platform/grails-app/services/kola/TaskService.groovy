@@ -54,26 +54,26 @@ class TaskService {
 
 	private void sendAssignedNotification(task) {
 		def msg = [
-				"title":messageSource.getMessage("kola.push.assigned.title", null, Locale.GERMAN),
-				"message":task.name,
-				"style":"inbox",
-				"collapse_key":"assigned_tasks",
-				"summaryText":messageSource.getMessage("kola.push.assigned.summaryText", null, Locale.GERMAN),
+			"data" : [
+				"title" : messageSource.getMessage("kola.push.assigned.title", null, Locale.GERMAN),
+				"body" : task.name,
+				"category" : "assigned_tasks",
 				"referenceId":task.id,
 				"referenceClass":Task.class.simpleName
+			]
 		]
 		pushNotificationService.sendPushNotification(task.assignee, msg)
 	}
 
 	private void sendDocumentedNotification(task) {
 		def msg = [
-				"title":messageSource.getMessage("kola.push.documented.title", null, Locale.GERMAN),
-				"message":task.name,
-				"style":"inbox",
-				"collapse_key":"documented_tasks",
-				"summaryText":messageSource.getMessage("kola.push.documented.summaryText", null, Locale.GERMAN),
+			"data" : [
+				"title" : messageSource.getMessage("kola.push.documented.title", null, Locale.GERMAN),
+				"body" : task.name,
+				"category" : "documented_tasks",
 				"referenceId":task.id,
 				"referenceClass":Task.class.simpleName
+			]
 		]
 		pushNotificationService.sendPushNotification(task.creator, msg)
 	}

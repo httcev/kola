@@ -21,6 +21,7 @@ class Task extends QuestionReference {
 		name blank:false
 		description nullable:true
 		due nullable:true
+		expires nullable:true
 		template nullable:true
 		assignee nullable:true
 		type nullable:true, validator: { val, obj ->
@@ -32,6 +33,8 @@ class Task extends QuestionReference {
 		steps cascade: "all-delete-orphan"
 		name type: "text"
 		description type: "text"
+		documentations cascade: "all-delete-orphan"
+		// attachments cascade:"all-delete-orphan" DO NOT CASCADE TO ATTACHMENTS! Reason: attachments are used multiple times, e.g. in templates and instanced tasks. since we can't define a proper many-to-many relation, the grails orphan detection is not working correctly.
 	}
 
 	String name
@@ -41,6 +44,7 @@ class Task extends QuestionReference {
 	boolean done
 	boolean deleted
 	Date due
+	Date expires
 	boolean isTemplate
 	Task template
 	User assignee
@@ -56,7 +60,7 @@ class Task extends QuestionReference {
 
 	TaxonomyTerm type
 
-	static _embedded = ["name", "description", "done", "deleted", "due", "isTemplate", "lastUpdated", "dateCreated", "type"]
+	static _embedded = ["name", "description", "done", "deleted", "due", "expires", "isTemplate", "lastUpdated", "dateCreated", "type"]
 	static _referenced = ["steps", "resources", "attachments", "reflectionQuestions", "template", "creator", "assignee"]
 
 	static {

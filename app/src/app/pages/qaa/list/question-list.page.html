@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Fragen</ion-title>
+    <ion-buttons slot="end">
+      <sync-control></sync-control>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+<ion-fab *ngIf="segment==='own'" vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab-button (click)="create()">
+    <ion-icon src="/assets/icons/question.svg"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+<ion-content>
+  <div *ngIf="questions; else loadingTemplate">
+    <ion-segment (ionChange)="segmentChanged($event)" [value]="segment">
+      <ion-segment-button value="own">
+        <ion-label>Eigene</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="other">
+        <ion-label>Andere</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+    <question-list *ngIf="questions.length" [questions]="questions"></question-list>
+    <div *ngIf="!questions.length" class="ion-text-center ion-padding">
+      <ion-note color="medium">
+        <p><ion-icon src="/assets/icons/question.svg" class="large-icon"></ion-icon></p>
+        <p>Keine {{segment==='own' ? 'eigenen ' :''}}Fragen vorhanden.</p>
+        <p *ngIf="segment==='own'">Mit dem Knopf unten rechts können Sie eine neue Frage stellen.</p>
+      </ion-note>
+    </div>
+  </div>
+  <ng-template #loadingTemplate><div class="ion-margin-top ion-text-center"><ion-spinner color="medium"></ion-spinner></div></ng-template>
+</ion-content>

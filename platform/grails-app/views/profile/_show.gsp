@@ -25,7 +25,7 @@
 				<g:if test="${profile.company}">
 					<div class="row padding-vertical">
 						<label class="col-sm-3"><g:message code="de.httc.plugin.user.company" />:</label>
-						<div class="col-sm-9">${profile.company}</div>
+						<div class="col-sm-9">${profile.company.label}</div>
 					</div>
 				</g:if>
 				<g:if test="${profile.phone}">

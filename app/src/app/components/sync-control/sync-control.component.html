@@ -1,0 +1,7 @@
+<ion-spinner *ngIf="databaseService.syncing | async; else showButton" name="dots" class="ion-margin-end"></ion-spinner>
+<ng-template #showButton>
+  <ion-button *ngIf="networkService.online | async; else showWarning" (click)="databaseService.sync()"><ion-icon name="sync"></ion-icon></ion-button>
+</ng-template>
+<ng-template #showWarning>
+  <ion-label class="ion-padding"><ion-icon name="warning" color="warning"></ion-icon> <ion-text color="medium" class="small-text">Offline</ion-text></ion-label>
+</ng-template>
