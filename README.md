@@ -1,11 +1,10 @@
 KOLA
 ====
 
-Project page: http://www.kola-projekt.de
+Project page: http://www.httc.de/projekte/abgeschlossene-projekte/kola-kompetenzorientiertes-lernen-im-arbeitsprozess-mit-digitalen-medien
 
 | Releases ||
 | -------- | ----------- |
-| Server   | http://repo.httc.de/artifactory/libs-release/de/httc/kola-platform/2.0.10/kola-platform-2.0.10.war |
 | App      | https://play.google.com/store/apps/details?id=de.httc.kola |
 
 Building the server platform
@@ -15,6 +14,12 @@ Building the server platform
 
 - Java 8
 - Apache Maven 3 (https://maven.apache.org/)
+
+**Prerequisites**
+
+- On the build machine, clone https://github.com/httcev/grails-plugins and install it with ```mvn install```
+
+**Building the platform**
 
 ```bash
 $ cd platform
