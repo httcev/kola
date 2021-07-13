@@ -112,7 +112,7 @@ elasticSearch {
     index.name = "kola-${Environment.current.name}"
     datastoreImpl = "hibernateDatastore"
     includeTransients = false
-    client.mode = "node"
+    client.mode = "local"
     bulkIndexOnStartup = true
 }
 
