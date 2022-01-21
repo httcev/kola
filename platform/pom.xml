@@ -10,7 +10,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<grails.version>2.5.3</grails.version>
-		<h2.version>1.4.192</h2.version>
+		<h2.version>2.1.210</h2.version>
 		<httc.plugins.version>2.0.13-SNAPSHOT</httc.plugins.version>
 	</properties>
 	<developers>
